@@ -1,0 +1,284 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8" />
+  <title>Eventra管理者平台</title>
+
+  <!-- Fonts / Icons -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/source-sans-3@5.0.12/index.css" crossorigin="anonymous" media="print" onload="this.media='all'"/>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css" crossorigin="anonymous"/>
+
+  <!-- AdminLTE & custom -->
+  <link rel="stylesheet" href="./css/adminlte.css" />
+  <link rel="stylesheet" href="./css/custom.css" />
+
+  <!-- Bootstrap 5 -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+
+  <!-- jQuery -->
+  <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+  <!-- Bootstrap Datepicker -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-datepicker@1.10.0/dist/css/bootstrap-datepicker.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap-datepicker@1.10.0/dist/js/bootstrap-datepicker.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap-datepicker@1.10.0/dist/locales/bootstrap-datepicker.zh-TW.min.js"></script>
+</head>
+
+<body class="layout-fixed sidebar-expand-lg sidebar-open bg-body-tertiary">
+  <div class="app-wrapper">
+
+    <!-- Header -->
+    <nav class="app-header navbar navbar-expand bg-body-tertiary" data-bs-theme="dark">
+      <div class="container-fluid">
+        <ul class="navbar-nav">
+          <li class="nav-item">
+            <a class="nav-link" data-lte-toggle="sidebar" href="#" role="button"><i class="bi bi-list"></i></a>
+          </li>
+        </ul>
+        <ul class="navbar-nav ms-auto">
+          <li class="user-footer">
+            <a href="/dist/examples/login.html" class="btn btn-default btn-flat float-end">Sign out</a>
+          </li>
+        </ul>
+      </div>
+    </nav>
+
+    <!-- Sidebar (已替換成完整版本) -->
+    <aside class="app-sidebar bg-body-tertiary" data-bs-theme="dark">
+      <div class="sidebar-brand">
+        <a href="./index.html" class="brand-link">
+          <img src="img/AdminLTELogo.png" alt="AdminLTE Logo" class="brand-image opacity-75 shadow" />
+          <span class="brand-text fw-light">Eventra</span>
+        </a>
+      </div>
+      <div class="sidebar-wrapper">
+        <nav class="mt-2">
+          <ul class="nav sidebar-menu flex-column" data-lte-toggle="treeview" role="navigation"
+              aria-label="Main navigation" data-accordion="false" id="navigation">
+
+            <!-- 用戶管理 -->
+            <li class="nav-item">
+              <a href="#" class="nav-link">
+                <i class="nav-icon bi bi-people-fill"></i>
+                <p>
+                  用戶管理
+                  <i class="nav-arrow bi bi-chevron-right"></i>
+                </p>
+              </a>
+              <ul class="nav nav-treeview">
+                <li class="nav-item">
+                  <a href="#" class="nav-link" style="padding-left: 56px;">
+                    <p>會員列表</p>
+                  </a>
+                </li>
+                <li class="nav-item">
+                  <a href="#" class="nav-link" style="padding-left: 56px;">
+                    <p>廠商列表</p>
+                  </a>
+                </li>
+              </ul>
+            </li>
+
+            <!-- 留言管理 -->
+            <li class="nav-item">
+              <a href="#" class="nav-link">
+                <i class="nav-icon bi bi-chat-left-text-fill"></i>
+                <p>
+                  留言管理
+                  <i class="nav-arrow bi bi-chevron-right"></i>
+                </p>
+              </a>
+              <ul class="nav nav-treeview">
+                <li class="nav-item">
+                  <a href="#" class="nav-link" style="padding-left: 56px;">
+                    <p>留言列表</p>
+                  </a>
+                </li>
+                <li class="nav-item">
+                  <a href="./UI/timeline.html" class="nav-link" style="padding-left: 56px;">
+                    <p>檢舉管理</p>
+                  </a>
+                </li>
+              </ul>
+            </li>
+
+            <!-- 申請管理 -->
+            <li class="nav-item">
+              <a href="#" class="nav-link">
+                <i class="nav-icon bi bi-pencil-square"></i>
+                <p>
+                  申請管理
+                  <i class="nav-arrow bi bi-chevron-right"></i>
+                </p>
+              </a>
+              <ul class="nav nav-treeview">
+                <li class="nav-item">
+                  <a href="#" class="nav-link" style="padding-left: 56px;">
+                    <p>廠商申請</p>
+                  </a>
+                </li>
+                <li class="nav-item">
+                  <a href="#" class="nav-link" style="padding-left: 56px;">
+                    <p>活動申請</p>
+                  </a>
+                </li>
+              </ul>
+            </li>
+
+            <!-- 訂單管理 -->
+            <li class="nav-item">
+              <a href="../generate/theme.html" class="nav-link">
+                <i class="nav-icon bi bi-circle"></i>
+                <p>訂單管理</p>
+              </a>
+            </li>
+
+            <!-- 報表管理 -->
+            <li class="nav-item">
+              <a href="../generate/theme.html" class="nav-link">
+                <i class="nav-icon bi bi-circle"></i>
+                <p>報表管理</p>
+              </a>
+            </li>
+          </ul>
+        </nav>
+      </div>
+    </aside>
+
+    <!-- Main -->
+    <main class="app-main">
+      <div class="app-content-header">
+        <div class="container-fluid">
+          <div class="container-fluid" style="margin-top:10px; margin-bottom:40px;">
+            <div class="container-fluid">
+              <h3 class="mb-0" style="font-weight:700; font-size:36px;">修改廠商</h3>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 基本資訊 -->
+      <div class="container-fluid">
+        <div class="card card-primary card-outline">
+          <div class="card-header"><div class="card-title mb-0">基本資訊</div></div>
+          <form>
+            <div class="card-body">
+              <div class="row g-3">
+                <div class="col-md-6">
+                  <label class="form-label">廠商編號</label>
+                  <input type="text" class="form-control" value="A003" readonly>
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label">註冊平台名稱</label>
+                  <input type="text" class="form-control" value="博碩Tibame">
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label">帳號</label>
+                  <input type="text" class="form-control" value="24708053">
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label">註冊日期</label>
+                  <input type="text" class="form-control" id="register_date" readonly>
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label">公司名稱</label>
+                  <input type="text" class="form-control" value="博碩股份有限公司">
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label">代表人姓名</label>
+                  <input type="text" class="form-control" value="黃信源">
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label">連絡電話</label>
+                  <input type="text" class="form-control" value="02-66152085 #102">
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label">聯絡人姓名</label>
+                  <input type="text" class="form-control" value="王小姐">
+                </div>
+                <div class="col-12">
+                  <label class="form-label">公司地址</label>
+                  <input type="text" class="form-control" value="新北市汐止區新台五路1段100號22樓">
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label">Email</label>
+                  <input type="email" class="form-control" value="def@tibame.com">
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label">外部連結</label>
+                  <input type="url" class="form-control" value="https://www.tibame.com/">
+                </div>
+                <div class="col-12">
+                  <label class="form-label">簡介</label>
+                  <textarea class="form-control" rows="6">我們是一群教育專業的團隊，深信透過網際網路可以改變一個人的生命價值...</textarea>
+                </div>
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <!-- 帳戶資訊 -->
+      <div class="container-fluid mt-4">
+        <div class="card card-primary card-outline">
+          <div class="card-header"><div class="card-title mb-0">帳戶資訊</div></div>
+          <div class="card-body row g-3">
+            <div class="col-md-4">
+              <label class="form-label">銀行行名</label>
+              <input type="text" class="form-control" value="OO銀行">
+            </div>
+            <div class="col-md-4">
+              <label class="form-label">銀行代碼</label>
+              <input type="text" class="form-control" value="000">
+            </div>
+            <div class="col-md-4">
+              <label class="form-label">銀行帳號</label>
+              <input type="text" class="form-control" value="0000000000000000">
+            </div>
+          </div>
+          <div class="card-footer text-center">
+            <button type="submit" class="btn btn-primary me-2">修改送出</button>
+            <button type="button" class="btn btn-secondary" onclick="history.back()">返回</button>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="app-footer">
+      <strong>Copyright &copy; 2025&nbsp;&nbsp;<span class="text-decoration-none">Eventra Inc.</span></strong>
+      ｜ Tibame TJA102 G1 專題製作
+    </footer>
+  </div>
+
+  <!-- Plugins -->
+  <script src="https://cdn.jsdelivr.net/npm/overlayscrollbars@2.11.0/browser/overlayscrollbars.browser.es6.min.js" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.min.js" crossorigin="anonymous"></script>
+  <script src="./js/adminlte.js"></script>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      const SELECTOR_SIDEBAR_WRAPPER = '.sidebar-wrapper';
+      const Default = {scrollbarTheme: 'os-theme-light', scrollbarAutoHide: 'leave', scrollbarClickScroll: true};
+      const sidebarWrapper = document.querySelector(SELECTOR_SIDEBAR_WRAPPER);
+      if (sidebarWrapper && OverlayScrollbarsGlobal?.OverlayScrollbars !== undefined) {
+        OverlayScrollbarsGlobal.OverlayScrollbars(sidebarWrapper, {
+          scrollbars: {theme: Default.scrollbarTheme, autoHide: Default.scrollbarAutoHide, clickScroll: Default.scrollbarClickScroll}
+        });
+      }
+
+      $('#register_date').datepicker({
+        format: "yyyy/mm/dd",
+        language: "zh-TW",
+        autoclose: true,
+        todayHighlight: true,
+        endDate: new Date()
+      });
+
+      $('#register_date').datepicker('setDate', new Date());
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,279 @@
+<!doctype html>
+<html lang="zh-Hant">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <title>Eventra管理者平台</title>
+
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/source-sans-3@5.0.12/index.css"
+    integrity="sha256-tXJfXfp6Ewt1ilPzLDtQnJV4hclT9XuaZUKyUvmyr+Q=" crossorigin="anonymous" media="print"
+    onload="this.media='all'" />
+
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css"
+    crossorigin="anonymous" />
+
+  <link rel="stylesheet" href="./css/adminlte.css" />
+
+  <link rel="stylesheet" href="./css/index.css" />
+
+  <link rel="stylesheet" href="./css/report.css" />
+
+</head>
+
+<body class="layout-fixed sidebar-expand-lg sidebar-open bg-body-tertiary">
+  <div class="app-wrapper">
+
+    <!-- 頁首 -->
+    <nav class="app-header navbar navbar-expand bg-body-tertiary" data-bs-theme="dark">
+      <div class="container-fluid">
+        <!-- 漢堡 -->
+        <ul class="navbar-nav">
+          <li class="nav-item">
+            <a class="nav-link" data-lte-toggle="sidebar" href="#" role="button">
+              <i class="bi bi-list"></i>
+            </a>
+          </li>
+        </ul>
+
+        <!-- 登出 -->
+        <ul class="navbar-nav ms-auto">
+          <li class="user-footer">
+            <a href="#" class="btn btn-default btn-flat float-end">登出</a>
+          </li>
+        </ul>
+      </div>
+    </nav>
+
+
+    <!-- 左側欄 -->
+    <aside class="app-sidebar bg-body-tertiary" data-bs-theme="dark">
+      <div class="sidebar-brand">
+        <a href="./index.html" class="brand-link">
+          <img src="img/AdminLTELogo.png" alt="AdminLTE Logo" class="brand-image opacity-75 shadow" />
+          <span class="brand-text fw-light">Eventra</span>
+        </a>
+      </div>
+
+      <div class="sidebar-wrapper">
+        <nav class="mt-2">
+          <ul class="nav sidebar-menu flex-column" data-lte-toggle="treeview" role="navigation"
+            aria-label="Main navigation" data-accordion="false" id="navigation">
+
+            <!-- 用戶管理 -->
+            <li class="nav-item">
+              <a href="#" class="nav-link">
+                <i class="nav-icon bi bi-people-fill"></i>
+                <p>
+                  用戶管理
+                  <i class="nav-arrow bi bi-chevron-right"></i>
+                </p>
+              </a>
+              <!-- 子選單 -->
+              <ul class="nav nav-treeview">
+                <li class="nav-item">
+                  <a href="member_list.html" class="nav-link" style="padding-left: 56px;">
+                    <p>會員列表</p>
+                  </a>
+                </li>
+                <li class="nav-item">
+                  <a href="partner_list.html" class="nav-link" style="padding-left: 56px;">
+                    <p>廠商列表</p>
+                  </a>
+                </li>
+              </ul>
+            </li>
+
+            <!-- 留言管理 -->
+            <li class="nav-item">
+              <a href="#" class="nav-link">
+                <i class="nav-icon bi bi-chat-left-text-fill"></i>
+                <p>
+                  留言管理
+                  <i class="nav-arrow bi bi-chevron-right"></i>
+                </p>
+              </a>
+              <ul class="nav nav-treeview">
+                <li class="nav-item">
+                  <a href="comments.html" class="nav-link" style="padding-left: 56px;">
+                    <p>留言列表</p>
+                  </a>
+                </li>
+                <li class="nav-item">
+                  <a href="report.html" class="nav-link" style="padding-left: 56px;">
+                    <p>檢舉管理</p>
+                  </a>
+                </li>
+              </ul>
+            </li>
+
+            <!-- 申請管理 -->
+            <li class="nav-item">
+              <a href="#" class="nav-link">
+                <i class="nav-icon bi bi-pencil-square"></i>
+                <p>
+                  申請管理
+                  <i class="nav-arrow bi bi-chevron-right"></i>
+                </p>
+              </a>
+              <ul class="nav nav-treeview">
+                <li class="nav-item">
+                  <a href="exhibitor_list.html" class="nav-link" style="padding-left: 56px;">
+                    <p>展商申請</p>
+                  </a>
+                </li>
+                <li class="nav-item">
+                  <a href="exhibition_list.html" class="nav-link" style="padding-left: 56px;">
+                    <p>活動申請</p>
+                  </a>
+                </li>
+              </ul>
+            </li>
+
+            <!-- 訂單管理 -->
+            <li class="nav-item">
+              <a href="#" class="nav-link">
+                <i class="nav-icon bi bi-circle"></i>
+                <p>訂單管理</p>
+              </a>
+            </li>
+
+            <!-- 報表管理 -->
+            <li class="nav-item">
+              <a href="#" class="nav-link">
+                <i class="nav-icon bi bi-circle"></i>
+                <p>報表管理</p>
+              </a>
+            </li>
+          </ul>
+        </nav>
+      </div>
+    </aside>
+
+    <!-- 主畫面 -->
+    <main class="app-main">
+      <!-- 主畫面首 -->
+      <div class="app-content-header">
+
+        <div class="container-fluid">
+          <div class="container-fluid " style="margin-top: 10px; margin-bottom: 40px;">
+            <!-- 頁面標題 -->
+            <div class="container-fluid">
+              <h3 class="mb-0" style="font-weight: 700; font-size: 36px; ">Eventra 平台管理系統</h3>
+            </div>
+          </div>
+
+          <!-- 主要區域 -->
+          <div class="container-fluid">
+            <!-- 標題 -->
+            <div class="container-fluid">
+              <h3 class="mb-0" style="margin: 0 1rem; font-size: 24px;">檢舉管理</h3>
+            </div>
+          </div>
+          <div class="container-fluid">
+            <div class="d-flex justify-content-end" style="margin-bottom: 15px;">
+            </div>
+
+            <div class="card mb-4">
+              <div class="card-header d-flex align-items-center">
+                <h3 class="card-title mb-0">檢舉一覽</h3>
+
+                <!-- 搜尋 -->
+                <div class="ms-auto d-flex align-items-center">
+                  <form class="d-flex" role="search">
+                    <input class="form-control w-auto me-2" type="search" aria-label="Search" />
+                    <button class="btn btn-outline-success btn-sm" type="submit">搜尋</button>
+                  </form>
+                </div>
+              </div>
+
+              <div class="card-body">
+                <!-- 分頁籤 -->
+                <ul class="nav nav-underline mt-3 tabs" id="tabs" role="tablist">
+                  <li class="nav-item" role="presentation"><button class="nav-link active" data-filter="all"
+                      type="button" role="tab">所有留言</button></li>
+                  <li class="nav-item" role="presentation"><button class="nav-link" data-filter="pending" type="button"
+                      role="tab">待處理</button></li>
+                  <li class="nav-item" role="presentation"><button class="nav-link" data-filter="done" type="button"
+                      role="tab">已處理</button></li>
+                </ul>
+                <table class="table table-bordered">
+                  <thead>
+                    <tr style="text-align: center;">
+                      <th>留言編號</th>
+                      <th>所屬活動</th>
+                      <th>留言者</th>
+                      <th>留言內容</th>
+                      <th>檢舉原因</th>
+                      <th>檢舉時間</th>
+                      <th>檢舉狀態</th>
+                      <th>　</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr class="align-middle">
+                      <td style="text-align: center;">1</td>
+                      <td>
+                        2025蘑菇展《少年的奇幻漂流》
+                      </td>
+                      <td>王小華</td>
+                      <td>回覆：廣告連結進…</td>
+                      <td>廣告推銷…，麻煩管理員處理</td>
+                      <td>2000/01/02 11:00</td>
+                      <td>
+                        <select name="" id="" btn class="btn btn-outline-secondary btn-sm btn-commit">
+                          <option value="1">未處理</option>
+                          <option value="2">判定正常</option>
+                          <option value="3">判定違規</option>
+                        </select>
+                        <button type="button" class="btn btn-outline-secondary btn-sm btn-commit">確認修改</button>
+                      </td>
+                      <td>
+                        <a class="btn btn-ghost btn-sm ms-1" href="#" target="_blank" rel="noopener">查看</a>
+                      </td>
+
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+
+              <!-- 分頁 -->
+              <div class="card-footer clearfix">
+                <nav aria-label="...">
+                  <ul class="pagination pagination-sm m-0 float-end">
+                    <li class="page-item disabled"><a class="page-link">上一頁</a></li>
+                    <li class="page-item active" aria-current="page">
+                      <a class="page-link" href="#">1</a>
+                    </li>
+                    <li class="page-item"><a class="page-link" href="#">2</a></li>
+                    <li class="page-item"><a class="page-link" href="#">3</a></li>
+                    <li class="page-item"><a class="page-link" href="#">下一頁</a></li>
+                  </ul>
+                </nav>
+              </div>
+            </div>
+          </div>
+
+        </div>
+    </main>
+
+    <!-- 頁尾 -->
+    <footer class="app-footer">
+      <strong>
+        Copyright &copy; 2025&nbsp;&nbsp;
+        <span class="text-decoration-none">Eventra Inc.</span>
+      </strong>
+      ｜ Tibame TJA102 G1 專題製作
+    </footer>
+  </div>
+
+
+  <script src="https://cdn.jsdelivr.net/npm/overlayscrollbars@2.11.0/browser/overlayscrollbars.browser.es6.min.js"
+    crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"
+    crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.min.js" crossorigin="anonymous"></script>
+  <script src="./js/adminlte.js"></script>
+  <script src="./js/index.js"></script>
+</body>
+
+</html>
