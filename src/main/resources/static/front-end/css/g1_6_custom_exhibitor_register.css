@@ -1,0 +1,10 @@
+@charset "UTF-8";
+/* 展商註冊頁 0906 新增  */
+
+/* 背景 */
+section#hero.login {
+  background: url("../img/group1_img/富士山.jpg") no-repeat center center fixed;
+  background-size: cover;
+  min-height: 100vh;  /* 至少一個螢幕高，內容多會自動撐開 */
+  height: auto;
+}
