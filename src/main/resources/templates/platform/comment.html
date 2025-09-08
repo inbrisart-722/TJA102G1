@@ -1,0 +1,481 @@
+<!doctype html>
+<html lang="zh-Hant">
+<!--begin::Head-->
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <title>Eventra 管理者平台 — 留言列表</title>
+
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/source-sans-3@5.0.12/index.css"
+    integrity="sha256-tXJfXfp6Ewt1ilPzLDtQnJV4hclT9XuaZUKyUvmyr+Q=" crossorigin="anonymous" media="print"
+    onload="this.media='all'" />
+
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css"
+    crossorigin="anonymous" />
+
+  <link rel="stylesheet" href="./css/adminlte.css" />
+
+  <link rel="stylesheet" href="./css/06_custom.css">
+
+  <style>
+    body {
+      font-family: "Source Sans 3", system-ui, -apple-system, "Segoe UI", Roboto, "Noto Sans TC", "Microsoft JhengHei", sans-serif
+    }
+
+    .logo-circle {
+      width: 96px;
+      height: 96px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(0, 0, 0, .06)
+    }
+
+    .tabs .nav-link {
+      color: inherit
+    }
+
+    .tabs .nav-link.active {
+      font-weight: 700;
+      border-bottom: 2px solid #7c3aed
+    }
+
+    .violet-outline {
+      border: 2px solid #7c3aed;
+      border-radius: .5rem;
+      position: relative
+    }
+
+    .table thead th {
+      white-space: nowrap
+    }
+
+    .cell-1 {
+      max-width: 110px
+    }
+
+    .cell-2 {
+      max-width: 280px
+    }
+
+    .cell-3 {
+      max-width: 160px
+    }
+
+    .cell-ellipsis {
+      display: -webkit-box;
+      -webkit-box-orient: vertical;
+      /* -webkit-line-clamp: 1; */
+      overflow: hidden;
+      text-overflow: ellipsis
+    }
+
+    .btn-ghost {
+      background: #f3f4f6;
+      border: 1px solid #d1d5db;
+      color: #111827
+    }
+
+    .btn-ghost:hover {
+      background: #e5e7eb
+    }
+
+    .skeleton-bar {
+      height: 32px;
+      background: #e5e5e5;
+      border-radius: 6px
+    }
+
+    .search-wrap {
+      position: relative;
+      width: min(360px, 100%)
+    }
+
+    .search-wrap input {
+      padding-right: 40px
+    }
+
+    .search-wrap .icon {
+      position: absolute;
+      right: 10px;
+      top: 50%;
+      transform: translateY(-50%);
+      pointer-events: none
+    }
+
+    .hint {
+      position: absolute;
+      right: 10px;
+      bottom: 10px;
+      color: var(--bs-secondary-color);
+      font-size: .875rem
+    }
+
+    @media (max-width:576px) {
+      .cell-2 {
+        max-width: 160px
+      }
+
+      .cell-3 {
+        max-width: 120px
+      }
+    }
+  </style>
+</head>
+
+
+<body class="layout-fixed sidebar-expand-lg sidebar-open bg-body-tertiary">
+  <div class="app-wrapper">
+
+    <!-- 頁首 -->
+    <nav class="app-header navbar navbar-expand bg-body-tertiary" data-bs-theme="dark">
+      <div class="container-fluid">
+        <!-- 漢堡 -->
+        <ul class="navbar-nav">
+          <li class="nav-item">
+            <a class="nav-link" data-lte-toggle="sidebar" href="#" role="button">
+              <i class="bi bi-list"></i>
+            </a>
+          </li>
+        </ul>
+
+        <!-- 登出 -->
+        <ul class="navbar-nav ms-auto">
+          <li class="user-footer">
+            <a href="#" class="btn btn-default btn-flat float-end">登出</a>
+          </li>
+        </ul>
+      </div>
+    </nav>
+
+
+    <!-- 左側欄 -->
+    <aside class="app-sidebar bg-body-tertiary" data-bs-theme="dark">
+      <div class="sidebar-brand">
+        <a href="./index.html" class="brand-link">
+          <img src="img/AdminLTELogo.png" alt="AdminLTE Logo" class="brand-image opacity-75 shadow" />
+          <span class="brand-text fw-light">Eventra</span>
+        </a>
+      </div>
+
+      <div class="sidebar-wrapper">
+        <nav class="mt-2">
+          <ul class="nav sidebar-menu flex-column" data-lte-toggle="treeview" role="navigation"
+            aria-label="Main navigation" data-accordion="false" id="navigation">
+
+            <!-- 用戶管理 -->
+            <li class="nav-item">
+              <a href="#" class="nav-link">
+                <i class="nav-icon bi bi-people-fill"></i>
+                <p>
+                  用戶管理
+                  <i class="nav-arrow bi bi-chevron-right"></i>
+                </p>
+              </a>
+              <!-- 子選單 -->
+              <ul class="nav nav-treeview">
+                <li class="nav-item">
+                  <a href="member_list.html" class="nav-link" style="padding-left: 56px;">
+                    <p>會員列表</p>
+                  </a>
+                </li>
+                <li class="nav-item">
+                  <a href="partner_list.html" class="nav-link" style="padding-left: 56px;">
+                    <p>廠商列表</p>
+                  </a>
+                </li>
+              </ul>
+            </li>
+
+            <!-- 留言管理 -->
+            <li class="nav-item">
+              <a href="#" class="nav-link">
+                <i class="nav-icon bi bi-chat-left-text-fill"></i>
+                <p>
+                  留言管理
+                  <i class="nav-arrow bi bi-chevron-right"></i>
+                </p>
+              </a>
+              <ul class="nav nav-treeview">
+                <li class="nav-item">
+                  <a href="#" class="nav-link" style="padding-left: 56px;">
+                    <p>留言列表</p>
+                  </a>
+                </li>
+                <li class="nav-item">
+                  <a href="./UI/timeline.html" class="nav-link" style="padding-left: 56px;">
+                    <p>檢舉管理</p>
+                  </a>
+                </li>
+              </ul>
+            </li>
+
+            <!-- 申請管理 -->
+            <li class="nav-item">
+              <a href="#" class="nav-link">
+                <i class="nav-icon bi bi-pencil-square"></i>
+                <p>
+                  申請管理
+                  <i class="nav-arrow bi bi-chevron-right"></i>
+                </p>
+              </a>
+              <ul class="nav nav-treeview">
+                <li class="nav-item">
+                  <a href="#" class="nav-link" style="padding-left: 56px;">
+                    <p>廠商申請</p>
+                  </a>
+                </li>
+                <li class="nav-item">
+                  <a href="#" class="nav-link" style="padding-left: 56px;">
+                    <p>活動申請</p>
+                  </a>
+                </li>
+              </ul>
+            </li>
+
+            <!-- 訂單管理 -->
+            <li class="nav-item">
+              <a href="../generate/theme.html" class="nav-link">
+                <i class="nav-icon bi bi-circle"></i>
+                <p>訂單管理</p>
+              </a>
+            </li>
+
+            <!-- 報表管理 -->
+            <li class="nav-item">
+              <a href="../generate/theme.html" class="nav-link">
+                <i class="nav-icon bi bi-circle"></i>
+                <p>報表管理</p>
+              </a>
+            </li>
+          </ul>
+        </nav>
+      </div>
+    </aside>
+
+    <!-- Main -->
+    <main class="app-main">
+      <div class="app-content-header">
+        <div class="container-fluid d-flex align-items-center justify-content-between flex-wrap gap-3">
+          <h1 class="mb-0" style="font-weight:700;font-size:32px;">留言列表</h1>
+          <!-- 搜尋 -->
+          <div class="search-wrap">
+            <label for="search" class="visually-hidden">搜尋</label>
+            <input id="search" class="form-control" type="search" placeholder="搜尋…" />
+            <i class="bi bi-search icon"></i>
+          </div>
+        </div>
+        <!-- 篩選分頁籤 -->
+        <ul class="nav nav-underline mt-3 tabs" id="tabs" role="tablist">
+          <li class="nav-item" role="presentation"><button class="nav-link active" data-filter="all" type="button"
+              role="tab">所有留言</button></li>
+          <li class="nav-item" role="presentation"><button class="nav-link" data-filter="visible" type="button"
+              role="tab">已顯示</button></li>
+          <li class="nav-item" role="presentation"><button class="nav-link" data-filter="hidden" type="button"
+              role="tab">已隱藏</button></li>
+        </ul>
+      </div>
+
+      <div class="app-content">
+        <div class="container-fluid">
+          <div class="p-3 violet-outline">
+            <div class="table-responsive">
+              <table class="table align-middle mb-0">
+                <thead>
+                  <tr>
+                    <th>留言編號</th>
+                    <th>所屬活動</th>
+                    <th>留言者</th>
+                    <th>留言內容</th>
+                    <th>評價</th>
+                    <th>讚數</th>
+                    <th>倒讚數</th>
+                    <th>留言時間</th>
+                    <th>留言狀態</th>
+                    <th>多加1</th>
+                  </tr>
+                </thead>
+                <tbody id="tbody"><!-- JS 注入 --></tbody>
+              </table>
+            </div>
+
+            <!-- 分頁 -->
+            <nav class="mt-3 d-flex justify-content-center" aria-label="列表分頁">
+              <ul class="pagination pagination-sm mb-0" id="pager"><!-- JS 注入 --></ul>
+            </nav>
+
+            <!-- 註記 -->
+            <div class="hint d-none d-md-block">導到前台留言處</div>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="app-footer">
+      <strong>Copyright &copy; 2025&nbsp;&nbsp;<span class="text-decoration-none">Eventra Inc.</span></strong>
+      ｜ Tibame TJA102 G1 專題製作
+    </footer>
+  </div>
+
+  <!-- Scripts -->
+  <script src="https://cdn.jsdelivr.net/npm/overlaysscrollbars@2.11.0/browser/overlaysscrollbars.browser.es6.min.js"
+    crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"
+    crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.min.js" crossorigin="anonymous"></script>
+  <script src="./js/adminlte.js"></script>
+  <script>
+    // ===== 側欄捲軸 =====
+    document.addEventListener('DOMContentLoaded', () => {
+      const sw = document.querySelector('.sidebar-wrapper');
+      if (sw && OverlayScrollbarsGlobal?.OverlayScrollbars) {
+        OverlayScrollbarsGlobal.OverlayScrollbars(sw, { scrollbars: { autoHide: 'leave' } });
+      }
+    });
+
+    // ===== Demo 資料（與設計稿一致的 3 筆）=====
+    const seed = [
+      { id: 'C00001', event: '2025蘑菇展《少年的奇幻漂流》', user: '王小明', content: '這個展覽很棒！', rating: 5, likes: 18, dislikes: 3, time: '2000/01/01 10:50', status: 'visible', link: '/front/event/1#comment=C00001' },
+      { id: 'C00002', event: '2025蘑菇展《少年的奇幻漂流》', user: '王小華', content: '回覆：廣告連結連結…', rating: 0, likes: 0, dislikes: 1, time: '2000/01/01 10:51', status: 'visible', link: '/front/event/1#comment=C00002' },
+      { id: 'C00003', event: '2025-台灣燈會南投縣燈會公…', user: '林小美', content: '廣告連結請點擊…', rating: 1, likes: 1, dislikes: 3, time: '2000/01/02 11:15', status: 'hidden', link: '/front/event/2#comment=C00003' },
+    ];
+
+    // ===== 狀態 =====
+    const state = { filter: 'all', query: '', page: 1, pageSize: 10, maxPage: 5, data: seed.map(x => ({ ...x, _dirty: false, _pending: x.status })) };
+
+    // ===== DOM =====
+    const $tbody = document.getElementById('tbody');
+    const $pager = document.getElementById('pager');
+    const $tabs = document.getElementById('tabs');
+    const $search = document.getElementById('search');
+
+    // ===== 工具 =====
+    const esc = s => String(s || '').replace(/[&<>"']/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[m]));
+    const norm = s => (s || '').toLowerCase();
+    function getFiltered() {
+      let list = state.data.slice();
+      if (state.filter !== 'all') list = list.filter(x => (state.filter === 'visible' ? x.status === 'visible' : x.status === 'hidden'));
+      if (state.query) {
+        const q = norm(state.query);
+        list = list.filter(x => [x.id, x.event, x.user, x.content, x.time].some(v => norm(v).includes(q)));
+      }
+      return list;
+    }
+
+    // ===== 繪製 =====
+    function render() {
+      renderTable();
+      renderPager();
+    }
+    function renderTable() {
+      const rows = (state.page === 1) ? getFiltered() : [];
+      const html = rows.map((r, idx) => {
+        const selId = `sel-${state.page}-${idx}`;
+        const pending = r._pending ?? r.status;
+        const changed = pending !== r.status;
+        return `
+        <tr>
+          <td>${r.id}</td>
+          <td title="${esc(r.event)}">${esc(r.event)}</td>
+          <td>${esc(r.user)}</td>
+          <td title="${esc(r.content)}">${esc(r.content)}</td>
+          <td>${r.rating}</td>
+          <td>${r.likes}</td>
+          <td>${r.dislikes}</td>
+          <td>${r.time}</td>
+          <td>
+            <select class="form-select form-select-sm" id="${selId}" data-id="${r.id}">
+              <option value="visible" ${pending === 'visible' ? 'selected' : ''}>正常</option>
+              <option value="hidden"  ${pending === 'hidden' ? 'selected' : ''}>已隱藏</option>
+            </select>
+          </td>
+          <td class="text-end">
+            <button type="button" class="btn btn-outline-secondary btn-sm btn-commit" data-id="${r.id}" ${changed ? '' : 'disabled'}>確認修改</button>
+            <a class="btn btn-ghost btn-sm ms-1" href="${esc(r.link)}" target="_blank" rel="noopener">查看</a>
+          </td>
+        </tr>
+      `;
+      }).join('');
+
+      // 補骨架列（讓列表高度與設計稿一致）
+      const pad = Math.max(0, state.pageSize - rows.length);
+      const pads = Array.from({ length: pad }).map(() => `<tr><td colspan="10"><div class="skeleton-bar w-100"></div></td></tr>`).join('');
+
+      $tbody.innerHTML = html + pads;
+    }
+
+    function renderPager() {
+      const items = [];
+      items.push(`<li class="page-item ${state.page === 1 ? 'disabled' : ''}"><a class="page-link" href="#" data-page="prev" aria-label="上一頁">«</a></li>`);
+      for (let p = 1; p <= state.maxPage; p++) {
+        items.push(`<li class="page-item ${p === state.page ? 'active' : ''}"><a class="page-link" href="#" data-page="${p}">${p}</a></li>`);
+      }
+      items.push(`<li class="page-item ${state.page === state.maxPage ? 'disabled' : ''}"><a class="page-link" href="#" data-page="next" aria-label="下一頁">»</a></li>`);
+      $pager.innerHTML = items.join('');
+    }
+
+    // ===== 事件 =====
+    // 篩選籤
+    $tabs.addEventListener('click', e => {
+      const btn = e.target.closest('[data-filter]');
+      if (!btn) return;
+      $tabs.querySelectorAll('.nav-link').forEach(x => x.classList.remove('active'));
+      btn.classList.add('active');
+      state.filter = btn.getAttribute('data-filter');
+      state.page = 1;
+      render();
+    });
+
+    // 搜尋
+    $search.addEventListener('input', () => {
+      state.query = $search.value.trim();
+      state.page = 1;
+      render();
+    });
+
+    // 分頁
+    $pager.addEventListener('click', e => {
+      const a = e.target.closest('a[data-page]');
+      if (!a) return;
+      e.preventDefault();
+      const tag = a.getAttribute('data-page');
+      if (tag === 'prev' && state.page > 1) state.page--;
+      else if (tag === 'next' && state.page < state.maxPage) state.page++;
+      else if (!isNaN(Number(tag))) state.page = Number(tag);
+      render();
+    });
+
+    // 事件委派：狀態選單與確認修改
+    $tbody.addEventListener('change', e => {
+      const sel = e.target.closest('select.form-select');
+      if (!sel) return;
+      const id = sel.getAttribute('data-id');
+      const row = state.data.find(x => x.id === id);
+      if (!row) return;
+      row._pending = sel.value; // 暫存
+      // 啟用當列的「確認修改」
+      const btn = sel.closest('tr').querySelector('.btn-commit');
+      if (btn) btn.disabled = (row._pending === row.status);
+    });
+
+    $tbody.addEventListener('click', e => {
+      const btn = e.target.closest('.btn-commit');
+      if (!btn) return;
+      const id = btn.getAttribute('data-id');
+      const row = state.data.find(x => x.id === id);
+      if (!row) return;
+      // 這裡可換成 PATCH /api/comments/:id
+      row.status = row._pending;
+      btn.disabled = true;
+      // 簡單提示（正式環境可換 Toast）
+      alert(`已更新 ${id} 狀態為：${row.status === 'visible' ? '正常' : '已隱藏'}`);
+    });
+
+    // 初次渲染
+    render();
+  </script>
+</body>
+
+</html>

@@ -1,0 +1,19 @@
+    /* 卡片專用 */
+    .info-box-number {
+      font-size: 48px;
+      text-align: center;
+    }
+
+    .info-box .info-box-number {
+      margin: 0;
+    }
+
+    .info-box-content {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      /* 水平置中 */
+      justify-content: center;
+      /* 垂直置中（可選） */
+      text-align: center;
+    }
