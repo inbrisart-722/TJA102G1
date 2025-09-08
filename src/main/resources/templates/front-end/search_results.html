@@ -1,0 +1,1489 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Eventra</title>
+
+    <!-- Favicons-->
+    <link rel="shortcut icon" href="img/favicon.ico" type="image/x-icon" />
+    <link
+      rel="apple-touch-icon"
+      type="image/x-icon"
+      href="img/apple-touch-icon-57x57-precomposed.png"
+    />
+    <link
+      rel="apple-touch-icon"
+      type="image/x-icon"
+      sizes="72x72"
+      href="img/apple-touch-icon-72x72-precomposed.png"
+    />
+    <link
+      rel="apple-touch-icon"
+      type="image/x-icon"
+      sizes="114x114"
+      href="img/apple-touch-icon-114x114-precomposed.png"
+    />
+    <link
+      rel="apple-touch-icon"
+      type="image/x-icon"
+      sizes="144x144"
+      href="img/apple-touch-icon-144x144-precomposed.png"
+    />
+
+    <!-- GOOGLE WEB FONT -->
+    <link
+      href="https://fonts.googleapis.com/css2?family=Gochi+Hand&family=Montserrat:wght@300;400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+
+    <!-- COMMON CSS -->
+    <link href="css/bootstrap.min.css" rel="stylesheet" />
+    <link href="css/style.css" rel="stylesheet" />
+    <link href="css/vendors.css" rel="stylesheet" />
+
+    <!-- CUSTOM CSS -->
+    <link href="css/g1_6_custom.css" rel="stylesheet" />
+    <link href="css/g1_10_custom_common.css" rel="stylesheet" />
+  </head>
+
+  <body>
+    <div id="preloader">
+      <div class="sk-spinner sk-spinner-wave">
+        <div class="sk-rect1"></div>
+        <div class="sk-rect2"></div>
+        <div class="sk-rect3"></div>
+        <div class="sk-rect4"></div>
+        <div class="sk-rect5"></div>
+      </div>
+    </div>
+
+    <div class="layer"></div>
+
+    <!-- Header================================================== -->
+    <header>
+      <div class="container">
+        <div class="row" id="header-row">
+          <div class="col-md-2">
+            <div id="logo">
+              <a href="index.html"
+                ><img
+                  src="img/logo.png"
+                  width="160"
+                  height="34"
+                  alt="City tours"
+                  class="logo_normal"
+              /></a>
+              <a href="index.html"
+                ><img
+                  src="img/logo_sticky.png"
+                  width="160"
+                  height="34"
+                  alt="City tours"
+                  class="logo_sticky"
+              /></a>
+            </div>
+          </div>
+          <nav class="col-md-9">
+            <a
+              class="cmn-toggle-switch cmn-toggle-switch__htx open_close"
+              href="javascript:void(0);"
+              ><span>Menu mobile</span></a
+            >
+            <div class="main-menu">
+              <div id="header_menu">
+                <img
+                  src="img/logo_sticky.png"
+                  width="160"
+                  height="34"
+                  alt="City tours"
+                />
+              </div>
+              <a href="#" class="open_close" id="close_in"
+                ><i class="icon_set_1_icon-77"></i
+              ></a>
+              <ul>
+                <li class="submenu">
+                  <a href="/html/index.html" class="show-submenu">首頁</a>
+                </li>
+                <li class="submenu">
+                  <a href="/html/page_with_map.html" class="show-submenu"
+                    >地圖探索</a
+                  >
+                </li>
+                <li class="submenu">
+                  <a href="/html/all_tours_list.html" class="show-submenu"
+                    >推薦展覽</a
+                  >
+                </li>
+              </ul>
+            </div>
+            <!-- End main-menu -->
+            <!-- 搜尋專用 -->
+            <div id="nav_icon_1">
+              <a href="search_results.html" class="search-overlay-menu-btn"
+                ><i class="icon_search active"></i
+              ></a>
+              <input
+                class="searchbar"
+                type="text"
+                id="nav_search"
+                placeholder=" 搜尋展覽或主辦名稱"
+              />
+            </div>
+            <!-- 搜尋專用 end -->
+            <ul id="top_tools">
+              <li id="nav_icon_2">
+                <a href="/html/cart.html" class="cart_bt"
+                  ><i class="icon-cart"></i><strong>29:52</strong></a
+                >
+              </li>
+              <li id="nav_icon_3">
+                <a href="#"><i class="icon-ticket-2"></i></a>
+              </li>
+              <li id="nav_icon_4">
+                <!-- 不知怎麼引入那個登入彈窗 -->
+                <a href="#"><i class="icon-user"></i></a>
+              </li>
+            </ul>
+          </nav>
+        </div>
+      </div>
+      <!-- container -->
+    </header>
+    <!-- End Header -->
+
+    <!-- 1400*470px 背景圖區 -->
+    <section
+      class="parallax-window"
+      data-parallax="scroll"
+      data-image-src="img/0_exhibition/banner.jpg"
+      data-natural-width="1400"
+      data-natural-height="470"
+    >
+      <div
+        class="parallax-content-1 opacity-mask"
+        data-opacity-mask="rgba(0, 0, 0, 0.6)"
+      >
+        <div class="animated fadeInDown" style="height: 60px"></div>
+      </div>
+    </section>
+
+    <!-- 主畫面 -->
+    <main>
+      <div class="container margin_60">
+        <div class="row">
+          <div class="col-lg-9">
+            <!-- filtersBar -->
+            <section id="filtersBar" class="card border-0 shadow-sm mb-4">
+              <div class="card-body">
+                <form
+                  id="filtersForm"
+                  class="row gy-3"
+                  role="search"
+                  aria-label="展演搜尋與篩選"
+                >
+                  <!-- ① 區域 + 日期：同一行（RWD：md 同行，sm 直排） -->
+                  <div class="col-12">
+                    <div class="row align-items-start g-3">
+                      <!-- 區域 -->
+                      <div class="col-12 col-md-8">
+                        <label class="form-label mb-1">區域篩選</label>
+                        <div id="regionGroup" class="d-flex flex-wrap gap-3">
+                          <label class="form-check m-0"
+                            ><input
+                              class="form-check-input"
+                              type="checkbox"
+                              value="台北市"
+                            /><span class="form-check-label ms-1"
+                              >台北市</span
+                            ></label
+                          >
+                          <label class="form-check m-0"
+                            ><input
+                              class="form-check-input"
+                              type="checkbox"
+                              value="新北市"
+                            /><span class="form-check-label ms-1"
+                              >新北市</span
+                            ></label
+                          >
+                          <label class="form-check m-0"
+                            ><input
+                              class="form-check-input"
+                              type="checkbox"
+                              value="桃園市"
+                            /><span class="form-check-label ms-1"
+                              >桃園市</span
+                            ></label
+                          >
+                          <label class="form-check m-0"
+                            ><input
+                              class="form-check-input"
+                              type="checkbox"
+                              value="台中市"
+                            /><span class="form-check-label ms-1"
+                              >台中市</span
+                            ></label
+                          >
+                          <label class="form-check m-0"
+                            ><input
+                              class="form-check-input"
+                              type="checkbox"
+                              value="台南市"
+                            /><span class="form-check-label ms-1"
+                              >台南市</span
+                            ></label
+                          >
+                          <label class="form-check m-0"
+                            ><input
+                              class="form-check-input"
+                              type="checkbox"
+                              value="高雄市"
+                            /><span class="form-check-label ms-1"
+                              >高雄市</span
+                            ></label
+                          >
+                        </div>
+                      </div>
+
+                      <!-- 日期（fb- 前綴） -->
+                      <div class="col-12 col-md-4">
+                        <label class="form-label mb-1">日期篩選</label>
+                        <div
+                          id="fb-dateRangeBox"
+                          class="position-relative text-md-end"
+                        >
+                          <input
+                            id="fb-dateRangeInput"
+                            class="form-control"
+                            type="text"
+                            placeholder="選擇日期區間"
+                            readonly
+                          />
+                          <!-- 月曆彈窗 -->
+                          <div
+                            id="fb-datePopup"
+                            class="date-popup shadow"
+                            role="dialog"
+                            aria-modal="true"
+                            style="display: none"
+                          >
+                            <div
+                              class="date-header d-flex justify-content-between align-items-center mb-2"
+                            >
+                              <button
+                                id="fb-prevMonth"
+                                class="btn btn-sm btn-light"
+                                type="button"
+                                aria-label="上一月"
+                              >
+                                ‹
+                              </button>
+                              <strong id="fb-currentMonth" class="mx-2"
+                                >YYYY/MM</strong
+                              >
+                              <button
+                                id="fb-nextMonth"
+                                class="btn btn-sm btn-light"
+                                type="button"
+                                aria-label="下一月"
+                              >
+                                ›
+                              </button>
+                            </div>
+                            <table class="table table-sm mb-2 calendar-table">
+                              <thead>
+                                <tr>
+                                  <th class="text-center">日</th>
+                                  <th class="text-center">一</th>
+                                  <th class="text-center">二</th>
+                                  <th class="text-center">三</th>
+                                  <th class="text-center">四</th>
+                                  <th class="text-center">五</th>
+                                  <th class="text-center">六</th>
+                                </tr>
+                              </thead>
+                              <tbody id="fb-calendarBody"></tbody>
+                            </table>
+                            <div class="d-flex justify-content-between">
+                              <button
+                                id="fb-dateClear"
+                                class="btn btn-outline-secondary btn-sm"
+                                type="button"
+                              >
+                                清除
+                              </button>
+                              <button
+                                id="fb-dateConfirm"
+                                class="btn btn-primary btn-sm"
+                                type="button"
+                              >
+                                確認
+                              </button>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- ② 關鍵字 -->
+                  <div class="col-12">
+                    <label for="keywordInput" class="form-label mb-1"
+                      >搜尋關鍵字</label
+                    >
+                    <div class="input-group">
+                      <input
+                        id="keywordInput"
+                        type="search"
+                        class="form-control"
+                        placeholder="請輸入關鍵字"
+                        aria-label="輸入關鍵字（標題、地點）"
+                      />
+                      <button
+                        id="searchBtn"
+                        class="btn btn-primary"
+                        type="submit"
+                        aria-label="送出搜尋"
+                      >
+                        搜尋
+                      </button>
+                    </div>
+                  </div>
+
+                  <!-- ③ 回顯 -->
+                  <div class="col-12">
+                    <div
+                      id="fbSearchEcho"
+                      class="mt-2"
+                      style="display: none"
+                      aria-live="polite"
+                    >
+                      <small class="d-block"
+                        >搜尋關鍵字：<span id="fbKeywordText"
+                          >（尚未輸入）</span
+                        ></small
+                      >
+                      <small class="d-block"
+                        >區域篩選：<span id="fbRegionText"
+                          >（未選擇）</span
+                        ></small
+                      >
+                      <small class="d-block"
+                        >日期篩選：<span id="fbDateText"
+                          >（未選擇）</span
+                        ></small
+                      >
+                    </div>
+                  </div>
+
+                  <!-- ④ 排序 -->
+                  <div class="col-12">
+                    <nav class="sort-tabs" aria-label="排序條件">
+                      <a
+                        class="sort-tab is-active"
+                        href="#"
+                        data-sort="popularity"
+                        aria-current="true"
+                        >熱門度</a
+                      >
+                      <a class="sort-tab" href="#" data-sort="rating">評價</a>
+                      <a class="sort-tab" href="#" data-sort="newest"
+                        >最新上架</a
+                      >
+                      <a class="sort-tab" href="#" data-sort="nearest"
+                        >離我最近</a
+                      >
+                    </nav>
+                  </div>
+                </form>
+              </div>
+            </section>
+
+            <!-- 展覽卡片(長) 展6個 -->
+            <!-- 1 -->
+            <div id="cardsContainer">
+              <div
+                class="strip_all_tour_list wow fadeIn"
+                data-created="2025-07-15"
+                data-views="150"
+                data-popularity="1250"
+                data-lat="25.0523"
+                data-lng="121.5436"
+                data-wow-delay="0.1s"
+              >
+                <a href="single_tour.html">
+                  <div class="row">
+                    <div class="col-lg-4 col-md-4 position-relative">
+                      <div class="img_list">
+                        <img
+                          src="img/0_exhibition/ChatGPT_exhibition_1.png"
+                          alt="Image"
+                        />
+                      </div>
+                    </div>
+                    <div class="col-lg-6 col-md-6">
+                      <div class="tour_list_desc">
+                        <div>
+                          <h3>感官解放：藝術的另一種語言</h3>
+                          <p>
+                            <span class="start_time">2025/08/01</span> ~
+                            <span class="end_time">2025/08/01</span>
+                          </p>
+                          <p>
+                            <span class="location"
+                              >台北市中山區南京東路三段219號4樓</span
+                            >
+                          </p>
+                          <p>
+                            <span class="rating">
+                              <i class="icon-star voted"></i>
+                              <i class="icon-star voted"></i>
+                              <i class="icon-star-half-alt voted"></i>
+                              <i class="icon-star-empty"></i>
+                              <i class="icon-star-empty"></i> </span
+                            >(22)
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="col-lg-2 col-md-2">
+                      <div class="price_list">
+                        <div><span class="currency">$</span>2,000 - 2,500</div>
+                      </div>
+                    </div>
+                  </div>
+                </a>
+              </div>
+            </div>
+
+            <!-- 2 -->
+            <div
+              class="strip_all_tour_list wow fadeIn"
+              data-created="2025-06-01"
+              data-views="150"
+              data-popularity="980"
+              data-lat="25.0123"
+              data-lng="121.4655"
+            >
+              <a href="single_tour.html">
+                <div class="row">
+                  <div class="col-lg-4 col-md-4 position-relative">
+                    <div class="img_list">
+                      <img
+                        src="img/0_exhibition/ChatGPT_exhibition_2.png"
+                        alt="Image"
+                      />
+                    </div>
+                  </div>
+                  <div class="col-lg-6 col-md-6">
+                    <div class="tour_list_desc">
+                      <div>
+                        <h3>奇幻世界：當想像力化為藝術的形狀與色彩</h3>
+                        <p>
+                          <span class="start_time">2025/07/01</span> ~
+                          <span class="end_time">2025/07/31</span>
+                        </p>
+                        <p>
+                          <span class="location"
+                            >新北市板橋區文化路一段100號</span
+                          >
+                        </p>
+                        <p>
+                          <span class="rating">
+                            <i class="icon-star voted"></i>
+                            <i class="icon-star voted"></i>
+                            <i class="icon-star voted"></i>
+                            <i class="icon-star-empty"></i>
+                            <i class="icon-star-empty"></i> </span
+                          >(22)
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="col-lg-2 col-md-2">
+                    <div class="price_list">
+                      <div><span class="currency">$</span>2,000 - 2,500</div>
+                    </div>
+                  </div>
+                </div>
+              </a>
+            </div>
+
+            <!-- 3 -->
+            <div
+              class="strip_all_tour_list wow fadeIn"
+              data-created="2025-01-01"
+              data-views="1000"
+              data-popularity="3560"
+              data-lat="24.1477"
+              data-lng="120.6736"
+            >
+              <a href="single_tour.html">
+                <div class="row">
+                  <div class="col-lg-4 col-md-4 position-relative">
+                    <div class="img_list">
+                      <img
+                        src="img/0_exhibition/ChatGPT_exhibition_3.png"
+                        alt="Image"
+                      />
+                    </div>
+                  </div>
+                  <div class="col-lg-6 col-md-6">
+                    <div class="tour_list_desc">
+                      <div>
+                        <h3>都市敘事：以鏡頭書寫在城市縫隙間的故事與記憶</h3>
+                        <p>
+                          <span class="start_time">2025/01/05</span> ~
+                          <span class="end_time">2025/11/01</span>
+                        </p>
+                        <p>
+                          <span class="location">台中市西區公益路200號</span>
+                        </p>
+                        <p>
+                          <span class="rating">
+                            <i class="icon-star voted"></i>
+                            <i class="icon-star voted"></i>
+                            <i class="icon-star voted"></i>
+                            <i class="icon-star-half-alt voted"></i>
+                            <i class="icon-star-empty"></i> </span
+                          >(22)
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="col-lg-2 col-md-2">
+                    <div class="price_list">
+                      <div><span class="currency">$</span>2,000 - 2,500</div>
+                    </div>
+                  </div>
+                </div>
+              </a>
+            </div>
+
+            <!-- 4 -->
+            <div
+              class="strip_all_tour_list wow fadeIn"
+              data-created="2024-12-15"
+              data-views="200"
+              data-popularity="2100"
+              data-lat="25.0350"
+              data-lng="121.5645"
+            >
+              <a href="single_tour.html">
+                <div class="row">
+                  <div class="col-lg-4 col-md-4 position-relative">
+                    <div class="img_list">
+                      <img
+                        src="img/0_exhibition/ChatGPT_exhibition_1.png"
+                        alt="Image"
+                      />
+                    </div>
+                  </div>
+                  <div class="col-lg-6 col-md-6">
+                    <div class="tour_list_desc">
+                      <div>
+                        <h3>感官解放：藝術的另一種語言（年度特展）</h3>
+                        <p>
+                          <span class="start_time">2025/01/01</span> ~
+                          <span class="end_time">2025/12/31</span>
+                        </p>
+                        <p>
+                          <span class="location">桃園市桃園區中正路50號</span>
+                        </p>
+                        <p>
+                          <span class="rating">
+                            <i class="icon-star voted"></i>
+                            <i class="icon-star voted"></i>
+                            <i class="icon-star voted"></i>
+                            <i class="icon-star voted"></i>
+                            <i class="icon-star-half-alt voted"></i> </span
+                          >(22)
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="col-lg-2 col-md-2">
+                    <div class="price_list">
+                      <div><span class="currency">$</span>2,000 - 2,500</div>
+                    </div>
+                  </div>
+                </div>
+              </a>
+            </div>
+
+            <!-- 5 -->
+            <div
+              class="strip_all_tour_list wow fadeIn"
+              data-created="2025-08-18"
+              data-views="50"
+              data-popularity="760"
+              data-lat="25.0478"
+              data-lng="121.5319"
+            >
+              <a href="single_tour.html">
+                <div class="row">
+                  <div class="col-lg-4 col-md-4 position-relative">
+                    <div class="img_list">
+                      <img
+                        src="img/0_exhibition/ChatGPT_exhibition_2.png"
+                        alt="Image"
+                      />
+                    </div>
+                  </div>
+                  <div class="col-lg-6 col-md-6">
+                    <div class="tour_list_desc">
+                      <div>
+                        <h3>
+                          奇幻世界：當想像力化為藝術的形狀與色彩（九月檔）
+                        </h3>
+                        <p>
+                          <span class="start_time">2025/09/01</span> ~
+                          <span class="end_time">2025/09/30</span>
+                        </p>
+                        <p>
+                          <span class="location"
+                            >台北市大安區敦化南路一段200號</span
+                          >
+                        </p>
+                        <p>
+                          <span class="rating">
+                            <i class="icon-star voted"></i>
+                            <i class="icon-star voted"></i>
+                            <i class="icon-star voted"></i>
+                            <i class="icon-star-empty"></i>
+                            <i class="icon-star-empty"></i> </span
+                          >(22)
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="col-lg-2 col-md-2">
+                    <div class="price_list">
+                      <div><span class="currency">$</span>2,000 - 2,500</div>
+                    </div>
+                  </div>
+                </div>
+              </a>
+            </div>
+
+            <!-- 6 -->
+            <div
+              class="strip_all_tour_list wow fadeIn"
+              data-created="2025-08-01"
+              data-views="350"
+              data-popularity="300"
+              data-lat="22.6273"
+              data-lng="120.3014"
+            >
+              <a href="single_tour.html">
+                <div class="row">
+                  <div class="col-lg-4 col-md-4 position-relative">
+                    <div class="img_list">
+                      <img
+                        src="img/0_exhibition/ChatGPT_exhibition_3.png"
+                        alt="Image"
+                      />
+                    </div>
+                  </div>
+                  <div class="col-lg-6 col-md-6">
+                    <div class="tour_list_desc">
+                      <div>
+                        <h3>
+                          都市敘事：以鏡頭書寫在城市縫隙間的故事與記憶（南部巡展）
+                        </h3>
+                        <p>
+                          <span class="start_time">2025/08/01</span> ~
+                          <span class="end_time">2025/08/31</span>
+                        </p>
+                        <p>
+                          <span class="location">高雄市苓雅區四維三路2號</span>
+                        </p>
+                        <p>
+                          <span class="rating">
+                            <i class="icon-star voted"></i>
+                            <i class="icon-star-empty"></i>
+                            <i class="icon-star-empty"></i>
+                            <i class="icon-star-empty"></i>
+                            <i class="icon-star-empty"></i> </span
+                          >(22)
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="col-lg-2 col-md-2">
+                    <div class="price_list">
+                      <div><span class="currency">$</span>2,000 - 2,500</div>
+                    </div>
+                  </div>
+                </div>
+              </a>
+            </div>
+
+            <!-- 分頁區 -->
+            <nav aria-label="Page navigation">
+              <ul class="pagination justify-content-center">
+                <li class="page-item">
+                  <a class="page-link" href="#" aria-label="Previous">
+                    <span aria-hidden="true">&laquo;</span>
+                    <span class="sr-only">上一頁</span>
+                  </a>
+                </li>
+                <li class="page-item active">
+                  <span class="page-link">1</span>
+                </li>
+                <li class="page-item"><a class="page-link" href="#">2</a></li>
+                <li class="page-item"><a class="page-link" href="#">3</a></li>
+                <li class="page-item">
+                  <a class="page-link" href="#" aria-label="Next">
+                    <span class="sr-only">下一頁</span>
+                    <span aria-hidden="true">&raquo;</span>
+                  </a>
+                </li>
+              </ul>
+            </nav>
+          </div>
+
+          <!-- 為你推薦區 展示6個 -->
+          <aside class="col-lg-3">
+            <h3>為您推薦</h3>
+            <div class="recommend">
+              <!-- 1 -->
+              <a href="#" class="recommend_item">
+                <div class="row g-2">
+                  <div class="col-4">
+                    <img
+                      src="img/0_exhibition/ChatGPT_exhibition_1.png"
+                      alt="推薦圖片"
+                    />
+                  </div>
+                  <div class="col-8">
+                    <h4>九月啊九月</h4>
+                    <p>
+                      <span class="start_time">2025/08/01</span> ~
+                      <span class="end_time">2025/08/01</span>
+                    </p>
+                  </div>
+                </div>
+              </a>
+
+              <!-- 2 -->
+              <a href="#" class="recommend_item">
+                <div class="row g-2">
+                  <div class="col-4">
+                    <img
+                      src="img/0_exhibition/ChatGPT_exhibition_1.png"
+                      alt="推薦圖片"
+                    />
+                  </div>
+                  <div class="col-8">
+                    <h4>九月啊九月</h4>
+                    <p>
+                      <span class="start_time">2025/08/01</span> ~
+                      <span class="end_time">2025/08/01</span>
+                    </p>
+                  </div>
+                </div>
+              </a>
+
+              <!-- 3 -->
+              <a href="#" class="recommend_item">
+                <div class="row g-2">
+                  <div class="col-4">
+                    <img
+                      src="img/0_exhibition/ChatGPT_exhibition_1.png"
+                      alt="推薦圖片"
+                    />
+                  </div>
+                  <div class="col-8">
+                    <h4>九月啊九月</h4>
+                    <p>
+                      <span class="start_time">2025/08/01</span> ~
+                      <span class="end_time">2025/08/01</span>
+                    </p>
+                  </div>
+                </div>
+              </a>
+
+              <!-- 4 -->
+              <a href="#" class="recommend_item">
+                <div class="row g-2">
+                  <div class="col-4">
+                    <img
+                      src="img/0_exhibition/ChatGPT_exhibition_3.png"
+                      alt="推薦圖片"
+                    />
+                  </div>
+                  <div class="col-8">
+                    <h4>都市敘事：以鏡頭書寫在城市縫隙間的故事與記憶</h4>
+                    <p>
+                      <span class="start_time">2025/08/01</span> ~
+                      <span class="end_time">2025/08/01</span>
+                    </p>
+                  </div>
+                </div>
+              </a>
+
+              <!-- 5 -->
+              <a href="#" class="recommend_item">
+                <div class="row g-2">
+                  <div class="col-4">
+                    <img
+                      src="img/0_exhibition/ChatGPT_exhibition_3.png"
+                      alt="推薦圖片"
+                    />
+                  </div>
+                  <div class="col-8">
+                    <h4>都市敘事：以鏡頭書寫在城市縫隙間的故事與記憶</h4>
+                    <p>
+                      <span class="start_time">2025/08/01</span> ~
+                      <span class="end_time">2025/08/01</span>
+                    </p>
+                  </div>
+                </div>
+              </a>
+
+              <!-- 6 -->
+              <a href="#" class="recommend_item">
+                <div class="row g-2">
+                  <div class="col-4">
+                    <img
+                      src="img/0_exhibition/ChatGPT_exhibition_3.png"
+                      alt="推薦圖片"
+                    />
+                  </div>
+                  <div class="col-8">
+                    <h4>都市敘事：以鏡頭書寫在城市縫隙間的故事與記憶</h4>
+                    <p>
+                      <span class="start_time">2025/08/01</span> ~
+                      <span class="end_time">2025/08/01</span>
+                    </p>
+                  </div>
+                </div>
+              </a>
+            </div>
+          </aside>
+        </div>
+      </div>
+    </main>
+
+    <!-- 頁尾 -->
+    <footer class="revealed">
+      <div class="container">
+        <div class="row">
+          <div class="col-md-4">
+            <h3>Need help?</h3>
+            <a href="tel://004542344599" id="phone">+45 423 445 99</a>
+            <a href="mailto:help@citytours.com" id="email_footer"
+              >help@citytours.com</a
+            >
+          </div>
+          <div class="col-md-3">
+            <h3>About</h3>
+            <ul>
+              <li><a href="#">About us</a></li>
+              <li><a href="#">FAQ</a></li>
+              <li><a href="#">Login</a></li>
+              <li><a href="#">Register</a></li>
+              <li><a href="#">Terms and condition</a></li>
+            </ul>
+          </div>
+          <div class="col-md-3">
+            <h3>Discover</h3>
+            <ul>
+              <li><a href="#">Community blog</a></li>
+              <li><a href="#">Tour guide</a></li>
+              <li><a href="#">Wishlist</a></li>
+              <li><a href="#">Gallery</a></li>
+            </ul>
+          </div>
+          <div class="col-md-2">
+            <h3>Settings</h3>
+            <div class="styled-select">
+              <select name="lang" id="lang">
+                <option value="English" selected>English</option>
+                <option value="French">French</option>
+                <option value="Spanish">Spanish</option>
+                <option value="Russian">Russian</option>
+              </select>
+            </div>
+            <div class="styled-select">
+              <select name="currency" id="currency">
+                <option value="USD" selected>USD</option>
+                <option value="EUR">EUR</option>
+                <option value="GBP">GBP</option>
+                <option value="RUB">RUB</option>
+              </select>
+            </div>
+          </div>
+        </div>
+        <!-- End row -->
+        <div class="row">
+          <div class="col-md-12">
+            <div id="social_footer">
+              <ul>
+                <li>
+                  <a href="#0"><i class="bi bi-instagram"></i></a>
+                </li>
+                <li>
+                  <a href="#0"><i class="bi bi-whatsapp"></i></a>
+                </li>
+                <li>
+                  <a href="#0"><i class="bi bi-facebook"></i></a>
+                </li>
+                <li>
+                  <a href="#0"><i class="bi bi-twitter-x"></i></a>
+                </li>
+                <li>
+                  <a href="#0"><i class="bi bi-youtube"></i></a>
+                </li>
+              </ul>
+              <p>© Citytours 2024</p>
+            </div>
+          </div>
+        </div>
+        <!-- End row -->
+      </div>
+      <!-- End container -->
+    </footer>
+    <!-- End footer -->
+
+    <div id="toTop"></div>
+    <!-- Back to top button -->
+
+    <!-- Search Menu -->
+    <div class="search-overlay-menu">
+      <span class="search-overlay-close"
+        ><i class="icon_set_1_icon-77"></i
+      ></span>
+
+      <!-- 搜尋表單 -->
+      <form role="search" id="searchform" method="get">
+        <input
+          value=""
+          name="q"
+          type="text"
+          placeholder="搜尋展覽或主辦名稱 "
+        />
+        <button type="submit"><i class="icon_set_1_icon-78"></i></button>
+      </form>
+
+      <div id="search_block_parent">
+        <div id="search_filter_block">
+          <!-- 篩選按鈕 -->
+          <button id="regionFilterBtn" type="button">
+            <i class="icon-filter"></i> 區域篩選
+          </button>
+          <button id="dateFilterBtn" type="button">
+            <i class="icon-filter"></i> 日期篩選
+          </button>
+
+          <!-- 區域篩選彈窗 -->
+          <div
+            id="regionFilterPopup"
+            class="region-filter-popup"
+            style="display: none"
+          >
+            <div class="region-filter-header">
+              <button id="regionClear" class="btn-clear" type="button">
+                清除設定
+              </button>
+              <button id="regionSelectAll" class="btn-all" type="button">
+                全選
+              </button>
+            </div>
+            <div class="region-section">
+              <div class="region-options">
+                <button class="region-btn" data-region="台北市" type="button">
+                  台北市
+                </button>
+                <button class="region-btn" data-region="新北市" type="button">
+                  新北市
+                </button>
+                <button class="region-btn" data-region="桃園市" type="button">
+                  桃園市
+                </button>
+                <button class="region-btn" data-region="台中市" type="button">
+                  台中市
+                </button>
+                <button class="region-btn" data-region="台南市" type="button">
+                  台南市
+                </button>
+                <button class="region-btn" data-region="高雄市" type="button">
+                  高雄市
+                </button>
+              </div>
+            </div>
+            <div class="region-footer">
+              <button id="regionConfirm" class="btn-confirm" type="button">
+                確認
+              </button>
+            </div>
+          </div>
+
+          <!-- 日期篩選彈窗 -->
+          <div
+            id="dateFilterPopup"
+            class="date-filter-popup"
+            style="display: none"
+          >
+            <div class="date-filter-header">
+              <button id="dateClear" class="btn-clear" type="button">
+                清除設定
+              </button>
+            </div>
+            <div class="calendar-container">
+              <div class="calendar-header">
+                <button id="prevMonth" type="button">‹</button>
+                <span id="currentMonth">2025/08</span>
+                <button id="nextMonth" type="button">›</button>
+              </div>
+              <table class="calendar-table">
+                <thead>
+                  <tr>
+                    <th>日</th>
+                    <th>一</th>
+                    <th>二</th>
+                    <th>三</th>
+                    <th>四</th>
+                    <th>五</th>
+                    <th>六</th>
+                  </tr>
+                </thead>
+                <tbody id="calendarBody"></tbody>
+              </table>
+            </div>
+            <div class="date-filter-footer">
+              <button id="confirmDate" class="btn-confirm" type="button">
+                確認
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- 回顯欄位：預設隱藏 -->
+        <div id="searchEcho" class="mt-3 mb-3" style="display: none">
+          <small id="keywordEcho" class="d-block">
+            搜尋關鍵字：<span id="keywordText">（尚未輸入）</span>
+          </small>
+          <small id="regionEcho" class="d-block">
+            區域篩選：<span id="regionText">（未選擇）</span>
+          </small>
+          <small id="dateEcho" class="d-block">
+            日期篩選：<span id="dateText">（未選擇）</span>
+          </small>
+        </div>
+
+        <!-- 熱門搜尋 -->
+        <h3>熱門搜尋</h3>
+        <div id="search_hot_block" class="search_block">
+          <a href="/html/all_tours_list.html" class="history-btn">熱門搜尋</a>
+          <a href="/html/all_tours_list.html" class="history-btn">熱門搜尋</a>
+          <a href="/html/all_tours_list.html" class="history-btn">熱門搜尋</a>
+          <a href="/html/all_tours_list.html" class="history-btn">熱門搜尋</a>
+          <a href="/html/all_tours_list.html" class="history-btn">熱門搜尋</a>
+          <a href="/html/all_tours_list.html" class="history-btn">熱門搜尋</a>
+        </div>
+        <hr />
+
+        <!-- 最近搜尋 -->
+        <h3>您最近搜尋過</h3>
+        <div id="search_history_block" class="search_block">
+          <a href="/html/all_tours_list.html" class="history-btn">歷史搜尋</a>
+          <a href="/html/all_tours_list.html" class="history-btn">歷史搜尋</a>
+          <a href="/html/all_tours_list.html" class="history-btn">歷史搜尋</a>
+          <a href="/html/all_tours_list.html" class="history-btn">歷史搜尋</a>
+          <a href="/html/all_tours_list.html" class="history-btn">歷史搜尋</a>
+          <a href="/html/all_tours_list.html" class="history-btn">歷史搜尋</a>
+          <a href="/html/all_tours_list.html" class="history-btn">歷史搜尋</a>
+          <a href="/html/all_tours_list.html" class="history-btn">歷史搜尋</a>
+          <a href="/html/all_tours_list.html" class="history-btn">歷史搜尋</a>
+          <a href="/html/all_tours_list.html" class="history-btn">歷史搜尋</a>
+          <a href="/html/all_tours_list.html" class="history-btn">歷史搜尋</a>
+          <a href="/html/all_tours_list.html" class="history-btn">歷史搜尋</a>
+        </div>
+      </div>
+    </div>
+    <!-- End Search Menu -->
+
+    <!-- Sign In Popup -->
+    <div id="sign-in-dialog" class="zoom-anim-dialog mfp-hide">
+      <div class="small-dialog-header">
+        <h3>Sign In</h3>
+      </div>
+      <form>
+        <div class="sign-in-wrapper">
+          <a href="#0" class="social_bt facebook">Login with Facebook</a>
+          <a href="#0" class="social_bt google">Login with Google</a>
+          <div class="divider"><span>Or</span></div>
+          <div class="form-group">
+            <label>Email</label>
+            <input type="email" class="form-control" name="email" id="email" />
+            <i class="icon_mail_alt"></i>
+          </div>
+          <div class="form-group">
+            <label>Password</label>
+            <input
+              type="password"
+              class="form-control"
+              name="password"
+              id="password"
+              value=""
+            />
+            <i class="icon_lock_alt"></i>
+          </div>
+          <div class="clearfix add_bottom_15">
+            <div class="checkboxes float-start">
+              <label class="container_check"
+                >Remember me
+                <input type="checkbox" />
+                <span class="checkmark"></span>
+              </label>
+            </div>
+            <div class="float-end">
+              <a id="forgot" href="javascript:void(0);">Forgot Password?</a>
+            </div>
+          </div>
+          <div class="text-center">
+            <input type="submit" value="Log In" class="btn_login" />
+          </div>
+          <div class="text-center">
+            Don’t have an account? <a href="javascript:void(0);">Sign up</a>
+          </div>
+          <div id="forgot_pw">
+            <div class="form-group">
+              <label>Please confirm login email below</label>
+              <input
+                type="email"
+                class="form-control"
+                name="email_forgot"
+                id="email_forgot"
+              />
+              <i class="icon_mail_alt"></i>
+            </div>
+            <p>
+              You will receive an email containing a link allowing you to reset
+              your password to a new preferred one.
+            </p>
+            <div class="text-center">
+              <input type="submit" value="Reset Password" class="btn_1" />
+            </div>
+          </div>
+        </div>
+      </form>
+      <!--form -->
+    </div>
+    <!-- /Sign In Popup -->
+
+    <!-- Common scripts -->
+    <script src="js/jquery-3.7.1.min.js"></script>
+    <script src="js/common_scripts_min.js"></script>
+    <script src="js/functions.js"></script>
+
+    <!-- Specific scripts -->
+    <!-- Cat nav mobile -->
+    <script src="js/cat_nav_mobile.js"></script>
+    <script>
+      $("#cat_nav").mobileMenu();
+    </script>
+
+    <!-- Map -->
+    <script src="http://maps.googleapis.com/maps/api/js"></script>
+    <script src="js/map.js"></script>
+    <script src="js/infobox.js"></script>
+    <script src="js/g1_10_custom_common.js"></script>
+    <script src="js/g1_6_search_modal.js"></script>
+    <script src="js/g1_6_search_results_only.js"></script>
+
+    <!-- 模板原生 js -->
+    <script>
+      /* ===========================
+		   展演清單：按「搜尋」才套用 區域/日期/關鍵字顯示；排序即時；樣式高亮
+		   - 依據你貼的 HTML 結構 (.col-lg-9、#filtersForm、.sort-tab、Bootstrap 分頁 nav)
+		   =========================== */
+
+      /* --- 小工具 --- */
+      // 解析日期（支援 YYYY-MM-DD / YYYY/MM/DD）
+      function parseDateStr(str) {
+        if (!str) return NaN;
+        const s = String(str).trim();
+        let t = Date.parse(s);
+        if (!isNaN(t)) return t;
+        const s2 = s.replaceAll("/", "-");
+        t = Date.parse(s2);
+        return isNaN(t) ? NaN : t;
+      }
+      // Haversine 距離（公里）
+      function haversineKm(lat1, lon1, lat2, lon2) {
+        const toRad = (d) => (d * Math.PI) / 180,
+          R = 6371;
+        const dLat = toRad(lat2 - lat1),
+          dLon = toRad(lon2 - lon1);
+        const a =
+          Math.sin(dLat / 2) ** 2 +
+          Math.cos(toRad(lat1)) *
+            Math.cos(toRad(lat2)) *
+            Math.sin(dLon / 2) ** 2;
+        return 2 * R * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+      }
+
+      /* --- URL 參數工具（不新增歷史紀錄） --- */
+      const url = new URL(window.location.href);
+      const params = url.searchParams;
+      function setParam(key, val) {
+        if (val === "" || val == null) params.delete(key);
+        else params.set(key, val);
+        history.replaceState(null, "", "?" + params.toString()); // 更新目前條目而非新增歷史
+      }
+
+      /* --- DOM 參照 --- */
+      const colMain = document.querySelector(".col-lg-9");
+      const form = document.getElementById("filtersForm");
+      const regionSelect = document.getElementById("regionSelect");
+      const dateFrom = document.getElementById("dateFrom");
+      const dateTo = document.getElementById("dateTo");
+      const keywordInput = document.getElementById("keywordInput");
+      const clearBtn = document.getElementById("clearBtn");
+      const keywordEcho = document.getElementById("keywordEcho");
+      const sortTabs = document.querySelectorAll(".sort-tab");
+      const pagerNav = document.querySelector(
+        '.col-lg-9 nav[aria-label="Page navigation"]'
+      );
+
+      /* --- 取得卡片資料（每次呼叫都從 DOM 重新收集，避免「尚未顯示」漏抓） --- */
+      function readRating(el) {
+        const full = el.querySelectorAll(".icon-star.voted").length;
+        const half = el.querySelectorAll(".icon-star-half-alt.voted").length;
+        return full + half * 0.5;
+      }
+      function readCardData(el) {
+        const d = el.dataset;
+        const startStr = (
+          el.querySelector(".start_time")?.textContent || ""
+        ).trim();
+        const endStr = (
+          el.querySelector(".end_time")?.textContent || ""
+        ).trim();
+        const startTs = parseDateStr(startStr);
+        const endTs = parseDateStr(endStr);
+        const location = (
+          el.querySelector(".location")?.textContent || ""
+        ).trim();
+        const regionFromLoc = location.slice(0, 3);
+
+        return {
+          el,
+          title: (el.querySelector("h3")?.textContent || "").trim(),
+          location,
+          region: d.region || regionFromLoc || "",
+          startTs: isNaN(startTs) ? 0 : startTs,
+          endTs: isNaN(endTs) ? 0 : endTs,
+          popularity: Number(d.popularity || 0),
+          rating: isNaN(Number(d.rating)) ? readRating(el) : Number(d.rating),
+          createdTs: d.created ? Date.parse(d.created) : 0,
+          lat: d.lat ? Number(d.lat) : null,
+          lng: d.lng ? Number(d.lng) : null,
+          distanceKm: null,
+        };
+      }
+      function collectData() {
+        const nodeList =
+          colMain?.querySelectorAll(".strip_all_tour_list") || [];
+        return Array.from(nodeList).map(readCardData);
+      }
+
+      /* --- 使用者座標（僅在「離我最近」時需求） --- */
+      let userGeo = { lat: null, lng: null },
+        gettingGeo = false;
+      async function ensureUserGeo() {
+        if (userGeo.lat != null && userGeo.lng != null) return userGeo;
+        if (gettingGeo || !("geolocation" in navigator)) return null;
+        gettingGeo = true;
+        return new Promise((resolve) => {
+          navigator.geolocation.getCurrentPosition(
+            (pos) => {
+              userGeo = { lat: pos.coords.latitude, lng: pos.coords.longitude };
+              gettingGeo = false;
+              resolve(userGeo);
+            },
+            (_err) => {
+              gettingGeo = false;
+              resolve(null);
+            },
+            { enableHighAccuracy: false, timeout: 8000, maximumAge: 600000 }
+          );
+        });
+      }
+
+      /* --- 狀態：只有「按下搜尋」才更新（排序即時） --- */
+      const applied = {
+        q: params.get("q") || "",
+        region: params.get("region") || "",
+        from: params.get("from") || "",
+        to: params.get("to") || "",
+        sort: params.get("sort") || "popularity",
+      };
+
+      /* --- UI 載入初值 --- */
+      (function init() {
+        regionSelect && (regionSelect.value = applied.region);
+        dateFrom && (dateFrom.value = applied.from);
+        dateTo && (dateTo.value = applied.to);
+        keywordInput && (keywordInput.value = params.get("q") || "");
+        // 排序高亮
+        activateSort(applied.sort);
+        // 關鍵字顯示區：顯示「已套用」的字串
+        if (keywordEcho)
+          keywordEcho.querySelector("span").textContent =
+            applied.q || "（尚未輸入）";
+        // 初次渲染（依目前已套用狀態）
+        applyAll();
+      })();
+
+      /* --- 排序 Seg 樣式切換 --- */
+      function activateSort(key) {
+        sortTabs.forEach((a) => {
+          const active = a.dataset.sort === key;
+          a.classList.toggle("is-active", active);
+          a.setAttribute("aria-current", active ? "true" : "false");
+        });
+      }
+
+      /* --- 核心：依「已套用狀態 applied」做篩選排序並渲染 --- */
+      function applyAll() {
+        const data = collectData(); // 每次重新抓，避免延遲載入漏抓
+        const fromTs = applied.from ? Date.parse(applied.from) : null;
+        const toTs = applied.to ? Date.parse(applied.to) : null;
+
+        // 篩選：區域 + 日期；關鍵字僅顯示在 #keywordEcho，不影響卡片（依你前述需求）
+        const filtered = data.filter((item) => {
+          const hitRegion = !applied.region || item.region === applied.region;
+          const aStart = item.startTs;
+          const aEnd = item.endTs || item.startTs;
+          const uStart = fromTs ?? -Infinity;
+          const uEnd = toTs ?? Infinity;
+          const hitDate = !(fromTs || toTs)
+            ? true
+            : aStart <= uEnd && aEnd >= uStart;
+          return hitRegion && hitDate;
+        });
+
+        // 排序鍵
+        const sortKey = applied.sort || "popularity";
+
+        // 「離我最近」需要距離
+        if (sortKey === "nearest") {
+          (async () => {
+            const ok = await ensureUserGeo();
+            if (ok) {
+              data.forEach((item) => {
+                if (item.lat != null && item.lng != null) {
+                  item.distanceKm = haversineKm(
+                    userGeo.lat,
+                    userGeo.lng,
+                    item.lat,
+                    item.lng
+                  );
+                } else {
+                  item.distanceKm = Infinity;
+                }
+              });
+              render(filtered, sortKey);
+            } else {
+              applied.sort = "popularity";
+              activateSort("popularity");
+              render(filtered, "popularity");
+            }
+          })();
+          render(filtered, sortKey); // 先以現況渲染一次
+        } else {
+          render(filtered, sortKey);
+        }
+      }
+
+      function render(list, sortKey) {
+        if (!colMain) return;
+        const parentBefore = document.querySelector(
+          '.col-lg-9 nav[aria-label="Page navigation"]'
+        );
+
+        const sorted = list.slice().sort((a, b) => {
+          switch (sortKey) {
+            case "rating":
+              return b.rating - a.rating;
+            case "newest":
+              return b.createdTs - a.createdTs;
+            case "nearest":
+              return (a.distanceKm ?? Infinity) - (b.distanceKm ?? Infinity);
+            case "popularity":
+            default:
+              return b.popularity - a.popularity;
+          }
+        });
+
+        // 先全部隱藏
+        const allCards = colMain.querySelectorAll(".strip_all_tour_list");
+        allCards.forEach((c) => (c.style.display = "none"));
+
+        // 依序附掛到分頁 nav 之前
+        sorted.forEach((item) => {
+          item.el.style.display = "";
+          parentBefore
+            ? colMain.insertBefore(item.el, parentBefore)
+            : colMain.appendChild(item.el);
+        });
+      }
+
+      /* --- 事件：按下「搜尋」才更新已套用狀態 applied --- */
+      form?.addEventListener("submit", (e) => {
+        e.preventDefault();
+        // 讀取目前表單值 → 更新「已套用」狀態
+        applied.q = (keywordInput?.value || "").trim();
+        applied.region = (regionSelect?.value || "").trim();
+        applied.from = (dateFrom?.value || "").trim();
+        applied.to = (dateTo?.value || "").trim();
+
+        // 顯示到「搜尋關鍵字」文字區
+        if (keywordEcho)
+          keywordEcho.querySelector("span").textContent =
+            applied.q || "（尚未輸入）";
+
+        // 同步網址參數（方便分享/返回）
+        setParam("q", applied.q);
+        setParam("region", applied.region);
+        setParam("from", applied.from);
+        setParam("to", applied.to);
+
+        applyAll();
+      });
+
+      /* --- 排序 Seg：即時切換（不必按搜尋） --- */
+      sortTabs.forEach((a) => {
+        a.addEventListener("click", (e) => {
+          e.preventDefault();
+          applied.sort = a.dataset.sort;
+          activateSort(applied.sort);
+          setParam("sort", applied.sort);
+          applyAll();
+        });
+      });
+
+      /* --- 清除：重置表單，但不動排序 --- */
+      clearBtn?.addEventListener("click", () => {
+        regionSelect && (regionSelect.value = "");
+        dateFrom && (dateFrom.value = "");
+        dateTo && (dateTo.value = "");
+        keywordInput && (keywordInput.value = "");
+        applied.q = applied.region = applied.from = applied.to = "";
+        if (keywordEcho)
+          keywordEcho.querySelector("span").textContent = "（尚未輸入）";
+        setParam("q", "");
+        setParam("region", "");
+        setParam("from", "");
+        setParam("to", "");
+        applyAll();
+      });
+    </script>
+  </body>
+</html>
