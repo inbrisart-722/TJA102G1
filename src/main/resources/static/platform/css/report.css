@@ -1,0 +1,109 @@
+/* 檢舉頁用 */
+
+body {
+    font-family: "Source Sans 3", system-ui, -apple-system, "Segoe UI", Roboto, "Noto Sans TC", "Microsoft JhengHei", sans-serif
+}
+
+.logo-circle {
+    width: 96px;
+    height: 96px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(0, 0, 0, .06)
+}
+
+.tabs .nav-link {
+    color: inherit
+}
+
+.tabs .nav-link.active {
+    font-weight: 700;
+    border-bottom: 2px solid #7c3aed
+}
+
+.violet-outline {
+    border: 2px solid #7c3aed;
+    border-radius: .5rem
+}
+
+.table thead th {
+    white-space: nowrap
+}
+
+.cell-ellipsis {
+    max-width: 280px
+}
+
+.cell-ellipsis,
+.cell-ellipsis-200 {
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis
+}
+
+.cell-ellipsis {
+    -webkit-line-clamp: 1
+}
+
+.cell-ellipsis-200 {
+    max-width: 200px;
+    -webkit-line-clamp: 1
+}
+
+.status-pending {
+    color: #dc3545;
+    font-weight: 600
+}
+
+.status-done {
+    color: #28a745;
+    font-weight: 600
+}
+
+.btn-ghost {
+    background: #f3f4f6;
+    border: 1px solid #d1d5db;
+    color: #111827
+}
+
+.btn-ghost:hover {
+    background: #e5e7eb
+}
+
+/* 骨架列 */
+.skeleton-bar {
+    height: 32px;
+    background: #e5e5e5;
+    border-radius: 6px
+}
+
+/* 搜尋框 */
+.search-wrap {
+    position: relative;
+    width: min(360px, 100%)
+}
+
+.search-wrap input {
+    padding-right: 40px
+}
+
+.search-wrap .icon {
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    pointer-events: none
+}
+
+@media (max-width: 576px) {
+    .cell-ellipsis {
+        max-width: 160px
+    }
+
+    .cell-ellipsis-200 {
+        max-width: 140px
+    }
+}

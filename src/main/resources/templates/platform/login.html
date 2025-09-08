@@ -1,0 +1,156 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>平台後台｜登入</title>
+
+  <!-- 只載一份 Bootstrap 5 -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css">
+  <!-- Bootstrap Icons（讓眼睛圖示正常） -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+
+  <style>
+    /* 讓這頁不受其他全域 CSS 影響 */
+    .login-page, .login-page * { box-sizing: border-box; }
+    body { background: #fff7f8; } /* 淡粉底，跟你給的截圖接近 */
+    .login-page { min-height: 100dvh; display: grid; place-items: center; padding: 24px; }
+
+    .login-card {
+      width: min(760px, 100%);
+      border: 2px solid #2b2b2b;
+      border-radius: 8px;
+      background: #fff;
+      box-shadow: 0 8px 24px rgba(0,0,0,.06);
+    }
+    .login-card .card-body { padding: clamp(20px, 4vw, 48px); }
+
+    .login-title {
+      font-weight: 900;
+      font-size: clamp(28px, 4.2vw, 44px);
+      letter-spacing:.02em;
+      margin-bottom: 8px;
+    }
+    .login-sub { color:#6c757d; margin-bottom: 24px; }
+
+    .form-label { font-weight: 700; font-size: 1.125rem; }
+    .help-text { color:#6c757d; font-size:.95rem; margin-top:.25rem; }
+
+    .form-control, .input-group-text, .btn { border-radius: 14px; }
+    .form-control {
+      height: 56px;
+      padding: .75rem 1rem;
+      font-size: 1.05rem;
+    }
+    .input-group-text { padding: .5rem .85rem; }
+
+    .btn-primary {
+      background: #e458b2; border-color: #e458b2;
+    }
+    .btn-primary:hover { background:#d94aa8; border-color:#d94aa8; }
+    .btn-outline-secondary { border-color:#ced4da; }
+
+    .or-line { display:flex; align-items:center; gap:16px; color:#7a7a7a; }
+    .or-line::before, .or-line::after {
+      content:""; height:1px; flex:1; background:#e9ecef;
+    }
+
+    /* 錯誤訊息微調 */
+    .invalid-feedback { margin-top:.4rem; }
+  </style>
+</head>
+<body>
+  <main class="login-page">
+    <div class="card login-card">
+      <div class="card-body">
+        <h1 class="login-title">管理者登入</h1>
+        <p class="login-sub">平台後台</p>
+
+        
+          <!-- 帳號 -->
+          <div class="mb-3">
+            <label for="vat" class="form-label">帳號</label>
+            <input type="text" inputmode="numeric" pattern="[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}"
+                   class="form-control" id="vat" placeholder="請輸入管理者信箱" autocomplete="username" required>
+            <div class="invalid-feedback" id="vatError">請輸入管理者信箱</div>
+          </div>
+
+          <!-- 密碼 -->
+          <div class="mb-2">
+            <label for="password" class="form-label">密碼</label>
+            <div class="input-group">
+              <input type="password" id="password" class="form-control" placeholder="輸入密碼"
+                     autocomplete="current-password" minlength="8" required>
+              <button class="btn btn-outline-secondary" type="button" id="togglePwd" aria-label="切換密碼可視">
+                <i class="bi bi-eye"></i>
+              </button>
+            </div>
+            <div class="help-text"></div>
+            <div class="text-end mt-2">
+              
+            </div>
+            <div class="invalid-feedback" id="pwdError">請輸入密碼（至少 8 碼）</div>
+          </div>
+
+          <br></br>
+
+          <button class="btn btn-primary w-100 py-3 fs-5" type="submit">登入</button>
+
+          <div class="text-center mt-3">
+          </div>
+        </form>
+      </div>
+    </div>
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+
+    // 全形數字轉半形
+    function toHalfWidthDigits(str){
+      return (str || '').replace(/[０-９]/g, ch => String.fromCharCode(ch.charCodeAt(0) - 0xFF10 + 0x30));
+    }
+
+    // 切換密碼可視
+    document.getElementById('togglePwd').addEventListener('click', function(){
+      const ipt = document.getElementById('password');
+      const icon = this.querySelector('i');
+      const show = ipt.type === 'password';
+      ipt.type = show ? 'text' : 'password';
+      icon.classList.toggle('bi-eye', !show);
+      icon.classList.toggle('bi-eye-slash', show);
+    });
+
+    // 表單送出
+    document.getElementById('loginForm').addEventListener('submit', function(e){
+      e.preventDefault();
+
+      // 正規化輸入
+      const vatIpt = document.getElementById('vat');
+      const pwdIpt = document.getElementById('password');
+      vatIpt.value = toHalfWidthDigits(vatIpt.value).replace(/\s+/g, '');
+
+
+      // 顯示/隱藏錯誤
+      vatIpt.classList.toggle('is-invalid', !vatOk || !chkOk);
+      document.getElementById('vatError').textContent =
+        !vatOk ? '請輸入 8 碼數字的統編' :
+        (!chkOk ? '統編檢核未通過，請確認是否輸入正確' : '');
+
+      pwdIpt.classList.toggle('is-invalid', !pwdOk);
+
+      if (!(vatOk && chkOk && pwdOk)) return;
+
+      // 模擬登入：你可在這裡串 API，成功後導到列表
+      const session = {
+        exhibitorVat: vatIpt.value,
+        loginAt: Date.now()
+      };
+      sessionStorage.setItem('exhibitorSession', JSON.stringify(session));
+
+      // 導向活動列表（可改成你的路徑）
+      window.location.href = './back_end_homepage.html';
+    });
+  </script>
+</body>
+</html>
