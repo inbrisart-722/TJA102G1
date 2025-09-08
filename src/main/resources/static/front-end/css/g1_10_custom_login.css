@@ -1,0 +1,30 @@
+/* body {
+  height: 100%;
+} */
+section#hero.login {
+  background-image: url("../img/group1_img/富士山.jpg");
+  height: 100vh;
+}
+
+div#login {
+  /* margin-top: 270px; */
+  margin-top: 60%;
+}
+
+div#email_block {
+  margin-bottom: 5%;
+}
+
+input.form-control {
+  margin-top: 3%;
+  height: 15%;
+}
+
+/* h6#continue { */
+/* background-color: lightgray;
+  border-radius: 10px;
+  padding: 5px 0;
+  text-align: center;
+  margin-top: 5%;
+  margin-bottom: 10%; */
+/* } */

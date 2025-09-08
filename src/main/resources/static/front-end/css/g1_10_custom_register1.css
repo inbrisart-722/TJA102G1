@@ -1,0 +1,99 @@
+section#hero.login {
+  background-image: url("../img/group1_img/富士山.jpg");
+  height: 100vh;
+}
+
+div#login {
+  /* margin-top: 270px; */
+  margin-top: 60%;
+}
+
+div#email_block {
+  margin-bottom: 5%;
+}
+
+input.form-control {
+  margin-top: 3%;
+  height: 15%;
+}
+
+span.error-message {
+  color: #dc3545; /* Bootstrap 的紅色 */
+  font-size: 0.875em; /* 比較小的字體 */
+  margin-top: 0.875rem;
+  display: block;
+}
+
+.is-invalid {
+  border-color: #dc3545; /* 輸入框外框變紅 */
+}
+
+/* 驗證彈窗用 */
+/* 彈窗的基本容器 */
+.toast-container {
+  position: fixed;
+  bottom: 30%;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 1000;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  pointer-events: none;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.3s ease-in-out, visibility 0.3s ease-in-out;
+}
+
+/* 彈窗內容區塊 */
+.toast-content {
+  display: flex;
+  align-items: center;
+  background-color: #ffffff;
+  color: #333333; /* 深灰色文字 */
+  padding: 15px 25px;
+  border-radius: 8px;
+  border: 2px solid #4caf50;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+/* 彈窗圖示 */
+.toast-icon {
+  font-size: 24px;
+  color: #4caf50;
+  margin-right: 15px;
+}
+
+/* 彈窗訊息 */
+.toast-message p {
+  margin: 0;
+  line-height: 1.4;
+}
+
+/* 顯示彈窗的狀態 */
+.toast-container.show {
+  opacity: 1;
+  visibility: visible;
+  /* display: block; */
+}
+
+/* btn 取得驗證碼按鈕 disabled */
+
+/* 當按鈕被 disabled 時的樣式 */
+.btn_full[disabled] {
+  background-color: #cccccc; /* 變灰 */
+  color: #666666; /* 文字顏色變淡 */
+  cursor: not-allowed; /* 鼠標變成禁止符號 */
+  pointer-events: none; /* 禁用所有鼠標事件，包括 hover */
+  opacity: 0.7; /* 稍微透明 */
+}
+
+/* 最重要：覆寫 disabled 狀態下的 hover 效果 */
+/* 確保 disabled 狀態下的樣式不會有 hover 變化 */
+.btn_full[disabled]:hover {
+  background-color: #cccccc; /* 保持與非 hover 狀態相同 */
+  color: #666666; /* 保持與非 hover 狀態相同 */
+  cursor: not-allowed;
+  /* 如果你的模板有 transition，你可能需要在這裡也設定 transition: none; */
+  /* transition: none; */
+}
