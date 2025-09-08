@@ -1,0 +1,128 @@
+/* 1. 基本背景等 */
+section#hero.login {
+  background-image: url("../img/group1_img/富士山.jpg");
+  height: 100vh;
+}
+
+div#login {
+  /* margin-top: 270px; */
+  margin-top: 60%;
+}
+
+div#email_block {
+  margin-bottom: 5%;
+}
+
+input.form-control {
+  margin-top: 3%;
+  height: 15%;
+}
+
+/* 2. 驗證（錯誤）訊息用 */
+.validation-message {
+  font-size: 0.875em;
+  margin-top: 5px;
+  display: block;
+}
+
+.validation-message.success {
+  color: #28a745; /* 綠色，表示成功 */
+}
+
+.validation-message.error {
+  color: #dc3545; /* 紅色，表示錯誤 */
+}
+
+.is-invalid {
+  border-color: #dc3545 !important;
+}
+
+.is-valid {
+  border-color: #28a745 !important;
+}
+
+/* 3. Toast 用 */
+#toast-container {
+  position: fixed;
+  top: 15%;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 1000;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  pointer-events: none; /* 讓點擊可以穿透 */
+}
+
+/* Toast 訊息 */
+.toast-message {
+  background-color: #24b129; /* 成功綠色 */
+  color: white;
+  padding: 12px 20px;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-family: Arial, sans-serif;
+  font-weight: 700;
+  font-size: 16px;
+  opacity: 0;
+  animation: slideIn 0.5s forwards, fadeOut 0.5s 2.5s forwards;
+}
+
+/* 成功圖示 */
+.toast-message .icon {
+  font-size: 20px;
+}
+
+/* 動畫效果 */
+@keyframes slideIn {
+  from {
+    transform: translateY(-50px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+@keyframes fadeOut {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
+select#gender {
+  margin: 2% 0% 4% 0%;
+  padding: 2%;
+  border: 1px solid rgb(212, 211, 219);
+  display: block;
+  color: rgb(80, 78, 78);
+  width: 28%;
+  font-size: 12px;
+}
+
+/* 按鈕 disabled */
+/* 目前暫時沒用到！！！ */
+.btn_full[disabled] {
+  background-color: #cccccc; /* 變灰 */
+  color: #666666; /* 文字顏色變淡 */
+  cursor: not-allowed; /* 鼠標變成禁止符號 */
+  pointer-events: none; /* 禁用所有鼠標事件，包括 hover */
+  opacity: 0.7; /* 稍微透明 */
+}
+
+/* 最重要：覆寫 disabled 狀態下的 hover 效果 */
+/* 確保 disabled 狀態下的樣式不會有 hover 變化 */
+.btn_full[disabled]:hover {
+  background-color: #cccccc; /* 保持與非 hover 狀態相同 */
+  color: #666666; /* 保持與非 hover 狀態相同 */
+  cursor: not-allowed;
+  /* 如果你的模板有 transition，你可能需要在這裡也設定 transition: none; */
+  /* transition: none; */
+}

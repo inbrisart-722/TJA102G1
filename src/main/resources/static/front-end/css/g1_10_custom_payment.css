@@ -1,0 +1,96 @@
+aside.col-lg-4 {
+  margin-top: 68px;
+}
+aside.col-lg-4 > div.box_style_1 {
+  padding-bottom: 12px;
+}
+div.step th {
+  padding: 10px 10px;
+}
+div.step td {
+  padding: 15px 10px;
+}
+
+div.step th:first-child,
+td:first-child {
+  text-align: left;
+  width: 70%;
+  /* padding-left: 1%; */
+}
+div.step td:first-child > div.thumb_cart.img_block {
+  /* border: 1px solid blue; */
+  border: 1px solid lightgray;
+  width: 92px;
+}
+div.step td:first-child > div.thumb_cart.img_block > img {
+  /* border: 1px solid green; */
+  width: 100%;
+}
+div.step th:nth-child(1) {
+  padding-left: 1.5%;
+}
+div.step th:nth-child(2),
+td:nth-child(2) {
+  width: 10%;
+}
+div.step td:nth-child(3),
+td:nth-child(3) {
+  width: 8%;
+  padding-left: 1%;
+}
+div.step th:nth-child(4),
+td:nth-child(4) {
+  width: 8%;
+  text-align: center;
+}
+
+input#pay_method2 {
+  margin-top: 16px;
+}
+
+input#carrier_text {
+  margin-left: 16px;
+  padding-left: 8px;
+  border: 1px solid gray;
+  border-radius: 6px;
+}
+input#carrier_text:focus {
+  outline: 1px solid rgb(197, 196, 196);
+}
+
+div#policy > div.form-group {
+  margin: 24px 0;
+}
+
+/* 更動 radio 選中樣式 => 隱藏他 插入 content="" */
+/* 隱藏原生 radio */
+input[type="radio"] {
+  appearance: none; /* 清掉預設樣式 */
+  -webkit-appearance: none;
+  -moz-appearance: none;
+
+  width: 18px;
+  height: 18px;
+  border: 2px solid #ccc;
+  border-radius: 50%;
+  outline: none;
+  cursor: pointer;
+  position: relative;
+  margin-right: 5px;
+}
+
+/* 選到時顯示紅點 */
+input[type="radio"]:checked {
+  border-color: #d33; /* 外框紅色 */
+}
+
+input[type="radio"]:checked::before {
+  content: "";
+  position: absolute;
+  top: 2.5px;
+  left: 2.5px;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: #d33; /* 中間紅點 */
+}

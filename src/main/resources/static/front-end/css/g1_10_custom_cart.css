@@ -1,0 +1,328 @@
+/* div.search-overlay-menu {
+  background-color: rgb(0, 0, 0);
+} */
+
+/* section { */
+/* height: 75px; */
+/* background-color: #000000; */
+/* background-color: rgba(84, 70, 84, 0.489);
+} */
+
+/* 遮罩 */
+#modal_overlay {
+  display: none; /* 預設隱藏 */
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5); /* 半透明黑色 */
+  z-index: 999; /* 在最上層 */
+  align-items: center;
+  justify-content: center;
+}
+
+/* 彈窗本體 */
+#clear_cart_modal {
+  background-color: #f2f2f2;
+  border-radius: 20px;
+  padding: 20px;
+  width: 20%;
+  text-align: center;
+  color: rgb(0, 0, 0);
+  font-weight: 600;
+  font-size: 16px;
+  opacity: 0;
+  transform: scale(0.8); /* 初始縮小 */
+  transition: all 0.3s ease; /* 動畫效果 */
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.4);
+  position: relative;
+}
+
+/* 彈窗開啟動畫 class */
+#clear_cart_modal.show {
+  opacity: 1;
+  transform: scale(1); /* 放大到正常大小 */
+}
+
+/* 關閉叉叉 */
+#close_modal_btn {
+  background: none;
+  border: none;
+  font-size: 20px;
+  font-weight: bold;
+  position: absolute;
+  right: 10px;
+  top: 10px;
+  cursor: pointer;
+}
+
+/* 彈窗內容 */
+#modal_div1 {
+  margin: 20px 0;
+}
+
+#modal_div2 {
+  display: flex;
+  justify-content: center;
+  margin-top: 20px;
+}
+
+/* 按鈕樣式 */
+#modal_div2 > button {
+  border: none;
+  border-radius: 15px;
+  padding: 6px 14px;
+  margin: 0 10px;
+  cursor: pointer;
+}
+
+#cancel_btn {
+  background-color: darkcyan;
+  color: white;
+  font-weight: 600;
+}
+
+#clear_btn {
+  background-color: rgb(231, 231, 231);
+  font-weight: 400;
+}
+
+div#cart_title_block {
+  position: relative;
+  /* border: 1px solid black; */
+}
+div#cart_title_block > button#clear_cart {
+  position: absolute;
+  left: 144px;
+  top: 2px;
+  background: rgb(240, 240, 240);
+  border-radius: 15px;
+  border: 0;
+}
+/* ===== cart-list 對齊規則 ===== */
+
+h3.cart_title {
+  margin-bottom: 24px;
+}
+
+table.cart-list {
+  margin-bottom: 64px;
+  /* box-shadow: 0 10px 50px 0px rgba(211, 211, 211, 0.3); */
+  /* border: 1px solid darkgrey; */
+}
+/* 表頭：第一欄左、其餘右 */
+table.cart-list th {
+  padding: 12px 16px;
+  background: #f8f8f8;
+  font-weight: 600;
+  font-size: 14px;
+  vertical-align: middle;
+  white-space: nowrap;
+}
+table.cart-list th:first-child {
+  text-align: left;
+}
+table.cart-list th:not(:first-child) {
+  text-align: right;
+}
+
+/* 內容列：第一欄左、其餘右 */
+table.cart-list td {
+  padding: 16px;
+  border-top: 1px solid #eee;
+  vertical-align: middle;
+  font-size: 14px;
+  white-space: nowrap;
+}
+table.cart-list td:first-child {
+  text-align: left;
+}
+table.cart-list td:not(:first-child) {
+  text-align: right;
+}
+table.cart-list td:nth-child(3) {
+  padding-right: 25px;
+}
+
+/* 小計表頭微調，與金額右邊對齊感覺更緊 */
+table.cart-list > thead > tr > th:nth-child(4) {
+  padding-right: 8px; /* 讓「小計」與金額字尾對齊舒服一點 */
+}
+table.cart-list > thead > tr > th:nth-child(5) {
+  padding-right: 18px;
+}
+
+/* ===== 最右欄：結帳選項（checkbox + 釋出） ===== */
+
+/* 用表格本身的右對齊，不改 display 型態，避免破版 */
+table.cart-list td.actions {
+  text-align: right;
+  padding-right: 28px; /* 與表頭保持一致 */
+  white-space: nowrap; /* 不要換行 */
+}
+
+/* 讓 checkbox 與「釋出」橫向排，維持間距 */
+table.cart-list td.actions .buy_checked,
+table.cart-list td.actions .buy_release {
+  display: inline-block;
+  vertical-align: middle;
+  background: 0;
+}
+
+/* 兩者之間留點距離（不要用 margin-left:auto;）*/
+table.cart-list td.actions .buy_release {
+  margin-left: 10px;
+  font-size: 14px;
+  color: #6f6f6f;
+  border: 0;
+}
+
+/* checkbox 圖示大小維持 */
+table.cart-list td.actions .buy_checked {
+  font-size: 20px;
+  border: 0;
+}
+
+aside.col-lg-4 {
+  margin-top: 68px;
+}
+aside.col-lg-4 > div.box_style_1 {
+  padding-bottom: 12px;
+}
+
+table.cart-list.overtime td.actions .buy_putback {
+  background-color: #007a78;
+  color: white;
+  border: 1px solid gray;
+  border-radius: 16px;
+  font-weight: 600;
+  padding: 6px;
+}
+table.cart-list.overtime td.actions {
+  padding-right: 72px;
+}
+
+/* 側欄結帳框框 */
+tr.total > td {
+  padding: 12px 0;
+  font-weight: 400;
+}
+tr.total > td.text-end {
+  font-weight: 600;
+}
+aside a.btn_full {
+  font-size: 16px;
+  margin-top: 16px;
+}
+
+/* 圖改成 長方形 */
+
+div.thumb_cart.img_block {
+  border: 1px solid lightgray;
+  position: relative;
+  width: 100%;
+  border-radius: 8px;
+  overflow: hidden;
+}
+div.thumb_cart.img_block > img {
+  /* border: 1px solid black; */
+  position: absolute;
+  width: 100%;
+}
+
+/* 購物車淡出 */
+
+/* 初始狀態：讓 height/opacity/padding 可以過渡 */
+tr.cart_item_row {
+  height: var(--row-h, auto);
+  transition: height 0.28s ease, opacity 0.28s ease;
+}
+
+/* 讓每個 cell 的上下 padding 也跟著收合，視覺更順 */
+tr.cart_item_row > td {
+  --cell-pad-y: 0.75rem; /* 視你的設計調整 */
+  padding-top: var(--cell-pad-y);
+  padding-bottom: var(--cell-pad-y);
+  transition: padding 0.6s ease;
+}
+
+/* 觸發移除動畫的 class */
+tr.cart_item_row.is-removing {
+  opacity: 0;
+  height: 0 !important;
+}
+tr.cart_item_row.is-removing > td {
+  padding-top: 0;
+  padding-bottom: 0;
+}
+
+/* （可選）交錯淡出看起來更滑順時，把位移也加上去（table-row 兼容性 OK） */
+tr.cart_item_row.is-removing {
+  transform: translateY(-4px);
+  transition: height 0.6s ease, opacity 0.6s ease, transform 0.6s ease;
+}
+
+/*  */
+/*  */
+/*  */
+/*  */
+/*  */
+/* ====== 圖片不跑版：固定縮略圖尺寸，文字跟在右側 ====== */
+table.cart-list td:first-child {
+  display: flex;
+  align-items: center;
+  gap: 12px; /* 圖與文字的間距 */
+}
+
+table.cart-list td:first-child > .thumb_cart.img_block {
+  flex: 0 0 96px; /* 固定寬度 */
+  height: 64px; /* 固定高度（可依設計調整） */
+  border: 1px solid #e5e5e5;
+  border-radius: 8px;
+  overflow: hidden;
+  position: relative; /* 保留圓角裁切 */
+}
+
+table.cart-list .thumb_cart.img_block > img {
+  /* 覆寫你原本的 absolute/width:100% 設定 */
+  position: static !important;
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover; /* 填滿裁切、不變形 */
+}
+
+/* 文字不要被擠壓 */
+table.cart-list td:first-child > .item_cart {
+  flex: 1 1 auto;
+  min-width: 0;
+  margin-top: 0;
+}
+
+/* ====== 新增的「數量」欄 ====== */
+table.cart-list td.qty,
+table.cart-list th.th-qty {
+  text-align: right; /* 和其他數字欄一致靠右 */
+  white-space: nowrap;
+  width: 80px; /* 讓欄寬穩定 */
+}
+
+/* ====== 取代 nth-child 的微調（更耐用） ====== */
+table.cart-list th.th-subtotal {
+  text-align: right;
+}
+table.cart-list th.th-subtotal {
+  padding-right: 18px;
+}
+table.cart-list th.th-actions {
+  padding-right: 93px;
+}
+table.cart-list td.actions {
+  padding-right: 28px;
+}
+
+/* 仍保留你原本「保留時間」的右內距微調（第 3 欄位） */
+table.cart-list td:nth-child(3) {
+  padding-right: 25px;
+}

@@ -1,0 +1,279 @@
+/* 用來開發時調整預設顯示第幾頁使用 */
+/* #tabs .content > section {
+  display: none;
+}
+#tabs .content > section.content-current {
+  display: block;
+} */
+
+/* 訂單／票匣 */
+/* 1. 上方 tab */
+nav#tablist_order {
+  text-align: center;
+  margin-bottom: 3%;
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  /* border: 1px solid black; */
+}
+nav#tablist_order > button.tab_order {
+  background: 0;
+  border: 0;
+  border-radius: 15px;
+  width: 6%;
+  border-bottom: 1px solid gray;
+  /* border: 1px solid gray; */
+}
+nav#tablist_order > button.tab_order.-on {
+  color: white;
+  background: darkcyan;
+  font-weight: 600;
+}
+
+/* 2. 訂單本體架構 */
+/* 第 1 階層：訂單 */
+div.order_row {
+  padding: 1%;
+}
+div.order_row > div.order_head {
+  /* border: 1px solid blue; */
+  background: rgb(255, 255, 255);
+  background: rgba(0, 139, 139, 0.5);
+  color: black;
+  font-weight: 400;
+  padding: 2% 2.5%;
+  border-radius: 5px;
+  border: 1px solid rgb(74, 161, 161);
+
+  display: flex;
+  justify-content: center;
+}
+div.order_row > div.order_head > span.order_id {
+  flex-grow: 20;
+}
+div.order_row > div.order_head > span.order_amount {
+  flex-grow: 1.5;
+}
+div.order_row > div.order_head > span.order_status {
+  flex-grow: 2;
+}
+div.order_row > div.order_head > button {
+  flex-grow: 0.5;
+  margin: 0 1%;
+
+  background: rgb(122, 122, 122);
+  border: 0;
+  border-radius: 15px;
+  width: 5%;
+  font-weight: 700;
+  color: white;
+  padding: 0 0.2%;
+  padding-left: 0.6%;
+}
+div.order_row > div.order_head > button:last-child {
+  width: 3.5%;
+  padding-right: 0.6%;
+}
+
+/* 第 2 階層：訂單明細收納 by 展覽 */
+div.order_row > div.order_body {
+  margin: 1% 0;
+  /* display: none; */
+  overflow: hidden;
+  max-height: 0;
+  opacity: 0;
+  transition: max-height 800ms ease, opacity 400ms ease;
+}
+div.order_row > div.order_body.-expanded {
+  max-height: 1000px;
+  opacity: 1;
+  /* display: block; */
+}
+div.order_row > div.order_body > div.order_item_head {
+  border: 1px solid rgb(172, 172, 172);
+  padding: 1% 2%;
+  margin-left: 2%;
+  border-radius: 5px;
+  display: flex;
+  align-items: center;
+}
+div.order_row > div.order_body > div.order_item_head > img {
+  float: left;
+}
+div.order_row > div.order_body > div.order_item_head::after {
+  content: "";
+  display: block;
+  clear: both;
+}
+
+div.order_row > div.order_body > div.order_item_head > div {
+  display: flex;
+  flex-wrap: wrap;
+  width: 100%;
+}
+
+div.order_row > div.order_body > div.order_item_head > div > span {
+  width: 100%;
+  margin: 0.4% 1% 0.4% 2%;
+}
+div.order_row > div.order_body > div.order_item_head > div > span:nth-child(2) {
+  display: flex;
+  justify-content: space-between;
+}
+
+/* div.order_row > div.order_body > div.order_item_head > div > button {
+  border: 0;
+  border-radius: 15px;
+  width: 5%;
+  font-weight: 700;
+  background: 0;
+} */
+
+div.order_row > div.order_body > div.order_item_body {
+  border: 1px solid rgb(172, 172, 172);
+  padding: 2% 2%;
+  margin: 1% 0% 1% 4%;
+  border-radius: 5px;
+  /* background: rgb(203, 199, 9); */
+}
+
+/* 第 3 階層：訂單明細 */
+div.order_row > div.order_body > div.order_item_body > div.order_item_ticket {
+  display: flex;
+}
+div.order_row
+  > div.order_body
+  > div.order_item_body
+  > div.order_item_ticket
+  > span:nth-child(1) {
+  flex-grow: 9;
+}
+div.order_row
+  > div.order_body
+  > div.order_item_body
+  > div.order_item_ticket
+  > span:nth-child(2) {
+  flex-grow: 1;
+}
+
+div.order_row
+  > div.order_body
+  > div.order_item_body
+  > div.order_item_ticket
+  > button {
+  background: darkcyan;
+  color: white;
+  font-weight: 600;
+  border: 1px solid gray;
+  border-radius: 15px;
+  margin-left: 5%;
+}
+
+/* qrcode */
+#qrcode_model {
+  width: 50%;
+  margin-left: 0;
+  /* position: relative; */
+  /* right: 10%; */
+}
+#modal-content {
+  margin-left: 0;
+  width: 60%;
+  display: none;
+}
+#modal-content > div {
+  text-align: right;
+  margin: 5% 5% 5% 0;
+}
+#modal-content > div > button {
+  font-size: 32px;
+  border: 0;
+  background: 0;
+}
+
+#modal-content > canvas {
+  margin: 10%;
+  margin-top: 0;
+}
+/* =============================================================== */
+/* =============================================================== */
+/* =============================================================== */
+
+/* 基本資料 */
+
+ul#profile_summary > li > span > button {
+  border: 0;
+  border-bottom: 1px solid gray;
+  /* box-shadow:1px 1px 5px rgb(136, 134, 134) */
+  background: rgb(218, 218, 218);
+}
+
+ul#profile_summary > li {
+  width: 90%;
+}
+#related_account {
+  margin: 6% 0 3% 0;
+}
+ul#profile_summary > li.third_party {
+  position: relative;
+  padding-right: 25px;
+}
+ul#profile_summary > li.third_party > button {
+  position: absolute;
+  right: 2%;
+  text-align: right;
+  border: 0;
+  background: 0;
+}
+/* ul#profile_summary > li.third_party  > button {
+} */
+div.form-group > input {
+  height: 32px;
+  margin-top: 8px;
+  width: 80%;
+}
+div.form-group > label > small {
+  font-size: 10px;
+}
+
+#js-upload-files {
+  display: none;
+  width: 0;
+  height: 0;
+}
+#img_block {
+  /* width: 30%; */
+  text-align: right;
+  position: relative;
+}
+#user_img {
+  border-radius: 50%;
+  width: 200px;
+  height: 200px;
+  position: absolute;
+  right: 25%;
+  bottom: 52.5%;
+  overflow: hidden;
+}
+#js-upload-submit {
+  position: absolute;
+  right: 45%;
+  bottom: 42.5%;
+}
+div.row > div#btn_block {
+  margin-top: 4%;
+  display: flex;
+  justify-content: end;
+}
+div.row > div > button.btn_updateinfo {
+  width: 10%;
+}
+#btn_recover {
+  border: 0;
+  background: 0;
+  color: darkgray;
+}
+div.order_item_head > img {
+  height: 60px;
+  border: 1px solid lightgray;
+}

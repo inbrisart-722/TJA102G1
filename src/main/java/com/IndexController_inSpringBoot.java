@@ -11,5 +11,10 @@ public class IndexController_inSpringBoot {
 	public String select_page(Model model) {
 		return "platform/index"; // 對應 templates/platform/index.html
 	}
+    
+    @GetMapping("/exhibitions")
+	public String exhibitions(Model model) {
+		return "front-end/exhibitions"; // 對應 templates/platform/index.html
+	}
 	
 }
