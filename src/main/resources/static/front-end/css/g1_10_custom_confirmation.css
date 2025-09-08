@@ -1,0 +1,9 @@
+div.thumb_cart.img_block {
+  border: 1px solid lightgray;
+  width: 89px;
+  border-radius: 10px;
+}
+div.thumb_cart.img_block > img {
+  /* border: 1px solid green; */
+  width: 100%;
+}
