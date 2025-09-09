@@ -1,13 +1,23 @@
 package com.eventra.exhibition_ticket_type.model;
 
-import com.eventra.exhibition.model.ExhibitionVO;
-import com.eventra.ticket_type.model.TicketTypeVO;
-import jakarta.persistence.*;
-import jakarta.validation.constraints.NotNull;
+import java.time.LocalDateTime;
+
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
-import java.time.LocalDateTime;
+import com.eventra.exhibition.model.ExhibitionVO;
+import com.eventra.ticket_type.model.TicketTypeVO;
+
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
+import jakarta.validation.constraints.NotNull;
 
 @Entity
 @Table(name = "exhibition_ticket_type")
@@ -18,10 +28,13 @@ public class ExhibitionTicketTypeVO {
     @Column(name = "exhibition_ticket_type_id")
     private Integer exhibitionTicketTypeId;
 
+    @Column(name = "exhibition_id", insertable = false, updatable = false)
+	private Integer exhibitionId;
+    
     @NotNull
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "exhibition_id", nullable = false)
-    private ExhibitionVO exhibitionId;
+    private ExhibitionVO exhibition;
 
     @NotNull
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
@@ -52,11 +65,11 @@ public class ExhibitionTicketTypeVO {
     }
 
     public ExhibitionVO getExhibitionId() {
-        return exhibitionId;
+        return exhibition;
     }
 
-    public void setExhibitionId(ExhibitionVO exhibitionId) {
-        this.exhibitionId = exhibitionId;
+    public void setExhibition(ExhibitionVO exhibition) {
+        this.exhibition = exhibition;
     }
 
     public TicketTypeVO getTicketTypeId() {
