@@ -22,7 +22,7 @@ import jakarta.validation.constraints.NotNull;
 @Entity
 @Table(name = "exhibition_ticket_type")
 public class ExhibitionTicketTypeVO {
-
+	
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "exhibition_ticket_type_id")
@@ -48,7 +48,7 @@ public class ExhibitionTicketTypeVO {
     @CreationTimestamp
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
-
+    
     @UpdateTimestamp
     @Column(name = "updated_at", nullable = false)
     private LocalDateTime updatedAt;
