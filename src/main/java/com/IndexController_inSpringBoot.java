@@ -12,9 +12,10 @@ public class IndexController_inSpringBoot {
 		return "platform/index"; // 對應 templates/platform/index.html
 	}
     
-    @GetMapping("/exhibitions")
+
+    @GetMapping("/back-end/create_event")
 	public String exhibitions(Model model) {
-		return "front-end/exhibitions"; // 對應 templates/platform/index.html
+		return "front-end/create_event"; // 對應 templates/platform/index.html
 	}
-	
+
 }
