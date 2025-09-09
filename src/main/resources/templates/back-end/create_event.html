@@ -1,0 +1,729 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes"/>
+    <title>Exhibitor | 建立展覽</title>
+
+    <!-- CSS：順序很重要 -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css"/>
+    <link href="https://cdn.jsdelivr.net/npm/summernote@0.8.20/dist/summernote-bs5.min.css" rel="stylesheet">
+    <link rel="preload" href="./css/adminlte.css" as="style"/>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/source-sans-3@5.0.12/index.css"
+          crossorigin="anonymous" media="print" onload="this.media='all'"/>
+    <link rel="stylesheet"
+          href="https://cdn.jsdelivr.net/npm/overlayscrollbars@2.11.0/styles/overlayscrollbars.min.css"/>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css"/>
+    <link rel="stylesheet" href="./css/adminlte.css"/>
+
+    <style>
+        .cover-box{width:220px;height:280px;background:#adb5bd33;border:2px dashed #ced4da;border-radius:.75rem;display:flex;align-items:center;justify-content:center;overflow:hidden}
+        .cover-box img{max-width:100%;max-height:100%;object-fit:cover}
+        .ticket-row .form-control{min-width:90px}
+        .ticket-row .remove{visibility:hidden}
+        .ticket-row:hover .remove{visibility:visible}
+        .help-text{font-size:.825rem;color:var(--bs-secondary-color)}
+
+        /* Summernote 漂浮層避免被蓋住或裁切 */
+        .note-editor .note-toolbar,
+        .note-editor .note-popover,
+        .note-modal,
+        .note-dropdown-menu { z-index:1085 !important; }
+        .note-editor { overflow: visible !important; }
+
+      .ticket-row .form-control{min-width:90px}
+      .ticket-row.inactive{opacity:.55}
+      .ticket-row.inactive input{pointer-events:none}
+      .ticket-row .toggle-active.btn{--bs-btn-padding-y:.25rem;--bs-btn-padding-x:.55rem;--bs-btn-font-size:.8rem}
+
+      /* 通用：等比例預覽盒（用 CSS 變數控制長寬比） */
+    .ratio-uploader {
+      --ar: 4/3;                 /* 預設比例，可由行內 style 覆蓋 */
+      width: 100%;
+      max-width: 620px;
+      background: #adb5bd33;
+      border: 2px dashed #ced4da;
+      border-radius: .75rem;
+      position: relative;
+      overflow: hidden;
+      display: grid;
+      place-items: center;
+    }
+    .ratio-uploader::before {
+      content: "";
+      display: block;
+      width: 100%;
+      aspect-ratio: var(--ar);
+    }
+    .ratio-uploader > .preview {
+      position: absolute;
+      inset: 0;
+      display: grid;
+      place-items: center;
+    }
+    .ratio-uploader img {
+      max-width: 100%;
+      max-height: 100%;
+      object-fit: cover;
+    }
+
+    /* 小提示字 */
+    .help-text{font-size:.825rem;color:var(--bs-secondary-color)}
+
+
+    </style>
+</head>
+<body class="layout-fixed sidebar-expand-lg bg-body-tertiary">
+<div class="app-wrapper">
+    <!-- Header（自動注入） -->
+    <div data-include="./header.html"></div>
+
+
+    <!-- Sidebar -->
+    <aside class="app-sidebar bg-body-secondary" data-bs-theme="dark">
+        <div class="sidebar-brand">
+            <a href="#" class="brand-link">
+                <img src="./assets/img/AdminLTELogo.png" alt="AdminLTE Logo" class="brand-image opacity-75 shadow"/>
+                <span class="brand-text fw-light">eventra</span>
+            </a>
+        </div>
+        <div class="sidebar-wrapper">
+            <nav class="mt-2">
+                <ul class="nav sidebar-menu flex-column" data-lte-toggle="treeview" role="navigation"
+                    data-accordion="false">
+                    <li class="nav-item"><a class="nav-link"><p>展商後台</p></a></li>
+                    <li class="nav-item menu-open">
+                        <a href="#" class="nav-link"><i class="nav-icon bi bi-circle-fill"></i>
+                            <p>展覽管理</p></a>
+                        <ul class="nav nav-treeview">
+                            <li class="nav-item"><a href="./event_list.html" class="nav-link"><p>展覽列表</p></a></li>
+                        </ul>
+                    </li>
+                    <li class="nav-item menu-open">
+                        <a href="#" class="nav-link"><i class="nav-icon bi bi-circle-fill"></i>
+                            <p>銷售管理</p></a>
+                        <ul class="nav nav-treeview">
+                            <li class="nav-item"><a href="./order_list.html" class="nav-link"><p>訂單列表</p></a></li>
+                            <li class="nav-item"><a href="#" class="nav-link"><p>銷售列表</p></a></li>
+                        </ul>
+                    </li>
+                    <li class="nav-item menu-open">
+                        <a href="#" class="nav-link"><i class="nav-icon bi bi-circle-fill"></i>
+                            <p>會員中心</p></a>
+                        <ul class="nav nav-treeview">
+                            <li class="nav-item"><a href="./exhibitor_info.html" class="nav-link"><p>展商資訊</p></a>
+                            </li>
+                            <li class="nav-item"><a href="./exhibitor_account_data.html" class="nav-link"><p>
+                                帳戶資料</p></a></li>
+                        </ul>
+                    </li>
+                </ul>
+            </nav>
+            <!-- 底部：登出連結 -->
+            <div class="p-3 border-top">
+                <a href="./exhibitor_login.html" id="logoutLink" class="nav-link text-danger">
+                    <i class="bi bi-box-arrow-right me-1"></i> 登出
+                </a>
+            </div>
+        </div>
+    </aside>
+
+    <!-- Main -->
+    <main class="app-main">
+        <div class="app-content-header">
+            <div class="container-fluid">
+                <div class="row align-items-center">
+                    <div class="col-sm-6"><h3 class="mb-0">建立展覽</h3></div>
+                    <div class="col-sm-6 text-sm-end mt-2 mt-sm-0">
+                        <a href="./event_list.html" class="btn btn-outline-secondary btn-sm"><i
+                                class="bi bi-arrow-left-short me-1"></i>返回列表</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="app-content">
+            <div class="container-fluid">
+
+                <form id="eventForm">
+                    <!-- 基本資訊 -->
+                    <div class="col-lg-4 d-flex flex-column align-items-center gap-2">
+                        <!-- 800×533 封面 -->
+                        <div class="ratio-uploader" id="coverBox" style="--ar: 800/533;">
+                            <div class="preview"><span class="text-secondary">上傳圖片</span></div>
+                        </div>
+                        <div class="d-flex gap-2">
+                            <input class="form-control form-control-sm" id="coverInput" type="file" accept="image/*">
+                            <button type="button" class="btn btn-outline-secondary btn-sm" id="btnClearCover">清除
+                            </button>
+                        </div>
+                        <div class="help-text">建議尺寸：800×533（JPG/PNG）</div>
+                    </div>
+
+
+                    <div class="col-lg-8">
+                        <div class="row g-3">
+                            <div class="col-12">
+                                <label class="form-label">展覽名稱</label>
+                                <input type="text" class="form-control" id="evName" placeholder="輸入展覽名稱" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">開始時間</label>
+                                <input type="datetime-local" class="form-control" id="startAt" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">結束時間</label>
+                                <input type="datetime-local" class="form-control" id="endAt" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">展覽地點</label>
+                                <input type="text" class="form-control" id="location" placeholder="輸入展覽地點">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">主辦單位</label>
+                                <input type="text" class="form-control" id="organizer" placeholder="展覽主辦方">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">總票數</label>
+                                <input type="number" min="0" class="form-control" id="totalTickets"
+                                       placeholder="輸入總票數">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">開賣日</label>
+                                <input type="datetime-local" class="form-control" id="saleOpenAt">
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- 票種設定 -->
+        <div class="card mt-4 mb-4">
+            <div class="card-header d-flex align-items-center justify-content-between flex-wrap gap-2">
+                <h5 class="card-title mb-0">票種設定</h5>
+                <!-- 依需求：拔掉新增票種；若不需要常用票種，下行也可整段移除 -->
+                <div class="btn-group d-none">
+                    <button class="btn btn-outline-secondary btn-sm dropdown-toggle" data-bs-toggle="dropdown">
+                        <i class="bi bi-tags me-1"></i>常用票種
+                    </button>
+                    <ul class="dropdown-menu" id="presetMenu">
+                        <li><a class="dropdown-item" data-name="全票">全票</a></li>
+                        <li><a class="dropdown-item" data-name="學生票">學生票</a></li>
+                        <li><a class="dropdown-item" data-name="敬老票">敬老票</a></li>
+                        <li><a class="dropdown-item" data-name="身心障礙者票">身心障礙者票</a></li>
+                        <li><a class="dropdown-item" data-name="軍警票">軍警票</a></li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="card-body">
+                <div class="row fw-semibold text-secondary d-none d-lg-flex px-2">
+                    <div class="col-lg-6">票種名稱</div>
+                    <div class="col-lg-4">金額</div>
+                    <div class="col-lg-2 text-end">操作</div>
+                </div>
+                <div id="ticketList" class="mt-2"></div>
+            </div>
+        </div>
+
+        <!-- 展覽橫幅（1400×470） -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="card-title mb-0">展覽橫幅</h5>
+            </div>
+            <div class="card-body">
+                <div class="d-flex flex-column align-items-start gap-2">
+                    <div class="ratio-uploader" id="bannerBox" style="--ar: 1400/470;">
+                        <div class="preview"><span class="text-secondary">上傳橫幅</span></div>
+                    </div>
+                    <div class="d-flex gap-2">
+                        <input class="form-control form-control-sm" id="bannerInput" type="file" accept="image/*">
+                        <button type="button" class="btn btn-outline-secondary btn-sm" id="btnClearBanner">清除</button>
+                    </div>
+                    <div class="help-text">建議尺寸：1400×470（JPG/PNG）</div>
+                </div>
+            </div>
+        </div>
+
+
+        <!-- 展覽資訊（Summernote） -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="card-title mb-0">展覽資訊</h5>
+            </div>
+            <div class="card-body">
+                <div id="editor"></div>
+            </div>
+        </div>
+
+        </form>
+        <!-- 操作按鈕 -->
+        <div class="d-flex flex-wrap gap-2 justify-content-end mb-5">
+            <button class="btn btn-outline-secondary" id="btnPreview"><i class="bi bi-eye me-1"></i>預覽</button>
+            <button class="btn btn-primary" id="btnSaveDraft"><i class="bi bi-save me-1"></i>儲存為草稿</button>
+            <button class="btn btn-success" id="btnSubmit"><i class="bi bi-check2-circle me-1"></i>完成</button>
+        </div>
+
+
+
+</main>
+
+<footer class="app-footer"></footer>
+</div>
+
+<!-- Preview Modal -->
+<div class="modal fade" id="previewModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header"><h5 class="modal-title">預覽</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div id="previewArea"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- JS：順序很重要（jQuery -> Bootstrap.bundle -> Summernote -> 其他 -> AdminLTE 最後） -->
+<script src="https://cdn.jsdelivr.net/npm/jquery@3.7.1/dist/jquery.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+    // 有些環境 bootstrap 不是掛在全域，補上給 Summernote 取用
+    window.jQuery = window.$ = jQuery;
+    if (typeof bootstrap !== 'undefined') window.bootstrap = bootstrap;
+</script>
+
+<script src="https://cdn.jsdelivr.net/npm/summernote@0.8.20/dist/summernote-bs5.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/overlayscrollbars@2.11.0/browser/overlayscrollbars.browser.es6.min.js"></script>
+<script src="./js/adminlte.js"></script>
+
+<script>
+    // --- Summernote 初始化（不呼叫 focus，避免自動捲動） ---
+    $(function () {
+      const $ed = $('#editor');
+      if ($ed.next('.note-editor').length) { try { $ed.summernote('destroy'); } catch(e){} }
+
+      $ed.summernote({
+        placeholder: '請輸入展覽資訊…',
+        height: 300,
+        dialogsInBody: true,
+        toolbar: [
+          ['style',    ['style']],
+          ['font',     ['bold', 'italic', 'underline', 'clear']],
+          ['fontname', ['fontname']],
+          ['fontsize', ['fontsize']],
+          ['color',    ['color']],
+          ['para',     ['ul', 'ol', 'paragraph']],
+          ['table',    ['table']],
+          ['insert',   ['link', 'picture', 'video']],
+          ['view',     ['codeview', 'help']]
+        ]
+      });
+
+      // 修正老版本 data-toggle，確保下拉能用
+      const editor = document.querySelector('.note-editor');
+      if (editor) {
+        editor.querySelectorAll('[data-toggle="dropdown"]').forEach(btn => {
+          btn.setAttribute('data-bs-toggle', 'dropdown');
+          btn.removeAttribute('data-toggle');
+        });
+        // 以 fixed 策略建立 Dropdown，避免被父層 overflow 影響
+        if (window.bootstrap?.Dropdown) {
+          editor.querySelectorAll('[data-bs-toggle="dropdown"]').forEach(btn => {
+            bootstrap.Dropdown.getOrCreateInstance(btn, { popperConfig: { strategy: 'fixed' } });
+          });
+        }
+      }
+
+      console.log('jQuery', $.fn.jquery, 'Bootstrap.Dropdown?', !!window.bootstrap?.Dropdown, 'Summernote?', !!$.fn.summernote);
+    });
+
+    // ---- 封面上傳 ----
+    const coverInput = document.getElementById('coverInput');
+    const coverBox = document.getElementById('coverBox');
+    const btnClearCover = document.getElementById('btnClearCover');
+    coverInput.addEventListener('change', ()=>{
+      const f = coverInput.files[0]; if(!f) return;
+      const img = document.createElement('img');
+      img.onload = ()=>{ coverBox.innerHTML=''; coverBox.appendChild(img); };
+      img.src = URL.createObjectURL(f);
+    });
+    btnClearCover.addEventListener('click', ()=>{ coverBox.innerHTML = '<span class="text-secondary">上傳圖片</span>'; coverInput.value = ''; });
+
+
+
+    // ---- 描述存取 ----
+    function getDescriptionHtml(){ return $('#editor').summernote('code'); }
+    function setDescriptionHtml(html){ $('#editor').summernote('code', html || ''); }
+
+    // ---- 從 sessionStorage 帶入編輯資料 ----
+    document.addEventListener('DOMContentLoaded', () => {
+    const params = new URLSearchParams(location.search);
+    const editId = params.get('edit');
+
+    if (!editId) {
+      // 沒有 edit 參數 => 新增模式，確保不殘留舊資料
+      sessionStorage.removeItem('editingEvent');
+      return;
+    }
+
+    const raw = sessionStorage.getItem('editingEvent');
+    if (!raw) return;
+
+    try {
+      const ev = JSON.parse(raw);
+      document.getElementById('evName').value   = ev.name || '';
+      document.getElementById('startAt').value  = ev.startAt || ev.date || '';
+      document.getElementById('endAt').value    = ev.endAt || '';
+      document.getElementById('location').value = ev.location || '';
+      document.getElementById('organizer').value= ev.organizer || '';
+
+      const totalInput = document.getElementById('totalTickets');
+      const saleOpen   = document.getElementById('saleOpenAt');
+      if (totalInput && ev.total != null) totalInput.value = ev.total;
+      if (saleOpen   && ev.saleOpenAt)   saleOpen.value   = ev.saleOpenAt;
+
+
+
+      if ($('#editor').length) {
+        const html = ev.descriptionHtml || ev.descriptionText || '';
+        $('#editor').summernote('code', html);
+      }
+
+          // 若活動物件保存了圖片（DataURL），帶回預覽
+      if (ev.coverImage) { coverDataUrl = ev.coverImage;
+        document.querySelector('#coverBox .preview').innerHTML = `<img src="${coverDataUrl}" />`; }
+
+      if (ev.bannerImage) { bannerDataUrl = ev.bannerImage;
+        document.querySelector('#bannerBox .preview').innerHTML = `<img src="${bannerDataUrl}" />`; }
+
+    } catch(e) {
+      console.warn('editingEvent parse error', e);
+    }
+  });
+
+  // 點「返回列表」時順便清掉殘留
+  document.addEventListener('click', (e) => {
+    const a = e.target.closest('a[href="./event_list.html"]');
+    if (a) sessionStorage.removeItem('editingEvent');
+  });
+
+    // ---- 預覽 ----
+    document.getElementById('btnPreview').addEventListener('click', ()=>{
+      const descriptionHtml = getDescriptionHtml();
+      const html = `
+        <h4>${document.getElementById('evName').value || '(未命名活動)'}</h4>
+        <div class="text-secondary mb-2">${document.getElementById('startAt').value} ~ ${document.getElementById('endAt').value}</div>
+        <div class="mb-2">地點：${document.getElementById('location').value || '-'}</div>
+        <div class="mb-3">主辦：${document.getElementById('organizer').value || '-'}</div>
+        <h6 class="mt-3">票種</h6>
+        <ul>${
+          [...document.querySelectorAll('#ticketList .ticket-row')].map(r=>{
+            const name  = r.children[0].querySelector('input').value || '(未命名)';
+            const price = r.children[1].querySelector('input').value || '-';
+            return `<li>${name} / $${price}</li>`;
+          }).join('')
+        }</ul>
+        <h6 class="mt-3">說明</h6>
+        <div class="mb-0">${descriptionHtml}</div>`;
+      document.getElementById('previewArea').innerHTML = html;
+      new bootstrap.Modal(document.getElementById('previewModal')).show();
+    });
+
+    // ---- 狀態判斷（以開賣日→結束時間）----
+    function computeStatusBySaleOpen(saleOpenISO, endISO){
+    if (!saleOpenISO || !endISO) return '尚未開賣';
+    const s = new Date(saleOpenISO);
+    const e = new Date(endISO);
+    const now = new Date();
+    if (now < s) return '尚未開賣';
+    if (now > e) return '已結束';
+    return '售票中';
+  }
+
+
+    // ---- 儲存共用 ----
+
+
+    function saveEventAndBack(draft){
+      const form = document.getElementById('eventForm');
+      if (!form) {
+        console.error('找不到 #eventForm，請確認 form 是否存在且包住所有欄位');
+        alert('內部表單錯誤，請刷新頁面後重試');
+        return;
+      }
+      if (!form.reportValidity()) return;
+
+      try {
+        const params = new URLSearchParams(location.search);
+        const editId = params.get('edit');
+        const finalId = editId ? Number(editId) : Date.now();
+
+        const totalInput = document.getElementById('totalTickets').value;
+        const openAt     = document.getElementById('saleOpenAt').value; // YYYY-MM-DD
+        const code       = getDescriptionHtml();
+        const plain      = $('<div>').html(code).text().trim();
+
+        const payload = {
+          id: finalId,
+          name: document.getElementById('evName').value.trim(),
+          startAt: document.getElementById('startAt').value || '',
+          endAt:   document.getElementById('endAt').value   || '',
+          location:  document.getElementById('location').value.trim(),
+          organizer: document.getElementById('organizer').value.trim(),
+          tickets:   collectTickets(),
+          total:     totalInput ? Number(totalInput) : null,
+          remain:    totalInput ? Number(totalInput) : null,
+          saleOpenAt: openAt || '',
+          descriptionHtml: code,
+          descriptionText: plain,
+          coverImage:  coverDataUrl || null,   // 800×533
+          bannerImage: bannerDataUrl || null,  // 1400×470
+  };
+
+
+
+        payload.status = draft ? '草稿' : computeStatusBySaleOpen(payload.saleOpenAt, payload.endAt);
+
+        const storeKey = 'events';
+        const list = JSON.parse(localStorage.getItem(storeKey) || '[]');
+        const idx = list.findIndex(x => x.id === finalId);
+        if (idx >= 0) list[idx] = { ...list[idx], ...payload };
+        else list.unshift(payload);
+        localStorage.setItem(storeKey, JSON.stringify(list));
+
+        sessionStorage.removeItem('editingEvent');
+        location.href = './event_list.html';
+      } catch (err) {
+        console.error('儲存時發生錯誤：', err);
+        alert('儲存時發生錯誤，請開 Console 看詳細訊息。\n' + String(err));
+      }
+    }
+
+    document.getElementById('btnSaveDraft').addEventListener('click', () => saveEventAndBack(true));
+    document.getElementById('btnSubmit').addEventListener('click',    () => saveEventAndBack(false));
+</script>
+<script>
+    document.getElementById('logoutLink')?.addEventListener('click', (e) => {
+      e.preventDefault();
+      // 清除登入紀錄
+      sessionStorage.removeItem('exhibitorSession');
+      // 導回登入頁
+      window.location.href = './exhibitor_login.html';
+    });
+</script>
+<script>
+    (async () => {
+      // 讓放了 data-include 的容器先隱藏，避免 FOUC
+      document.querySelectorAll('[data-include]').forEach(el => el.style.visibility = 'hidden');
+
+      // 載入所有 partial
+      const tasks = [...document.querySelectorAll('[data-include]')].map(async (el) => {
+        const url = el.getAttribute('data-include');
+        const bust = `v=${encodeURIComponent((window.__PARTIALS_VERSION__) || '1')}`; // 可手動改版本清快取
+        const src = url.includes('?') ? `${url}&${bust}` : `${url}?${bust}`;
+        try {
+          const res = await fetch(src, { cache: 'no-store' });
+          if (!res.ok) throw new Error(res.statusText);
+          el.innerHTML = await res.text();
+          el.style.visibility = 'visible';
+          el.dispatchEvent(new CustomEvent('partial:loaded', { bubbles: true }));
+        } catch (err) {
+          el.innerHTML = `<!-- include failed: ${url} -->`;
+          el.style.visibility = 'visible';
+          console.warn('Include failed:', url, err);
+        }
+      });
+
+      await Promise.all(tasks);
+
+      // 1) 根據目前 URL 自動加上 active（如果 sidebar 裡的 a[href] 剛好指到當前頁）
+      const here = location.pathname.split('/').pop() || 'index.html';
+      document.querySelectorAll('aside a.nav-link, aside .nav-treeview a.nav-link').forEach(a => {
+        const href = (a.getAttribute('href') || '').split('/').pop();
+        if (href && href === here) a.classList.add('active');
+      });
+
+      // 2) AdminLTE 如果要初始化（依你專案需要）
+      // window.AdminLTE && window.AdminLTE.autoInit?.();
+
+      // 3) 登出（若要清 sessionStorage / localStorage）
+      const logout = document.getElementById('logoutLink');
+      if (logout) {
+        logout.addEventListener('click', (e) => {
+          // e.preventDefault(); // 若要攔截導頁再手動跳轉，取消註解
+          sessionStorage.removeItem('auth');       // 依專案實際使用的 key
+          sessionStorage.removeItem('editingEvent');
+          // location.href = logout.getAttribute('href'); // 若攔截，最後導回登入頁
+        });
+      }
+    })();
+    // ===== 票種：固定 5 種、可啟用/停用 =====
+const DEFAULT_TICKETS = [
+  { name:'全票',       price:'' , active:true },
+  { name:'學生票',     price:'' , active:true },
+  { name:'敬老票',     price:'' , active:true },
+  { name:'身心障礙者票', price:'' , active:true },
+  { name:'軍警票',     price:'' , active:true },
+];
+
+const ticketList = document.getElementById('ticketList');
+let ticketState = JSON.parse(JSON.stringify(DEFAULT_TICKETS)); // 深拷貝
+
+function renderTickets(){
+  ticketList.innerHTML = '';
+  ticketState.forEach((t, idx) => {
+    const row = document.createElement('div');
+    row.className = 'ticket-row row g-2 align-items-center mb-2' + (t.active ? '' : ' inactive');
+    row.dataset.index = idx;
+
+    row.innerHTML = `
+      <div class="col-lg-6">
+        <input class="form-control name-input" placeholder="票種" value="${t.name}" ${t.active?'':'disabled'}>
+      </div>
+      <div class="col-lg-4">
+        <input type="number" min="0" class="form-control price-input" placeholder="金額" value="${t.price}" ${t.active?'':'disabled'}>
+      </div>
+      <div class="col-lg-2 text-end">
+        <button type="button" class="btn ${t.active ? 'btn-success' : 'btn-outline-secondary'} btn-sm toggle-active" title="${t.active?'已選用，點擊停用':'未選用，點擊啟用'}">
+          <i class="bi bi-check-lg"></i>
+        </button>
+      </div>
+    `;
+
+    // 綁定輸入更新 state
+    row.querySelector('.name-input').addEventListener('input', (e)=>{
+      ticketState[idx].name = e.target.value;
+    });
+    row.querySelector('.price-input').addEventListener('input', (e)=>{
+      ticketState[idx].price = e.target.value;
+    });
+
+    // 切換啟用/停用
+    row.querySelector('.toggle-active').addEventListener('click', ()=>{
+      ticketState[idx].active = !ticketState[idx].active;
+      renderTickets();
+    });
+
+    ticketList.appendChild(row);
+  });
+}
+
+// 初次渲染
+renderTickets();
+
+// ===== collectTickets：僅帶啟用的票種 =====
+function collectTickets(){
+  return ticketState
+    .filter(t => t.active)
+    .map(t => ({
+      name: t.name.trim() || '未命名',
+      price: t.price ? Number(t.price) : null
+    }));
+}
+
+// ===== 若從 sessionStorage 載入編輯資料，票種同步進來（沒有的就關閉） =====
+document.addEventListener('DOMContentLoaded', () => {
+  const raw = sessionStorage.getItem('editingEvent');
+  if (!raw) return;
+
+  try{
+    const ev = JSON.parse(raw);
+
+    // 先把基本欄位帶回（你原本已有，保留即可）
+    // ...
+
+    // 票種處理：ev.tickets 只存「被啟用」的票種
+    if (Array.isArray(ev.tickets)) {
+      // 以「名稱（去空白、轉小寫）」做對應，較不怕大小寫/前後空白
+      const key = s => (s ?? '').trim().toLowerCase();
+      const tMap = new Map(ev.tickets.map(t => [key(t.name), t]));
+
+      // 預設 5 種：有出現在 ev.tickets → active:true，否則 active:false
+      ticketState = DEFAULT_TICKETS.map(d => {
+        const found = tMap.get(key(d.name));
+        if (found) {
+          return { name: d.name, price: found.price ?? '', active: true };
+        }
+        // ⭐ 關鍵：沒找到就預設為「未啟用」
+        return { ...d, active: false, price: '' };
+      });
+
+      renderTickets();
+    }
+  }catch(e){
+    console.warn(e);
+  }
+});
+
+    // ===== 圖片上傳與預覽（封面 800×533、橫幅 1400×470） =====
+let coverDataUrl = null;
+let bannerDataUrl = null;
+
+function bindImageUploader(inputEl, boxEl, clearBtn, onDataUrl, expectRatio){
+  const preview = boxEl.querySelector('.preview');
+
+  function setPreview(src){
+    if (!src){
+      preview.innerHTML = '<span class="text-secondary">上傳圖片</span>';
+      return;
+    }
+    preview.innerHTML = '';
+    const img = new Image();
+    img.onload = () => {
+      if (expectRatio){
+        const ratio = img.naturalWidth / img.naturalHeight;
+        if (Math.abs(ratio - expectRatio) > expectRatio * 0.03) {
+          alert(`建議上傳 ${expectRatio===800/533?'800×533':'1400×470'} 的圖片，否則可能被裁切或變形`);
+        }
+      }
+    };
+    img.src = src;
+    preview.appendChild(img);
+  }
+
+  inputEl.addEventListener('change', ()=>{
+    const f = inputEl.files?.[0]; if (!f) return;
+    const reader = new FileReader();
+    reader.onload = (ev)=>{
+      const dataUrl = String(ev.target.result || '');
+      onDataUrl(dataUrl);
+      setPreview(dataUrl);
+    };
+    reader.readAsDataURL(f);
+  });
+
+  clearBtn.addEventListener('click', ()=>{
+    inputEl.value = '';
+    onDataUrl(null);
+    setPreview(null);
+  });
+
+  setPreview(null);
+}
+
+// 綁定封面（800×533）
+bindImageUploader(
+  document.getElementById('coverInput'),
+  document.getElementById('coverBox'),
+  document.getElementById('btnClearCover'),
+  (d)=>{ coverDataUrl = d; },
+  800/533
+);
+
+// 綁定橫幅（1400×470）
+bindImageUploader(
+  document.getElementById('bannerInput'),
+  document.getElementById('bannerBox'),
+  document.getElementById('btnClearBanner'),
+  (d)=>{ bannerDataUrl = d; },
+  1400/470
+);
+
+
+</script>
+</body>
+</html>

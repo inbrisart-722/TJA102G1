@@ -1,0 +1,399 @@
+<!doctype html>
+<html lang="zh-Hant">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+    <title>Exhibitor | 會員中心－帳戶資料</title>
+    <link rel="preload" href="./css/adminlte.css" as="style" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/source-sans-3@5.0.12/index.css" crossorigin="anonymous" media="print" onload="this.media='all'" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/overlayscrollbars@2.11.0/styles/overlayscrollbars.min.css"/>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css"/>
+    <link rel="stylesheet" href="./css/adminlte.css" />
+    <style>
+      .kv-line{display:flex; gap:1rem; padding:.5rem 0; border-bottom:1px solid var(--bs-border-color)}
+      .kv-line .k{width:120px; color:var(--bs-secondary-color)}
+      .section-title{font-weight:700}
+      
+    </style>
+  </head>
+  <body class="layout-fixed sidebar-expand-lg bg-body-tertiary">
+    <div class="app-wrapper">
+      <!-- Header（自動注入） -->
+    <div data-include="./header.html"></div>
+      
+
+      <!-- Sidebar (你的版本) -->
+     <aside class="app-sidebar bg-body-secondary" data-bs-theme="dark">
+        <div class="sidebar-brand">
+          <a href="#" class="brand-link">
+            <img src="./assets/img/AdminLTELogo.png" alt="AdminLTE Logo" class="brand-image opacity-75 shadow" />
+            <span class="brand-text fw-light">eventra</span>
+          </a>
+        </div>
+        <div class="sidebar-wrapper">
+          <nav class="mt-2">
+            <ul class="nav sidebar-menu flex-column" data-lte-toggle="treeview" role="navigation" data-accordion="false">
+              <li class="nav-item"><a  class="nav-link"><p>展商後台</p></a></li>
+              <li class="nav-item menu-open">
+                <a href="#" class="nav-link"><i class="nav-icon bi bi-circle-fill"></i><p>展覽管理</p></a>
+                <ul class="nav nav-treeview">
+                  <li class="nav-item"><a href="./event_list.html" class="nav-link"><p>展覽列表</p></a></li>
+                
+                </ul>
+              </li>
+              <li class="nav-item menu-open">
+                <a href="#" class="nav-link"><i class="nav-icon bi bi-circle-fill"></i><p>銷售管理</p></a>
+                <ul class="nav nav-treeview">
+                  <li class="nav-item"><a href="./order_list.html" class="nav-link"><p>訂單列表</p></a></li>
+                  <li class="nav-item"><a href="#" class="nav-link"><p>銷售列表</p></a></li>
+                
+                </ul>
+              </li>
+               <li class="nav-item menu-open">
+                <a href="#" class="nav-link"><i class="nav-icon bi bi-circle-fill"></i><p>會員中心</p></a>
+                <ul class="nav nav-treeview">
+                  <li class="nav-item"><a href="./exhibitor_info.html" class="nav-link"><p>展商資訊</p></a></li>
+                  <li class="nav-item"><a href="./exhibitor_account_data.html" class="nav-link"><p>帳戶資料</p></a></li>
+                
+                </ul>
+              </li>
+            </ul>
+          </nav>
+         <!-- 底部：登出連結 -->
+          <div class="p-3 border-top">
+            <a href="./exhibitor_login.html" id="logoutLink" class="nav-link text-danger">
+              <i class="bi bi-box-arrow-right me-1"></i> 登出
+            </a>
+          </div>
+        </div>
+      </aside>
+
+      <!-- Main -->
+      <main class="app-main">
+        <div class="app-content-header">
+          <div class="container-fluid">
+            <div class="row align-items-center">
+              <div class="col-sm-8"><h3 class="mb-0">會員中心－帳戶資料</h3></div>
+              <div class="col-sm-4 text-sm-end mt-2 mt-sm-0">
+                <button class="btn btn-outline-secondary btn-sm" id="btnEdit"><i class="bi bi-pencil me-1"></i>編輯</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="app-content">
+          <div class="container-fluid">
+            <div class="card mb-4">
+              <div class="card-body">
+                <div class="kv-line"><div class="k">帳號(統編)</div><div id="vTaxId">12345678</div></div>
+                <div class="kv-line"><div class="k">信箱</div><div id="vEmail">abc@gmail.com</div></div>
+                <div class="kv-line"><div class="k">聯絡人姓名</div><div id="vContact">王小明</div></div>
+                <div class="kv-line"><div class="k">聯絡電話</div><div id="vPhone">0912345678</div></div>
+                <div class="kv-line"><div class="k">公司/單位名稱</div><div id="vCompany">XXXXXX公司</div></div>
+                <div class="kv-line" style="border:none"><div class="k">平台註冊名稱</div><div id="vDisplay">OOOOOO</div></div>
+              </div>
+            </div>
+
+            <div class="card">
+              <div class="card-header"><span class="section-title">銀行帳戶資訊</span></div>
+              <div class="card-body">
+                <div class="kv-line"><div class="k">戶名</div><div id="vBankOwner">王小明</div></div>
+                <div class="kv-line"><div class="k">銀行代碼</div><div id="vBankCode">013國泰世華</div></div>
+                <div class="kv-line" style="border:none"><div class="k">帳號</div><div id="vBankNo">012345678910</div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </main>
+
+      <footer class="app-footer">
+        <!-- <div class="float-end d-none d-sm-inline">Anything you want</div>
+        <strong>Copyright &copy; 2014-2025 <a href="https://adminlte.io">AdminLTE.io</a>.</strong> All rights reserved. -->
+      </footer>
+    </div>
+
+    <!-- 編輯 Modal -->
+    <div class="modal fade" id="editModal" tabindex="-1" aria-hidden="true">
+      <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content">
+          <div class="modal-header"><h5 class="modal-title">編輯帳戶資料</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
+          <div class="modal-body">
+            <form id="accountForm" class="row g-3 needs-validation" novalidate>
+                <div class="col-md-6">
+                    <label class="form-label">帳號(統編)</label>
+                    <input type="text" class="form-control" id="fTaxId" value="10000009" required pattern="^\d{8}$" />
+                    <div class="invalid-feedback">請輸入 8 碼數字統一編號。</div>
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">信箱</label>
+                    <input type="email" class="form-control" id="fEmail" value="abc@gmail.com" required />
+                    <div class="invalid-feedback">請輸入有效的 Email。</div>
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">聯絡人姓名</label>
+                    <input type="text" class="form-control" id="fContact" value="王小明" required />
+                    <div class="invalid-feedback">請填寫聯絡人姓名。</div>
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">聯絡電話</label>
+                    <input type="text" class="form-control" id="fPhone" value="0912345678" required pattern="^09\d{8}$" />
+                    <div class="invalid-feedback">請輸入正確手機號碼（09 開頭共 10 碼）。</div>
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">公司/單位名稱</label>
+                    <input type="text" class="form-control" id="fCompany" value="緯育股份有限公司" required />
+                    <div class="invalid-feedback">請填寫公司/單位名稱。</div>
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">平台註冊名稱</label>
+                    <input type="text" class="form-control" id="fDisplay" value="OOOOOO" required />
+                    <div class="invalid-feedback">請填寫平台註冊名稱。</div>
+                </div>
+
+                <div class="col-12"><hr class="my-2"></div>
+
+                <div class="col-md-4">
+                    <label class="form-label">戶名</label>
+                    <input type="text" class="form-control" id="fBankOwner" value="王小明" required />
+                    <div class="invalid-feedback">請填寫戶名。</div>
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">銀行代碼</label>
+                    <input type="text" class="form-control" id="fBankCode" value="013國泰世華" required />
+                    <div class="invalid-feedback">請填寫銀行代碼（例如 013 國泰世華）。</div>
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">帳號</label>
+                    <input type="text" class="form-control" id="fBankNo" value="012345678910" required pattern="^\d{7,14}$" />
+                    <div class="invalid-feedback">請輸入 7–14 碼數字帳號。</div>
+                </div>
+            </form>
+
+          </div>
+          <div class="modal-footer">
+            <button  type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">取消</button>
+            <button  type="button" class="btn btn-primary" id="btnSave">儲存</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/overlayscrollbars@2.11.0/browser/overlayscrollbars.browser.es6.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.min.js"></script>
+    <script src="./js/adminlte.js"></script>
+    <script>
+       (() => {
+  const modalEl = document.getElementById('editModal');
+  const modal   = new bootstrap.Modal(modalEl);
+  const form    = document.getElementById('accountForm');
+
+  const ids = ['fTaxId','fEmail','fContact','fPhone','fCompany','fDisplay','fBankOwner','fBankCode','fBankNo'];
+  const els = Object.fromEntries(ids.map(id => [id, document.getElementById(id)]));
+
+  // 統編檢查碼
+  function isValidVat(taxId) {
+    if (!/^\d{8}$/.test(taxId)) return false;
+    const w = [1,2,1,2,1,2,4,1];
+    let sum = 0;
+    for (let i=0;i<8;i++){
+      const p = (taxId.charCodeAt(i)-48)*w[i];
+      sum += Math.floor(p/10) + (p%10);
+    }
+    return (sum%10===0) || (taxId[6]==='7' && (sum+1)%10===0);
+  }
+
+  // 👉 開啟時先「重置」驗證狀態（關鍵）
+  function resetValidation() {
+    form.classList.remove('was-validated');
+    form.querySelectorAll('.is-valid, .is-invalid').forEach(el => {
+      el.classList.remove('is-valid','is-invalid');
+    });
+    // 清掉任何自訂錯誤
+    els.fTaxId?.setCustomValidity('');
+  }
+  modalEl.addEventListener('show.bs.modal', resetValidation);
+
+  // 開啟編輯
+  document.getElementById('btnEdit')?.addEventListener('click', () => modal.show());
+
+  // 即時驗證：輸入/失焦才顯示
+  function liveCheck(el, custom) {
+    el.addEventListener('input', () => {
+      custom && custom(el);                 // 讓自訂規則更新
+      if (form.classList.contains('was-validated')) {
+        el.classList.toggle('is-invalid', !el.checkValidity());
+        el.classList.toggle('is-valid',   el.checkValidity());
+      }
+    });
+    el.addEventListener('blur', () => {
+      custom && custom(el);
+      el.classList.toggle('is-invalid', !el.checkValidity());
+      el.classList.toggle('is-valid',   el.checkValidity());
+    });
+  }
+
+  // 統編：同時做 pattern 與檢查碼；正確時要把自訂錯誤清掉
+  liveCheck(els.fTaxId, (el) => {
+    el.setCustomValidity('');
+    if (el.value && !isValidVat(el.value)) el.setCustomValidity('帳號無效');
+  });
+  // 手機靠 pattern，其他必填靠瀏覽器原生
+  [els.fEmail, els.fContact, els.fPhone, els.fCompany, els.fDisplay, els.fBankOwner, els.fBankCode, els.fBankNo]
+    .forEach(el => el && liveCheck(el));
+
+  // 儲存
+  document.getElementById('btnSave')?.addEventListener('click', () => {
+    // 再跑一次統編自訂檢查
+    els.fTaxId?.setCustomValidity('');
+    if (els.fTaxId?.value && !isValidVat(els.fTaxId.value)) {
+      els.fTaxId.setCustomValidity('帳號無效');
+    }
+
+    // 只有「驗證不通過」才加 was-validated 讓紅字顯示
+    if (!form.checkValidity()) {
+      form.classList.add('was-validated');
+      form.querySelector(':invalid')?.focus();
+      return;
+    }
+
+    // 通過 → 更新畫面
+    const get = id => els[id].value.trim() || '-';
+    document.getElementById('vTaxId').textContent     = get('fTaxId');
+    document.getElementById('vEmail').textContent     = get('fEmail');
+    document.getElementById('vContact').textContent   = get('fContact');
+    document.getElementById('vPhone').textContent     = get('fPhone');
+    document.getElementById('vCompany').textContent   = get('fCompany');
+    document.getElementById('vDisplay').textContent   = get('fDisplay');
+    document.getElementById('vBankOwner').textContent = get('fBankOwner');
+    document.getElementById('vBankCode').textContent  = get('fBankCode');
+    document.getElementById('vBankNo').textContent    = get('fBankNo');
+
+    modal.hide();
+    resetValidation(); // 關閉前也順便清乾淨，下一次打開不會一開始就紅
+  });
+})();
+//   (function () {
+//     const modalEl   = document.getElementById('editModal');
+//     const editModal = bootstrap.Modal.getOrCreateInstance(modalEl);
+//     const form      = document.getElementById('accountForm');
+
+//     // 開啟編輯
+//     document.getElementById('btnEdit')?.addEventListener('click', () => editModal.show());
+
+//     // ROC 統編檢查碼
+//     function isValidVat(taxId) {
+//       if (!/^\d{8}$/.test(taxId)) return false;
+//       const w = [1,2,1,2,1,2,4,1];
+//       let sum = 0;
+//       for (let i=0;i<8;i++){
+//         const p = (taxId.charCodeAt(i)-48)*w[i];
+//         sum += Math.floor(p/10) + (p%10);
+//       }
+//       if (sum % 10 === 0) return true;
+//       if (taxId[6] === '7' && (sum+1) % 10 === 0) return true;
+//       return false;
+//     }
+
+//     // 你的簡化版驗證：原生 + 統編檢查
+//     function runValidate() {
+//       // 先清掉自訂錯誤
+//       document.getElementById('fTaxId').setCustomValidity('');
+//       // 原生驗證
+//       if (!form.checkValidity()) return false;
+//       // 統編檢查碼
+//       const tax = document.getElementById('fTaxId');
+//       if (tax.value && !isValidVat(tax.value)) {
+//         tax.setCustomValidity('invalid');
+//         form.reportValidity();
+//         return false;
+//       }
+//       return true;
+//     }
+
+//     // 儲存
+//     document.getElementById('btnSave')?.addEventListener('click', () => {
+//       form.classList.add('was-validated');
+//       if (!runValidate()) return;
+
+//       // 更新畫面
+//       const get = id => document.getElementById(id).value.trim() || '-';
+//       document.getElementById('vTaxId').textContent   = get('fTaxId');
+//       document.getElementById('vEmail').textContent   = get('fEmail');
+//       document.getElementById('vContact').textContent = get('fContact');
+//       document.getElementById('vPhone').textContent   = get('fPhone');
+//       document.getElementById('vCompany').textContent = get('fCompany');
+//       document.getElementById('vDisplay').textContent = get('fDisplay');
+//       document.getElementById('vBankOwner').textContent = get('fBankOwner');
+//       document.getElementById('vBankCode').textContent  = get('fBankCode');
+//       document.getElementById('vBankNo').textContent    = get('fBankNo');
+
+//       editModal.hide();
+
+//       // 保險：清掉殘留 backdrop（避免畫面灰掉）
+//       setTimeout(() => {
+//         document.body.classList.remove('modal-open');
+//         document.querySelectorAll('.modal-backdrop').forEach(el => el.remove());
+//       }, 150);
+//     });
+//   })();
+</script>
+      <script>
+        document.getElementById('logoutLink')?.addEventListener('click', (e) => {
+          e.preventDefault();
+          // 清除登入紀錄
+          sessionStorage.removeItem('exhibitorSession');
+          // 導回登入頁
+          window.location.href = './exhibitor_login.html';
+        });
+      </script>
+
+      <script>
+    (async () => {
+      // 讓放了 data-include 的容器先隱藏，避免 FOUC
+      document.querySelectorAll('[data-include]').forEach(el => el.style.visibility = 'hidden');
+
+      // 載入所有 partial
+      const tasks = [...document.querySelectorAll('[data-include]')].map(async (el) => {
+        const url = el.getAttribute('data-include');
+        const bust = `v=${encodeURIComponent((window.__PARTIALS_VERSION__) || '1')}`; // 可手動改版本清快取
+        const src = url.includes('?') ? `${url}&${bust}` : `${url}?${bust}`;
+        try {
+          const res = await fetch(src, { cache: 'no-store' });
+          if (!res.ok) throw new Error(res.statusText);
+          el.innerHTML = await res.text();
+          el.style.visibility = 'visible';
+          el.dispatchEvent(new CustomEvent('partial:loaded', { bubbles: true }));
+        } catch (err) {
+          el.innerHTML = `<!-- include failed: ${url} -->`;
+          el.style.visibility = 'visible';
+          console.warn('Include failed:', url, err);
+        }
+      });
+
+      await Promise.all(tasks);
+
+      // 1) 根據目前 URL 自動加上 active（如果 sidebar 裡的 a[href] 剛好指到當前頁）
+      const here = location.pathname.split('/').pop() || 'index.html';
+      document.querySelectorAll('aside a.nav-link, aside .nav-treeview a.nav-link').forEach(a => {
+        const href = (a.getAttribute('href') || '').split('/').pop();
+        if (href && href === here) a.classList.add('active');
+      });
+
+      // 2) AdminLTE 如果要初始化（依你專案需要）
+      // window.AdminLTE && window.AdminLTE.autoInit?.();
+
+      // 3) 登出（若要清 sessionStorage / localStorage）
+      const logout = document.getElementById('logoutLink');
+      if (logout) {
+        logout.addEventListener('click', (e) => {
+          // e.preventDefault(); // 若要攔截導頁再手動跳轉，取消註解
+          sessionStorage.removeItem('auth');       // 依專案實際使用的 key
+          sessionStorage.removeItem('editingEvent');
+          // location.href = logout.getAttribute('href'); // 若攔截，最後導回登入頁
+        });
+      }
+    })();
+    </script>
+  </body>
+</html>
