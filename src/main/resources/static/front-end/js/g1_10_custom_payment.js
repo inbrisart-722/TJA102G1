@@ -1,11 +1,22 @@
+
+const all_tr_el = document.querySelectorAll("tr[data-cart-item-id]");
+	console.log(all_tr_el);
+	
+    let send_data = {};
+    send_data["cartItemIds"] = [];
+	
+	all_tr_el.forEach(tr => {
+		send_data["cartItemIds"].push(tr.dataset.cartItemId);
+	})	
+	
+	conseol.log(send_data["cartItemIds"]);
+	
 document.addEventListener("DOMContentLoaded", function () {
   const btn_pay = document.querySelector("a#pay");
-  console.log(btn_pay);
   btn_pay.addEventListener("click", function (e) {
     e.preventDefault();
 
-    let send_data = {};
-    send_data["cartItemIds"] = [52, 53];
+	
 
     fetch("http://localhost:8088/api/order/ECPay/sending", {
       method: "POST",
