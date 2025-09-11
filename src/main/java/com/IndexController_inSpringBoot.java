@@ -1,7 +1,5 @@
 package com;
 
-import java.util.List;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -38,5 +36,15 @@ public class IndexController_inSpringBoot {
     public String exhibitionsPage(Model model) {
         model.addAttribute("favList", favSvc.findFavoritesByMember(1));
         return "front-end/exhibitions";
+    }
+    
+    @GetMapping("front-end/cart")
+    public String cartPage() {
+    	return "front-end/cart";
+    }
+    
+    @GetMapping("front-end/payment")
+    public String paymentPage(Model model) {
+    	return "front-end/payment";
     }
 }

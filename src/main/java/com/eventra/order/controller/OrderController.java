@@ -21,11 +21,6 @@ public class OrderController {
 		this.ORDER_SERVICE = orderService;
 	}
 	
-	@GetMapping("front-end/123")
-	public String index() {
-		return "/front-end/exhibitions";
-	}
-	
 	// 給綠界打的
 	@PostMapping("front-end/OrderResultURL") // 對應 ECPay -> OrderResultURL client-to-server
 	public String ECPayOrderResultURL(@RequestParam("merchantTradeNo") String merchantTradeNo, Model model) {
