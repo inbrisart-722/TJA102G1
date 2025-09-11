@@ -193,7 +193,10 @@ public class OrderService {
 		String merchantTradeNo = MerchantTradeNo36Generator.generateMerchantTradeNo();
 		String merchantTradeDate = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss").format(new Date());
 			// 綠界：送出時叫 merchantTradeDate => 回傳時叫 tradeDate
+		System.out.println("before ulid");
 		String ulid = UlidCreator.getUlid().toString();
+		System.out.println("after ulid");
+		
 		
 		/* ********* 2nd part : 新增 order ********* */
 			// 需要 orderUlid, orderStatus, member, totalAmount, totalQuantity 
