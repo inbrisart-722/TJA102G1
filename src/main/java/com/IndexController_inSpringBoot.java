@@ -11,16 +11,16 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import com.eventra.favorite.model.FavoriteService;
 
 @Controller
-@RequestMapping("/front-end")
+@RequestMapping("/")
 public class IndexController_inSpringBoot {
 
-    @GetMapping("/platform/index")
+    @GetMapping("platform/index")
 	public String select_page(Model model) {
 		return "platform/index"; // 對應 templates/platform/index.html
 	}
     
 
-    @GetMapping("/back-end/create_event")
+    @GetMapping("back-end/create_event")
 	public String exhibitions(Model model) {
 		return "back-end/create_event"; // 對應 templates/back-end/create_event.html
 	}
@@ -28,13 +28,13 @@ public class IndexController_inSpringBoot {
     @Autowired
     private FavoriteService favSvc;
     
-    @GetMapping("/admin")
+    @GetMapping("front-end/admin")
     public String adminPage(Model model) {
         model.addAttribute("favList", favSvc.findFavoritesByMember(1));
         return "front-end/admin";
     }
 
-    @GetMapping("/exhibitions")
+    @GetMapping("front-end/exhibitions")
     public String exhibitionsPage(Model model) {
         model.addAttribute("favList", favSvc.findFavoritesByMember(1));
         return "front-end/exhibitions";
