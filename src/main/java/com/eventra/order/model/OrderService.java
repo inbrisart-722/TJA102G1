@@ -90,7 +90,6 @@ public class OrderService {
 		// 若有改成計數版本，或想接 long 型態 ---> Collectors.summingInt(OrderItemVO::getQuantity) or Collectors.counting();
 		for(Map.Entry<Integer, Integer> entry : releaseMap.entrySet())
 			EXHIBITION_REPO.updateSoldTicketQuantity(entry.getKey(), entry.getValue());
-		System.out.println("clearing finished");
 	}
 	
 	public String checkOrderStatus(String merchantTradeNo) {
