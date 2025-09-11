@@ -793,182 +793,41 @@
             </section>
 
             <!-- 收藏 -->
-            <section id="section-2">
+            <section id="section-2 favorite" th:attr="data-toggle-url=@{/favorite/toggle}">
               <!-- 展覽(方) 展示6個 -->
               <div class="row">
-                <!-- 1 -->
+              
+                <th:block th:each="favVO : ${favList}">
                 <div class="col-lg-4 col-md-6">
                   <div class="hotel_container">
                     <div class="img_container">
-                      <a href="single_tour.html">
-                        <img
-                          src="img/0_exhibition/ChatGPT_exhibition_6.png"
-                          width="800"
-                          height="533"
-                          class="img-fluid"
-                          alt="Image"
-                        />
+                      <a th:href="@{/front-end/exhibitions.html}">
+                        <img th:src="@{/front-end/img/0_exhibition/ChatGPT_exhibition_6.png}" width="800" height="533" class="img-fluid" alt="Image"/>
                         <div class="short_info hotel"></div>
                       </a>
                     </div>
                     <div class="hotel_title">
-                      <h3>感官解放：藝術的另一種語言</h3>
+                      <h3 th:text="${favVO.exhibition.exhibitionName}"></h3>
                       <div class="rating">
-                        <i class="icon-star voted"></i
-                        ><i class="icon-star voted"></i
-                        ><i class="icon-star voted"></i
-                        ><i class="icon-star voted"></i
-                        ><i class="icon-star-empty"></i>
+                        <i class="icon-star voted"></i>
+                        <i class="icon-star voted"></i>
+                        <i class="icon-star voted"></i>
+                        <i class="icon-star voted"></i>
+                        <i class="icon-star-empty"></i>
+                      </div> 
+                      <div>
+						<!-- 個人功能測試階段, 會員ID暫預設為1 -->
+                        <button type="button" 
+                        style="border: none; background: transparent; padding: 0;"
+                        class="wishlist_close_admin btn_fav" 
+                        th:data-mem-id="1" 
+                        th:data-exh-id="${favVO.exhibitionId}">-</button>
                       </div>
-                      <div class="wishlist_close_admin">-</div>
                     </div>
                   </div>
                 </div>
+                </th:block>
 
-                <!-- 2 -->
-                <div class="col-lg-4 col-md-6">
-                  <div class="hotel_container">
-                    <div class="img_container">
-                      <a href="single_tour.html">
-                        <img
-                          src="img/0_exhibition/ChatGPT_exhibition_6.png"
-                          width="800"
-                          height="533"
-                          class="img-fluid"
-                          alt="Image"
-                        />
-                        <div class="short_info hotel"></div>
-                      </a>
-                    </div>
-                    <div class="hotel_title">
-                      <h3>感官解放：藝術的另一種語言</h3>
-                      <div class="rating">
-                        <i class="icon-star voted"></i
-                        ><i class="icon-star voted"></i
-                        ><i class="icon-star voted"></i
-                        ><i class="icon-star voted"></i
-                        ><i class="icon-star-empty"></i>
-                      </div>
-                      <div class="wishlist_close_admin">-</div>
-                    </div>
-                  </div>
-                </div>
-
-                <!-- 3 -->
-                <div class="col-lg-4 col-md-6">
-                  <div class="hotel_container">
-                    <div class="img_container">
-                      <a href="single_tour.html">
-                        <img
-                          src="img/0_exhibition/ChatGPT_exhibition_6.png"
-                          width="800"
-                          height="533"
-                          class="img-fluid"
-                          alt="Image"
-                        />
-                        <div class="short_info hotel"></div>
-                      </a>
-                    </div>
-                    <div class="hotel_title">
-                      <h3>感官解放：藝術的另一種語言</h3>
-                      <div class="rating">
-                        <i class="icon-star voted"></i
-                        ><i class="icon-star voted"></i
-                        ><i class="icon-star voted"></i
-                        ><i class="icon-star voted"></i
-                        ><i class="icon-star-empty"></i>
-                      </div>
-                      <div class="wishlist_close_admin">-</div>
-                    </div>
-                  </div>
-                </div>
-
-                <!-- 4 -->
-                <div class="col-lg-4 col-md-6">
-                  <div class="hotel_container">
-                    <div class="img_container">
-                      <a href="single_tour.html">
-                        <img
-                          src="img/0_exhibition/ChatGPT_exhibition_6.png"
-                          width="800"
-                          height="533"
-                          class="img-fluid"
-                          alt="Image"
-                        />
-                        <div class="short_info hotel"></div>
-                      </a>
-                    </div>
-                    <div class="hotel_title">
-                      <h3>感官解放：藝術的另一種語言</h3>
-                      <div class="rating">
-                        <i class="icon-star voted"></i
-                        ><i class="icon-star voted"></i
-                        ><i class="icon-star voted"></i
-                        ><i class="icon-star voted"></i
-                        ><i class="icon-star-empty"></i>
-                      </div>
-                      <div class="wishlist_close_admin">-</div>
-                    </div>
-                  </div>
-                </div>
-
-                <!-- 5 -->
-                <div class="col-lg-4 col-md-6">
-                  <div class="hotel_container">
-                    <div class="img_container">
-                      <a href="single_tour.html">
-                        <img
-                          src="img/0_exhibition/ChatGPT_exhibition_6.png"
-                          width="800"
-                          height="533"
-                          class="img-fluid"
-                          alt="Image"
-                        />
-                        <div class="short_info hotel"></div>
-                      </a>
-                    </div>
-                    <div class="hotel_title">
-                      <h3>感官解放：藝術的另一種語言</h3>
-                      <div class="rating">
-                        <i class="icon-star voted"></i
-                        ><i class="icon-star voted"></i
-                        ><i class="icon-star voted"></i
-                        ><i class="icon-star voted"></i
-                        ><i class="icon-star-empty"></i>
-                      </div>
-                      <div class="wishlist_close_admin">-</div>
-                    </div>
-                  </div>
-                </div>
-
-                <!-- 6 -->
-                <div class="col-lg-4 col-md-6">
-                  <div class="hotel_container">
-                    <div class="img_container">
-                      <a href="single_tour.html">
-                        <img
-                          src="img/0_exhibition/ChatGPT_exhibition_6.png"
-                          width="800"
-                          height="533"
-                          class="img-fluid"
-                          alt="Image"
-                        />
-                        <div class="short_info hotel"></div>
-                      </a>
-                    </div>
-                    <div class="hotel_title">
-                      <h3>感官解放：藝術的另一種語言</h3>
-                      <div class="rating">
-                        <i class="icon-star voted"></i
-                        ><i class="icon-star voted"></i
-                        ><i class="icon-star voted"></i
-                        ><i class="icon-star voted"></i
-                        ><i class="icon-star-empty"></i>
-                      </div>
-                      <div class="wishlist_close_admin">-</div>
-                    </div>
-                  </div>
-                </div>
               </div>
             </section>
 
@@ -1525,23 +1384,14 @@
 
     <!-- Specific scripts -->
     <script src="js/tabs.js"></script>
-    <script>
-      new CBPFWTabs(document.getElementById("tabs"));
-    </script>
-    <script>
-      $(".wishlist_close_admin").on("click", function (c) {
-        $(this)
-          .parent()
-          .parent()
-          .parent()
-          .fadeOut("slow", function (c) {});
-      });
-    </script>
+    
     <!-- for QRcode -->
     <script src="js/qrcanvas.js"></script>
     <script src="js/g1_10_custom_common.js"></script>
     <script src="js/g1_10_custom_member_center.js"></script>
     <script src="js/g1_6_favorite_announcement.js"></script>
+    <script src="js/g1_6_favorite_ajax.js"></script>
     <script src="js/g1_6_search_modal.js"></script>
   </body>
 </html>
+            
