@@ -1,27 +1,7 @@
-// 頁面載入檢查是否已收藏
-$(function () {
-    var $btn = $("#favorite");
-    var memId = $btn.data("mem-id"); // 會員 ID
-    var exhId = $btn.data("exh-id"); // 展覽 ID
-
-    // 呼叫後端檢查
-    $.getJSON("/favorite/check", { memId: memId, exhId: exhId }, function (res) {
-		 console.log("memId= " + memId + ", exhId= " + exhId);
-        if (res.success && res.favoriteStatus) {
-            $btn.addClass("active");
-			console.log("載入頁面的初始收藏狀態 = 1");
-        } else {
-            $btn.removeClass("active");
-			console.log("載入頁面的初始收藏狀態 = 0");
-        }
-    });
-});
-
-
 // 切換收藏用
 (function() {
-	// 抓取id = favorite
-	var section = document.getElementById('favorite');
+	// 抓取id = section-2
+	var section = document.getElementById('section-2');
 	if (!section) return;
 
 	// 讀取data-toggle-url的值(即/favorite/toggle), 存到TOGGLE_URL, 供後續請求使用
@@ -33,7 +13,7 @@ $(function () {
 		var $btn = $(this);
 		var memId = $btn.data('mem-id');
 		var exhId = $btn.data('exh-id');
-//		 console.log(memId, exhId);
+		 console.log(memId, exhId);
 
 		$.ajax({
 			url: TOGGLE_URL, // 即/favorite/toggle

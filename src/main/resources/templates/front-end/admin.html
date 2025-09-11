@@ -793,7 +793,7 @@
             </section>
 
             <!-- 收藏 -->
-            <section id="section-2 favorite" th:attr="data-toggle-url=@{/favorite/toggle}">
+            <section id="section-2" th:attr="data-toggle-url=@{/api/favorite/toggle}">
               <!-- 展覽(方) 展示6個 -->
               <div class="row">
               
@@ -1384,14 +1384,13 @@
 
     <!-- Specific scripts -->
     <script src="js/tabs.js"></script>
-    
+
     <!-- for QRcode -->
     <script src="js/qrcanvas.js"></script>
     <script src="js/g1_10_custom_common.js"></script>
     <script src="js/g1_10_custom_member_center.js"></script>
     <script src="js/g1_6_favorite_announcement.js"></script>
-    <script src="js/g1_6_favorite_ajax.js"></script>
+    <script src="js/g1_6_favorite_admin.js"></script>
     <script src="js/g1_6_search_modal.js"></script>
   </body>
 </html>
-            

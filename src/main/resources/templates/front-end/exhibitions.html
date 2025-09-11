@@ -191,7 +191,7 @@
                     評價展覽
                   </button>
                   <!-- 個人功能測試階段, 會員ID暫預設為3, 展覽ID暫預設為1 -->
-                  <button id="favorite" th:attr="data-toggle-url=@{/favorite/toggle}"
+                  <button id="favorite" th:attr="data-toggle-url=@{/api/favorite/toggle}"
                   class="btn_fav"
                   		th:data-mem-id="3" 
                         th:data-exh-id="1">
@@ -830,7 +830,7 @@
     <script src="js/infobox.js"></script>
     <script src="js/g1_10_custom_common.js"></script>
     <script src="js/g1_10_custom_exhibition.js"></script>
-    <script src="js/g1_6_favorite_ajax.js"></script>
+    <script src="js/g1_6_favorite_exhibitions.js"></script>
     <script src="js/g1_6_search_modal.js"></script>
   </body>
 </html>
