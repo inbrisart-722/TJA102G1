@@ -5,12 +5,12 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
   <title>Exhibitor | 展覽管理</title>
 
-  <link rel="preload" href="./css/adminlte.css" as="style" />
+  <link rel="preload" href="/back-end/css/adminlte.css" as="style" />
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/source-sans-3@5.0.12/index.css" crossorigin="anonymous" media="print" onload="this.media='all'" />
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/overlayscrollbars@2.11.0/styles/overlayscrollbars.min.css"/>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css"/>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css"/>
-  <link rel="stylesheet" href="./css/adminlte.css" />
+  <link rel="stylesheet" href="/back-end/css/adminlte.css" />
   <style>
     .filter-chips .btn{--bs-btn-padding-y:.25rem; --bs-btn-padding-x:.5rem; --bs-btn-font-size:.8rem}
     .tableFixHead{max-height:520px; overflow:auto}
@@ -28,14 +28,14 @@
 <body class="layout-fixed sidebar-expand-lg bg-body-tertiary">
   <div class="app-wrapper">
     <!-- Header（自動注入） -->
-    <div data-include="./header.html"></div>
+    <div data-include="/back-end/header.html"></div>
    
 
     <!-- Sidebar -->
     <aside class="app-sidebar bg-body-secondary" data-bs-theme="dark">
       <div class="sidebar-brand">
         <a href="#" class="brand-link">
-          <img src="./assets/img/AdminLTELogo.png" alt="AdminLTE Logo" class="brand-image opacity-75 shadow" />
+          <img src="/back-end/img/AdminLTELogo.png" alt="AdminLTE Logo" class="brand-image opacity-75 shadow" />
           <span class="brand-text fw-light">eventra</span>
         </a>
       </div>
@@ -149,14 +149,15 @@
 
   <script>
   // ===================== 1) 讀資料（demo + localStorage 合併） =====================
-  const demoEvents = [
+  /*  const demoEvents = [
     {id:1,name:'活動1', startAt:'2025-07-18T10:00', endAt:'2025-07-20T18:00', saleOpenAt:'2025-07-01', status:'售票中',  remain:98, total:100, audit:'已通過'},
     {id:2,name:'活動2', startAt:'2025-07-25T09:00', endAt:'2025-07-25T17:00', saleOpenAt:'',           status:'籌備中',  remain:null, total:null, audit:'已通過'},
     {id:3,name:'活動3', startAt:'2025-07-01T09:00', endAt:'2025-07-05T17:00', saleOpenAt:'2025-06-01', status:'已結束',  remain:0,   total:200, audit:'已通過'},
     {id:4,name:'活動4', startAt:'',                 endAt:'',                 saleOpenAt:'',           status:'草稿',    remain:null, total:null, audit:''},
     {id:5,name:'活動5', startAt:'2025-08-10T10:00', endAt:'2025-08-12T18:00', saleOpenAt:'2025-08-05', status:'尚未開賣', remain:null, total:null, audit:'待審核'},
     {id:6,name:'活動6', startAt:'2024-06-04T10:00', endAt:'2024-06-06T18:00', saleOpenAt:'2024-05-20', status:'草稿',    remain:null, total:null, audit:'未通過'},
-  ];
+  ];  */
+  
 
   const stored = JSON.parse(localStorage.getItem('events') || '[]');
   const byId = new Map();
