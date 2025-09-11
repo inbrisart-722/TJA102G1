@@ -1,11 +1,14 @@
 package com.eventra.exhibition_ticket_type.model;
 
+import java.sql.Timestamp;
 import java.time.LocalDateTime;
+import java.util.Set;
 
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import com.eventra.exhibition.model.ExhibitionVO;
+import com.eventra.order_item.model.OrderItemVO;
 import com.eventra.ticket_type.model.TicketTypeVO;
 
 import jakarta.persistence.Column;
@@ -16,13 +19,14 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotNull;
 
 @Entity
 @Table(name = "exhibition_ticket_type")
-public class ExhibitionTicketTypeVO {
-
+public class ExhibitionTicketTypeVO{
+	
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "exhibition_ticket_type_id")
@@ -36,27 +40,54 @@ public class ExhibitionTicketTypeVO {
     @JoinColumn(name = "exhibition_id", nullable = false)
     private ExhibitionVO exhibition;
 
+    @Column(name = "ticket_type_id", insertable = false, updatable = false)
+    private Integer ticketTypeId;
+    
     @NotNull
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "ticket_type_id", nullable = false)
-    private TicketTypeVO ticketTypeId;
+    private TicketTypeVO ticketType;
 
+    @OneToMany(mappedBy = "exhibitionTicketType")
+    private Set<OrderItemVO> orderItems;
+    
     @NotNull(message = "請勿空白")
     @Column(name = "price")
     private Integer price;
 
     @CreationTimestamp
     @Column(name = "created_at", nullable = false, updatable = false)
-    private LocalDateTime createdAt;
-
+    private Timestamp createdAt;
+    
     @UpdateTimestamp
     @Column(name = "updated_at", nullable = false)
-    private LocalDateTime updatedAt;
+    private Timestamp updatedAt;
 
     public ExhibitionTicketTypeVO() {
     }
+    
 
-    public Integer getExhibitionTicketTypeId() {
+	public Set<OrderItemVO> getOrderItems() {
+		return orderItems;
+	}
+
+	public void setOrderItems(Set<OrderItemVO> orderItems) {
+		this.orderItems = orderItems;
+	}
+
+	public ExhibitionVO getExhibition() {
+		return exhibition;
+	}
+
+	public void setExhibitionId(Integer exhibitionId) {
+		this.exhibitionId = exhibitionId;
+	}
+
+	public void setTicketTypeId(Integer ticketTypeId) {
+		this.ticketTypeId = ticketTypeId;
+	}
+
+	public Integer getExhibitionTicketTypeId() {
         return exhibitionTicketTypeId;
     }
 
@@ -72,12 +103,12 @@ public class ExhibitionTicketTypeVO {
         this.exhibition = exhibition;
     }
 
-    public TicketTypeVO getTicketTypeId() {
-        return ticketTypeId;
+    public TicketTypeVO getTicketType() {
+        return ticketType;
     }
 
-    public void setTicketTypeId(TicketTypeVO ticketTypeId) {
-        this.ticketTypeId = ticketTypeId;
+    public void setTicketType(TicketTypeVO ticketType) {
+        this.ticketType = ticketType;
     }
 
     public Integer getPrice() {
@@ -88,19 +119,19 @@ public class ExhibitionTicketTypeVO {
         this.price = price;
     }
 
-    public LocalDateTime getCreatedAt() {
+    public Timestamp getCreatedAt() {
         return createdAt;
     }
 
-    public void setCreatedAt(LocalDateTime createdAt) {
+    public void setCreatedAt(Timestamp createdAt) {
         this.createdAt = createdAt;
     }
 
-    public LocalDateTime getUpdatedAt() {
+    public Timestamp getUpdatedAt() {
         return updatedAt;
     }
 
-    public void setUpdatedAt(LocalDateTime updatedAt) {
+    public void setUpdatedAt(Timestamp updatedAt) {
         this.updatedAt = updatedAt;
     }
 }

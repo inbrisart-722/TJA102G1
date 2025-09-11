@@ -15,7 +15,7 @@ public class IndexController_inSpringBoot {
 
     @GetMapping("/back-end/create_event")
 	public String exhibitions(Model model) {
-		return "front-end/create_event"; // 對應 templates/platform/index.html
+		return "back-end/create_event"; // 對應 templates/back-end/create_event.html
 	}
 
 }
