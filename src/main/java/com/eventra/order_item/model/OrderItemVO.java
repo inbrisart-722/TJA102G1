@@ -25,6 +25,9 @@ public class OrderItemVO implements Serializable{
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Integer orderItemId;
 	
+	@Column(name = "order_item_ulid", nullable = false)
+	private String orderItemUlid;
+	
 //	@Column(name = "order_id", insertable = false, updatable = false)
 //	private Integer orderId;
 	
@@ -44,7 +47,7 @@ public class OrderItemVO implements Serializable{
 	@Column(name = "unit_price", nullable = false)
 	private Integer unitPrice;
 	
-	@Column(name = "ticket_code", nullable = false)
+	@Column(name = "ticket_code")
 	private String ticketCode;
 
 	public Integer getOrderItemId() {
@@ -53,14 +56,10 @@ public class OrderItemVO implements Serializable{
 	public void setOrderItemId(Integer orderItemId) {
 		this.orderItemId = orderItemId;
 	}
-	public void setOrder(OrderVO order) {
-		this.order = order;
-	}
-	
 	public OrderVO getOrder() {
 		return order;
 	}
-	public void setOrderVO(OrderVO order) {
+	public void setOrder(OrderVO order) {
 		this.order = order;
 //		this.orderId = (orderVO != null ? orderVO.getOrderId() : null);
 	}
@@ -95,5 +94,44 @@ public class OrderItemVO implements Serializable{
 	public void setTicketCode(String ticketCode) {
 		this.ticketCode = ticketCode;
 	}
-	
+	public String getOrderItemUlid() {
+		return orderItemUlid;
+	}
+	public void setOrderItemUlid(String orderItemUlid) {
+		this.orderItemUlid = orderItemUlid;
+	}
+
+	 // ===== Builder =====
+    public static class Builder {
+        private String orderItemUlid;
+        private OrderVO order;
+        private ExhibitionTicketTypeVO exhibitionTicketType;
+        private Integer unitPrice;
+
+        public Builder orderItemUlid(String orderItemUlid) {
+            this.orderItemUlid = orderItemUlid;
+            return this;
+        }
+        public Builder order(OrderVO order) {
+            this.order = order;
+            return this;
+        }
+        public Builder exhibitionTicketType(ExhibitionTicketTypeVO exhibitionTicketType) {
+            this.exhibitionTicketType = exhibitionTicketType;
+            return this;
+        }
+        public Builder unitPrice(Integer unitPrice) {
+            this.unitPrice = unitPrice;
+            return this;
+        }
+
+        public OrderItemVO build() {
+            OrderItemVO vo = new OrderItemVO();
+            vo.setOrderItemUlid(this.orderItemUlid);
+            vo.setOrder(this.order);
+            vo.setExhibitionTicketType(this.exhibitionTicketType);
+            vo.setUnitPrice(this.unitPrice);
+            return vo;
+        }
+    }
 }

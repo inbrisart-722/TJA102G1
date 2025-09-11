@@ -1,20 +1,16 @@
 package com.util;
 
-import java.net.URI;
 import java.net.URLEncoder;
-import java.net.http.HttpClient;
-import java.net.http.HttpRequest;
-import java.net.http.HttpResponse;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-public class ECPay {
+import org.springframework.stereotype.Component;
+
+@Component
+public class CalcCheckMacValue {
 //	HashKey: 5294y06JbISpM5x9
 //	HashIV: v77hoKGq4kWxNNIS
 	private static final String HASH_KEY = "5294y06JbISpM5x9"; // 測試範例：請換成你的

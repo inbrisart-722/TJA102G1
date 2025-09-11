@@ -1,74 +1,76 @@
-document.addEventListener("DOMContentLoaded", function () {
-  // 2nd part: 計算勾選票卷 把內容取出放到 sticky aside
+// 2nd part: 計算勾選票卷 把內容取出放到 sticky aside
 
-  // 只計算主要購物車表格（不含逾時清單 .overtime）
-  const ROWS_SELECTOR = ".cart-list:not(.overtime) tbody tr";
+const ROWS_SELECTOR = ".cart-list:not(.overtime) tbody tr";
 
-  function isRowSelected(row) {
-    const icon = row.querySelector(".buy_checked i");
-    return icon && icon.classList.contains("icon-check");
-  }
+function isRowSelected(row) {
+  const icon = row.querySelector(".buy_checked i");
+  return icon && icon.classList.contains("icon-check");
+}
 
-  function parseIntSafe(text) {
-    const n = parseInt(String(text).replace(/[^0-9]/g, ""), 10);
-    return isNaN(n) ? 0 : n;
-  }
+function parseIntSafe(text) {
+  const n = parseInt(String(text).replace(/[^0-9]/g, ""), 10);
+  return isNaN(n) ? 0 : n;
+}
 
-  function updateCartSummary() {
-    const rows = document.querySelectorAll(ROWS_SELECTOR);
-    let totalQty = 0;
-    let totalAmount = 0;
+function updateCartSummary() {
+  const rows = document.querySelectorAll(ROWS_SELECTOR);
+  let totalQty = 0;
+  let totalAmount = 0;
 
-    rows.forEach((row) => {
-      if (!isRowSelected(row)) return;
+  rows.forEach((row) => {
+    if (!isRowSelected(row)) return;
 
-      const subEl = row.querySelector(".ticket_subtotal");
+    const subEl = row.querySelector(".ticket_subtotal");
 
-      const amount = parseIntSafe(subEl?.textContent || 0);
+    const amount = parseIntSafe(subEl?.textContent || 0);
 
-      totalQty += 1;
-      totalAmount += amount;
-    });
-
-    // 右側 aside：第一列=總數量、第二列=總金額（你的現有 HTML 結構）
-    const qtyCell = document.querySelector(
-      ".table_summary tr:nth-child(1) td.text-end"
-    );
-    const amtCell = document.querySelector(
-      ".table_summary tr:nth-child(2) td.text-end"
-    );
-    if (qtyCell) qtyCell.textContent = totalQty;
-    if (amtCell) amtCell.textContent = `$ ${totalAmount}`;
-
-    toggleCheckoutButton(totalQty > 0);
-  }
-
-  function toggleCheckoutButton(enabled) {
-    // 你的「立即結帳」按鈕（aside 裡第一個 .btn_full）
-    const payBtn =
-      document.querySelector('aside .btn_full[href*="payment"]') ||
-      document.querySelector("aside .btn_full");
-    if (!payBtn) return;
-
-    if (enabled) {
-      payBtn.setAttribute("aria-disabled", "false");
-      payBtn.style.pointerEvents = "";
-      payBtn.style.opacity = "";
-    } else {
-      payBtn.setAttribute("aria-disabled", "true");
-      payBtn.style.pointerEvents = "none";
-      payBtn.style.opacity = "0.5";
-    }
-  }
-
-  // 阻止被停用的結帳按鈕導航
-  document.addEventListener("click", (e) => {
-    const a = e.target.closest("aside .btn_full[href]");
-    if (a && a.getAttribute("aria-disabled") === "true") {
-      e.preventDefault();
-    }
+    totalQty += 1;
+    totalAmount += amount;
   });
 
+  // 右側 aside：第一列=總數量、第二列=總金額（你的現有 HTML 結構）
+  const qtyCell = document.querySelector(
+    ".table_summary tr:nth-child(1) td.text-end"
+  );
+  const amtCell = document.querySelector(
+    ".table_summary tr:nth-child(2) td.text-end"
+  );
+  if (qtyCell) qtyCell.textContent = totalQty;
+  if (amtCell) amtCell.textContent = `$ ${totalAmount}`;
+
+  toggleCheckoutButton(totalQty > 0);
+}
+
+function toggleCheckoutButton(enabled) {
+  // 你的「立即結帳」按鈕（aside 裡第一個 .btn_full）
+  const payBtn =
+    document.querySelector('aside .btn_full[href*="payment"]') ||
+    document.querySelector("aside .btn_full");
+  if (!payBtn) return;
+
+  if (enabled) {
+    payBtn.setAttribute("aria-disabled", "false");
+    payBtn.style.pointerEvents = "";
+    payBtn.style.opacity = "";
+  } else {
+    payBtn.setAttribute("aria-disabled", "true");
+    payBtn.style.pointerEvents = "none";
+    payBtn.style.opacity = "0.5";
+  }
+}
+
+// 阻止被停用的結帳按鈕導航
+document.addEventListener("click", (e) => {
+  const a = e.target.closest("aside .btn_full[href]");
+  if (a && a.getAttribute("aria-disabled") === "true") {
+    e.preventDefault();
+  }
+
+  // 從這裡繼續...
+  // 這裡可以用到 Page Controller 帶入 payment.html
+});
+
+document.addEventListener("DOMContentLoaded", function () {
   // 事件委派：切換勾選 / 釋出
   document.addEventListener("click", (e) => {
     // 勾選切換
@@ -92,9 +94,6 @@ document.addEventListener("DOMContentLoaded", function () {
     //   return;
     // }
   });
-
-  // 若其他程式會改動數量/小計，可呼叫 window.updateCartSummary() 重新計算
-  window.updateCartSummary = updateCartSummary;
 
   // // 3rd: 處理逾時清單 放回購物車
   // // 放回購物車：把 .overtime 表格的列搬回主購物車表格
@@ -206,7 +205,7 @@ document.addEventListener("DOMContentLoaded", function () {
   })
     .then((res) => {
       if (!res.ok) throw new Error("NOT OK");
-      return res.json();
+      else return res.json();
     })
     .then((result) => {
       console.log(result);
@@ -233,7 +232,7 @@ document.addEventListener("DOMContentLoaded", function () {
                     <span class="ticket_type">${item.ticketTypeName}</span>
                   </td>
                   <td><span class="ticket_time_left">${
-                    item.createdAt
+                    item.expirationTime
                   }</span></td>
                   <td class="qty"><span class="quantity">${
                     item.quantity
@@ -273,6 +272,7 @@ document.addEventListener("DOMContentLoaded", function () {
     .catch((error) => {
       console.log("error");
       console.log(error);
+      toggleCheckoutButton(false);
     });
 
   // 量測高度 → 設置 CSS 變數 → 加 class 觸發動畫 → 動畫結束後移除
@@ -331,6 +331,9 @@ document.addEventListener("DOMContentLoaded", function () {
           console.log("removeOneCartItem " + cart_item_id + ": success");
           const row = btn_buy_release.closest("tr.cart_item_row");
           collapseRow(row);
+          setTimeout(() => {
+            updateCartSummary();
+          }, 800);
         } else if (result === "failed")
           console.log("removeOneCartItem " + cart_item_id + ": failed");
       })
@@ -360,6 +363,9 @@ document.addEventListener("DOMContentLoaded", function () {
           const rows = document.querySelectorAll("tr.cart_item_row");
           const stagger = 60; // 交錯間隔 ms；若要同時消失就設 0
           rows.forEach((row, i) => collapseRow(row, { delay: i * stagger }));
+          setTimeout(() => {
+            updateCartSummary();
+          }, 1500);
         } else if (result === "failed") console.log("removeAllCartItem failed");
       })
       .catch((error) => {

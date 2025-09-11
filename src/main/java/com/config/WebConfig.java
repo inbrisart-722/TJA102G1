@@ -8,12 +8,14 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 public class WebConfig implements WebMvcConfigurer {
     @Override
     public void addCorsMappings(CorsRegistry registry) {
-    	registry.addMapping("/**")
+    	// 白名單設置
+    	registry.addMapping("/api/**")
         .allowedOriginPatterns(
-            "http://localhost:3000",
+            "http://localhost:3000", 
             "http://localhost:5173",
-            "http://127.0.0.1:*",
-            "https://*.yourdomain.com"
+            "http://localhost:8080",
+            "http://127.0.0.1:*", // 瀏覽器的 Origin 判斷非常嚴格, 如果前端有時用 localhost，有時用 127.0.0.1 開發 → 兩個都加進白名單較好。
+            "https://286b1b988565.ngrok-free.app" // ngrok to 外網 testing
         )
         .allowedMethods("GET","POST","PUT","PATCH","DELETE","OPTIONS")
         .allowedHeaders("Content-Type","Authorization","X-Requested-With")
