@@ -4,12 +4,15 @@ document.addEventListener("DOMContentLoaded", function () {
   btn_pay.addEventListener("click", function (e) {
     e.preventDefault();
 
-    fetch("http://localhost:8081/eventra/api/cartItem/ECPaySending", {
+    let send_data = {};
+    send_data["cartItemIds"] = [52, 53];
+
+    fetch("http://localhost:8088/api/order/ECPay/sending", {
       method: "POST",
       headers: {
         "CONTENT-TYPE": "application/json",
       },
-      body: {},
+      body: JSON.stringify(send_data),
     })
       .then((res) => {
         if (!res.ok) throw new Error("NOT OK");

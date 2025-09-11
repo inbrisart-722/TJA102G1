@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
   <head>
     <meta charset="utf-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
@@ -172,7 +172,7 @@
     >
       <div class="opacity-mask" data-opacity-mask="rgba(0, 0, 0, 0.1)">
         <div class="intro_title">
-          <h1>訂單成立啦！</h1>
+          <h1 style="font-weight: 800">訂單狀態確認中 . . .</h1>
           <div class="bs-wizard row">
             <div class="col-4 bs-wizard-step complete">
               <div class="text-center bs-wizard-stepnum">購物車</div>
@@ -190,12 +190,12 @@
               <a href="payment.html" class="bs-wizard-dot"></a>
             </div>
 
-            <div class="col-4 bs-wizard-step active">
+            <div class="col-4 bs-wizard-step disabled">
               <div class="text-center bs-wizard-stepnum">訂票成功！</div>
               <div class="progress">
                 <div class="progress-bar"></div>
               </div>
-              <a href="confirmation.html" class="bs-wizard-dot"></a>
+              <a href="confirmation.html" class="bs-wizard-dot"> </a>
             </div>
           </div>
           <!-- End bs-wizard -->
@@ -220,111 +220,34 @@
 
       <div class="container margin_60">
         <div class="row">
-          <div class="col-lg-8 add_bottom_15">
+          <div class="col-lg-12 add_bottom_15">
             <!--End step -->
 
             <div class="form_title">
               <h3>
-                <strong><i class="icon-tag-1"></i></strong>訂單成立
+                <strong><i class="icon-tag-1"></i></strong>訂單狀態確認中 . . .
               </h3>
-              <p>您的訂單記錄都會集中到「會員中心 - 訂單／票匣」哦！</p>
+              <p>請您稍待 3 ~ 10 秒，將為您提供訂單付款結果</p>
             </div>
             <div class="step">
-              <h6>本次訂單編號：<span>11290841</span></h6>
-              <hr />
-              <table class="table table-striped cart-list add_bottom_30">
-                <thead>
-                  <tr>
-                    <th>展覽</th>
-                    <th>票種</th>
-                    <th>數量</th>
-                    <th>小計</th>
-                    <th>票號</th>
-                    <th>訂單明細編號</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr>
-                    <td>
-                      <div class="thumb_cart img_block">
-                        <img
-                          src="img/0_exhibition/ChatGPT_exhibition_1.png"
-                          alt="推薦圖片"
-                        />
-                      </div>
-                      <span class="item_cart">當代藝術畫展 - TibaMe</span>
-                    </td>
-                    <td>
-                      <span class="ticket_type">全票</span>
-                    </td>
-                    <td><span class="ticket_quantity">1</span></td>
-                    <td><span class="ticket_subtotal">$ 200</span></td>
-                    <td>
-                      <span class="ticket_id">i880234itrs</span>
-                    </td>
-                    <td><span>1241411</span></td>
-                  </tr>
-                  <tr>
-                    <td>
-                      <div class="thumb_cart img_block">
-                        <img
-                          src="img/0_exhibition/ChatGPT_exhibition_1.png"
-                          alt="推薦圖片"
-                        />
-                      </div>
-                      <span class="item_cart">當代藝術畫展 - TibaMe</span>
-                    </td>
-                    <td>
-                      <span class="ticket_type">全票</span>
-                    </td>
-                    <td><span class="ticket_quantity">1</span></td>
-                    <td><span class="ticket_subtotal">$ 200</span></td>
-                    <td>
-                      <span class="ticket_id">i880234itrs</span>
-                    </td>
-                    <td><span>1241411</span></td>
-                  </tr>
-                  <tr>
-                    <td>
-                      <div class="thumb_cart img_block">
-                        <img
-                          src="img/0_exhibition/ChatGPT_exhibition_1.png"
-                          alt="推薦圖片"
-                        />
-                      </div>
-                      <span class="item_cart">當代藝術畫展 - TibaMe</span>
-                    </td>
-                    <td>
-                      <span class="ticket_type">全票</span>
-                    </td>
-                    <td><span class="ticket_quantity">1</span></td>
-                    <td><span class="ticket_subtotal">$ 200</span></td>
-                    <td>
-                      <span class="ticket_id">i880234itrs</span>
-                    </td>
-                    <td><span>1241411</span></td>
-                  </tr>
-                </tbody>
-              </table>
+              <h6>
+                訂單編號：<span th:text="${orderVO.orderUlid}" style="color: black"
+                  >01J9Z2V3QZ3X2B6N0E4YH3JDXW</span
+                >
+              </h6>
+              <h6>訂單金額：<span th:text="${orderVO.TotalAmount}" style="color: black">$ 3490</span></h6>
+              <h6>訂單數量：<span th:text="${orderVO.TotalQuantity}" style="color: black">8</span></h6>
+              .
+              <br />
+              .
+              <br />
+              .
+              <br />
+              <h6>訂單狀態：<span>（確認中 . . .）</span></h6>
             </div>
             <!--End step -->
           </div>
           <!--End col -->
-
-          <aside class="col-lg-4" id="sidebar">
-            <div class="theiaStickySidebar">
-              <div class="box_style_1" id="booking_box">
-                <h3 class="inner">會員中心</h3>
-                <br />
-                <p>本次訂單記錄已成功送達「會員中心 - 訂單／票匣」！</p>
-                <hr />
-                <a class="btn_full_outline" href="admin.html" target="_blank"
-                  >前往會員中心</a
-                >
-              </div>
-            </div>
-            <!--End sticky -->
-          </aside>
         </div>
         <!--End row -->
       </div>
@@ -504,6 +427,7 @@
     <!-- Fixed sidebar -->
     <script src="js/theia-sticky-sidebar.js"></script>
     <script src="js/g1_10_custom_common.js"></script>
+    <script src="js/g1_10_order_pending.js"></script>
     <script src="js/g1_6_search_modal.js"></script>
     <script>
       jQuery("#sidebar").theiaStickySidebar({
