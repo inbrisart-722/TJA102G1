@@ -799,11 +799,11 @@ document.addEventListener("DOMContentLoaded", function () {
       return;
     }
     let ticket_datas = {};
-    if (adults > 0) ticket_datas[0] = adults;
-    if (students > 0) ticket_datas[1] = students;
-    if (elderly > 0) ticket_datas[2] = elderly;
-    if (disabled > 0) ticket_datas[3] = disabled;
-    if (mili_and_police > 0) ticket_datas[4] = mili_and_police;
+    if (adults > 0) ticket_datas[1] = adults;
+    if (students > 0) ticket_datas[2] = students;
+    if (elderly > 0) ticket_datas[3] = elderly;
+    if (disabled > 0) ticket_datas[4] = disabled;
+    if (mili_and_police > 0) ticket_datas[5] = mili_and_police;
     // 先寫死給後端取 ticket_type_id
 
     // const ticket_datas = {
@@ -856,6 +856,13 @@ document.addEventListener("DOMContentLoaded", function () {
       });
   });
 
+  const btn_add_cart_and_go = document.querySelector("a#add_cart_and_go");
+
+  btn_add_cart_and_go.addEventListener("click", function (e) {
+    e.preventDefault();
+    btn_add_cart.click();
+    location.href = "http://localhost:8088/front-end/cart";
+  });
   // JavaScript 動態取得路徑的方法 by 小吳
 
   // const pathname = window.location.pathname;

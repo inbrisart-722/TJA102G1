@@ -20,6 +20,11 @@
     </properties>
     <dependencies>
         <!-- inbrisart start -->
+        <dependency>
+			<groupId>com.github.f4b6a3</groupId>
+			<artifactId>ulid-creator</artifactId>
+			<version>5.2.2</version>
+		</dependency>
         <!-- https://mvnrepository.com/artifact/com.google.code.gson/gson -->
         <dependency>
             <groupId>com.google.code.gson</groupId>

@@ -6,6 +6,7 @@ import java.util.Set;
 
 import com.eventra.member.model.MemberVO;
 import com.eventra.order_item.model.OrderItemVO;
+import com.eventra.payment_attempt.model.PaymentAttemptVO;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import jakarta.persistence.Column;
@@ -28,12 +29,19 @@ public class OrderVO implements Serializable{
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Integer orderId;
 	
+	@Column(name ="order_ulid", nullable = false)
+	private String orderUlid;
+	
 	@JsonIgnore
 	@OneToMany(mappedBy="order")
 	private Set<OrderItemVO> orderItems;
 
+	@JsonIgnore
+	@OneToMany(mappedBy="order")
+	private Set<PaymentAttemptVO> paymentAttempts;
+
 	@Column(name = "order_status")
-	private String orderStatus;
+	private String orderStatus; // 5種: 待付款、付款失敗、付款逾期、已付款、已退款
 	
 //	@Column(name = "member_id", insertable = false, updatable = false)
 //	private Integer memberId;
@@ -42,7 +50,7 @@ public class OrderVO implements Serializable{
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "member_id", referencedColumnName = "member_id", nullable = false)
 	private MemberVO member;
-
+	
 	@Column(name = "total_amount")
 	private Integer totalAmount;
 	
@@ -103,6 +111,22 @@ public class OrderVO implements Serializable{
 	public void setCancelledAt(Timestamp cancelledAt) {
 		this.cancelledAt = cancelledAt;
 	}
+	public String getOrderUlid() {
+		return orderUlid;
+	}
+
+	public void setOrderUlid(String orderUlid) {
+		this.orderUlid = orderUlid;
+	}
+
+	public Set<PaymentAttemptVO> getPaymentAttempts() {
+		return paymentAttempts;
+	}
+
+	public void setPaymentAttempts(Set<PaymentAttemptVO> paymentAttempts) {
+		this.paymentAttempts = paymentAttempts;
+	}
+
 	public Timestamp getCreatedAt() {
 		return createdAt;
 	}
@@ -121,12 +145,44 @@ public class OrderVO implements Serializable{
 	public void setOrderItems(Set<OrderItemVO> orderItems) {
 		this.orderItems = orderItems;
 	}
-
-//	@Override
-//	public String toString() {
-//		return "OrderVO [orderId=" + orderId + ", orderStatus=" + orderStatus + ", memberId=" + memberId
-//				+ ", totalAmount=" + totalAmount + ", totalQuantity=" + totalQuantity + ", cancelledAt=" + cancelledAt
-//				+ ", createdAt=" + createdAt + ", updatedAt=" + updatedAt + "]";
-//	}
 	
+
+	   public static class Builder {
+	        private String orderUlid;
+	        private String orderStatus;
+	        private MemberVO member;
+	        private Integer totalAmount;
+	        private Integer totalQuantity;
+
+	        public Builder orderUlid(String orderUlid) {
+	            this.orderUlid = orderUlid;
+	            return this;
+	        }
+	        public Builder orderStatus(String orderStatus) {
+	            this.orderStatus = orderStatus;
+	            return this;
+	        }
+	        public Builder member(MemberVO member) {
+	            this.member = member;
+	            return this;
+	        }
+	        public Builder totalAmount(Integer totalAmount) {
+	            this.totalAmount = totalAmount;
+	            return this;
+	        }
+	        public Builder totalQuantity(Integer totalQuantity) {
+	            this.totalQuantity = totalQuantity;
+	            return this;
+	        }
+
+	        public OrderVO build() {
+	            OrderVO order = new OrderVO();
+	            order.setOrderUlid(this.orderUlid);
+	            order.setOrderStatus(this.orderStatus);
+	            order.setMember(this.member);
+	            order.setTotalAmount(this.totalAmount);
+	            order.setTotalQuantity(this.totalQuantity);
+	            return order;
+	        }
+	    }
 }
