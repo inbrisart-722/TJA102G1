@@ -60,26 +60,32 @@ public class OrderService {
 	public OrderVO getOneOrderByTradeNo(String merchantTradeNo) {
 		return PAYMENT_ATTEMPT_REPO.findByMerchantTradeNo(merchantTradeNo).orElseThrow().getOrder(); 
 	}
-	public OrderVO getAllOrderByMemberId(Integer memberId) {
-		// 會員中心用 
-		return null;
+	public List<OrderVO> getAllOrderByMemberId(Integer memberId) {
+		// 會員中心用 一次拿前端再去按照頁籤切
+		return ORDER_REPO.findAllByMemberId(memberId);
 	}
 	
 	public void clearExpiredPaymentAttempts() {
 		System.out.println("clearing pending payment attempts " + new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()));
-/* ********* 1st part : 找到所有 1) 60 分鐘以上 2) 付款未成功("待付款" + "付款失敗（未逾時）") 3) 沒有任何 paymentAttempt status = "pending" 的 訂單 ********* */
+/* ********* 1st part : 找到所有 1) 30 分鐘以上 2) pending 的 payment attempts ********* */
 		Timestamp threshold = new Timestamp(System.currentTimeMillis() - 30*60*1000); // 30mins
 		List<PaymentAttemptVO> expiredPaymentAttempts = PAYMENT_ATTEMPT_REPO.findExpiredPaymentAttempts(threshold);
 /* ********* 2rd part : 調整PA狀態 paymentOrderStatus -> expired ********* */
-		for(PaymentAttemptVO vo : expiredPaymentAttempts)
+		for(PaymentAttemptVO vo : expiredPaymentAttempts) {
 			vo.setPaymentAttemptStatus("expired");
+			OrderVO orderVO = vo.getOrder();
+			if(System.currentTimeMillis() - orderVO.getCreatedAt().getTime() < 60 * 60 * 1000) {
+				orderVO.setOrderStatus("付款失敗");
+				ORDER_REPO.save(orderVO);
+			}
+		}
 	}
 	
 	public void clearExpiredOrders() {
 		System.out.println("clearing expired + pending orders... " + new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()));
 /* ********* 1st part : 找到所有 1) 60 分鐘以上 2) 付款未成功("待付款" + "付款失敗（未逾時）") 3) 沒有任何 paymentAttempt status = "pending" 的 訂單 ********* */
 		Timestamp threshold = new Timestamp(System.currentTimeMillis() - 60*60*1000); // 60mins
-		List<OrderVO> expiredOrders = ORDER_REPO.findExpiredOrders(threshold, Set.of("待付款", "付款失敗（未逾期）"));
+		List<OrderVO> expiredOrders = ORDER_REPO.findExpiredOrders(threshold, Set.of("付款中", "付款失敗"));
 /* ********* 2rd part : 調整訂單狀態 order orderStatus -> 付款失敗 ********* */
 		for(OrderVO vo: expiredOrders)
 			vo.setOrderStatus("付款逾期");
