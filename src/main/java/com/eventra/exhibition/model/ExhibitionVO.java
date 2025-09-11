@@ -1,12 +1,27 @@
 package com.eventra.exhibition.model;
 
+import java.time.LocalDateTime;
+import java.util.Set;
+
+import com.eventra.comment.model.CommentVO;
+import com.eventra.exhibition_ticket_type.model.ExhibitionTicketTypeVO;
 import com.eventra.exhibitor.model.ExhibitorVO;
-import jakarta.persistence.*;
+import com.eventra.rating.model.RatingVO;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.PositiveOrZero;
-
-import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "Exhibition")
@@ -16,6 +31,18 @@ public class ExhibitionVO {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "exhibition_id")
 	private Integer exhibitionId;
+    
+    @JsonIgnore
+    @OneToMany(mappedBy = "exhibition")
+    private Set<ExhibitionTicketTypeVO> exhibitionTicketTypes;
+    
+    @JsonIgnore
+    @OneToMany(mappedBy = "exhibition")
+    private Set<CommentVO> comments;
+    
+    @JsonIgnore
+    @OneToMany(mappedBy = "exhibition")
+    private Set<RatingVO> ratings;
 
     @Column(name = "exhibition_status_id")
 	private Integer exhibitionStatusId;
@@ -60,7 +87,7 @@ public class ExhibitionVO {
 	private Integer soldTicketQuantity;
 
     @NotBlank(message = "展覽資訊必填")
-    @Column(name = "description")
+    @Column(name = "description", columnDefinition="LONGTEXT")
 	private String description;
 
 
@@ -69,12 +96,12 @@ public class ExhibitionVO {
 	private Double longitude;
 
     @NotNull
-    @Column(name = "rating_count")
-	private Integer ratingCount = 0;
+    @Column(name = "total_rating_count")
+	private Integer totalRatingCount;
 
     @NotNull
-    @Column(name = "average_rating_score")
-	private Double averageRatingScore = 0.0;
+    @Column(name = "total_rating_score")
+	private Double totalRatingScore;
 
     public ExhibitionVO() {
         super();
@@ -88,8 +115,8 @@ public class ExhibitionVO {
         this.photoPortrait = photoPortrait;
         this.exhibitionName = exhibitionName;
         this.startTime = startTime;
-        this.averageRatingScore = averageRatingScore;
-        this.ratingCount = ratingCount;
+        this.totalRatingScore = averageRatingScore;
+        this.totalRatingCount = ratingCount;
         this.longitude = longitude;
         this.latitude = latitude;
         this.description = description;
@@ -221,20 +248,61 @@ public class ExhibitionVO {
     }
 
     public Integer getRatingCount() {
-        return ratingCount;
+        return totalRatingCount;
     }
 
     public void setRatingCount(Integer ratingCount) {
-        this.ratingCount = ratingCount;
+        this.totalRatingCount = ratingCount;
     }
 
     public Double getAverageRatingScore() {
-        return averageRatingScore;
+        return totalRatingScore;
     }
 
     public void setAverageRatingScore(Double averageRatingScore) {
-        this.averageRatingScore = averageRatingScore;
+        this.totalRatingScore = averageRatingScore;
     }
+
+	public Set<ExhibitionTicketTypeVO> getExhibitionTicketTypes() {
+		return exhibitionTicketTypes;
+	}
+
+	public void setExhibitionTicketTypes(Set<ExhibitionTicketTypeVO> exhibitionTicketTypes) {
+		this.exhibitionTicketTypes = exhibitionTicketTypes;
+	}
+
+	public Set<CommentVO> getComments() {
+		return comments;
+	}
+
+	public void setComments(Set<CommentVO> comments) {
+		this.comments = comments;
+	}
+
+	public Set<RatingVO> getRatings() {
+		return ratings;
+	}
+
+	public void setRatings(Set<RatingVO> ratings) {
+		this.ratings = ratings;
+	}
+
+	public Integer getTotalRatingCount() {
+		return totalRatingCount;
+	}
+
+	public void setTotalRatingCount(Integer totalRatingCount) {
+		this.totalRatingCount = totalRatingCount;
+	}
+
+	public Double getTotalRatingScore() {
+		return totalRatingScore;
+	}
+
+	public void setTotalRatingScore(Double totalRatingScore) {
+		this.totalRatingScore = totalRatingScore;
+	}
+    
 }
 
 

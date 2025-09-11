@@ -53,6 +53,10 @@ public class OrderItemVO implements Serializable{
 	public void setOrderItemId(Integer orderItemId) {
 		this.orderItemId = orderItemId;
 	}
+	public void setOrder(OrderVO order) {
+		this.order = order;
+	}
+	
 	public OrderVO getOrder() {
 		return order;
 	}
@@ -91,4 +95,5 @@ public class OrderItemVO implements Serializable{
 	public void setTicketCode(String ticketCode) {
 		this.ticketCode = ticketCode;
 	}
+	
 }

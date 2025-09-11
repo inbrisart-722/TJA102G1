@@ -8,8 +8,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 @RequestMapping("/back-end/exhibitor")
 public class ExhibitorBackendController {
 
-    @GetMapping("event_list")
+    @GetMapping("back_end_homepage")
     public String enterBackendExhibitor(){
-        return "back-end/event_list";
+        return "back-end/back_end_homepage";
     }
 }

@@ -6,6 +6,7 @@ import jakarta.validation.constraints.Pattern;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
+import java.sql.Timestamp;
 import java.time.LocalDateTime;
 
 @Entity
@@ -67,11 +68,11 @@ public class ExhibitorVO {
 	
 	@CreationTimestamp
 	@Column(name = "created_at", nullable = false, updatable = false)
-	private LocalDateTime createdAt;
+	private Timestamp createdAt;
 	
 	@UpdateTimestamp
 	@Column(name = "updated_at")
-	private LocalDateTime updatedAt;
+	private Timestamp updatedAt;
 
 	public ExhibitorVO() {
 		super();
@@ -80,7 +81,7 @@ public class ExhibitorVO {
 	public ExhibitorVO(Integer exhibitorId, Integer reviewStatusId, String exhibitorRegistrationName,
 			String businessIdNumber, String passwordHash, String email, String contactName, String contactPhone,
 			String companyName, String companyAddress, String bankAccountName, String bankCode,
-			String bankAccountNumber, String websiteUrl, String about, LocalDateTime createdAt, LocalDateTime updatedAt) {
+			String bankAccountNumber, String websiteUrl, String about, Timestamp createdAt, Timestamp updatedAt) {
 		super();
 		this.exhibitorId = exhibitorId;
 		this.reviewStatusId = reviewStatusId;
@@ -221,19 +222,19 @@ public class ExhibitorVO {
 		this.about = about;
 	}
 
-	public LocalDateTime getCreatedAt() {
+	public Timestamp getCreatedAt() {
 		return createdAt;
 	}
 
-	public void setCreatedAt(LocalDateTime createdAt) {
+	public void setCreatedAt(Timestamp createdAt) {
 		this.createdAt = createdAt;
 	}
 
-	public LocalDateTime getUpdatedAt() {
+	public Timestamp getUpdatedAt() {
 		return updatedAt;
 	}
 
-	public void setUpdatedAt(LocalDateTime updatedAt) {
+	public void setUpdatedAt(Timestamp updatedAt) {
 		this.updatedAt = updatedAt;
 	}
 	
