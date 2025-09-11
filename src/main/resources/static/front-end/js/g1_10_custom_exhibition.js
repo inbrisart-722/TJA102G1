@@ -227,10 +227,10 @@ document.addEventListener("DOMContentLoaded", function () {
   });
 
   // gpt 收藏
-  const favBtn = document.querySelector(".btn_fav");
-  favBtn.addEventListener("click", function () {
-    this.classList.toggle("active");
-  });
+//  const favBtn = document.querySelector(".btn_fav");
+//  favBtn.addEventListener("click", function () {
+//    this.classList.toggle("active");
+//  });
 
   // gpt sticky search bar 切換顏色
   const searchInput = document.getElementById("nav_search");
