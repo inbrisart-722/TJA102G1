@@ -122,6 +122,9 @@ public class CartItemService {
 //		}
 	}
 	
+	public List<GetCartItemResDTO> getCartItem(List<Integer> cartItemIds){
+		return null;
+	}
 	public List<GetCartItemResDTO> getAllCartItem(Integer memberId) {
 		cleanupExpired(memberId, System.currentTimeMillis());
 		/* ********* 3rd part : 扣除展覽售票量 ********* */
