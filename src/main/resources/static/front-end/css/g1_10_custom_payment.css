@@ -14,7 +14,7 @@ div.step td {
 div.step th:first-child,
 td:first-child {
   text-align: left;
-  width: 70%;
+  width: 64%;
   /* padding-left: 1%; */
 }
 div.step td:first-child > div.thumb_cart.img_block {
@@ -31,11 +31,11 @@ div.step th:nth-child(1) {
 }
 div.step th:nth-child(2),
 td:nth-child(2) {
-  width: 10%;
+  width: 16%;
 }
 div.step td:nth-child(3),
 td:nth-child(3) {
-  width: 8%;
+  width: 12%;
   padding-left: 1%;
 }
 div.step th:nth-child(4),

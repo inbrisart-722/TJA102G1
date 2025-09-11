@@ -175,6 +175,28 @@ public class CartItemRedisRepository {
 
 		return JSON_CODEC.read(VOJson, CartItemRedisVO.class);
 	}
+	
+	public List<CartItemRedisVO> getCartItem(Integer memberId, List<Integer> cartItemIds){
+		String hKey = hKey(memberId);
+		
+		String[] ids = cartItemIds.stream().map(String::valueOf)
+				.toArray(String[]::new); 
+		// constructor reference
+		// size -> new String[size] 
+			// -> Stream.toArray() 終端操作是 Stream API 給出 size 的
+		
+		List<String> listOfVOJsons = JEDIS.execute(jedis -> {
+			return jedis.hmget(hKey, ids);
+		});
+		
+		if(listOfVOJsons == null || listOfVOJsons.isEmpty()) return null;
+		List<CartItemRedisVO> listOfVOs = new ArrayList<>();
+		for(String VOJson : listOfVOJsons) {
+			if(VOJson == null || VOJson.isEmpty()) continue;
+			listOfVOs.add(JSON_CODEC.read(VOJson, CartItemRedisVO.class));
+		}
+		return listOfVOs;
+	}
 
 	public List<CartItemRedisVO> getAllCartItem(Integer memberId) {
 		String hKey = hKey(memberId);
