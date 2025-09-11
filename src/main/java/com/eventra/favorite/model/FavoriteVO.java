@@ -3,8 +3,12 @@ package com.eventra.favorite.model;
 import java.io.Serializable;
 import java.sql.Timestamp;
 
+import com.eventra.exhibition.model.ExhibitionVO;
+import com.eventra.member.model.MemberVO;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -24,15 +28,17 @@ public class FavoriteVO implements Serializable {
 
 	@Column(name ="member_id")
 	private Integer memberId;
-//	@ManyToOne
-//	@JoinColumn(name = "member_id", referencedColumnName = "member_id")
-//	private MemberVO member;
+	
+	@ManyToOne(fetch = FetchType.LAZY) // 降低不必要載入
+	@JoinColumn(name = "member_id", referencedColumnName = "member_id", insertable=false, updatable=false)
+	private MemberVO member;
 	
 	@Column(name ="exhibition_id")
-	private Integer exhibitionId;
-//	@ManyToOne
-//	@JoinColumn(name = "exhibition_id", referencedColumnName = "exhibition_id")
-//	private ExhibitionVO exhibition;
+	private Integer exhibitionId; 
+	
+	@ManyToOne(fetch = FetchType.LAZY) // 降低不必要載入
+	@JoinColumn(name = "exhibition_id", referencedColumnName = "exhibition_id", insertable=false, updatable=false)
+	private ExhibitionVO exhibition;
 	
 	@Column(name ="favorite_status", insertable = false)
 	private Integer favoriteStatus;
@@ -109,5 +115,23 @@ public class FavoriteVO implements Serializable {
 	public void setUpdatedAt(Timestamp updatedAt) {
 		this.updatedAt = updatedAt;
 	}
+
+	public MemberVO getMember() {
+		return member;
+	}
+
+	public void setMember(MemberVO member) {
+		this.member = member;
+	}
+
+	public ExhibitionVO getExhibition() {
+		return exhibition;
+	}
+
+	public void setExhibition(ExhibitionVO exhibition) {
+		this.exhibition = exhibition;
+	}
+	
+	
 	
 }

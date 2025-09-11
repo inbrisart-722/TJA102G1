@@ -12,6 +12,14 @@ import jakarta.transaction.Transactional;
 
 public interface FavoriteRepository extends JpaRepository<FavoriteVO, Integer> {
 
+	// 查詢會員所有收藏 (status = 1)
+	@Query(value = "SELECT * FROM favorite " +
+			"WHERE member_id = :memId " +
+			"AND favorite_status = 1 " +
+			"ORDER BY favorite_id DESC",
+			nativeQuery = true)
+	List<FavoriteVO> findFavoritesByMember(@Param("memId") Integer memId);
+	
 	// 修改收藏狀態
 	@Transactional
 	@Modifying
@@ -24,11 +32,4 @@ public interface FavoriteRepository extends JpaRepository<FavoriteVO, Integer> {
 	// 查詢會員是否已有收藏展覽 (UK: memberId + exhibitionId)
 	Optional<FavoriteVO> findByMemberIdAndExhibitionId(Integer memId, Integer exhId);
 	
-	// 查詢會員所有收藏 (status = 1)
-	@Query(value = "SELECT * FROM favorite " +
-				   "WHERE member_id = :memId " +
-				   "AND favorite_status = 1 " +
-				   "ORDER BY favorite_id DESC",
-	               nativeQuery = true)
-	List<FavoriteVO> findFavoritesByMember(@Param("memId") Integer memId);
 }
