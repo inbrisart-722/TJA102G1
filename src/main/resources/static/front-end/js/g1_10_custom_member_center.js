@@ -1,4 +1,8 @@
 document.addEventListener("DOMContentLoaded", function () {
+  //  fetch1: 載入用戶所有訂單 
+  
+  
+  
   //  用來開發時調整預設顯示第幾頁使用
   //  new CBPFWTabs(document.getElementById("tabs"), { start: 3 });
   //  document.querySelector('#tabs nav a[href="#section-4"]')?.click();
