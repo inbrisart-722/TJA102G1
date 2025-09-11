@@ -41,10 +41,10 @@ public class OrderVO implements Serializable{
 	private Set<PaymentAttemptVO> paymentAttempts;
 
 	@Column(name = "order_status")
-	private String orderStatus; // 5種: 待付款、付款失敗、付款逾期、已付款、已退款
+	private String orderStatus; // 5種: 付款中、付款失敗、付款逾期、已付款、已退款
 	
-//	@Column(name = "member_id", insertable = false, updatable = false)
-//	private Integer memberId;
+	@Column(name = "member_id", insertable = false, updatable = false)
+	private Integer memberId;
 	
 	@JsonIgnore
 	@ManyToOne(fetch = FetchType.LAZY)
@@ -85,7 +85,7 @@ public class OrderVO implements Serializable{
 	}
 	public void setMember(MemberVO member) {
 		this.member = member;
-//		this.memberId = (member != null ? member.getMemberId() : null);
+		this.memberId = (member != null ? member.getMemberId() : null);
 	}
 //	public Integer getMemberId() {
 //		return memberId;
