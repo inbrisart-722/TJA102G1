@@ -1,6 +1,7 @@
 package com.eventra.cart_item.model;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -95,7 +96,35 @@ public class CartItemRedisRepository {
 		});
 	}
 
-	public CartItemRedisVO removeOneCartItem(Integer cartItemId, Integer memberId) {
+	// removeCartItem -> overloading 1: 刪除多筆
+	public List<CartItemRedisVO> removeCartItem(Collection<Integer> cartItemIds, Integer memberId) {
+		String hKey = hKey(memberId);
+		String zKey = zKey(memberId); 
+		
+		String[] ids = cartItemIds.stream().map(Object::toString).collect(Collectors.toList()).toArray(new String[0]);
+		
+		return JEDIS.execute(jedis -> {
+			// MULTI + EXEC 主要是為了打包命令以節省網路往返次數，並確保命令序列不會被其他命令中斷。但它不提供隔離性...
+			Transaction t = jedis.multi();
+			// 先拿 Response<T> 代理物件 等待 exec() 後 .get() 取值
+			Response<List<String>> r1 = t.hmget(hKey, ids);
+			// 以下皆為回傳被刪除 rows 之數量
+			t.hdel(hKey, ids);
+			t.zrem(zKey, ids);
+			t.exec();
+			
+			List<String> listOfVOJsons = r1.get();
+			if(listOfVOJsons == null || listOfVOJsons.isEmpty()) return null;
+			List<CartItemRedisVO> listOfVOs = new ArrayList<>(); 
+			for(String VOJson : listOfVOJsons) {
+				if(VOJson == null || VOJson.isEmpty()) continue;
+				listOfVOs.add(JSON_CODEC.read(VOJson, CartItemRedisVO.class));
+			}
+			return listOfVOs;
+		});
+	}
+	// removeCartItem -> overloading 2: 刪除單筆
+		public CartItemRedisVO removeOneCartItem(Integer cartItemId, Integer memberId) {
 		String hKey = hKey(memberId);
 		String zKey = zKey(memberId); 
 		
@@ -129,9 +158,12 @@ public class CartItemRedisRepository {
 			List<String> listOfVOJsons = vals.get();
 			
 			if(listOfVOJsons == null || listOfVOJsons.isEmpty()) return null;
-			else return listOfVOJsons.stream()
-					.map(VOJson -> JSON_CODEC.read(VOJson, CartItemRedisVO.class))
-					.collect(Collectors.toList());
+			List<CartItemRedisVO> listOfVOs = new ArrayList<>(); 
+			for(String VOJson : listOfVOJsons) {
+				if(VOJson == null || VOJson.isEmpty()) continue;
+				listOfVOs.add(JSON_CODEC.read(VOJson, CartItemRedisVO.class));
+			}
+			return listOfVOs;
 		});
 	}
 
@@ -156,6 +188,7 @@ public class CartItemRedisRepository {
 		}
 
 		List<String> listOfVOJsons = JEDIS.execute(jedis -> jedis.hmget(hKey, arrayOfIds));
+		
 		List<CartItemRedisVO> listOfVOs = listOfVOJsons.stream().map(json -> JSON_CODEC.read(json, CartItemRedisVO.class))
 				.collect(Collectors.toList());
 

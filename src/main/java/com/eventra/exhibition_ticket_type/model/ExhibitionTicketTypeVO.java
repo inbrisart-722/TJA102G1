@@ -66,11 +66,9 @@ public class ExhibitionTicketTypeVO{
     public ExhibitionTicketTypeVO() {
     }
     
-
 	public Set<OrderItemVO> getOrderItems() {
 		return orderItems;
 	}
-
 	public void setOrderItems(Set<OrderItemVO> orderItems) {
 		this.orderItems = orderItems;
 	}
@@ -78,9 +76,19 @@ public class ExhibitionTicketTypeVO{
 	public ExhibitionVO getExhibition() {
 		return exhibition;
 	}
-
+    public void setExhibition(ExhibitionVO exhibition) {
+        this.exhibition = exhibition;
+    }
+    
 	public void setExhibitionId(Integer exhibitionId) {
 		this.exhibitionId = exhibitionId;
+	}
+	public Integer getExhibitionId() {
+        return exhibitionId;
+    }
+
+	public Integer getTicketTypeId() {
+		return ticketTypeId;
 	}
 
 	public void setTicketTypeId(Integer ticketTypeId) {
@@ -93,14 +101,6 @@ public class ExhibitionTicketTypeVO{
 
     public void setExhibitionTicketTypeId(Integer exhibitionTicketTypeId) {
         this.exhibitionTicketTypeId = exhibitionTicketTypeId;
-    }
-
-    public ExhibitionVO getExhibitionId() {
-        return exhibition;
-    }
-
-    public void setExhibition(ExhibitionVO exhibition) {
-        this.exhibition = exhibition;
     }
 
     public TicketTypeVO getTicketType() {
