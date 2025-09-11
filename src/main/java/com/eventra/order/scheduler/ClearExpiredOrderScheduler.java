@@ -17,7 +17,7 @@ public class ClearExpiredOrderScheduler {
 //	@Scheduled(fixedRate = 60_000)
 	@Scheduled(cron = "1 * * * * ?") // 秒 分 時 日 月 星期
 	public void clearExpirdeOrders() {
-//		ORDER_SERVICE.clearExpiredOrders();
+		ORDER_SERVICE.clearExpiredOrders();
 //		System.out.println("1 clearExpiredOrderScheduler calling...");
 	}
 }
