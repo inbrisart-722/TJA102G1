@@ -41,7 +41,7 @@ public class OrderVO implements Serializable{
 	private Set<PaymentAttemptVO> paymentAttempts;
 
 	@Column(name = "order_status")
-	private String orderStatus; // 5種: 付款中、付款失敗、付款逾期、已付款、已退款
+	private String orderStatus; // 5種: 付款中、付款失敗、付款逾時、已付款、已退款
 	
 	@Column(name = "member_id", insertable = false, updatable = false)
 	private Integer memberId;

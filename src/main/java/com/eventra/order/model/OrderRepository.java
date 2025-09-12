@@ -16,4 +16,6 @@ public interface OrderRepository extends JpaRepository<OrderVO, Integer> {
 	List<OrderVO> findExpiredOrders(@Param("threshold") Timestamp threshold, @Param("statuses") Set<String> statuses);
 	
 	List<OrderVO> findAllByMemberId(Integer memberId);
+	
+	OrderVO findByOrderUlid(String orderUlid);
 }
