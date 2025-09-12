@@ -2,20 +2,53 @@ package com.eventra.order.model;
 
 import java.util.List;
 
-import com.eventra.order_item.model.OrderItemVO;
-
 public class GetAllOrderResDTO {
 	private String orderUlid;
 	private String orderStatus;
 	private Integer totalAmount;
 	private Integer totalQuantity;
-//	private Map<ExhibitionDTO, List<OrderItemDTO>> orderItemsGrouped;
+	private List<GetAllOrderResGroupedDTO> groups;
+	
+	public String getOrderUlid() {
+		return orderUlid;
+	}
+	public GetAllOrderResDTO setOrderUlid(String orderUlid) {
+		this.orderUlid = orderUlid;
+		return this;
+	}
+	public String getOrderStatus() {
+		return orderStatus;
+	}
+	public GetAllOrderResDTO setOrderStatus(String orderStatus) {
+		this.orderStatus = orderStatus;
+		return this;
+	}
+	public Integer getTotalAmount() {
+		return totalAmount;
+	}
+	public GetAllOrderResDTO setTotalAmount(Integer totalAmount) {
+		this.totalAmount = totalAmount;
+		return this;
+	}
+	public Integer getTotalQuantity() {
+		return totalQuantity;
+	}
+	public GetAllOrderResDTO setTotalQuantity(Integer totalQuantity) {
+		this.totalQuantity = totalQuantity;
+		return this;
+	}
+	public List<GetAllOrderResGroupedDTO> getGroups() {
+		return groups;
+	}
+	public GetAllOrderResDTO setGroups(List<GetAllOrderResGroupedDTO> groups) {
+		this.groups = groups;
+		return this;
+	}
 	
 	// 前端以這樣的格式更好處理（序列化成 items 很方便）
 	
-//	Map<ExhibitionDTO, List<OrderItemDTO>>
-//	=> List<ExhibitionGroupDTO> 
-//	public class ExhibitionGroupDTO
-//		private ExhibitionDTO exhibition;
-//		private List<OrderItemDTO> items;
+	//	=> List<ExhibitionGroupDTO> 
+	//	public class ExhibitionGroupDTO
+	//	private ExhibitionDTO exhibition;
+	//	private List<OrderItemDTO> items;
 }

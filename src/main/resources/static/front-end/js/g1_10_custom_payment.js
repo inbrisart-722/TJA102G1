@@ -29,10 +29,13 @@ document.addEventListener("DOMContentLoaded", function() {
 					form.method = (result.method || "POST").toUpperCase();
 					form.action = result.action;
 
+					// .entries returns an array of key-value pairs
+					// Each pair is itself a small array
 					Object.entries(result.fields).forEach(([k, v]) => {
 						const input = document.createElement("input");
 						input.type = "hidden";
 						input.name = k;
+						// null or undefined return ""
 						input.value = (v ?? "").toString();
 						form.appendChild(input);
 					});
@@ -46,7 +49,7 @@ document.addEventListener("DOMContentLoaded", function() {
 					document.body.appendChild(form);
 					form.submit();
 				} else {
-					console.log("login failed");
+					console.log("ECPay sending failed");
 				}
 			})
 			.catch((error) => {

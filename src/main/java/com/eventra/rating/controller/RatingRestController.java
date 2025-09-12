@@ -17,6 +17,7 @@ public class RatingRestController {
 
 	private final RatingService RATING_SERVICE;
 	private static final Integer TEST_MEMBER = 3;
+	// 3 可評價無記錄 4 可評價無紀錄 5 訂單已退款不可評價
 	
 	public RatingRestController(RatingService ratingService) {
 		this.RATING_SERVICE = ratingService;

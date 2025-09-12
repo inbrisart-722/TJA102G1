@@ -35,13 +35,19 @@ public class OrderRestController {
 		this.CART_ITEM_SERVICE = cartItemService; 
 	}
 	
-	@GetMapping
+	@GetMapping("getAllOrder")
 	public List<GetAllOrderResDTO> getAllOrder(){
-		return null;
+		return ORDER_SERVICE.getAllOrderByMemberId(TEST_MEMBER);
 	}
 	
+/* ************************* 以下皆與綠界相關 ************************* */
+	@PostMapping("ECPay/resending")
+	public ECPaySendingResDTO ECPayResending(@RequestBody String orderUlid) {
+		System.out.println("re-sending");
+		ECPaySendingResDTO res = ORDER_SERVICE.ECPayResending(orderUlid);
+		return res;
+	}
 	
-/* ************************* 以下為跟綠界相關 ************************* */
 	@PostMapping("ECPay/sending")
 	public ECPaySendingResDTO ECPaySending(@RequestBody ECPaySendingReqDTO req) {
 		System.out.println("sending");
