@@ -76,7 +76,7 @@ public class RatingService {
 			
 			ExhibitionVO exhibitionVO = EXHIBITION_REPO.findById(exhibitionId).orElseThrow();
 			Integer totalRatingCount = exhibitionVO.getTotalRatingCount();
-			Double averageRatingScore = exhibitionVO.getAverageRatingScore();
+			Double averageRatingScore = exhibitionVO.getAverageRatingScore(); // not totalRatingScore
 			
 			res.setStatus("success").setTotalRatingCount(totalRatingCount).setAverageRatingScore(averageRatingScore);
 		}
