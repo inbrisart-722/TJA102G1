@@ -19,4 +19,6 @@ public interface PaymentAttemptRepository extends JpaRepository<PaymentAttemptVO
 	@Query(value="select pa from PaymentAttemptVO pa where pa.createdAt < :threshold and "
 			+ "pa.paymentAttemptStatus = 'pending'")
 	List<PaymentAttemptVO> findExpiredPaymentAttempts(@Param("threshold") Timestamp threshold);
+	
+	Optional<PaymentAttemptVO> findTopByOrderIdOrderByCreatedAtDesc(Integer orderId);
 }

@@ -14,6 +14,7 @@ public class ClearExpiredPaymentAttemptScheduler {
 		this.ORDER_SERVICE = orderService;
 	}
 	
+	// !!! -> 超過 30 mins but 訂單 < 60mins -> 同步調整訂單狀態為 付款失敗 讓用戶可以再次送
 //	@Scheduled(fixedRate = 60_000)
 	@Scheduled(cron = "0 * * * * ?") // 秒 分 時 日 月 星期
 	public void clearExpiredPaymentAttempts() {

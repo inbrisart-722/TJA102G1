@@ -1,7 +1,9 @@
 package com.eventra.exhibition.model;
 
-import java.time.LocalDateTime;
+import java.sql.Timestamp;
 import java.util.Set;
+
+import org.hibernate.annotations.Formula;
 
 import com.eventra.comment.model.CommentVO;
 import com.eventra.exhibitiontickettype.model.ExhibitionTicketTypeVO;
@@ -62,11 +64,11 @@ public class ExhibitionVO {
 
     @NotNull(message = "請勿空白")
     @Column(name = "start_time")
-	private LocalDateTime startTime;
+	private Timestamp startTime;
 
     @NotNull(message = "請勿空白")
     @Column(name = "end_time")
-	private LocalDateTime endTime;
+	private Timestamp endTime;
 
     @NotBlank(message = "展覽地點必填")
     @Column(name = "location")
@@ -74,7 +76,7 @@ public class ExhibitionVO {
 
     @NotNull(message = "請勿空白")
     @Column(name = "ticket_start_time")
-	private LocalDateTime ticketStartTime;
+	private Timestamp ticketStartTime;
 
     @NotNull(message = "必須填入總販售票數")
     @PositiveOrZero
@@ -90,7 +92,6 @@ public class ExhibitionVO {
     @Column(name = "description", columnDefinition="LONGTEXT")
 	private String description;
 
-
 	private Double latitude;
 
 	private Double longitude;
@@ -101,13 +102,18 @@ public class ExhibitionVO {
 
     @NotNull
     @Column(name = "total_rating_score")
-	private Double totalRatingScore;
+	private Integer totalRatingScore;
+    
+    @Formula("case when total_rating_count > 0"
+    		+ " then ROUND(total_rating_score / total_rating_count, 1)"
+    		+ " else 0 end")
+    private Double averageRatingScore;
 
     public ExhibitionVO() {
         super();
     }
 
-    public ExhibitionVO(Integer exhibitionId, Integer exhibitionStatusId, ExhibitorVO exhibitorId, String photoLandscape, String photoPortrait, String exhibitionName, LocalDateTime startTime, Double averageRatingScore, Integer ratingCount, Double longitude, Double latitude, String description, Integer soldTicketQuantity, Integer totalTicketQuantity, LocalDateTime ticketStartTime, String location, LocalDateTime endTime) {
+	public ExhibitionVO(Integer exhibitionId, Integer exhibitionStatusId, ExhibitorVO exhibitorId, String photoLandscape, String photoPortrait, String exhibitionName, Timestamp startTime, Integer totalRatingScore, Integer totalRatingCount, Double longitude, Double latitude, String description, Integer soldTicketQuantity, Integer totalTicketQuantity, Timestamp ticketStartTime, String location, Timestamp endTime) {
         this.exhibitionId = exhibitionId;
         this.exhibitionStatusId = exhibitionStatusId;
         this.exhibitorId = exhibitorId;
@@ -115,8 +121,8 @@ public class ExhibitionVO {
         this.photoPortrait = photoPortrait;
         this.exhibitionName = exhibitionName;
         this.startTime = startTime;
-        this.totalRatingScore = averageRatingScore;
-        this.totalRatingCount = ratingCount;
+        this.totalRatingScore = totalRatingScore;
+        this.totalRatingCount = totalRatingCount;
         this.longitude = longitude;
         this.latitude = latitude;
         this.description = description;
@@ -127,11 +133,11 @@ public class ExhibitionVO {
         this.endTime = endTime;
     }
 
-    public LocalDateTime getStartTime() {
+    public Timestamp getStartTime() {
         return startTime;
     }
 
-    public void setStartTime(LocalDateTime startTime) {
+    public void setStartTime(Timestamp startTime) {
         this.startTime = startTime;
     }
 
@@ -183,11 +189,11 @@ public class ExhibitionVO {
         this.exhibitionName = exhibitionName;
     }
 
-    public LocalDateTime getEndTime() {
+    public Timestamp getEndTime() {
         return endTime;
     }
 
-    public void setEndTime(LocalDateTime endTime) {
+    public void setEndTime(Timestamp endTime) {
         this.endTime = endTime;
     }
 
@@ -199,11 +205,11 @@ public class ExhibitionVO {
         this.location = location;
     }
 
-    public LocalDateTime getTicketStartTime() {
+    public Timestamp getTicketStartTime() {
         return ticketStartTime;
     }
 
-    public void setTicketStartTime(LocalDateTime ticketStartTime) {
+    public void setTicketStartTime(Timestamp ticketStartTime) {
         this.ticketStartTime = ticketStartTime;
     }
 
@@ -255,12 +261,12 @@ public class ExhibitionVO {
         this.totalRatingCount = ratingCount;
     }
 
-    public Double getAverageRatingScore() {
+    public Integer getTotalRatingScore() {
         return totalRatingScore;
     }
 
-    public void setAverageRatingScore(Double averageRatingScore) {
-        this.totalRatingScore = averageRatingScore;
+    public void setTotalRatingScore(Integer totalRatingScore) {
+        this.totalRatingScore = totalRatingScore;
     }
 
 	public Set<ExhibitionTicketTypeVO> getExhibitionTicketTypes() {
@@ -294,15 +300,13 @@ public class ExhibitionVO {
 	public void setTotalRatingCount(Integer totalRatingCount) {
 		this.totalRatingCount = totalRatingCount;
 	}
-
-	public Double getTotalRatingScore() {
-		return totalRatingScore;
+    public Double getAverageRatingScore() {
+		return averageRatingScore;
 	}
 
-	public void setTotalRatingScore(Double totalRatingScore) {
-		this.totalRatingScore = totalRatingScore;
+	public void setAverageRatingScore(Double averageRatingScore) {
+		this.averageRatingScore = averageRatingScore;
 	}
-    
 }
 
 

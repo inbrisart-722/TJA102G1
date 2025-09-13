@@ -21,11 +21,6 @@ public class OrderController {
 		this.ORDER_SERVICE = orderService;
 	}
 	
-	@GetMapping("front-end/123")
-	public String index() {
-		return "/front-end/exhibitions";
-	}
-	
 	// 給綠界打的
 	@PostMapping("front-end/OrderResultURL") // 對應 ECPay -> OrderResultURL client-to-server
 	public String ECPayOrderResultURL(@RequestParam("merchantTradeNo") String merchantTradeNo, Model model) {
@@ -53,6 +48,7 @@ public class OrderController {
 		return "front-end/order_pending";
 	}
 	
+	// 要檢查真的成功嗎！才show 怕有人亂輸入我就亂給
 	@GetMapping("front-end/order_success")
 	public String toOrderSuccess(@RequestParam("merchantTradeNo") String merchantTradeNo, Model model){
 		OrderVO orderVO = ORDER_SERVICE.getOneOrderByTradeNo(merchantTradeNo);
@@ -60,6 +56,7 @@ public class OrderController {
 		return "front-end/order_success"; // Spring 會自動在它前面加上 src/main/resources/templates/
 	}
 	
+	// 要檢查真的失敗嗎！才show 怕有人亂輸入我就亂給
 	@GetMapping("front-end/order_failure")
 	public String toOrderFailure(@RequestParam("merchantTradeNo") String merchantTradeNo, Model model){
 		OrderVO orderVO = ORDER_SERVICE.getOneOrderByTradeNo(merchantTradeNo);
