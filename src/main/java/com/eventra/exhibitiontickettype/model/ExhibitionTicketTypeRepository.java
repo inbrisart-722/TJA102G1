@@ -1,4 +1,4 @@
-package com.eventra.exhibition_ticket_type.model;
+package com.eventra.exhibitiontickettype.model;
 
 import java.util.Collection;
 import java.util.List;
