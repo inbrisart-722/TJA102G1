@@ -17,9 +17,9 @@ public class BackendIndexController {
     public String exhibitorBackendPage(){
         return "back-end/back_end_homepage";
     }
-    @GetMapping("exhibitor/event_list")
+    @GetMapping("exhibitor/exhibition_list")
     public String eventListPage() {
-    	return "back-end/event_list";
+    	return "back-end/exhibition_list";
     }
     @GetMapping("exhibitor/order_list")
     public String orderListPage() {
@@ -39,8 +39,8 @@ public class BackendIndexController {
     public String exhibitorLoginPage() {
     	return "back-end/exhibitor_login";
     }
-    @GetMapping("exhibitor/create_event")
+    @GetMapping("exhibitor/create_exhibition")
     public String createEventPage() {
-    	return "/back-end/create_event";
+    	return "/back-end/create_exhibition";
     }
 }
