@@ -21,6 +21,8 @@ public class OrderController {
 		this.ORDER_SERVICE = orderService;
 	}
 	
+	/* ************************* 以下皆與綠界相關 ************************* */
+	
 	// 給綠界打的
 	@PostMapping("front-end/OrderResultURL") // 對應 ECPay -> OrderResultURL client-to-server
 	public String ECPayOrderResultURL(@RequestParam("merchantTradeNo") String merchantTradeNo, Model model) {
