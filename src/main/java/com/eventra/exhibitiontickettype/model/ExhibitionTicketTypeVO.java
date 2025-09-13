@@ -1,4 +1,4 @@
-package com.eventra.exhibition_ticket_type.model;
+package com.eventra.exhibitiontickettype.model;
 
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
@@ -9,7 +9,7 @@ import org.hibernate.annotations.UpdateTimestamp;
 
 import com.eventra.exhibition.model.ExhibitionVO;
 import com.eventra.order_item.model.OrderItemVO;
-import com.eventra.ticket_type.model.TicketTypeVO;
+import com.eventra.tickettype.model.TicketTypeVO;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;

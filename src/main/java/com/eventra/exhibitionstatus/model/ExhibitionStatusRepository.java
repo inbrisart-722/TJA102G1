@@ -1,4 +1,4 @@
-package com.eventra.exhibition_status.model;
+package com.eventra.exhibitionstatus.model;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 

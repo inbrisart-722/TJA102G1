@@ -8,13 +8,13 @@
     <!-- CSS：順序很重要 -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css"/>
     <link href="https://cdn.jsdelivr.net/npm/summernote@0.8.20/dist/summernote-bs5.min.css" rel="stylesheet">
-    <link rel="preload" href="./css/adminlte.css" as="style"/>
+    <link rel="preload" href="/back-end/css/adminlte.css" as="style"/>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/source-sans-3@5.0.12/index.css"
           crossorigin="anonymous" media="print" onload="this.media='all'"/>
     <link rel="stylesheet"
           href="https://cdn.jsdelivr.net/npm/overlayscrollbars@2.11.0/styles/overlayscrollbars.min.css"/>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css"/>
-    <link rel="stylesheet" href="./css/adminlte.css"/>
+    <link rel="stylesheet" href="/back-end/css/adminlte.css"/>
 
     <style>
         .cover-box{width:220px;height:280px;background:#adb5bd33;border:2px dashed #ced4da;border-radius:.75rem;display:flex;align-items:center;justify-content:center;overflow:hidden}
@@ -76,14 +76,14 @@
 <body class="layout-fixed sidebar-expand-lg bg-body-tertiary">
 <div class="app-wrapper">
     <!-- Header（自動注入） -->
-    <div data-include="./header.html"></div>
+   <!--  <div data-include="/back-end/header.html"></div> -->
 
 
     <!-- Sidebar -->
     <aside class="app-sidebar bg-body-secondary" data-bs-theme="dark">
         <div class="sidebar-brand">
             <a href="#" class="brand-link">
-                <img src="./assets/img/AdminLTELogo.png" alt="AdminLTE Logo" class="brand-image opacity-75 shadow"/>
+                <img src="/back-end/img/AdminLTELogo.png" alt="AdminLTE Logo" class="brand-image opacity-75 shadow"/>
                 <span class="brand-text fw-light">eventra</span>
             </a>
         </div>
@@ -96,14 +96,14 @@
                         <a href="#" class="nav-link"><i class="nav-icon bi bi-circle-fill"></i>
                             <p>展覽管理</p></a>
                         <ul class="nav nav-treeview">
-                            <li class="nav-item"><a href="./event_list.html" class="nav-link"><p>展覽列表</p></a></li>
+                            <li class="nav-item"><a href="/back-end/exhibitor/event_list" class="nav-link"><p>展覽列表</p></a></li>
                         </ul>
                     </li>
                     <li class="nav-item menu-open">
                         <a href="#" class="nav-link"><i class="nav-icon bi bi-circle-fill"></i>
                             <p>銷售管理</p></a>
                         <ul class="nav nav-treeview">
-                            <li class="nav-item"><a href="./order_list.html" class="nav-link"><p>訂單列表</p></a></li>
+                            <li class="nav-item"><a href="/back-end/exhibitor/order_list" class="nav-link"><p>訂單列表</p></a></li>
                             <li class="nav-item"><a href="#" class="nav-link"><p>銷售列表</p></a></li>
                         </ul>
                     </li>
@@ -111,9 +111,9 @@
                         <a href="#" class="nav-link"><i class="nav-icon bi bi-circle-fill"></i>
                             <p>會員中心</p></a>
                         <ul class="nav nav-treeview">
-                            <li class="nav-item"><a href="./exhibitor_info.html" class="nav-link"><p>展商資訊</p></a>
+                            <li class="nav-item"><a href="/back-end/exhibitor/exhibitor_info" class="nav-link"><p>展商資訊</p></a>
                             </li>
-                            <li class="nav-item"><a href="./exhibitor_account_data.html" class="nav-link"><p>
+                            <li class="nav-item"><a href="/back-end/exhibitor/exhibitor_account_data" class="nav-link"><p>
                                 帳戶資料</p></a></li>
                         </ul>
                     </li>
@@ -121,7 +121,7 @@
             </nav>
             <!-- 底部：登出連結 -->
             <div class="p-3 border-top">
-                <a href="./exhibitor_login.html" id="logoutLink" class="nav-link text-danger">
+                <a href="/back-end/exhibitor/exhibitor_login" id="logoutLink" class="nav-link text-danger">
                     <i class="bi bi-box-arrow-right me-1"></i> 登出
                 </a>
             </div>
@@ -135,7 +135,7 @@
                 <div class="row align-items-center">
                     <div class="col-sm-6"><h3 class="mb-0">建立展覽</h3></div>
                     <div class="col-sm-6 text-sm-end mt-2 mt-sm-0">
-                        <a href="./event_list.html" class="btn btn-outline-secondary btn-sm"><i
+                        <a href="/back-end/exhibitor/event_list" class="btn btn-outline-secondary btn-sm"><i
                                 class="bi bi-arrow-left-short me-1"></i>返回列表</a>
                     </div>
                 </div>
@@ -145,7 +145,7 @@
         <div class="app-content">
             <div class="container-fluid">
 
-                <form id="eventForm">
+                <form id="eventForm" action="/api/exhibitor/events" method="post" enctype="multipart/form-data">
                     <!-- 基本資訊 -->
                     <div class="col-lg-4 d-flex flex-column align-items-center gap-2">
                         <!-- 800×533 封面 -->
@@ -153,7 +153,7 @@
                             <div class="preview"><span class="text-secondary">上傳圖片</span></div>
                         </div>
                         <div class="d-flex gap-2">
-                            <input class="form-control form-control-sm" id="coverInput" type="file" accept="image/*">
+                            <input class="form-control form-control-sm" id="coverInput" name="coverImage" type="file" accept="image/*">
                             <button type="button" class="btn btn-outline-secondary btn-sm" id="btnClearCover">清除
                             </button>
                         </div>
@@ -165,32 +165,32 @@
                         <div class="row g-3">
                             <div class="col-12">
                                 <label class="form-label">展覽名稱</label>
-                                <input type="text" class="form-control" id="evName" placeholder="輸入展覽名稱" required>
+                                <input type="text" class="form-control" id="evName" name ="name" placeholder="輸入展覽名稱" required>
                             </div>
                             <div class="col-md-6">
                                 <label class="form-label">開始時間</label>
-                                <input type="datetime-local" class="form-control" id="startAt" required>
+                                <input type="datetime-local" class="form-control" id="startAt" name="startAt" required>
                             </div>
                             <div class="col-md-6">
                                 <label class="form-label">結束時間</label>
-                                <input type="datetime-local" class="form-control" id="endAt" required>
+                                <input type="datetime-local" class="form-control" id="endAt" name="endAt" required>
                             </div>
                             <div class="col-md-6">
                                 <label class="form-label">展覽地點</label>
-                                <input type="text" class="form-control" id="location" placeholder="輸入展覽地點">
+                                <input type="text" class="form-control" id="location" name="location" placeholder="輸入展覽地點">
                             </div>
                             <div class="col-md-6">
                                 <label class="form-label">主辦單位</label>
-                                <input type="text" class="form-control" id="organizer" placeholder="展覽主辦方">
+                                <input type="text" class="form-control" id="organizer" name="organizer" placeholder="展覽主辦方">
                             </div>
                             <div class="col-md-6">
                                 <label class="form-label">總票數</label>
-                                <input type="number" min="0" class="form-control" id="totalTickets"
+                                <input type="number" min="0" class="form-control" name="totalTickets" id="totalTickets"
                                        placeholder="輸入總票數">
                             </div>
                             <div class="col-md-6">
                                 <label class="form-label">開賣日</label>
-                                <input type="datetime-local" class="form-control" id="saleOpenAt">
+                                <input type="datetime-local" class="form-control" id="saleOpenAt" name="saleOpenAt">
                             </div>
                         </div>
                     </div>
@@ -238,7 +238,7 @@
                         <div class="preview"><span class="text-secondary">上傳橫幅</span></div>
                     </div>
                     <div class="d-flex gap-2">
-                        <input class="form-control form-control-sm" id="bannerInput" type="file" accept="image/*">
+                        <input class="form-control form-control-sm" id="bannerInput" name="bannerImage" type="file" accept="image/*">
                         <button type="button" class="btn btn-outline-secondary btn-sm" id="btnClearBanner">清除</button>
                     </div>
                     <div class="help-text">建議尺寸：1400×470（JPG/PNG）</div>
@@ -254,15 +254,16 @@
             </div>
             <div class="card-body">
                 <div id="editor"></div>
+                <textarea id="editor" name="description"></textarea>
             </div>
         </div>
 
-        </form>
+       
         <!-- 操作按鈕 -->
         <div class="d-flex flex-wrap gap-2 justify-content-end mb-5">
             <button class="btn btn-outline-secondary" id="btnPreview"><i class="bi bi-eye me-1"></i>預覽</button>
             <button class="btn btn-primary" id="btnSaveDraft"><i class="bi bi-save me-1"></i>儲存為草稿</button>
-            <button class="btn btn-success" id="btnSubmit"><i class="bi bi-check2-circle me-1"></i>完成</button>
+            <button type="submit" class="btn btn-success" ><i class="bi bi-check2-circle me-1"></i>完成</button>
         </div>
 
 
@@ -512,7 +513,7 @@
       // 清除登入紀錄
       sessionStorage.removeItem('exhibitorSession');
       // 導回登入頁
-      window.location.href = './exhibitor_login.html';
+      window.location.href = '/back-end/exhibitor/exhibitor_login';
     });
 </script>
 <script>

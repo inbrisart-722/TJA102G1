@@ -18,7 +18,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.eventra.cart_item.model.CartItemRedisRepository;
 import com.eventra.cart_item.model.CartItemRedisVO;
 import com.eventra.exhibition.model.ExhibitionRepository;
-import com.eventra.exhibition_ticket_type.model.ExhibitionTicketTypeVO;
+import com.eventra.exhibitiontickettype.model.ExhibitionTicketTypeVO;
 import com.eventra.member.model.MemberVO;
 import com.eventra.order_item.model.OrderItemRepository;
 import com.eventra.order_item.model.OrderItemVO;
