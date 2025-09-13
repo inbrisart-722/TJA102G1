@@ -1,6 +1,7 @@
 document.addEventListener("DOMContentLoaded", function() {
 	const btn_pay = document.querySelector("a#pay");
 	btn_pay.addEventListener("click", function(e) {
+		e.preventDefault();
 		const all_tr_el = document.querySelectorAll("tr[data-cart-item-id]");
 
 		let send_data = {};
