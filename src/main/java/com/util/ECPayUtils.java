@@ -21,6 +21,30 @@ public class ECPayUtils {
 
 	public ECPayUtils() {};
 	
+//	public Map<String, String> genCheckMap(ECPayQueryResDTO res) {
+//	    Map<String, String> fields = new HashMap<>();
+//
+//	    if (res.getMerchantID() != null) fields.put("MerchantID", res.getMerchantID());
+//	    if (res.getMerchantTradeNo() != null) fields.put("MerchantTradeNo", res.getMerchantTradeNo());
+//	    if (res.getStoreID() != null) fields.put("StoreID", res.getStoreID());
+//	    if (res.getTradeNo() != null) fields.put("TradeNo", res.getTradeNo());
+//	    if (res.getTradeAmt() != null) fields.put("TradeAmt", String.valueOf(res.getTradeAmt()));
+//	    if (res.getPaymentDate() != null) fields.put("PaymentDate", res.getPaymentDate());
+//	    if (res.getPaymentType() != null) fields.put("PaymentType", res.getPaymentType());
+//	    if (res.getHandlingCharge() != null) fields.put("HandlingCharge", String.valueOf(res.getHandlingCharge()));
+//	    if (res.getPaymentTypeChargeFee() != null) fields.put("PaymentTypeChargeFee", String.valueOf(res.getPaymentTypeChargeFee()));
+//	    if (res.getTradeDate() != null) fields.put("TradeDate", res.getTradeDate());
+//	    if (res.getTradeStatus() != null) fields.put("TradeStatus", res.getTradeStatus());
+//	    if (res.getItemName() != null) fields.put("ItemName", res.getItemName());
+//	    if (res.getCustomField1() != null) fields.put("CustomField1", res.getCustomField1());
+//	    if (res.getCustomField2() != null) fields.put("CustomField2", res.getCustomField2());
+//	    if (res.getCustomField3() != null) fields.put("CustomField3", res.getCustomField3());
+//	    if (res.getCustomField4() != null) fields.put("CustomField4", res.getCustomField4());
+//	    if (res.getCheckMacValue() != null) fields.put("CheckMacValue", res.getCheckMacValue());
+//
+//	    return fields;
+//	}
+
 	public Map<String, String> genCheckMap(ECPayCallbackReqDTO req){
 		Map<String, String> fields = new HashMap<>();
 		// Populate the map with non-null values from the DTO
