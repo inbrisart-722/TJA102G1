@@ -46,28 +46,28 @@
             <li class="nav-item menu-open">
               <a href="#" class="nav-link"><i class="nav-icon bi bi-circle-fill"></i><p>展覽管理</p></a>
               <ul class="nav nav-treeview">
-                <li class="nav-item"><a href="./event_list.html" class="nav-link"><p>展覽列表</p></a></li>
+                <li class="nav-item"><a href="/back-end/exhibitor/event_list" class="nav-link"><p>展覽列表</p></a></li>
               </ul>
             </li>
             <li class="nav-item menu-open">
               <a href="#" class="nav-link"><i class="nav-icon bi bi-circle-fill"></i><p>銷售管理</p></a>
               <ul class="nav nav-treeview">
-                <li class="nav-item"><a href="./order_list.html" class="nav-link"><p>訂單列表</p></a></li>
+                <li class="nav-item"><a href="/back-end/exhibitor/order_list" class="nav-link"><p>訂單列表</p></a></li>
                 <li class="nav-item"><a href="#" class="nav-link"><p>銷售列表</p></a></li>
               </ul>
             </li>
             <li class="nav-item menu-open">
               <a href="#" class="nav-link"><i class="nav-icon bi bi-circle-fill"></i><p>會員中心</p></a>
               <ul class="nav nav-treeview">
-                <li class="nav-item"><a href="./exhibitor_info.html" class="nav-link"><p>展商資訊</p></a></li>
-                <li class="nav-item"><a href="./exhibitor_account_data.html" class="nav-link"><p>帳戶資料</p></a></li>
+                <li class="nav-item"><a href="/back-end/exhibitor/exhibitor_info" class="nav-link"><p>展商資訊</p></a></li>
+                <li class="nav-item"><a href="/back-end/exhibitor/exhibitor_account_data" class="nav-link"><p>帳戶資料</p></a></li>
               </ul>
             </li>
           </ul>
         </nav>
        <!-- 底部：登出連結 -->
           <div class="p-3 border-top">
-            <a href="./exhibitor_login.html" id="logoutLink" class="nav-link text-danger">
+            <a href="/back-end/exhibitor/exhibitor_login" id="logoutLink" class="nav-link text-danger">
               <i class="bi bi-box-arrow-right me-1"></i> 登出
             </a>
           </div>
@@ -334,7 +334,7 @@
           // 清除登入紀錄
           sessionStorage.removeItem('exhibitorSession');
           // 導回登入頁
-          window.location.href = './exhibitor_login.html';
+          window.location.href = '/back-end/exhibitor/exhibitor_login';
         });
       </script>
 

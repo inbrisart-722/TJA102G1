@@ -1,4 +1,4 @@
-package com.eventra.ticket_type.model;
+package com.eventra.tickettype.model;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 
