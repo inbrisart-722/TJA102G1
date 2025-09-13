@@ -6,7 +6,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 
 @Controller
 @RequestMapping("/back-end/exhibitor")
-public class EventApiController {
+public class ExhibitorApiController {
 	
    
 }
