@@ -10,8 +10,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.eventra.exhibition.model.ExhibitionRepository;
-import com.eventra.exhibition_ticket_type.model.ExhibitionTicketTypeRepository;
-import com.eventra.exhibition_ticket_type.model.ExhibitionTicketTypeVO;
+import com.eventra.exhibitiontickettype.model.ExhibitionTicketTypeRepository;
+import com.eventra.exhibitiontickettype.model.ExhibitionTicketTypeVO;
 import com.util.MillisToMinutesSecondsUtil;
 
 @Service

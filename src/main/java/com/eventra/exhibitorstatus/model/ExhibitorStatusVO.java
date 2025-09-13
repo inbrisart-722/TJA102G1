@@ -1,4 +1,4 @@
-package com.eventra.exhibitor_status.model;
+package com.eventra.exhibitorstatus.model;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;

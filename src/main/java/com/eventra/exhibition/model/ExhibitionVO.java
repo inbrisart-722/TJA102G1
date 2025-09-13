@@ -6,7 +6,7 @@ import java.util.Set;
 import org.hibernate.annotations.Formula;
 
 import com.eventra.comment.model.CommentVO;
-import com.eventra.exhibition_ticket_type.model.ExhibitionTicketTypeVO;
+import com.eventra.exhibitiontickettype.model.ExhibitionTicketTypeVO;
 import com.eventra.exhibitor.model.ExhibitorVO;
 import com.eventra.rating.model.RatingVO;
 import com.fasterxml.jackson.annotation.JsonIgnore;
