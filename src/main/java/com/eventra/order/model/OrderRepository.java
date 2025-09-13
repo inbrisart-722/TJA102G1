@@ -14,4 +14,8 @@ public interface OrderRepository extends JpaRepository<OrderVO, Integer> {
 	@Query(value="select o from OrderVO o where o.createdAt < :threshold and o.orderStatus in (:statuses) "
 			+ "and not exists (select 1 from o.paymentAttempts pa where pa.paymentAttemptStatus = 'pending')")
 	List<OrderVO> findExpiredOrders(@Param("threshold") Timestamp threshold, @Param("statuses") Set<String> statuses);
+	
+	List<OrderVO> findAllByMemberId(Integer memberId);
+	
+	OrderVO findByOrderUlid(String orderUlid);
 }

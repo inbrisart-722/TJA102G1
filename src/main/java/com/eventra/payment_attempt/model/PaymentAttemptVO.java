@@ -65,6 +65,8 @@ public class PaymentAttemptVO implements Serializable{
 	private String checkMacValue;
 	@Column(name = "created_at", insertable = false, updatable = false)
 	private Timestamp createdAt; 
+	@Column(name = "item_name")
+	private String itemName;
 	
 	public Timestamp getCreatedAt() {
 		return createdAt;
@@ -184,7 +186,13 @@ public class PaymentAttemptVO implements Serializable{
 //	10100255：「報失卡，請客戶更換卡片重新交易」
 //	10100256：「被盜用卡，請客戶更換卡片重新交易」
 	
-	
+	public String getItemName() {
+		return itemName;
+	}
+	public void setItemName(String itemName) {
+		this.itemName = itemName;
+	}
+
 	// 送出前先 build 基本資訊
 	public static class Builder {
 		private String paymentAttemptStatus;
@@ -194,6 +202,7 @@ public class PaymentAttemptVO implements Serializable{
 		private Integer tradeAmt;
 //		private String paymentType;
 		private String tradeDate;
+		private String itemName;
 
 		public Builder paymentAttemptStatus(String paymentAttemptStatus) {
 			this.paymentAttemptStatus = paymentAttemptStatus;
@@ -229,6 +238,11 @@ public class PaymentAttemptVO implements Serializable{
 			this.tradeDate = tradeDate;
 			return this;
 		}
+		
+		public Builder itemName(String itemName) {
+			this.itemName = itemName;
+			return this;
+		}
 
 		public PaymentAttemptVO build() {
 			PaymentAttemptVO vo = new PaymentAttemptVO();
@@ -239,6 +253,7 @@ public class PaymentAttemptVO implements Serializable{
 			vo.tradeAmt = this.tradeAmt;
 //			vo.paymentType = this.paymentType;
 			vo.tradeDate = this.tradeDate;
+			vo.itemName = this.itemName;
 			return vo;
 		}
 	}

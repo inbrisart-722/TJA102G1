@@ -131,7 +131,5 @@ public class FavoriteVO implements Serializable {
 	public void setExhibition(ExhibitionVO exhibition) {
 		this.exhibition = exhibition;
 	}
-	
-	
-	
+
 }

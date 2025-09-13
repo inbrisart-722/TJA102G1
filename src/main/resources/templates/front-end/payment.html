@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -670,60 +670,26 @@
                   </tr>
                 </thead>
                 <tbody>
-                  <tr>
-                    <td>
+                  <th:block th:each="DTO : ${listOfDTOs}">
+                  	<tr th:attr="data-cart-item-id=${DTO.cartItemId}">
+                  		<td>
                       <div class="thumb_cart img_block">
                         <img
                           src="img/0_exhibition/ChatGPT_exhibition_1.png"
                           alt="推薦圖片"
                         />
                       </div>
-                      <span class="item_cart">當代藝術畫展 - TibaMe</span>
+                      <span th:text="${DTO.exhibitionName}" class="item_cart">當代藝術畫展 - TibaMe</span>
                     </td>
                     <td>
-                      <span class="ticket_type">全票</span>
+                      <span th:text="${DTO.ticketTypeName}" class="ticket_type">全票</span>
                     </td>
                     <td>
-                      <span class="ticket_quantity">1</span>
+                      <span th:text="${DTO.quantity}" class="ticket_quantity">1</span>
                     </td>
-                    <td><span class="ticket_subtotal">$ 200</span></td>
-                  </tr>
-                  <tr>
-                    <td>
-                      <div class="thumb_cart img_block">
-                        <img
-                          src="img/0_exhibition/ChatGPT_exhibition_1.png"
-                          alt="推薦圖片"
-                        />
-                      </div>
-                      <span class="item_cart">當代藝術畫展 - TibaMe</span>
-                    </td>
-                    <td>
-                      <span class="ticket_type">全票</span>
-                    </td>
-                    <td>
-                      <span class="ticket_quantity">1</span>
-                    </td>
-                    <td><span class="ticket_subtotal">$ 200</span></td>
-                  </tr>
-                  <tr>
-                    <td>
-                      <div class="thumb_cart img_block">
-                        <img
-                          src="img/0_exhibition/ChatGPT_exhibition_1.png"
-                          alt="推薦圖片"
-                        />
-                      </div>
-                      <span class="item_cart">當代藝術畫展 - TibaMe</span>
-                    </td>
-                    <td>
-                      <span class="ticket_type">全票</span>
-                    </td>
-                    <td>
-                      <span class="ticket_quantity">1</span>
-                    </td>
-                    <td><span class="ticket_subtotal">$ 200</span></td>
-                  </tr>
+                    <td><span th:text="${'$ '+DTO.quantity * DTO.price}" class="ticket_subtotal">$ 200</span></td>
+                  	</tr>
+                  </th:block>
                 </tbody>
               </table>
             </div>

@@ -1,6 +1,7 @@
 package com.eventra.order.controller;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.springframework.http.ResponseEntity;
@@ -16,6 +17,7 @@ import com.eventra.cart_item.model.CartItemService;
 import com.eventra.order.model.ECPayCallbackReqDTO;
 import com.eventra.order.model.ECPaySendingReqDTO;
 import com.eventra.order.model.ECPaySendingResDTO;
+import com.eventra.order.model.GetAllOrderResDTO;
 import com.eventra.order.model.OrderService;
 
 @RestController
@@ -32,7 +34,20 @@ public class OrderRestController {
 		this.ORDER_SERVICE = orderService;
 		this.CART_ITEM_SERVICE = cartItemService; 
 	}
-			
+	
+	@GetMapping("getAllOrder")
+	public List<GetAllOrderResDTO> getAllOrder(){
+		return ORDER_SERVICE.getAllOrderByMemberId(TEST_MEMBER);
+	}
+	
+/* ************************* 以下皆與綠界相關 ************************* */
+	@PostMapping("ECPay/resending")
+	public ECPaySendingResDTO ECPayResending(@RequestBody String orderUlid) {
+		System.out.println("re-sending");
+		ECPaySendingResDTO res = ORDER_SERVICE.ECPayResending(orderUlid);
+		return res;
+	}
+	
 	@PostMapping("ECPay/sending")
 	public ECPaySendingResDTO ECPaySending(@RequestBody ECPaySendingReqDTO req) {
 		System.out.println("sending");
@@ -47,11 +62,11 @@ public class OrderRestController {
 		System.out.println("ReturnURL, processing...");
 		
 		// 測試 OrderResultURL Long Polling 用
-		try{Thread.sleep(5000);} 
+//		try{Thread.sleep(5000);} 
 		// 不知道為啥也會卡住 OrderResultURL...
 		// https://developers.ecpay.com.tw/?p=2878
 		// ReturnURL和 OrderResultURL沒有固定的先後順序，會依當下連線速度與系統執行速度而定
-		catch(InterruptedException e) {System.out.println(e.toString());}
+//		catch(InterruptedException e) {System.out.println(e.toString());}
 		
 		String returnCode = ORDER_SERVICE.ECPayReturnURL(req);
 		System.out.println("returnCode: " + returnCode);
