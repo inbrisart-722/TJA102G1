@@ -3,14 +3,26 @@ package com;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
+import com.eventra.exhibition.model.ExhibitionService;
+import com.eventra.exhibition.model.ExhibitionServiceImpl;
 import com.eventra.exhibitor.backend.controller.dto.ExhibitionCreateDTO;
+
+import jakarta.servlet.http.HttpSession;
 
 @Controller
 @RequestMapping("/back-end")
 public class BackendIndexController {
+	
+	private final ExhibitionService exhibitionService;
+	private final Integer TEST_EXHIBITOR = 3;
 
+	public BackendIndexController(ExhibitionService exhibitionService) {
+		this.exhibitionService = exhibitionService;
+	}
+	
     @GetMapping("exhibitor/back_end_homepage")
     public String exhibitorBackendPage(){
         return "back-end/back_end_homepage";
@@ -28,8 +40,24 @@ public class BackendIndexController {
     	return "/back-end/create_exhibition";
     }
     
+    /**
+     * 接收用戶新增資料請求
+     */
+    @PostMapping("exhibitor/insert_exhibition")
+    public String insertExhibition(ExhibitionCreateDTO dto, HttpSession session) {
+    	/*********** 錯誤處理(建議能成功新增後再做)************/
+    	
+    	/*********** 新增 ***********/
+    	// 取得登入展商id
+    	// eg. Integer exhibitorId = session.getAttribute("loginId")
+    	exhibitionService.addExhibition(dto, TEST_EXHIBITOR); // 呼叫service進行新增 // 還取不到exhibitorId，先用null代替
+    	
+    	return "back-end/exhibition_list";
+    }
+    
+    
     @GetMapping("exhibitor/exhibition_list")
-    public String eventListPage() {
+    public String exhibitionListPage() {
     	return "back-end/exhibition_list";
     }
     

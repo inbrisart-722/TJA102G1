@@ -74,33 +74,7 @@ public class ExhibitorVO {
 	@Column(name = "updated_at")
 	private Timestamp updatedAt;
 
-	public ExhibitorVO() {
-		super();
-	}
-
-	public ExhibitorVO(Integer exhibitorId, Integer reviewStatusId, String exhibitorRegistrationName,
-			String businessIdNumber, String passwordHash, String email, String contactName, String contactPhone,
-			String companyName, String companyAddress, String bankAccountName, String bankCode,
-			String bankAccountNumber, String websiteUrl, String about, Timestamp createdAt, Timestamp updatedAt) {
-		super();
-		this.exhibitorId = exhibitorId;
-		this.reviewStatusId = reviewStatusId;
-		this.exhibitorRegistrationName = exhibitorRegistrationName;
-		this.businessIdNumber = businessIdNumber;
-		this.passwordHash = passwordHash;
-		this.email = email;
-		this.contactName = contactName;
-		this.contactPhone = contactPhone;
-		this.companyName = companyName;
-		this.companyAddress = companyAddress;
-		this.bankAccountName = bankAccountName;
-		this.bankCode = bankCode;
-		this.bankAccountNumber = bankAccountNumber;
-		this.websiteUrl = websiteUrl;
-		this.about = about;
-		this.createdAt = createdAt;
-		this.updatedAt = updatedAt;
-	}
+	
 
 	public Integer getExhibitorId() {
 		return exhibitorId;
