@@ -1,9 +1,11 @@
 package com.eventra.exhibition.model;
 
 import java.sql.Timestamp;
+import java.time.LocalDateTime;
 import java.util.Set;
 
 import org.hibernate.annotations.Formula;
+import org.springframework.format.annotation.DateTimeFormat;
 
 import com.eventra.comment.model.CommentVO;
 import com.eventra.exhibitiontickettype.model.ExhibitionTicketTypeVO;
@@ -34,61 +36,51 @@ public class ExhibitionVO {
     @Column(name = "exhibition_id")
 	private Integer exhibitionId;
     
-    @JsonIgnore
     @OneToMany(mappedBy = "exhibition")
     private Set<ExhibitionTicketTypeVO> exhibitionTicketTypes;
     
-    @JsonIgnore
     @OneToMany(mappedBy = "exhibition")
     private Set<CommentVO> comments;
     
-    @JsonIgnore
     @OneToMany(mappedBy = "exhibition")
     private Set<RatingVO> ratings;
 
     @Column(name = "exhibition_status_id")
 	private Integer exhibitionStatusId;
 
-    @NotNull(message = "展商必須填寫")
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "exhibitor_id", nullable = false)
-	private ExhibitorVO exhibitorId;
+	private ExhibitorVO exhibitorVO;
 
 	private String photoPortrait;
 
 	private String photoLandscape;
 
-    @NotBlank(message = "展覽名稱必填")
     @Column(name = "exhibition_name")
 	private String exhibitionName;
 
-    @NotNull(message = "請勿空白")
     @Column(name = "start_time")
-	private Timestamp startTime;
-
-    @NotNull(message = "請勿空白")
+	private LocalDateTime startTime;
+    
     @Column(name = "end_time")
-	private Timestamp endTime;
+	private LocalDateTime endTime;
 
-    @NotBlank(message = "展覽地點必填")
     @Column(name = "location")
 	private String location;
 
-    @NotNull(message = "請勿空白")
     @Column(name = "ticket_start_time")
-	private Timestamp ticketStartTime;
+	private LocalDateTime ticketStartTime;
 
-    @NotNull(message = "必須填入總販售票數")
-    @PositiveOrZero
+    
     @Column(name = "total_ticket_quantity")
 	private Integer totalTicketQuantity;
 
-    @NotNull
-    @PositiveOrZero
+    
+    
     @Column(name = "sold_ticket_quantity")
 	private Integer soldTicketQuantity;
 
-    @NotBlank(message = "展覽資訊必填")
+    
     @Column(name = "description", columnDefinition="LONGTEXT")
 	private String description;
 
@@ -96,11 +88,11 @@ public class ExhibitionVO {
 
 	private Double longitude;
 
-    @NotNull
+
     @Column(name = "total_rating_count")
 	private Integer totalRatingCount;
 
-    @NotNull
+
     @Column(name = "total_rating_score")
 	private Integer totalRatingScore;
     
@@ -109,35 +101,13 @@ public class ExhibitionVO {
     		+ " else 0 end")
     private Double averageRatingScore;
 
-    public ExhibitionVO() {
-        super();
-    }
+   
 
-	public ExhibitionVO(Integer exhibitionId, Integer exhibitionStatusId, ExhibitorVO exhibitorId, String photoLandscape, String photoPortrait, String exhibitionName, Timestamp startTime, Integer totalRatingScore, Integer totalRatingCount, Double longitude, Double latitude, String description, Integer soldTicketQuantity, Integer totalTicketQuantity, Timestamp ticketStartTime, String location, Timestamp endTime) {
-        this.exhibitionId = exhibitionId;
-        this.exhibitionStatusId = exhibitionStatusId;
-        this.exhibitorId = exhibitorId;
-        this.photoLandscape = photoLandscape;
-        this.photoPortrait = photoPortrait;
-        this.exhibitionName = exhibitionName;
-        this.startTime = startTime;
-        this.totalRatingScore = totalRatingScore;
-        this.totalRatingCount = totalRatingCount;
-        this.longitude = longitude;
-        this.latitude = latitude;
-        this.description = description;
-        this.soldTicketQuantity = soldTicketQuantity;
-        this.totalTicketQuantity = totalTicketQuantity;
-        this.ticketStartTime = ticketStartTime;
-        this.location = location;
-        this.endTime = endTime;
-    }
-
-    public Timestamp getStartTime() {
+    public LocalDateTime getStartTime() {
         return startTime;
     }
 
-    public void setStartTime(Timestamp startTime) {
+    public void setStartTime(LocalDateTime startTime) {
         this.startTime = startTime;
     }
 
@@ -157,12 +127,12 @@ public class ExhibitionVO {
         this.exhibitionStatusId = exhibitionStatusId;
     }
 
-    public ExhibitorVO getExhibitorId() {
-        return exhibitorId;
+    public ExhibitorVO getExhibitorVO() {
+        return exhibitorVO;
     }
 
-    public void setExhibitorId(ExhibitorVO exhibitorId) {
-        this.exhibitorId = exhibitorId;
+    public void setExhibitorVO(ExhibitorVO exhibitorVO) {
+        this.exhibitorVO = exhibitorVO;
     }
 
     public String getPhotoPortrait() {
@@ -189,11 +159,11 @@ public class ExhibitionVO {
         this.exhibitionName = exhibitionName;
     }
 
-    public Timestamp getEndTime() {
+    public LocalDateTime getEndTime() {
         return endTime;
     }
 
-    public void setEndTime(Timestamp endTime) {
+    public void setEndTime(LocalDateTime endTime) {
         this.endTime = endTime;
     }
 
@@ -205,11 +175,11 @@ public class ExhibitionVO {
         this.location = location;
     }
 
-    public Timestamp getTicketStartTime() {
+    public LocalDateTime getTicketStartTime() {
         return ticketStartTime;
     }
 
-    public void setTicketStartTime(Timestamp ticketStartTime) {
+    public void setTicketStartTime(LocalDateTime ticketStartTime) {
         this.ticketStartTime = ticketStartTime;
     }
 

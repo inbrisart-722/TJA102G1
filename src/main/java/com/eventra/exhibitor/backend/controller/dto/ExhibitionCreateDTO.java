@@ -1,14 +1,14 @@
 package com.eventra.exhibitor.backend.controller.dto;
 
 import java.sql.Timestamp;
+import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Set;
 
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.multipart.MultipartFile;
 
-import jakarta.persistence.Column;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.PositiveOrZero;
+import com.eventra.exhibitiontickettype.model.ExhibitionTicketTypeVO;
 
 /**
  * 接收使用者新增展覽輸入資料
@@ -21,41 +21,47 @@ public class ExhibitionCreateDTO {
 	private List<MultipartFile> photoPortrait;
 
 	private List<MultipartFile> photoLandscape;
+	
+//	@JsonIgnore
+    private Set<ExhibitionTicketTypeVO> exhibitionTicketTypes;
 
-	@NotBlank(message = "展覽名稱必填")
-	@Column(name = "exhibition_name")
+//	@NotBlank(message = "展覽名稱必填")
 	private String exhibitionName;
+	
+//	@NotNull(message = "請勿空白")
+	private LocalDateTime startTime;
+	
+//	@NotNull(message = "請勿空白")
+	private LocalDateTime endTime;
 
-	@NotNull(message = "請勿空白")
-	@Column(name = "start_time")
-	private Timestamp startTime;
-
-	@NotNull(message = "請勿空白")
-	@Column(name = "end_time")
-	private Timestamp endTime;
-
-	@NotBlank(message = "展覽地點必填")
-	@Column(name = "location")
+//	@NotBlank(message = "展覽地點必填")
 	private String location;
+	
+//	@NotNull(message = "請勿空白")
+	private LocalDateTime ticketStartTime;
 
-	@NotNull(message = "請勿空白")
-	@Column(name = "ticket_start_time")
-	private Timestamp ticketStartTime;
-
-	@NotNull(message = "必須填入總販售票數")
-	@PositiveOrZero
-	@Column(name = "total_ticket_quantity")
+//	@NotNull(message = "必須填入總販售票數")
+//	@PositiveOrZero
 	private Integer totalTicketQuantity;
 
-	@NotBlank(message = "展覽資訊必填")
-	@Column(name = "description", columnDefinition = "LONGTEXT")
+//	@NotBlank(message = "展覽資訊必填")
 	private String description;
 
-	public Timestamp getStartTime() {
+	
+	
+	public Set<ExhibitionTicketTypeVO> getExhibitionTicketTypes() {
+		return exhibitionTicketTypes;
+	}
+
+	public void setExhibitionTicketTypes(Set<ExhibitionTicketTypeVO> exhibitionTicketTypes) {
+		this.exhibitionTicketTypes = exhibitionTicketTypes;
+	}
+
+	public LocalDateTime getStartTime() {
 		return startTime;
 	}
 
-	public void setStartTime(Timestamp startTime) {
+	public void setStartTime(LocalDateTime startTime) {
 		this.startTime = startTime;
 	}
 
@@ -83,11 +89,11 @@ public class ExhibitionCreateDTO {
 		this.exhibitionName = exhibitionName;
 	}
 
-	public Timestamp getEndTime() {
+	public LocalDateTime getEndTime() {
 		return endTime;
 	}
 
-	public void setEndTime(Timestamp endTime) {
+	public void setEndTime(LocalDateTime endTime) {
 		this.endTime = endTime;
 	}
 
@@ -99,11 +105,11 @@ public class ExhibitionCreateDTO {
 		this.location = location;
 	}
 
-	public Timestamp getTicketStartTime() {
+	public LocalDateTime getTicketStartTime() {
 		return ticketStartTime;
 	}
 
-	public void setTicketStartTime(Timestamp ticketStartTime) {
+	public void setTicketStartTime(LocalDateTime ticketStartTime) {
 		this.ticketStartTime = ticketStartTime;
 	}
 
