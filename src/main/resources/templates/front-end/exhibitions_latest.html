@@ -103,247 +103,30 @@
 	</header>
 	<!-- End Header -->
 
-
 	<!-- 1400*470px 背景圖區 -->
-	<section class="parallax-window" data-parallax="scroll" data-image-src="img/0_exhibition/banner.jpg"
-		data-natural-width="1400" data-natural-height="470">
+	<section class="parallax-window" data-parallax="scroll" data-image-src="img/0_exhibition/banner.jpg" data-natural-width="1400" data-natural-height="470">
 		<div class="parallax-content-1 opacity-mask" data-opacity-mask="rgba(0, 0, 0, 0.6)">
-			<div class="animated fadeInDown" style="height: 60px;">
-			</div>
+			<div class="animated fadeInDown" style="height: 60px;"></div>
 		</div>
 	</section>
-
 
 	<!-- 主畫面 -->
 	<main>
 		<div class="container margin_60">
 			<div class="row">
-				<!-- 展覽卡片(長)  展示6個 -->
+				<!-- 展覽卡片(長) -->
 				<div class="col-lg-9">
 					<!-- 熱門/最新切換 -->
 					<div class="seg-wrap">
 						<nav class="seg" aria-label="排序切換">
-							<a class="seg-link" href="all_tours_list.html">熱門</a>
-							<a class="seg-link" href="all_tours_list2.html" aria-current="page">最新</a>
+							<a class="seg-link" th:href="@{/front-end/exhibitions_popular}">熱門</a>
+							<a class="seg-link" th:href="@{/front-end/exhibitions_latest}" aria-current="page">最新</a>
 						</nav>
 					</div>
 
-					<!-- 1 -->
-					<div class="strip_all_tour_list">
-						<a href="single_tour.html">
-							<div class="row">
-								<div class="col-lg-4 col-md-4 position-relative">
-									<div class="img_list">
-										<img src="img/0_exhibition/ChatGPT_exhibition_1.png" alt="Image">
-									</div>
-								</div>
-								<div class="col-lg-6 col-md-6">
-									<div class="tour_list_desc">
-										<div>
-											<h3>感官解放：藝術的另一種語言</h3>
-											<p><span class="start_time">2025/08/01</span> ~ <span
-													class="end_time">2025/08/01</span></p>
-											<p><span class="location">台北市中山區南京東路三段219號4樓</span></p>
-											<p><span class="rating">
-													<i class="icon-star voted "></i>
-													<i class="icon-star voted"></i>
-													<i class="icon-star-half-alt voted"></i>
-													<i class="icon-star-empty"></i>
-													<i class="icon-star-empty"></i>
-												</span>(22)</p>
-
-										</div>
-									</div>
-								</div>
-								<div class="col-lg-2 col-md-2">
-									<div class="price_list">
-										<div><span class="currency">$</span>2,000 - 2,500</div>
-									</div>
-
-								</div>
-							</div>
-						</a>
-					</div>
-
-					<!-- 2 -->
-					<div class="strip_all_tour_list">
-						<a href="single_tour.html">
-							<div class="row">
-								<div class="col-lg-4 col-md-4 position-relative">
-									<div class="img_list">
-										<img src="img/0_exhibition/ChatGPT_exhibition_2.png" alt="Image">
-									</div>
-								</div>
-								<div class="col-lg-6 col-md-6">
-									<div class="tour_list_desc">
-										<div>
-											<h3>奇幻世界：當想像力化為藝術的形狀與色彩</h3>
-											<p><span class="start_time">2025/08/01</span> ~ <span
-													class="end_time">2025/08/01</span></p>
-											<p><span class="location">台北市中山區南京東路三段219號4樓</span></p>
-											<p><span class="rating">
-													<i class="icon-star voted "></i>
-													<i class="icon-star voted"></i>
-													<i class="icon-star-half-alt voted"></i>
-													<i class="icon-star-empty"></i>
-													<i class="icon-star-empty"></i>
-												</span>(22)</p>
-
-										</div>
-									</div>
-								</div>
-								<div class="col-lg-2 col-md-2">
-									<div class="price_list">
-										<div><span class="currency">$</span>2,000 - 2,500</div>
-									</div>
-								</div>
-							</div>
-						</a>
-					</div>
-
-					<!-- 3 -->
-					<div class="strip_all_tour_list">
-					 <a href="single_tour.html">
-						<div class="row">
-							<div class="col-lg-4 col-md-4 position-relative">
-								<div class="img_list">
-									<img src="img/0_exhibition/ChatGPT_exhibition_3.png" alt="Image">
-								</div>
-							</div>
-							<div class="col-lg-6 col-md-6">
-								<div class="tour_list_desc">
-									<div>
-										<h3>都市敘事：以鏡頭書寫在城市縫隙間的故事與記憶</h3>
-										<p><span class="start_time">2025/08/01</span> ~ <span
-												class="end_time">2025/08/01</span></p>
-										<p><span class="location">台北市中山區南京東路三段219號4樓</span></p>
-										<p><span class="rating">
-												<i class="icon-star voted "></i>
-												<i class="icon-star voted"></i>
-												<i class="icon-star-half-alt voted"></i>
-												<i class="icon-star-empty"></i>
-												<i class="icon-star-empty"></i>
-											</span>(22)</p>
-
-									</div>
-								</div>
-							</div>
-							<div class="col-lg-2 col-md-2">
-								<div class="price_list">
-									<div><span class="currency">$</span>2,000 - 2,500</div>
-								</div>
-							</div>
-						</div>
-						</a>
-					</div>
-
-					<!-- 4 -->
-					<div class="strip_all_tour_list">
-						<a href="single_tour.html">
-							<div class="row">
-								<div class="col-lg-4 col-md-4 position-relative">
-									<div class="img_list">
-										<img src="img/0_exhibition/ChatGPT_exhibition_1.png" alt="Image">
-									</div>
-								</div>
-								<div class="col-lg-6 col-md-6">
-									<div class="tour_list_desc">
-										<div>
-											<h3>感官解放：藝術的另一種語言</h3>
-											<p><span class="start_time">2025/08/01</span> ~ <span
-													class="end_time">2025/08/01</span></p>
-											<p><span class="location">台北市中山區南京東路三段219號4樓</span></p>
-											<p><span class="rating">
-													<i class="icon-star voted "></i>
-													<i class="icon-star voted"></i>
-													<i class="icon-star-half-alt voted"></i>
-													<i class="icon-star-empty"></i>
-													<i class="icon-star-empty"></i>
-												</span>(22)</p>
-										</div>
-									</div>
-								</div>
-								<div class="col-lg-2 col-md-2">
-									<div class="price_list">
-										<div><span class="currency">$</span>2,000 - 2,500</div>
-									</div>
-
-								</div>
-							</div>
-						</a>
-					</div>
-
-					<!-- 5 -->
-					<div class="strip_all_tour_list">
-						<a href="single_tour.html">
-							<div class="row">
-								<div class="col-lg-4 col-md-4 position-relative">
-									<div class="img_list">
-										<img src="img/0_exhibition/ChatGPT_exhibition_2.png" alt="Image">
-									</div>
-								</div>
-								<div class="col-lg-6 col-md-6">
-									<div class="tour_list_desc">
-										<div>
-											<h3>奇幻世界：當想像力化為藝術的形狀與色彩</h3>
-											<p><span class="start_time">2025/08/01</span> ~ <span
-													class="end_time">2025/08/01</span></p>
-											<p><span class="location">台北市中山區南京東路三段219號4樓</span></p>
-											<p><span class="rating">
-													<i class="icon-star voted "></i>
-													<i class="icon-star voted"></i>
-													<i class="icon-star-half-alt voted"></i>
-													<i class="icon-star-empty"></i>
-													<i class="icon-star-empty"></i>
-												</span>(22)</p>
-
-										</div>
-									</div>
-								</div>
-								<div class="col-lg-2 col-md-2">
-									<div class="price_list">
-										<div><span class="currency">$</span>2,000 - 2,500</div>
-									</div>
-								</div>
-							</div>
-						</a>
-					</div>
-
-					<!-- 6 -->
-					<div class="strip_all_tour_list">
-						<a href="single_tour.html">
-							<div class="row">
-								<div class="col-lg-4 col-md-4 position-relative">
-									<div class="img_list">
-										<img src="img/0_exhibition/ChatGPT_exhibition_3.png" alt="Image">
-									</div>
-								</div>
-								<div class="col-lg-6 col-md-6">
-									<div class="tour_list_desc">
-										<div>
-											<h3>都市敘事：以鏡頭書寫在城市縫隙間的故事與記憶</h3>
-											<p><span class="start_time">2025/08/01</span> ~ <span
-													class="end_time">2025/08/01</span></p>
-											<p><span class="location">台北市中山區南京東路三段219號4樓</span></p>
-											<p><span class="rating">
-													<i class="icon-star voted "></i>
-													<i class="icon-star voted"></i>
-													<i class="icon-star-half-alt voted"></i>
-													<i class="icon-star-empty"></i>
-													<i class="icon-star-empty"></i>
-												</span>(22)</p>
-
-										</div>
-									</div>
-								</div>
-								<div class="col-lg-2 col-md-2">
-									<div class="price_list">
-										<div><span class="currency">$</span>2,000 - 2,500</div>
-									</div>
-								</div>
-							</div>
-						</a>
-					</div>
+					<!-- ajax載入資料 -->
+					  <div id="latestExhibitionsList">
+					  </div>
 
 					<!-- 分頁區 -->
 					<nav aria-label="Page navigation">
@@ -714,6 +497,7 @@
 	<script src="js/map.js"></script>
 	<script src="js/infobox.js"></script>
 	<script src="js/g1_10_custom_common.js"></script>
+	<script src="js/g1_6_exhibitions_latest.js"></script>
 	<script src="js/g1_6_search_modal.js"></script>
 
 

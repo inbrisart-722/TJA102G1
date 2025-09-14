@@ -1,4 +1,4 @@
-package com.eventra.order_notification.model;
+package com.eventra.ordernotification.model;
 
 import java.util.List;
 

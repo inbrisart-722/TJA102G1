@@ -1,4 +1,4 @@
-package com.eventra.exhibition_page_popularity_stats.model;
+package com.eventra.exhibitionpagepopularitystats.model;
 
 import java.io.Serializable;
 import java.sql.Date;
@@ -8,8 +8,6 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 
 @Entity
@@ -23,9 +21,6 @@ public class ExhibitionPagePopularityStatsVO implements Serializable {
 	
 	@Column(name ="exhibition_id")
 	private Integer exhibitionId;
-//	@ManyToOne
-//	@JoinColumn(name = "exhibition_id", referencedColumnName = "exhibition_id")
-//	private ExhibitionVO exhibitionVO;
 	
 	@Column(name ="view_date", insertable = false)
 	private Date viewDate;
@@ -80,6 +75,5 @@ public class ExhibitionPagePopularityStatsVO implements Serializable {
 	public void setExhibitionPageViewCount(Integer exhibitionPageViewCount) {
 		this.exhibitionPageViewCount = exhibitionPageViewCount;
 	}
-	
 	
 }
