@@ -1,9 +1,7 @@
-package com.eventra.event_notifiation.model;
+package com.eventra.ordernotification.model;
 
 import java.io.Serializable;
 import java.sql.Timestamp;
-
-import com.eventra.favorite.model.FavoriteVO;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -15,27 +13,29 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 
 @Entity
-@Table (name ="event_notification")
-public class EventNotifiationVO implements Serializable {
+@Table (name ="order_notification")
+public class OrderNotificationVO implements Serializable {
 	private static final long serialVersionUID = 1L;
 
 	@Id
-	@Column(name="favorite_announcement_id" , insertable = false)
+	@Column(name="order_announcement_id" , insertable = false)
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private Integer favoriteAnnouncementId;
-	
-	@ManyToOne
-	@JoinColumn(name = "favorite_id", referencedColumnName = "favorite_id")
-	private FavoriteVO favoriteVO;
+	private Integer orderAnnouncementId;
 	
 	@Column(name ="member_id")
 	private Integer memberId;
 //	@ManyToOne
 //	@JoinColumn(name = "member_id", referencedColumnName = "member_id")
-//	private MemberVO memberVO;
+//	private MemberVO member;
+	
+	@Column(name ="order_id")
+	private Integer orderId;
+//	@ManyToOne
+//	@JoinColumn(name = "order_id", referencedColumnName = "order_id")
+//	private OrderVO order;
 	
 	@Column(name ="read_status", nullable = false)
-	private Boolean readStatus = false; // default false
+	private Boolean readStatus = false; 
 	
 	private String title;
 	
@@ -43,40 +43,32 @@ public class EventNotifiationVO implements Serializable {
 	
 	@Column(name ="created_at", insertable = false, updatable = false)
 	private Timestamp createdAt;
-	
+
 	// 無參數建構子
-	public EventNotifiationVO() {
+	public OrderNotificationVO() {
 		super();
 	}
-	
+
 	// 有參數建構子
-	public EventNotifiationVO(Integer favoriteAnnouncementId, FavoriteVO favoriteVO, Integer memberId, Boolean readStatus,
+	public OrderNotificationVO(Integer orderAnnouncementId, Integer memberId, Integer orderId, Boolean readStatus,
 			String title, String content, Timestamp createdAt) {
 		super();
-		this.favoriteAnnouncementId = favoriteAnnouncementId;
-		this.favoriteVO = favoriteVO;
+		this.orderAnnouncementId = orderAnnouncementId;
 		this.memberId = memberId;
+		this.orderId = orderId;
 		this.readStatus = readStatus;
 		this.title = title;
 		this.content = content;
 		this.createdAt = createdAt;
 	}
-	
+
 	// getter/setter
-	public Integer getFavoriteAnnouncementId() {
-		return favoriteAnnouncementId;
+	public Integer getOrderAnnouncementId() {
+		return orderAnnouncementId;
 	}
 
-	public void setFavoriteAnnouncementId(Integer favoriteAnnouncementId) {
-		this.favoriteAnnouncementId = favoriteAnnouncementId;
-	}
-
-	public FavoriteVO getFavoriteVO() {
-		return favoriteVO;
-	}
-
-	public void setFavorite(FavoriteVO favoriteVO) {
-		this.favoriteVO = favoriteVO;
+	public void setOrderAnnouncementId(Integer orderAnnouncementId) {
+		this.orderAnnouncementId = orderAnnouncementId;
 	}
 
 	public Integer getMemberId() {
@@ -85,6 +77,14 @@ public class EventNotifiationVO implements Serializable {
 
 	public void setMemberId(Integer memberId) {
 		this.memberId = memberId;
+	}
+
+	public Integer getOrderId() {
+		return orderId;
+	}
+
+	public void setOrderId(Integer orderId) {
+		this.orderId = orderId;
 	}
 
 	public Boolean getReadStatus() {
@@ -118,5 +118,6 @@ public class EventNotifiationVO implements Serializable {
 	public void setCreatedAt(Timestamp createdAt) {
 		this.createdAt = createdAt;
 	}
+	
 	
 }
