@@ -44,7 +44,7 @@ import jakarta.persistence.PersistenceContext;
 public class OrderService {
 
 	private static final String MERCHANT_ID = "2000132";
-	private static final String PROXY_HOST = "https://44207b177b3c.ngrok-free.app";
+	private static final String PROXY_HOST = "https://f80521215bf7.ngrok-free.app";
 
 	@PersistenceContext
 	private EntityManager entityManager;
@@ -148,18 +148,16 @@ public class OrderService {
 //			ECPayQueryResDTO res = ECPayQuery(multiParams);
 			Map<String, String> res = ECPayQuery(multiParams);
 			System.out.println("ECPayQuery receiving");
-			Map<String, String> resForCheck = new LinkedHashMap<>(res);
 			
 			/* ********* 3rd part : 驗 checkMacValue ********* */
 			String checkMac= null;
 			try {
-				checkMac = ECPAY_UTILS.genCheckMacValue(resForCheck);
+				checkMac = ECPAY_UTILS.genCheckMacValue(res);
 			} catch (Exception e) {
 				System.out.println(e.toString());
 			}
 			// throw new Exception("WRONG checkMacValue");
 			if(!res.get("CheckMacValue").equals(checkMac)) return;
-			System.out.println(res.get("CheckMacValue"));
 			System.out.println("Query API checkMacValue validated");
 			
 			/* ********* 4rd part : 驗其他內容 ********* */
@@ -203,6 +201,11 @@ public class OrderService {
 			Long createdAt = orderVO.getCreatedAt().getTime();
 			if (System.currentTimeMillis() - createdAt > 120 * 60 * 1000) {
 				orderVO.setOrderStatus("付款逾時");
+				// 釋出票出口 1
+				Map<Integer, Integer> releaseMap = orderVO.getOrderItems().stream().collect(Collectors
+						.groupingBy(item -> item.getExhibitionTicketType().getExhibitionId(), Collectors.summingInt(item -> 1)));
+				for(Map.Entry<Integer, Integer> entry : releaseMap.entrySet())
+					EXHIBITION_REPO.updateSoldTicketQuantity(entry.getKey(), -entry.getValue());
 			}
 //			ORDER_REPO.save(orderVO);
 		}
@@ -221,13 +224,14 @@ public class OrderService {
 		for (OrderVO vo : expiredOrders)
 			vo.setOrderStatus("付款逾時");
 		/* ********* 3rd part : 庫存釋放 ********* */
+		// 釋出票出口 2
 		Map<Integer, Integer> releaseMap = expiredOrders.stream().flatMap(order -> order.getOrderItems().stream())
 				.collect(Collectors.groupingBy(item -> item.getExhibitionTicketType().getExhibitionId(),
 						Collectors.summingInt(i -> 1)));
 		// 若有改成計數版本，或想接 long 型態 ---> Collectors.summingInt(OrderItemVO::getQuantity) or
 		// Collectors.counting();
 		for (Map.Entry<Integer, Integer> entry : releaseMap.entrySet())
-			EXHIBITION_REPO.updateSoldTicketQuantity(entry.getKey(), entry.getValue());
+			EXHIBITION_REPO.updateSoldTicketQuantity(entry.getKey(), -entry.getValue());
 	}
 	
 	public String checkOrderStatus(String merchantTradeNo) {
@@ -248,11 +252,11 @@ public class OrderService {
 		} catch (Exception e) {
 			System.out.println(e.toString());
 		}
-		System.out.println("merchantCheckMacValue: " + req.getCheckMacValue());
-		System.out.println("checkMacValue: " + checkMacValue);
+//		System.out.println("merchantCheckMacValue: " + req.getCheckMacValue());
+//		System.out.println("checkMacValue: " + checkMacValue);
 
 		if (!Objects.equals(req.getCheckMacValue(), checkMacValue))
-			return "0|failed";
+			return "0|FAILED";
 		System.out.println("checkMacValue validated!!! it's ECPay here");
 		/* ********* 3rd part : 核對 PaymentAttempt 送出前已存的部分欄位 失敗就在此截斷 0|FAIL ********* */
 		System.out.println(req.toString());
@@ -260,7 +264,10 @@ public class OrderService {
 		// 避免 nullpointer
 		if (!Objects.equals(paVO.getMerchantId(), req.getMerchantID()) ||
 			!Objects.equals(paVO.getTradeAmt(), req.getTradeAmt()))
-			return "0|failed";
+			return "0|FAILED";
+		
+		/* ********* *rd part : 以防 ECPay 多次送出同樣的 ReturnURL ********* */
+		if(!"pending".equals(paVO.getPaymentAttemptStatus())) return "1|OK";
 		
 		/* ********* 4th part: 先更新共用欄位 ********* */
 		paVO.setStoreId(req.getStoreID());
@@ -278,27 +285,33 @@ public class OrderService {
 			System.out.println("payment succeeded");
 			/* ********* 5-1 part : 更新 PaymentAttempt 填入多項明細 ********* */
 			paVO.setPaymentAttemptStatus("success");
-
 			/* ********* 5-2 part : 更新 Order 調整 orderStatus ********* */
 			orderVO.setOrderStatus("已付款");
 //			ORDER_REPO.save(orderVO);
 			/* ********* 5-3 part : 更新 OrderItem 寫入 ticketCode ********* */
 			Set<OrderItemVO> orderItemVOs = orderVO.getOrderItems();
 			for (OrderItemVO item : orderItemVOs)
-				item.setTicketCode(genTicketCode(item.getOrderItemUlid()));
+				if(item.getTicketCode() == null) item.setTicketCode(genTicketCode(item.getOrderItemUlid()));
 //			ORDER_ITEM_REPO.saveAll(orderItemVOs);
 		}
 		/* ********* 6th part : 處理付款失敗與異常情況 ********* */
 		// 10300066：「交易付款結果待確認中，請勿出貨」，請至廠商管理後台確認已付款完成再出貨。
-		// 這個特殊 code 我留著 放在之後掃過期 payment attempt 時候會再次確認
+		// 這個特殊 code 留著 放在之後掃過期 payment attempt 時候會再次確認
 		else if(!"10300066".equals(req.getRtnCode())){
 			System.out.println("payment failed");
 			/* ********* 6-1 part : 更新 PaymentAttempt 填入多項明細 ********* */
 			paVO.setPaymentAttemptStatus("failed");
-			/* ********* 6-2 part : 額外確認此訂單是否過期 ********* */
+			/* ********* 6-2 part : 更新 Order 調整 orderStatus ********* */
+			orderVO.setOrderStatus("付款失敗");
+			/* ********* 6-3 part : 額外確認此訂單是否過期 ********* */
 			Long createdAt = orderVO.getCreatedAt().getTime();
 			if (System.currentTimeMillis() - createdAt > 120 * 60 * 1000) {
 				orderVO.setOrderStatus("付款逾時");
+				// 釋出票出口 3
+				Map<Integer, Integer> releaseMap = orderVO.getOrderItems().stream().collect(Collectors
+						.groupingBy(item -> item.getExhibitionTicketType().getExhibitionId(), Collectors.summingInt(item -> 1)));
+				for(Map.Entry<Integer, Integer> entry : releaseMap.entrySet())
+					EXHIBITION_REPO.updateSoldTicketQuantity(entry.getKey(), -entry.getValue());
 			}
 //			ORDER_REPO.save(orderVO);
 		}
@@ -316,7 +329,7 @@ public class OrderService {
 		
 		orderVO.setOrderStatus("付款中");
 		
-		// no value present ？ 這裡 throw 會丟錯嗎 ？
+		// no value present ？ 這裡 throw 有機會丟錯嗎 ？
 		PaymentAttemptVO paVO = PAYMENT_ATTEMPT_REPO.findTopByOrderIdOrderByCreatedAtDesc(orderId).orElseThrow();
 		Integer totalAmount = paVO.getTradeAmt();
 		String itemName = paVO.getItemName();
@@ -360,9 +373,7 @@ public class OrderService {
 		String merchantTradeNo = MerchantTradeNo36Generator.generateMerchantTradeNo();
 		String merchantTradeDate = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss").format(new Date());
 		// 綠界：送出時叫 merchantTradeDate => 回傳時叫 tradeDate
-		System.out.println("before ulid");
 		String ulid = UlidCreator.getUlid().toString();
-		System.out.println("after ulid");
 
 		/* ********* 2nd part : 新增 order ********* */
 		// 需要 orderUlid, orderStatus, member, totalAmount, totalQuantity
