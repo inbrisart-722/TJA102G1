@@ -56,5 +56,21 @@ public class FrontendIndexController {
 	public String index() {
 		return "front-end/index";
 	}
+	
+	@GetMapping("/login")
+	public String login() {
+		return "front-end/login";
+	}
+	
+	@GetMapping("/register1")
+	public String register1() {
+		return "front-end/register1";
+	}
+	
+	@GetMapping("/register2")
+	public String register2() {
+		return "front-end/register2";
+	}
+	
 
 }
