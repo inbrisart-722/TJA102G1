@@ -7,10 +7,10 @@ document.addEventListener("DOMContentLoaded", function () {
     const input_password = document.querySelector("input#password");
 
     const send_data = {
-      email: input_email.value,
+      username: input_email.value,
       password: input_password.value,
     };
-    fetch("http://localhost:8081/eventra/api/auth/login", {
+    fetch("/api/auth/login", {
       method: "POST",
       headers: {
         "CONTENT-TYPE": "application/json",
@@ -28,6 +28,7 @@ document.addEventListener("DOMContentLoaded", function () {
         } else if (result.status === "failed") {
           console.log("login failed");
         }
+		location.href = "/front-end/cart";
       })
       .catch((error) => {
         console.log("error");
