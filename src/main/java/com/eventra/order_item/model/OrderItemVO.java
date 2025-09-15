@@ -2,7 +2,7 @@ package com.eventra.order_item.model;
 
 import java.io.Serializable;
 
-import com.eventra.exhibition_ticket_type.model.ExhibitionTicketTypeVO;
+import com.eventra.exhibitiontickettype.model.ExhibitionTicketTypeVO;
 import com.eventra.order.model.OrderVO;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 

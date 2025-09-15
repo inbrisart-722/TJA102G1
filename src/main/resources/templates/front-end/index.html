@@ -152,98 +152,16 @@
             <div class="main_title">
                 <h2><span>熱門</span>展覽</h2>
             </div>
-
-            <!-- 展覽卡片(方) 展示5個 -->
-            <div class="owl-carousel owl-theme list_carousel add_bottom_30">
-                <!-- 1 -->
-                <div class="item">
-                    <div class="tour_container">
-                        <div class="img_container">
-                            <a href="single_tour.html">
-                                <img src="img/0_exhibition/ChatGPT_exhibition_1.png" width="800" height="533"
-                                    class="img-fluid" alt="image">
-                                <div class="short_info">
-                                    <span class="price">
-                                </div>
-                            </a>
-                        </div>
-                        <div class="tour_title">
-                            <h3>感官解放：藝術的另一種語言</h3>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- 2  -->
-                <div class="item">
-                    <div class="tour_container">
-                        <div class="img_container">
-                            <a href="single_tour.html">
-                                <img src="img/0_exhibition/ChatGPT_exhibition_2.png" width="800" height="533"
-                                    class="img-fluid" alt="image">
-                                <div class="short_info">
-                                </div>
-                            </a>
-                        </div>
-                        <div class="tour_title">
-                            <h3>奇幻世界：當想像力化為藝術的形狀與色彩</h3>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- 3 -->
-                <div class="item">
-                    <div class="tour_container">
-                        <div class="img_container">
-                            <a href="single_tour.html">
-                                <img src="img/0_exhibition/ChatGPT_exhibition_3.png" width="800" height="533"
-                                    class="img-fluid" alt="image">
-                                <div class="short_info">
-                                </div>
-                            </a>
-                        </div>
-                        <div class="tour_title">
-                            <h3>都市敘事：以鏡頭書寫在城市縫隙間的故事與記憶</h3>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- 4 -->
-                <div class="item">
-                    <div class="tour_container">
-                        <div class="img_container">
-                            <a href="single_tour.html">
-                                <img src="img/tour_box_4.jpg" width="800" height="533" class="img-fluid" alt="image">
-                                <div class="short_info">
-                                </div>
-                            </a>
-                        </div>
-                        <div class="tour_title">
-                            <h3>Lorem ipsum, dolor sit amet consectetur adipisicing elit.</h3>
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- 5 -->
-                <div class="item">
-                    <div class="tour_container">
-                        <div class="img_container">
-                            <a href="single_tour.html">
-                                <img src="img/tour_box_14.jpg" width="800" height="533" class="img-fluid" alt="image">
-                                <div class="short_info">
-                                </div>
-                            </a>
-                        </div>
-                        <div class="tour_title">
-                            <h3>Lorem ipsum dolor sit amet consectetur adipisicing elit. Qui, culpa.</h3>
-                        </div>
-                    </div>
-                </div>
+            
+            <!-- ajax載入資料 -->
+            <div id="popularExhibitionsCarousel" class="owl-carousel owl-theme list_carousel add_bottom_30">
             </div>
 
             <!-- 看全部 -->
             <p class="text-center add_bottom_30">
-                <a href="all_tours_list.html" class="btn_1">看全部</a>
+                <a th:href="@{/front-end/exhibitions_popular}" class="btn_1">看全部</a>
             </p>
+            
 
             <hr class="mt-5 mb-5">
 
@@ -254,96 +172,13 @@
                 <h2><span>最新</span>展覽</h2>
             </div>
 
-            <!-- 展覽卡片(方) 展示5個 -->
-            <div class="owl-carousel owl-theme list_carousel add_bottom_30">
-                <!-- 1 -->
-                <div class="item">
-                    <div class="tour_container">
-                        <div class="img_container">
-                            <a href="single_tour.html">
-                                <img src="img/0_exhibition/ChatGPT_exhibition_4.png" width="800" height="533"
-                                    class="img-fluid" alt="image">
-                                <div class="short_info">
-                                    <span class="price">
-                                </div>
-                            </a>
-                        </div>
-                        <div class="tour_title">
-                            <h3>形與色的對話：當代抽象藝術特展</h3>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- 2 -->
-                <div class="item">
-                    <div class="tour_container">
-                        <div class="img_container">
-                            <a href="single_tour.html">
-                                <img src="img/0_exhibition/ChatGPT_exhibition_5.png" width="800" height="533"
-                                    class="img-fluid" alt="image">
-                                <div class="short_info">
-                                </div>
-                            </a>
-                        </div>
-                        <div class="tour_title">
-                            <h3>大地的藝術──陶與自然</h3>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- 3 -->
-                <div class="item">
-                    <div class="tour_container">
-                        <div class="img_container">
-                            <a href="single_tour.html">
-                                <img src="img/0_exhibition/ChatGPT_exhibition_6.png" width="800" height="533"
-                                    class="img-fluid" alt="image">
-                                <div class="short_info">
-                                </div>
-                            </a>
-                        </div>
-                        <div class="tour_title">
-                            <h3>城市低語與回響：透過鏡頭捕捉時間流轉、靜止片刻與記憶的交錯</h3>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- 4 -->
-                <div class="item">
-                    <div class="tour_container">
-                        <div class="img_container">
-                            <a href="single_tour.html">
-                                <img src="img/tour_box_4.jpg" width="800" height="533" class="img-fluid" alt="image">
-                                <div class="short_info">
-                                </div>
-                            </a>
-                        </div>
-                        <div class="tour_title">
-                            <h3>Lorem ipsum, dolor sit amet consectetur adipisicing elit.</h3>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- 5 -->
-                <div class="item">
-                    <div class="tour_container">
-                        <div class="img_container">
-                            <a href="single_tour.html">
-                                <img src="img/tour_box_14.jpg" width="800" height="533" class="img-fluid" alt="image">
-                                <div class="short_info">
-                                </div>
-                            </a>
-                        </div>
-                        <div class="tour_title">
-                            <h3>Lorem ipsum dolor sit amet consectetur adipisicing elit. Qui, culpa.</h3>
-                        </div>
-                    </div>
-                </div>
+            <<!-- ajax載入資料 -->
+            <div id="latestExhibitionsCarousel" class="owl-carousel owl-theme list_carousel add_bottom_30">
             </div>
 
             <!-- 看全部 -->
             <p class="text-center add_bottom_30">
-                <a href="all_tours_list.html" class="btn_1">看全部</a>
+                <a th:href="@{/front-end/exhibitions_latest}" class="btn_1">看全部</a>
             </p>
 
             <hr class="mt-5 mb-5">
@@ -611,6 +446,8 @@
     <!-- NOTIFY BUBBLES  -->
     <script src="js/notify_func.js"></script>
     <script src="js/g1_10_custom_common.js"></script>
+    <script src="js/g1_6_exhibitions_popular_index.js"></script>
+    <script src="js/g1_6_exhibitions_latest_index.js"></script>
     <script src="js/g1_6_search_modal.js"></script>
 
 </body>

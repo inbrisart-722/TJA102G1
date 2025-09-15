@@ -23,6 +23,7 @@ public class FrontendIndexController {
 	
 	@Autowired
 	private CartItemService cartItemSvc;
+
 	
 	private static final Integer TEST_MEMBER = 3;
 
@@ -54,7 +55,17 @@ public class FrontendIndexController {
 
 	@GetMapping("/index")
 	public String index() {
-		return "front-end/index";
+        return "front-end/index";
+	}
+	
+	@GetMapping("/exhibitions_popular")
+	public String exhibitionsPopularPage() {
+		return "front-end/exhibitions_popular";
+	}
+	
+	@GetMapping("/exhibitions_latest")
+	public String exhibitionsLatestPage() {
+		return "front-end/exhibitions_latest";
 	}
 	
 	@GetMapping("/login")
