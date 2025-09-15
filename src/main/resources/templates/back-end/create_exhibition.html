@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="zh-Hant">
+<html xmlns:th="http://www.thymeleaf.org" lang="zh-Hant">
 <head>
     <meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes"/>
@@ -142,10 +142,13 @@
             </div>
         </div>
 
+                <form id="eventForm" th:action="@{/back-end/exhibitor/insert_exhibition}"
+                					 th:object="${exhibitionCreateDTO}" 
+                					 method="post" 
+                					 enctype="multipart/form-data">
         <div class="app-content">
             <div class="container-fluid">
 
-                <form id="eventForm" action="/api/exhibitor/events" method="post" enctype="multipart/form-data">
                     <!-- 基本資訊 -->
                     <div class="col-lg-4 d-flex flex-column align-items-center gap-2">
                         <!-- 800×533 封面 -->
@@ -153,7 +156,7 @@
                             <div class="preview"><span class="text-secondary">上傳圖片</span></div>
                         </div>
                         <div class="d-flex gap-2">
-                            <input class="form-control form-control-sm" id="coverInput" name="coverImage" type="file" accept="image/*">
+                            <input class="form-control form-control-sm" id="coverInput" name="coverImage" type="file" th:field="*{photoPortrait}" multiple="multiple" accept="image/*">
                             <button type="button" class="btn btn-outline-secondary btn-sm" id="btnClearCover">清除
                             </button>
                         </div>
@@ -165,36 +168,36 @@
                         <div class="row g-3">
                             <div class="col-12">
                                 <label class="form-label">展覽名稱</label>
-                                <input type="text" class="form-control" id="evName" name ="name" placeholder="輸入展覽名稱" required>
+                                <input type="text" th:field="*{exhibitionName}" class="form-control" id="evName" name ="name" placeholder="輸入展覽名稱" required>
                             </div>
                             <div class="col-md-6">
                                 <label class="form-label">開始時間</label>
-                                <input type="datetime-local" class="form-control" id="startAt" name="startAt" required>
+                                <input type="datetime-local" th:field="*{startTime}" class="form-control" id="startAt" name="startAt" required>
                             </div>
                             <div class="col-md-6">
                                 <label class="form-label">結束時間</label>
-                                <input type="datetime-local" class="form-control" id="endAt" name="endAt" required>
+                                <input type="datetime-local" th:field="*{endTime}" class="form-control" id="endAt" name="endAt" required>
                             </div>
                             <div class="col-md-6">
                                 <label class="form-label">展覽地點</label>
-                                <input type="text" class="form-control" id="location" name="location" placeholder="輸入展覽地點">
+                                <input type="text" th:field="*{location}" class="form-control" id="location" name="location" placeholder="輸入展覽地點">
                             </div>
-                            <div class="col-md-6">
+                            <!-- <div class="col-md-6">
                                 <label class="form-label">主辦單位</label>
                                 <input type="text" class="form-control" id="organizer" name="organizer" placeholder="展覽主辦方">
-                            </div>
+                            </div> -->
                             <div class="col-md-6">
                                 <label class="form-label">總票數</label>
-                                <input type="number" min="0" class="form-control" name="totalTickets" id="totalTickets"
+                                <input type="number" th:field="*{totalTicketQuantity}" min="0" class="form-control" name="totalTickets" id="totalTickets"
                                        placeholder="輸入總票數">
                             </div>
                             <div class="col-md-6">
                                 <label class="form-label">開賣日</label>
-                                <input type="datetime-local" class="form-control" id="saleOpenAt" name="saleOpenAt">
+                                <input type="datetime-local" th:field="*{ticketStartTime}" class="form-control" id="saleOpenAt" name="saleOpenAt">
                             </div>
                         </div>
                     </div>
-                </form>
+                
             </div>
         </div>
 
@@ -238,7 +241,7 @@
                         <div class="preview"><span class="text-secondary">上傳橫幅</span></div>
                     </div>
                     <div class="d-flex gap-2">
-                        <input class="form-control form-control-sm" id="bannerInput" name="bannerImage" type="file" accept="image/*">
+                        <input class="form-control form-control-sm" th:field="*{photoLandscape}" id="bannerInput" name="bannerImage" type="file" accept="image/*">
                         <button type="button" class="btn btn-outline-secondary btn-sm" id="btnClearBanner">清除</button>
                     </div>
                     <div class="help-text">建議尺寸：1400×470（JPG/PNG）</div>
@@ -265,6 +268,7 @@
             <button class="btn btn-primary" id="btnSaveDraft"><i class="bi bi-save me-1"></i>儲存為草稿</button>
             <button type="submit" class="btn btn-success" ><i class="bi bi-check2-circle me-1"></i>完成</button>
         </div>
+        </form>
 
 
 
@@ -343,7 +347,7 @@
     });
 
     // ---- 封面上傳 ----
-    const coverInput = document.getElementById('coverInput');
+   /*  const coverInput = document.getElementById('coverInput');
     const coverBox = document.getElementById('coverBox');
     const btnClearCover = document.getElementById('btnClearCover');
     coverInput.addEventListener('change', ()=>{
@@ -351,9 +355,9 @@
       const img = document.createElement('img');
       img.onload = ()=>{ coverBox.innerHTML=''; coverBox.appendChild(img); };
       img.src = URL.createObjectURL(f);
-    });
-    btnClearCover.addEventListener('click', ()=>{ coverBox.innerHTML = '<span class="text-secondary">上傳圖片</span>'; coverInput.value = ''; });
-
+    }); */
+    /* btnClearCover.addEventListener('click', ()=>{ coverBox.innerHTML = '<span class="text-secondary">上傳圖片</span>'; coverInput.value = ''; });
+ */
 
 
     // ---- 描述存取 ----
@@ -586,7 +590,7 @@ function renderTickets(){
         <input class="form-control name-input" placeholder="票種" value="${t.name}" ${t.active?'':'disabled'}>
       </div>
       <div class="col-lg-4">
-        <input type="number" min="0" class="form-control price-input" placeholder="金額" value="${t.price}" ${t.active?'':'disabled'}>
+        <input type="number" th:field="*{exhibitionTicketTypes}" min="0" class="form-control price-input" placeholder="金額" value="${t.price}" ${t.active?'':'disabled'}>
       </div>
       <div class="col-lg-2 text-end">
         <button type="button" class="btn ${t.active ? 'btn-success' : 'btn-outline-secondary'} btn-sm toggle-active" title="${t.active?'已選用，點擊停用':'未選用，點擊啟用'}">
