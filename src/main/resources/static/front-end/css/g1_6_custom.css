@@ -262,16 +262,16 @@ div.search_block > a {
 }
 
 .price_list {
-  display: flex;
+/*   display: flex; */
   align-items: center;
   justify-content: flex-end;
   height: 220px;
   font-size: 18px;
   color: #e74c3c;
-  margin-left: -15px;
+/*   margin-left: -15px; */
   text-align: right;
   white-space: nowrap;
-  padding-right: 12px;
+/*   padding-right: 12px; */
 }
 
 .price_list .currency {
@@ -332,8 +332,8 @@ div.search_block > a {
 }
 
 /* ========================================================================= */
-/* 熱門展覽頁(推薦展覽頁)		 all_tours_list.html */
-/* 最新展覽頁					all_tours_list2.html */
+/* 熱門展覽頁(推薦展覽頁)		 exhibitions_popular.html */
+/* 最新展覽頁					exhibitions_latest.html */
 
 /* 熱門/最新切換 */
 .seg {
@@ -384,7 +384,8 @@ div.search_block > a {
 }
 
 .seg .seg-link:hover {
-  color: #e04f67;
+  font-size: 16px;
+  font-weight: 700;
 }
 
 /* ========================================================================= */
@@ -432,7 +433,7 @@ div.search_block > a {
 }
 
 /* ========================================================================= */
-/* 展商主頁				all_tours_list3.html */
+/* 展商主頁				exhibitor_home.html */
 
 /* 展商資訊區 */
 .recommend-sidebar {
@@ -516,7 +517,7 @@ div.search_block > a {
 }
 
 /* ========================================================================= */
-/* 地圖探索頁				page_with_map.html */
+/* 地圖探索頁				map_explore.html */
 .marker_info {
   width: 280px;
   height: 360px;
