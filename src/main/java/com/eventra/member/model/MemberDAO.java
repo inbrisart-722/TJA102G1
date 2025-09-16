@@ -1,12 +1,13 @@
 package com.eventra.member.model;
 
-import jakarta.persistence.EntityManager;
-import jakarta.persistence.PersistenceContext;
-import jakarta.persistence.TypedQuery;
+import java.util.List;
+
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
+import jakarta.persistence.TypedQuery;
 
 /**
  * MemberDAO
@@ -32,16 +33,16 @@ public class MemberDAO implements MemberDAO_Interface {
     // ====== C ======
     @Override
     @Transactional
-    public void insert(MemberVO member) {
-        em.persist(member);
+    public void insert(MemberVO memberVO) {
+        em.persist(memberVO);
         // Persist 後，IDENTITY 主鍵會回填到 entity
     }
 
     // ====== U ======
     @Override
     @Transactional
-    public void update(MemberVO member) {
-        em.merge(member);
+    public void update(MemberVO memberVO) {
+        em.merge(memberVO);
     }
 
     // ====== D ======
