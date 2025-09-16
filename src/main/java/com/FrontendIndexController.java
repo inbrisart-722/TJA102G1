@@ -3,6 +3,10 @@ package com;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -23,7 +27,6 @@ public class FrontendIndexController {
 	
 	@Autowired
 	private CartItemService cartItemSvc;
-
 	
 	private static final Integer TEST_MEMBER = 3;
 
@@ -40,7 +43,10 @@ public class FrontendIndexController {
 	}
 
 	@GetMapping("/cart")
-	public String cartPage(Model model) {
+	public String cartPage(Model model, Authentication auth) {
+		System.out.println(auth);
+		System.out.println("Hello, " + auth.getName() + ": " + auth.getAuthorities());
+		System.out.println(SecurityContextHolder.getContext().getAuthentication().getName());
 		return "front-end/cart";
 	}
 
@@ -54,7 +60,10 @@ public class FrontendIndexController {
 	}
 
 	@GetMapping("/index")
-	public String index() {
+	public String index(@AuthenticationPrincipal UserDetails user) {
+		System.out.println(user.getUsername());
+		System.out.println(user.getPassword());
+		System.out.println(user.getAuthorities());
         return "front-end/index";
 	}
 	
@@ -81,6 +90,11 @@ public class FrontendIndexController {
 	@GetMapping("/register2")
 	public String register2() {
 		return "front-end/register2";
+	}
+	
+	@GetMapping("/exhibitor_register")
+	public String exhibitorRegister() {
+		return "front-end/exhibitor_register";
 	}
 	
 

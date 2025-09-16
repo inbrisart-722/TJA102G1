@@ -1,48 +1,55 @@
 // instead of setTimeout() short polling, use long polling 30s here
-const fetch_order_result = function () {
-  const params = new URLSearchParams(window.location.search);
-  const merchantTradeNo = params.get("merchantTradeNo");
-  console.log(merchantTradeNo);
+const fetch_order_result = function() {
+	const params = new URLSearchParams(window.location.search);
+	const merchantTradeNo = params.get("merchantTradeNo");
+	console.log(merchantTradeNo);
 
-  fetch(
-    "http://localhost:8088/api/order/checkOrderStatus?merchantTradeNo=" +
-      merchantTradeNo,
-    {
-      method: "GET",
-    }
-  )
-    .then((res) => {
-      if (!res.ok) throw new Error("NOT OK");
-      return res.json();
-    })
-    .then((result) => {
-      // ResponseEntity<Map<String, String>>
-      const status = result.orderStatus;
-      console.log(status);
-      if (status === "已付款") {
-        console.log(1);
-        location.href =
-          "http://localhost:8088/front-end/order_success?merchantTradeNo=" +
-          merchantTradeNo;
-      }
-      if (status === "付款失敗（未逾期）") {
-        console.log(2);
-        location.href =
-          "http://localhost:8088/front-end/order_failure?merchantTradeNo=" +
-          merchantTradeNo;
-      }
-      console.log("30秒都沒更新，看來該做點什麼了");
-    })
-    .catch((error) => {
-      console.log("error");
-      console.log(error);
-    });
+	csrfFetch(
+		"/api/front-end/protected/order/checkOrderStatus?merchantTradeNo=" +
+		merchantTradeNo,
+		{
+			method: "GET",
+		}
+	)
+		.then((res) => {
+			if (res.status === 401) {
+				sessionStorage.setItem("redirect", window.location.pathname);
+				location.href = "/front-end/login";
+			}
+			if (!res.ok) throw new Error("checkOrderStatus: Not 2XX or 401");
+			return res.json();
+		})
+		.then((result) => {
+			// ResponseEntity<Map<String, String>>
+			const status = result.orderStatus;
+			console.log(status);
+			if (status === "已付款") {
+				location.href =
+					"/front-end/order_success?merchantTradeNo=" +
+					merchantTradeNo;
+			}
+			else if (status === "付款失敗" && status === "付款逾時") {
+				location.href =
+					"/front-end/order_failure?merchantTradeNo=" +
+					merchantTradeNo;
+			}
+			// ReturnURL 都沒回應的措施
+			else {
+				console.log("30秒都沒更新，看來該做點什麼了");
+				alert("目前訂單狀態正在查詢中，請您稍後至「會員中心 - 訂單頁」查看狀態");
+				location.href = "/front-end/admin";
+			}
+		})
+		.catch((error) => {
+			console.log("error");
+			console.log(error);
+		});
 };
 
-document.addEventListener("DOMContentLoaded", function () {
-  //   let interval = setInterval();
-  //   fetch;
-  fetch_order_result();
+document.addEventListener("DOMContentLoaded", function() {
+	//   let interval = setInterval();
+	//   fetch;
+	fetch_order_result();
 });
 
 ///////////////////////////////////////////////////////////////

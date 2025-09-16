@@ -12,7 +12,7 @@ import com.eventra.rating.model.RatingService;
 import com.eventra.rating.model.UpsertRatingResDTO;
 
 @RestController
-@RequestMapping("/api/rating")
+@RequestMapping("/api/front-end")
 public class RatingRestController {
 
 	private final RatingService RATING_SERVICE;
@@ -23,14 +23,14 @@ public class RatingRestController {
 		this.RATING_SERVICE = ratingService;
 	}
 	
-	@GetMapping("getMyRating")
+	@GetMapping("/rating/getMyRating")
 	public GetMyRatingResDTO getMyRating(@RequestParam("exhibitionId") Integer exhibitionId){
 		return RATING_SERVICE.getRating(exhibitionId, TEST_MEMBER);
 	}
 	// 前端給：exhibitionId
 	// 後端回：status, canRate, originalRating  => addCommentResDTO
 	
-	@PutMapping("upsertRating")
+	@PutMapping("/protected/rating/upsertRating")
 	public UpsertRatingResDTO upsertRating
 		(@RequestParam("exhibitionId") Integer exhibitionId,
 		 @RequestParam("ratingScore") Byte ratingScore) {

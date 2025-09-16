@@ -6,7 +6,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -25,14 +24,15 @@ import org.springframework.web.client.RestClient;
 import com.eventra.cart_item.model.CartItemRedisRepository;
 import com.eventra.cart_item.model.CartItemRedisVO;
 import com.eventra.exhibition.model.ExhibitionRepository;
-import com.eventra.exhibitiontickettype.model.ExhibitionTicketTypeVO;
 import com.eventra.exhibition.model.ExhibitionVO;
+import com.eventra.exhibitiontickettype.model.ExhibitionTicketTypeVO;
 import com.eventra.member.model.MemberVO;
 import com.eventra.order_item.model.OrderItemRepository;
 import com.eventra.order_item.model.OrderItemVO;
 import com.eventra.payment_attempt.model.PaymentAttemptRepository;
 import com.eventra.payment_attempt.model.PaymentAttemptVO;
 import com.github.f4b6a3.ulid.UlidCreator;
+import com.properties.ECPayProperties;
 import com.util.ECPayUtils;
 import com.util.MerchantTradeNo36Generator;
 
@@ -43,13 +43,12 @@ import jakarta.persistence.PersistenceContext;
 @Transactional
 public class OrderService {
 
-	private static final String MERCHANT_ID = "2000132";
-	private static final String PROXY_HOST = "https://f80521215bf7.ngrok-free.app";
+	private final ECPayProperties ECPAY_PROPS;
 
 	@PersistenceContext
 	private EntityManager entityManager;
 
-	private ECPayUtils ECPAY_UTILS;
+	private final ECPayUtils ECPAY_UTILS;
 	private final ExhibitionRepository EXHIBITION_REPO;
 	private final CartItemRedisRepository CART_ITEM_REDIS_REPO;
 	private final OrderRepository ORDER_REPO;
@@ -57,10 +56,11 @@ public class OrderService {
 	private final PaymentAttemptRepository PAYMENT_ATTEMPT_REPO;
 	private final RestClient REST_CLIENT;
 
-	public OrderService(ECPayUtils ECPayUtils, ExhibitionRepository exhibitionRepository,
+	public OrderService(ECPayProperties ECPayProps, ECPayUtils ECPayUtils, ExhibitionRepository exhibitionRepository,
 			CartItemRedisRepository cartItemRedisRepository, OrderRepository orderRepository,
 			OrderItemRepository orderItemRepository, PaymentAttemptRepository paymentAttemptRepository,
 			RestClient.Builder restClientBuilder) {
+		this.ECPAY_PROPS = ECPayProps;
 		this.ECPAY_UTILS = ECPayUtils;
 		this.EXHIBITION_REPO = exhibitionRepository;
 		this.CART_ITEM_REDIS_REPO = cartItemRedisRepository;
@@ -68,7 +68,7 @@ public class OrderService {
 		this.ORDER_ITEM_REPO = orderItemRepository;
 		this.PAYMENT_ATTEMPT_REPO = paymentAttemptRepository;
 		this.REST_CLIENT = restClientBuilder.
-			baseUrl("https://payment-stage.ecpay.com.tw/Cashier/QueryTradeInfo/V5")
+			baseUrl(ECPAY_PROPS.queryUrl())
 			.build();
 	}
 
@@ -341,12 +341,12 @@ public class OrderService {
 		/* ********* 1th part : 拼湊前端所需資訊 ********* */
 		// 除了 fields 要動態拼，其他在 demo 環境下為固定
 		ECPaySendingResDTO res = new ECPaySendingResDTO.Builder().status("success")
-				.action("https://payment-stage.ecpay.com.tw/Cashier/AioCheckOut/V5").method("POST")
+				.action(ECPAY_PROPS.checkoutUrl()).method("POST")
 				.fields(fieldsBuilder(merchantTradeNo, merchantTradeDate, totalAmount, itemName)).build();
 		/* ********* 2th part : 新增 payment attempt 並回傳 ********* */
 		// 需要 order, merchantTradeNo, merchantId, tradeAmt, paymentType, checkMacValue
 		PaymentAttemptVO paymentAttemptVO = new PaymentAttemptVO.Builder().paymentAttemptStatus("pending")
-				.order(orderVO).merchantTradeNo(merchantTradeNo).merchantId(MERCHANT_ID).tradeAmt(totalAmount)
+				.order(orderVO).merchantTradeNo(merchantTradeNo).merchantId(ECPAY_PROPS.merchantId()).tradeAmt(totalAmount)
 //			.paymentType("Credit") // Callback 寫不一樣的...
 				.tradeDate(merchantTradeDate).build();
 
@@ -400,12 +400,12 @@ public class OrderService {
 		/* ********* 4th part : 拼湊前端所需資訊 ********* */
 		// 除了 fields 要動態拼，其他在 demo 環境下為固定
 		ECPaySendingResDTO res = new ECPaySendingResDTO.Builder().status("success")
-				.action("https://payment-stage.ecpay.com.tw/Cashier/AioCheckOut/V5").method("POST")
+				.action(ECPAY_PROPS.checkoutUrl()).method("POST")
 				.fields(fieldsBuilder(merchantTradeNo, merchantTradeDate, totalAmount, itemName)).build();
 		/* ********* 5th part : 新增 payment attempt 並回傳 ********* */
 		// 需要 order, merchantTradeNo, merchantId, tradeAmt, paymentType, checkMacValue
 		PaymentAttemptVO paymentAttemptVO = new PaymentAttemptVO.Builder().paymentAttemptStatus("pending")
-				.order(orderVO).merchantTradeNo(merchantTradeNo).merchantId(MERCHANT_ID).tradeAmt(totalAmount)
+				.order(orderVO).merchantTradeNo(merchantTradeNo).merchantId(ECPAY_PROPS.merchantId()).tradeAmt(totalAmount)
 //				.paymentType("Credit") // Callback 寫不一樣的...
 				.tradeDate(merchantTradeDate).itemName(itemName).build();
 
@@ -476,23 +476,23 @@ public class OrderService {
 
 		// merchantTradeNo, merchantTradeDate, ItemName 為動態拼，其他在 demo 環境下固定
 		// 此處 3 種連結，全都是 Page Controller 去接 -> forward, redirect, text/html 回傳
-		fields.put("MerchantID", MERCHANT_ID); // 測試用，寫死
+		fields.put("MerchantID", ECPAY_PROPS.merchantId()); // 測試用，寫死
 		fields.put("MerchantTradeNo", merchantTradeNo);
 		fields.put("MerchantTradeDate", merchantTradeDate);
-		fields.put("PaymentType", "aio"); // 測試用，寫死
+		fields.put("PaymentType", ECPAY_PROPS.paymentType()); // 測試用，寫死
 		fields.put("TotalAmount", String.valueOf(totalAmount));
-		fields.put("TradeDesc", "Eventra demo  --- TradeDesc"); // 測試用，寫死
+		fields.put("TradeDesc", ECPAY_PROPS.tradeDesc()); // 測試用，寫死
 		fields.put("ItemName", itemName); // 限制 400 字
-		fields.put("ReturnURL", PROXY_HOST + "/api/order/ECPay/ReturnURL");
-		fields.put("ChoosePayment", "Credit"); // 測試用，寫死
-		fields.put("EncryptType", "1"); // 測試用，寫死
+		fields.put("ReturnURL", ECPAY_PROPS.returnUrl());
+		fields.put("ChoosePayment", ECPAY_PROPS.choosePayment()); // 測試用，寫死
+		fields.put("EncryptType", ECPAY_PROPS.encryptType()); // 測試用，寫死
 //		fields.put("ItemURL", ...); // 商品銷售網址
 
 		// 以下兩者皆設定為佳（ClientBackURL 按鈕式，作為 OrderResultURL rollback 用）
-//		fields.put("ClientBackURL", "http://localhost:8088/order/ECPay/ClientBackURL");
-		fields.put("ClientBackURL", PROXY_HOST + "/front-end/ClientBackURL?merchantTradeNo=" + merchantTradeNo);
-//		fields.put("OrderResultURL", "http://localhost:8088/order/ECPay/OrderResultURL");
-		fields.put("OrderResultURL", PROXY_HOST + "/front-end/OrderResultURL?merchantTradeNo=" + merchantTradeNo);
+		fields.put("ClientBackURL", ECPAY_PROPS.clientBackUrlPrefix() + merchantTradeNo);
+//		fields.put("ClientBackURL", PROXY_HOST + "/front-end/order/ClientBackURL?merchantTradeNo=" + merchantTradeNo);
+		fields.put("OrderResultURL", ECPAY_PROPS.orderResultUrlPrefix() + merchantTradeNo);
+//		fields.put("OrderResultURL", PROXY_HOST + "/front-end/order/OrderResultURL?merchantTradeNo=" + merchantTradeNo);
 
 		/********** 產生 CheckMacValue 1. 這段只能在後端 2. 要在所有欄位拼完後 **********/
 		String checkMac = null;

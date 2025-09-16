@@ -440,11 +440,11 @@
     </script>
     <script>
       document.getElementById('logoutLink')?.addEventListener('click', (e) => {
-        e.preventDefault();
+//         e.preventDefault();
         // 清除登入紀錄
-        sessionStorage.removeItem('exhibitorSession');
+//         sessionStorage.removeItem('exhibitorSession');
         // 導回登入頁
-        window.location.href = '/back-end/exhibitor/exhibitor_login';
+//         window.location.href = '/back-end/exhibitor/exhibitor_login';
       });
     </script>
     <script>
@@ -533,10 +533,22 @@
       const logout = document.getElementById('logoutLink');
       if (logout) {
         logout.addEventListener('click', (e) => {
-          // e.preventDefault(); // 若要攔截導頁再手動跳轉，取消註解
-          sessionStorage.removeItem('auth');       // 依專案實際使用的 key
-          sessionStorage.removeItem('editingEvent');
+          e.preventDefault(); // 若要攔截導頁再手動跳轉，取消註解
+//           sessionStorage.removeItem('auth');       // 依專案實際使用的 key
+//           sessionStorage.removeItem('editingEvent');
           // location.href = logout.getAttribute('href'); // 若攔截，最後導回登入頁
+          
+          // 可以不用 csrfFetch (有另外放權限)
+          fetch("/api/auth/logout/exhibitor", { 
+        	method: "POST",
+          })
+          .then((res) => {
+        	  if(res.status === 204)
+        		  location.href = "/back-end/exhibitor/exhibitor_login";
+        	  if(!res.ok) throw new Error("Not 2XX");
+          })
+          .catch(error => console.log(error))
+          
         });
       }
     })();

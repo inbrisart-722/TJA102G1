@@ -1,4 +1,10 @@
 // 2nd part: 計算勾選票卷 把內容取出放到 sticky aside
+function getCookie(name) {
+	const value = `; ${document.cookie}`; // "; XSRF-TOKEN=abc123; theme=dark; sessionId=xyz789"
+	const parts = value.split(`; ${name}=`); // ["; ", "abc123; theme=dark; sessionId=xyz789"]
+	if (parts.length === 2) return parts.pop().split(";").shift(); // 2代表有該 cookie(1則為沒有） -> 拿後面陣列 -> 以;分隔 -> 拿第一個值
+	return null;
+}
 
 const ROWS_SELECTOR = ".cart-list:not(.overtime) tbody tr";
 
@@ -62,7 +68,7 @@ function toggleCheckoutButton(enabled) {
 document.addEventListener("click", (e) => {
 	e.preventDefault();
 	const a = e.target.closest("#send_payment");
-	if(!a) return;
+	if (!a) return;
 	if (a && a.getAttribute("aria-disabled") === "true") {
 		e.preventDefault();
 	}
@@ -78,7 +84,7 @@ document.addEventListener("click", (e) => {
 	const form = document.createElement("form");
 	form.method = "POST";
 	form.action = "/front-end/payment";
-	
+
 	// appendChild 操縱 DOM Node (createElement)
 	// insertAdjacentHTML 自己拼 html 字串
 	cartItemIds.forEach(id => {
@@ -88,7 +94,13 @@ document.addEventListener("click", (e) => {
 		input.value = id;
 		form.appendChild(input);
 	})
-	
+	// csrf 相關 (X-XSRF-TOKEN 在 from 要叫 _csrf)
+	const hidden = document.createElement("input");
+	hidden.type = "hidden";
+	hidden.name = "_csrf";
+	hidden.value = getCookie("XSRF-TOKEN");
+	form.appendChild(hidden);
+
 	// IE 舊版 / 一些嵌入式瀏覽器 → 可能會忽略沒在 DOM 的 form。
 	document.body.appendChild(form);
 	form.submit();
@@ -220,14 +232,17 @@ function formatTime(seconds) {
 
 document.addEventListener("DOMContentLoaded", function() {
 	// 取得所有購物車明細
-	// fetch("http://localhost:8081/eventra/api/cartItem/deleteAll");
-	fetch("http://localhost:8088/api/cartItem/getAllCartItem", {
+	csrfFetch("/api/front-end/protected/cartItem/getAllCartItem", {
 		method: "GET",
 		headers: {
 			"CONTENT-TYPE": "application/json",
 		},
 	})
 		.then((res) => {
+			if (res.status === 401) { // *理論上* getall 401 這裡不會觸發
+			        sessionStorage.setItem("redirect", window.location.pathname);
+			        location.href = "/front-end/login";
+			}
 			if (!res.ok) throw new Error("NOT OK");
 			else return res.json();
 		})
@@ -336,14 +351,18 @@ document.addEventListener("DOMContentLoaded", function() {
 		const cart_item_id = btn_buy_release.closest("tr").dataset.cartItemId;
 		console.log(cart_item_id);
 
-		fetch(
-			"http://localhost:8088/api/cartItem/removeOneCartItem?cartItemId=" +
+		csrfFetch(
+			"/api/front-end/protected/cartItem/removeOneCartItem?cartItemId=" +
 			cart_item_id,
 			{
 				method: "DELETE",
 			}
 		)
 			.then((res) => {
+				if (res.status === 401) { // *理論上* getall 401 這裡不會觸發
+					sessionStorage.setItem("redirect", window.location.pathname);
+					location.href = "/front-end/login";
+				}
 				if (!res.ok) throw new Error("NOT OK");
 				return res.text();
 			})
@@ -365,15 +384,18 @@ document.addEventListener("DOMContentLoaded", function() {
 	});
 
 	// 清空購物車明細
-	// fetch("http://localhost:8081/eventra/api/cartItem/deleteAll")
 	const btn_clear_cart = document.querySelector("button#clear_btn");
 	btn_clear_cart.addEventListener("click", function(e) {
 		e.preventDefault();
 
-		fetch("http://localhost:8088/api/cartItem/removeAllCartItem", {
+		csrfFetch("/api/front-end/protected/cartItem/removeAllCartItem", {
 			method: "DELETE",
 		})
 			.then((res) => {
+				if (res.status === 401) { // *理論上* getall 401 這裡不會觸發
+					sessionStorage.setItem("redirect", window.location.pathname);
+					location.href = "/front-end/login";
+				}
 				if (!res.ok) throw new Error("NOT OK");
 				return res.text();
 			})
