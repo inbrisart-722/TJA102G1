@@ -16,7 +16,7 @@ import com.eventra.cart_item.model.GetCartItemResDTO;
 import com.eventra.cart_item.model.GetMyExpirationResDTO;
 
 @RestController
-@RequestMapping("api/cartItem")
+@RequestMapping("/api/front-end/protected/cartItem")
 public class CartItemRestController {
 
 	private final CartItemService CART_ITEM_SERVICE;
@@ -27,7 +27,7 @@ public class CartItemRestController {
 		this.CART_ITEM_SERVICE = cartItemService;
 	}
 	
-	@PostMapping("addCartItem")
+	@PostMapping("/addCartItem")
 	public String addCartItem(@RequestBody AddCartItemReqDTO req) {
 		CART_ITEM_SERVICE.addCartItem(req, TEST_MEMBER);
 		return "success";
@@ -35,22 +35,22 @@ public class CartItemRestController {
 	// 前端給：exhibitionId, ticketDatas
 	// 後端回：status ? 
 	
-	@DeleteMapping("removeOneCartItem")
+	@DeleteMapping("/removeOneCartItem")
 	public String removeOneCartItem(@RequestParam("cartItemId") Integer cartItemId) {
 		return CART_ITEM_SERVICE.removeOneCartItem(cartItemId, TEST_MEMBER);
 	}
 	
-	@DeleteMapping("removeAllCartItem")
+	@DeleteMapping("/removeAllCartItem")
 	public String removeCartItem() {
 		return CART_ITEM_SERVICE.removeAllCartItem(TEST_MEMBER);
 	}
 	
-	@GetMapping("getAllCartItem")
+	@GetMapping("/getAllCartItem")
 	public List<GetCartItemResDTO> getAllCartItem() {
 		return CART_ITEM_SERVICE.getAllCartItem(TEST_MEMBER);
 	}
 	
-	@GetMapping("getMyExpiration")
+	@GetMapping("/getMyExpiration")
 	public GetMyExpirationResDTO getMyExpiration() {
 		return CART_ITEM_SERVICE.getEarliestExpiration(TEST_MEMBER);
 	}

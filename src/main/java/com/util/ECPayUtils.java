@@ -11,15 +11,18 @@ import java.util.stream.Collectors;
 import org.springframework.stereotype.Component;
 
 import com.eventra.order.model.ECPayCallbackReqDTO;
+import com.properties.ECPayProperties;
 
 @Component
 public class ECPayUtils {
-//	HashKey: 5294y06JbISpM5x9
-//	HashIV: v77hoKGq4kWxNNIS
-	private static final String HASH_KEY = "5294y06JbISpM5x9"; // 測試範例：請換成你的
-	private static final String HASH_IV = "v77hoKGq4kWxNNIS"; // 測試範例：請換成你的
+	
+	private final String HASH_KEY;
+	private final String HASH_IV;
 
-	public ECPayUtils() {};
+	public ECPayUtils(ECPayProperties ECPayProps) {
+		this.HASH_KEY = ECPayProps.hashKey();
+		this.HASH_IV = ECPayProps.hashIv();
+	};
 	
 //	public Map<String, String> genCheckMap(ECPayQueryResDTO res) {
 //	    Map<String, String> fields = new HashMap<>();

@@ -116,7 +116,7 @@ document.addEventListener("DOMContentLoaded", () => {
       const nickname = nicknameInput.value;
       const send_data = { email, password, nickname };
 
-      fetch("http://localhost:8081/eventra/api/auth/finishRegistration", {
+      csrfFetch("http://localhost:8081/eventra/api/auth/finishRegistration", {
         method: "POST",
         headers: {
           "CONTENT-TYPE": "application/json",

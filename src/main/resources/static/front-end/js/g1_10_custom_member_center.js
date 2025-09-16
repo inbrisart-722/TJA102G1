@@ -3,10 +3,14 @@ document.addEventListener("DOMContentLoaded", function() {
 	let ordersByStatus = {};
 
 	// fetch 1 次而已: 載入用戶所有訂單 => 後續動態呼叫一堆 addEventListener
-	fetch("/api/order/getAllOrder", {
+	csrfFetch("/api/front-end/protected/order/getAllOrder", {
 		method: "GET"
 	}).then((res) => {
-		if (!res.ok) throw new Error("NOT OK");
+		if (res.status === 401) {
+		    sessionStorage.setItem("redirect", window.location.pathname);
+		    location.href = "/front-end/login";
+		}
+		if (!res.ok) throw new Error("getAllOrder: Not 2XX or 401");
 		return res.json();
 	})
 		.then((orders) => {
@@ -22,7 +26,6 @@ document.addEventListener("DOMContentLoaded", function() {
 			btn_default.click();
 		})
 		.catch((error) => {
-			console.log("error");
 			console.log(error);
 		});
 
@@ -213,14 +216,18 @@ document.addEventListener("DOMContentLoaded", function() {
 		if(!btn_repay) return;
 		const order_ulid = btn_repay.closest("div.order_row").querySelector("span.order_id > span").innerText;
 		console.log(order_ulid);
-		fetch("/api/order/ECPay/resending", {
+		csrfFetch("/api/front-end/protected/order/ECPay/resending", {
 			method: "POST",
 			headers: {
 				"CONTENT-TYPE": "text/plain" // 純字串
 			},
 			body: order_ulid
 		}).then((res) => {
-			if(!res.ok) throw new Error("Resending failed");
+			if (res.status === 401) {
+			    sessionStorage.setItem("redirect", window.location.pathname);
+			    location.href = "/front-end/login";
+			}
+			if(!res.ok) throw new Error("ECPay/resending: Not 2XX or 401");
 			return res.json();
 		}).then((result) => {
 			if(result.status === "success"){
@@ -251,7 +258,6 @@ document.addEventListener("DOMContentLoaded", function() {
 				console.log("ECPay Re-sending failed")
 			}
 		}).catch((error) => {
-			console.log("error");
 			console.log(error);		
 		});
 
