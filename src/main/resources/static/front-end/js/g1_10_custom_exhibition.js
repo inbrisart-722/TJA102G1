@@ -1,67 +1,70 @@
 // 分開包了很多事件委派（但其實應該包一起）
-document.addEventListener("DOMContentLoaded", function () {
-  // 父層留言 + 子層回覆 新增 start
-  document.addEventListener("click", function (e) {
-    const btn_send = e.target.closest("form.form_reply > button");
-    if (btn_send) {
-      e.preventDefault();
-      const input_comment_el = btn_send.closest("form").querySelector("input");
-      // 檢驗 value 是否合理
-      const comment_value = input_comment_el.value;
-      if (comment_value.trim() === "") return; // 防止空內容
-      if (comment_value.length >= 200) return; // 防止空字串
-      // 缺少防止 html 注入 => 底下 p 標籤有
+document.addEventListener("DOMContentLoaded", function() {
+	// 父層留言 + 子層回覆 新增 start
+	document.addEventListener("click", function(e) {
+		const btn_send = e.target.closest("form.form_reply > button");
+		if (btn_send) {
+			e.preventDefault();
+			const input_comment_el = btn_send.closest("form").querySelector("input");
+			// 檢驗 value 是否合理
+			const comment_value = input_comment_el.value;
+			if (comment_value.trim() === "") return; // 防止空內容
+			if (comment_value.length >= 200) return; // 防止空字串
+			// 缺少防止 html 注入 => 底下 p 標籤有
 
-      // 收集數據
-      // 收集數據 -> 1. exhibition_id;
-      const path_name = window.location.pathname;
-      const last_slash_index = path_name.lastIndexOf("/");
-      const exhibition_id = path_name.substring(last_slash_index);
-      // 收集數據 -> 2. parent_comment_id
-      const parent_comment = btn_send.closest("div.review_strip_single");
-      let parent_comment_id;
-      if (parent_comment)
-        parent_comment_id = Number(parent_comment.dataset.commentId);
+			// 收集數據
+			// 收集數據 -> 1. exhibition_id;
+			const path_name = window.location.pathname;
+			const last_slash_index = path_name.lastIndexOf("/");
+			const exhibition_id = path_name.substring(last_slash_index);
+			// 收集數據 -> 2. parent_comment_id
+			const parent_comment = btn_send.closest("div.review_strip_single");
+			let parent_comment_id;
+			if (parent_comment)
+				parent_comment_id = Number(parent_comment.dataset.commentId);
 
-      // exhibition_id, parent_comment_id, content
-      const send_data = {
-        exhibitionId: 2, // test
-        parentCommentId: parent_comment_id,
-        content: comment_value,
-      };
+			// exhibition_id, parent_comment_id, content
+			send_data = {
+				exhibitionId: 2, // test
+				parentCommentId: parent_comment_id,
+				content: comment_value,
+			};
 
-      // fetch 1 => 新增父子留言
-      fetch("http://localhost:8088/api/comment/addComment", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(send_data),
-      })
-        .then((res) => {
-          if (!res.ok) throw new error("Network response was not ok");
-          return res.json();
-        })
-        .then((result) => {
-          console.log(result);
-          // result => status, commentVO, commentCount, replyCount
+			// fetch 1 => 新增父子留言
+			csrfFetch("/api/front-end/protected/comment/addComment", {
+				method: "POST",
+				headers: {
+					"Content-Type": "application/json",
+				},
+				body: JSON.stringify(send_data),
+			})
+				.then((res) => {
+					if (res.status === 401) {
+						sessionStorage.setItem("redirect", window.location.pathname);
+						location.href = "/front-end/login";
+					}
+					if (!res.ok) throw new error("addComment: Not 2XX or 401");
+					return res.json();
+				})
+				.then((result) => {
+					console.log(result);
+					// result => status, commentVO, commentCount, replyCount
 
-          // 判斷是父層還是子層
-          if (btn_send.closest("form").classList.contains("sub")) {
-            // 子層
-            const reply_body_html = document.createElement("div");
-            reply_body_html.className = "reply_body";
-            reply_body_html.dataset.commentId = result.commentVO.commentId;
-            // member 圖片、member 暱稱 or 姓名
-            reply_body_html.innerHTML = `<!-- 單個回覆 -->
+					// 判斷是父層還是子層
+					if (btn_send.closest("form").classList.contains("sub")) {
+						// 子層
+						const reply_body_html = document.createElement("div");
+						reply_body_html.className = "reply_body";
+						reply_body_html.dataset.commentId = result.commentVO.commentId;
+						// member 圖片、member 暱稱 or 姓名
+						reply_body_html.innerHTML = `<!-- 單個回覆 -->
                         <img
                           src="./img/avatar1.jpg"
                           alt="Image"
                           class="rounded-circle replier_others"
                         />
-                        <h6>${
-                          "result.memberId: " + result.commentVO.memberId
-                        }</h6>
+                        <h6>${"result.memberId: " + result.commentVO.memberId
+							}</h6>
                         <small>${result.commentVO.createdAt}</small>
                         <div class="report_block">
                           <button>...</button>
@@ -78,25 +81,25 @@ document.addEventListener("DOMContentLoaded", function () {
                           <i class="icon-thumbs-down"></i>&nbsp;<span>0</span>
                         </button>
                       <!-- 單個回覆 end -->`;
-            const report_block = reply_body_html.querySelector(".report_block");
-            const p = document.createElement("p");
-            p.innerText = result.commentVO.content; // comment_value
-            report_block.insertAdjacentElement("afterend", p);
-            // 找到插入區塊
-            const sub_reply_block = btn_send
-              .closest("section.replies")
-              .querySelector("article.reply_block");
-            sub_reply_block.insertAdjacentElement(
-              "afterbegin",
-              reply_body_html
-            );
-          } else {
-            // 待插入的整份父層留言 html 按讚評價留言都帶 0 但會員日期等內容要另外抓
-            const review_strip_single_html = document.createElement("div");
-            review_strip_single_html.className = "review_strip_single";
-            review_strip_single_html.dataset.commentId =
-              result.commentVO.commentId; // data-comment-id 設值
-            review_strip_single_html.innerHTML = `
+						const report_block = reply_body_html.querySelector(".report_block");
+						const p = document.createElement("p");
+						p.innerText = result.commentVO.content; // comment_value
+						report_block.insertAdjacentElement("afterend", p);
+						// 找到插入區塊
+						const sub_reply_block = btn_send
+							.closest("section.replies")
+							.querySelector("article.reply_block");
+						sub_reply_block.insertAdjacentElement(
+							"afterbegin",
+							reply_body_html
+						);
+					} else {
+						// 待插入的整份父層留言 html 按讚評價留言都帶 0 但會員日期等內容要另外抓
+						const review_strip_single_html = document.createElement("div");
+						review_strip_single_html.className = "review_strip_single";
+						review_strip_single_html.dataset.commentId =
+							result.commentVO.commentId; // data-comment-id 設值
+						review_strip_single_html.innerHTML = `
                   <!-- 留言 header 部分 -->
                   <img
                     src="img/avatar1.jpg"
@@ -142,228 +145,227 @@ document.addEventListener("DOMContentLoaded", function () {
                     <article class="reply_block">
                     </article>
                     </section>`;
-            const report_block =
-              review_strip_single_html.querySelector(".report_block");
-            const p = document.createElement("p");
-            p.className = "review_content";
-            p.innerText = result.commentVO.content; // comment_value
-            report_block.insertAdjacentElement("afterend", p);
-            // 找到插入區塊
-            const top_reply = document.querySelector("section.top-reply");
-            top_reply.insertAdjacentElement(
-              "afterend",
-              review_strip_single_html
-            );
-          }
+						const report_block =
+							review_strip_single_html.querySelector(".report_block");
+						const p = document.createElement("p");
+						p.className = "review_content";
+						p.innerText = result.commentVO.content; // comment_value
+						report_block.insertAdjacentElement("afterend", p);
+						// 找到插入區塊
+						const top_reply = document.querySelector("section.top-reply");
+						top_reply.insertAdjacentElement(
+							"afterend",
+							review_strip_single_html
+						);
+					}
 
-          // 渲染 子層回覆 總數
-          if (parent_comment) {
-            const sum_total_replies = btn_send
-              .closest("div.review_strip_single")
-              .querySelector("button.btn_reply > span");
-            sum_total_replies.innerHTML = `&nbsp;${result.replyCount}&nbsp;&nbsp;&nbsp;`;
-          }
+					// 渲染 子層回覆 總數
+					if (parent_comment) {
+						const sum_total_replies = btn_send
+							.closest("div.review_strip_single")
+							.querySelector("button.btn_reply > span");
+						sum_total_replies.innerHTML = `&nbsp;${result.replyCount}&nbsp;&nbsp;&nbsp;`;
+					}
 
-          // 渲染 父層留言 總數
-          const sum_total_comments = document.querySelector(
-            "#general_rating > span"
-          );
-          sum_total_comments.innerText = result.commentCount;
+					// 渲染 父層留言 總數
+					const sum_total_comments = document.querySelector(
+						"#general_rating > span"
+					);
+					sum_total_comments.innerText = result.commentCount;
 
-          // 清空 input 並 blur
-          input_comment_el.value = "";
-          input_comment_el.blur();
-        })
-        .catch((error) => {
-          console.log("error");
-          console.log(error);
-        });
-    }
-  });
-  // 父層留言 + 子層回覆 新增 end
-  // 展商資訊按鈕 start
-  const btn_exhibitor = document.querySelector(".exhibitor-link");
-  btn_exhibitor.addEventListener("mouseover", function () {
-    btn_exhibitor.style.backgroundColor = "#e1e1e1";
-  });
-  btn_exhibitor.addEventListener("mouseleave", function () {
-    btn_exhibitor.style.backgroundColor = "#efefef";
-  });
+					// 清空 input 並 blur
+					input_comment_el.value = "";
+					input_comment_el.blur();
+				})
+				.catch((error) => {
+					console.log(error);
+				});
+		}
+	});
+	// 父層留言 + 子層回覆 新增 end
+	// 展商資訊按鈕 start
+	const btn_exhibitor = document.querySelector(".exhibitor-link");
+	btn_exhibitor.addEventListener("mouseover", function() {
+		btn_exhibitor.style.backgroundColor = "#e1e1e1";
+	});
+	btn_exhibitor.addEventListener("mouseleave", function() {
+		btn_exhibitor.style.backgroundColor = "#efefef";
+	});
 
-  const el = document.querySelector("div.search-overlay-menu");
-  const search_input = document.querySelector("#searchform input");
-  const search_block_el = document.querySelector("#nav_icon_1");
-  // 展商資訊按鈕 end
+	const el = document.querySelector("div.search-overlay-menu");
+	const search_input = document.querySelector("#searchform input");
+	const search_block_el = document.querySelector("#nav_icon_1");
+	// 展商資訊按鈕 end
 
-  search_block_el.addEventListener("click", function () {
-    el.classList.add("open");
-    setTimeout(() => search_input.focus(), 50);
-  });
+	search_block_el.addEventListener("click", function() {
+		el.classList.add("open");
+		setTimeout(() => search_input.focus(), 50);
+	});
 
-  // 檢舉留言
-  document.addEventListener("click", function (e) {
-    const trigger = e.target.closest("div.report_block > button");
-    if (!trigger) {
-      document.querySelectorAll("div.report_block ul").forEach((ul) => {
-        ul.style.display = "none";
-      });
-      return;
-    }
+	// 檢舉留言
+	document.addEventListener("click", function(e) {
+		const trigger = e.target.closest("div.report_block > button");
+		if (!trigger) {
+			document.querySelectorAll("div.report_block ul").forEach((ul) => {
+				ul.style.display = "none";
+			});
+			return;
+		}
 
-    const report_ul = trigger.closest("div.report_block").querySelector("ul");
-    report_ul.style.display =
-      report_ul.style.display !== "block" ? "block" : "none";
-  });
+		const report_ul = trigger.closest("div.report_block").querySelector("ul");
+		report_ul.style.display =
+			report_ul.style.display !== "block" ? "block" : "none";
+	});
 
-  /* ---- (2) 內頁錨點導覽平滑捲動 ---- */
-  document.querySelectorAll(".section_nav a").forEach((a) => {
-    a.addEventListener("click", (e) => {
-      e.preventDefault();
-      const target = document.querySelector(a.getAttribute("href"));
-      if (target) {
-        target.scrollIntoView({ behavior: "smooth", block: "start" });
-      }
-    });
-  });
+	/* ---- (2) 內頁錨點導覽平滑捲動 ---- */
+	document.querySelectorAll(".section_nav a").forEach((a) => {
+		a.addEventListener("click", (e) => {
+			e.preventDefault();
+			const target = document.querySelector(a.getAttribute("href"));
+			if (target) {
+				target.scrollIntoView({ behavior: "smooth", block: "start" });
+			}
+		});
+	});
 
-  // gpt 收藏
-//  const favBtn = document.querySelector(".btn_fav");
-//  favBtn.addEventListener("click", function () {
-//    this.classList.toggle("active");
-//  });
+	// gpt 收藏
+	//  const favBtn = document.querySelector(".btn_fav");
+	//  favBtn.addEventListener("click", function () {
+	//    this.classList.toggle("active");
+	//  });
 
-  // gpt sticky search bar 切換顏色
-  const searchInput = document.getElementById("nav_search");
-  const sentinel = document.createElement("div");
-  sentinel.style.height = "1px";
-  document.body.prepend(sentinel);
+	// gpt sticky search bar 切換顏色
+	const searchInput = document.getElementById("nav_search");
+	const sentinel = document.createElement("div");
+	sentinel.style.height = "1px";
+	document.body.prepend(sentinel);
 
-  const observer = new IntersectionObserver(
-    (entries) => {
-      if (entries[0].boundingClientRect.y < 0) {
-        searchInput.classList.add("is-sticky");
-      } else {
-        searchInput.classList.remove("is-sticky");
-      }
-    },
-    { threshold: [1] }
-  );
+	const observer = new IntersectionObserver(
+		(entries) => {
+			if (entries[0].boundingClientRect.y < 0) {
+				searchInput.classList.add("is-sticky");
+			} else {
+				searchInput.classList.remove("is-sticky");
+			}
+		},
+		{ threshold: [1] }
+	);
 
-  observer.observe(sentinel);
+	observer.observe(sentinel);
 
-  // 調整購票 block
-  const table_body = document.querySelector("tbody#table_body");
-  const button_incs = document.querySelectorAll("div.inc");
-  const button_decs = document.querySelectorAll("div.dec");
-  button_incs.forEach(function (inc) {
-    console.log(inc);
-    inc.addEventListener("click", function () {
-      console.log(this);
-    });
-  });
+	// 調整購票 block
+	const table_body = document.querySelector("tbody#table_body");
+	const button_incs = document.querySelectorAll("div.inc");
+	const button_decs = document.querySelectorAll("div.dec");
+	button_incs.forEach(function(inc) {
+		console.log(inc);
+		inc.addEventListener("click", function() {
+			console.log(this);
+		});
+	});
 
-  // 訂票 => 重算總和
-  const recalcTotal = function () {
-    let sum = 0;
-    document.querySelectorAll(".numbers-row-parent").forEach((row) => {
-      const q = Number(row.querySelector(".numbers-row input").value);
-      const price = Number(row.querySelector("span").innerText.substring(2));
-      sum += q * price;
-    });
-    const totalEl = document.querySelector("tr.total > td.text-end");
-    totalEl.innerText = "$" + sum;
-  };
+	// 訂票 => 重算總和
+	const recalcTotal = function() {
+		let sum = 0;
+		document.querySelectorAll(".numbers-row-parent").forEach((row) => {
+			const q = Number(row.querySelector(".numbers-row input").value);
+			const price = Number(row.querySelector("span").innerText.substring(2));
+			sum += q * price;
+		});
+		const totalEl = document.querySelector("tr.total > td.text-end");
+		totalEl.innerText = "$" + sum;
+	};
 
-  const clearTable = function () {
-    document.querySelectorAll("tbody#table_body > tr").forEach((row) => {
-      if (row.classList.contains("total")) return;
-      const td = row.querySelector("td.text-end");
-      td.innerText = 0;
-      row.style.display = "none";
-    });
-  };
+	const clearTable = function() {
+		document.querySelectorAll("tbody#table_body > tr").forEach((row) => {
+			if (row.classList.contains("total")) return;
+			const td = row.querySelector("td.text-end");
+			td.innerText = 0;
+			row.style.display = "none";
+		});
+	};
 
-  // 訂票
-  document.addEventListener("click", (e) => {
-    const inc = e.target.closest(".inc");
-    const dec = e.target.closest(".dec");
-    if (!inc && !dec) return;
-    const num_val_el = e.target
-      .closest("div.numbers-row")
-      .querySelector("input");
-    const num_val_el_numVal = Number(num_val_el.value);
-    const num_label_el = e.target
-      .closest("div.numbers-row-parent")
-      .querySelector("label");
+	// 訂票
+	document.addEventListener("click", (e) => {
+		const inc = e.target.closest(".inc");
+		const dec = e.target.closest(".dec");
+		if (!inc && !dec) return;
+		const num_val_el = e.target
+			.closest("div.numbers-row")
+			.querySelector("input");
+		const num_val_el_numVal = Number(num_val_el.value);
+		const num_label_el = e.target
+			.closest("div.numbers-row-parent")
+			.querySelector("label");
 
-    const summary_labels = document.querySelectorAll(
-      "#table_body > tr > td.label"
-    );
+		const summary_labels = document.querySelectorAll(
+			"#table_body > tr > td.label"
+		);
 
-    // 1. 找到目標 td
-    let summary_label_el;
-    summary_labels.forEach(function (label) {
-      if (label.innerText === num_label_el.innerText) summary_label_el = label;
-    });
-    const summary_tr_el = summary_label_el.closest("tr");
-    const summary_val_el = summary_tr_el.querySelector("td.text-end");
-    summary_val_el.innerText = num_val_el_numVal;
-    // 2. 重新計算總計
-    recalcTotal();
-    // 3. inc
-    if (inc && num_val_el_numVal === 1)
-      summary_tr_el.style.display = "table-row";
-    // 4. dec
-    if (dec && num_val_el_numVal === 0) summary_tr_el.style.display = "none";
-  });
+		// 1. 找到目標 td
+		let summary_label_el;
+		summary_labels.forEach(function(label) {
+			if (label.innerText === num_label_el.innerText) summary_label_el = label;
+		});
+		const summary_tr_el = summary_label_el.closest("tr");
+		const summary_val_el = summary_tr_el.querySelector("td.text-end");
+		summary_val_el.innerText = num_val_el_numVal;
+		// 2. 重新計算總計
+		recalcTotal();
+		// 3. inc
+		if (inc && num_val_el_numVal === 1)
+			summary_tr_el.style.display = "table-row";
+		// 4. dec
+		if (dec && num_val_el_numVal === 0) summary_tr_el.style.display = "none";
+	});
 
-  // 處理 載入更多留言、回覆
-  document.addEventListener("click", (e) => {
-    // 點擊父留言的「查看更多」
-    if (e.target.closest(".btn_more_comments_parent")) {
-      const btn_more_parent = e.target.closest(".btn_more_comments_parent");
-      btn_more_parent.innerText = "載入中...";
-      // 收集數據
-      // 收集數據 -> 1. exhibition_id;
-      const path_name = window.location.pathname;
-      const last_slash_index = path_name.lastIndexOf("/");
-      const exhibition_id = path_name.substring(last_slash_index);
-      // 收集數據 -> 2. created_at;
-      // const created_at = btn_more_parent.dataset.createdAt;
-      // 收集數據 -> 3. comment_id;
-      const comment_id = btn_more_parent.dataset.commentId;
-      // 收集數據 -> 4. is_parent;
+	// 處理 載入更多留言、回覆
+	document.addEventListener("click", (e) => {
+		// 點擊父留言的「查看更多」
+		if (e.target.closest(".btn_more_comments_parent")) {
+			const btn_more_parent = e.target.closest(".btn_more_comments_parent");
+			btn_more_parent.innerText = "載入中...";
+			// 收集數據
+			// 收集數據 -> 1. exhibition_id;
+			const path_name = window.location.pathname;
+			const last_slash_index = path_name.lastIndexOf("/");
+			const exhibition_id = path_name.substring(last_slash_index);
+			// 收集數據 -> 2. created_at;
+			// const created_at = btn_more_parent.dataset.createdAt;
+			// 收集數據 -> 3. comment_id;
+			const comment_id = btn_more_parent.dataset.commentId;
+			// 收集數據 -> 4. is_parent;
 
-      const send_data = {
-        exhibitionId: 2, // test
-        // createdAt: created_at,
-        commentId: comment_id,
-      };
-      fetch("http://localhost:8088/api/comment/loadComment", {
-        method: "POST",
-        headers: {
-          "CONTENT-TYPE": "application/json",
-        },
-        body: JSON.stringify(send_data),
-      })
-        .then((res) => {
-          if (!res.ok) throw new Error("NOT OK");
-          return res.json();
-        })
-        .then((result) => {
-          console.log(result);
-          // status, message, list, mapReaction, hasNextPage
-          const container = btn_more_parent.closest(".col-lg-12"); // 父留言容器
-          // let to_created_at;
-          let to_comment_id;
-          result.list.forEach((c) => {
-            console.log(c);
-            const div = document.createElement("div");
-            div.className = "review_strip_single";
-            div.dataset.commentId = c.commentId;
+			const send_data = {
+				exhibitionId: 2, // test
+				// createdAt: created_at,
+				commentId: comment_id,
+			};
+			csrfFetch("/api/front-end/comment/loadComment", {
+				method: "POST",
+				headers: {
+					"Content-Type": "application/json",
+				},
+				body: JSON.stringify(send_data),
+			})
+				.then((res) => {
+					if (!res.ok) throw new Error("loadComment: Not 2XX");
+					return res.json();
+				})
+				.then((result) => {
+					console.log(result);
+					// status, message, list, mapReaction, hasNextPage
+					const container = btn_more_parent.closest(".col-lg-12"); // 父留言容器
+					// let to_created_at;
+					let to_comment_id;
+					result.list.forEach((c) => {
+						console.log(c);
+						const div = document.createElement("div");
+						div.className = "review_strip_single";
+						div.dataset.commentId = c.commentId;
 
-            // 圖片與會員姓名還沒處理 !!!!!!!
-            div.innerHTML = `
+						// 圖片與會員姓名還沒處理 !!!!!!!
+						div.innerHTML = `
                       <img
                         src="./img/avatar1.jpg"
                         alt="Image"
@@ -384,19 +386,16 @@ document.addEventListener("DOMContentLoaded", function () {
                       <!-- 留言 footer 部分 -->
                       <footer>
                         <button class="btn_like">
-                          <i class="icon-thumbs-up"></i>&nbsp;<span>${
-                            c.likeCount
-                          }</span>
+                          <i class="icon-thumbs-up"></i>&nbsp;<span>${c.likeCount
+							}</span>
                         </button>
                         <button class="btn_dislike">
-                          <i class="icon-thumbs-down"></i>&nbsp;<span>${
-                            c.dislikeCount
-                          }</span>
+                          <i class="icon-thumbs-down"></i>&nbsp;<span>${c.dislikeCount
+							}</span>
                         </button>
                         <button class="btn_reply">
-                          回覆&nbsp;<span>&nbsp;${
-                            c.childCommentsCount
-                          }&nbsp;&nbsp;&nbsp;</span
+                          回覆&nbsp;<span>&nbsp;${c.childCommentsCount
+							}&nbsp;&nbsp;&nbsp;</span
                           ><i class="icon-down-open-big"></i>
                         </button>
                       </footer>
@@ -424,88 +423,88 @@ document.addEventListener("DOMContentLoaded", function () {
                         </article>
                       </section>
           `;
-            container.insertBefore(div, btn_more_parent); // 插入在「查看更多」之前
-            // to_created_at = c.createdAt;
-            to_comment_id = c.commentId;
+						container.insertBefore(div, btn_more_parent); // 插入在「查看更多」之前
+						// to_created_at = c.createdAt;
+						to_comment_id = c.commentId;
 
-            // 調整 member_id 此人的按讚與倒讚狀況
-            const icon_like = div.querySelector("i.icon-thumbs-up");
-            const icon_dislike = div.querySelector("i.icon-thumbs-down");
+						// 調整 member_id 此人的按讚與倒讚狀況
+						const icon_like = div.querySelector("i.icon-thumbs-up");
+						const icon_dislike = div.querySelector("i.icon-thumbs-down");
 
-            // undefined / LIKE / DISLIKE
-            const member_reaction = result.mapReaction[c.commentId];
-            if (member_reaction === "LIKE") icon_like.classList.add("-on");
-            else if (member_reaction === "DISLIKE")
-              icon_dislike.classList.add("-on");
-          });
+						// undefined / LIKE / DISLIKE
+						const member_reaction = result.mapReaction[c.commentId];
+						if (member_reaction === "LIKE") icon_like.classList.add("-on");
+						else if (member_reaction === "DISLIKE")
+							icon_dislike.classList.add("-on");
+					});
 
-          btn_more_parent.innerText = "查看更多留言";
-          // btn_more_parent.dataset.createdAt = to_created_at;
-          btn_more_parent.dataset.commentId = to_comment_id;
+					btn_more_parent.innerText = "查看更多留言";
+					// btn_more_parent.dataset.createdAt = to_created_at;
+					btn_more_parent.dataset.commentId = to_comment_id;
 
-          // 如果沒下一頁就處理
-          if (!result.hasNextPage) {
-            btn_more_parent.innerText = "沒有更多留言了！";
-            btn_more_parent.disabled = true;
-          }
-        })
-        .catch((error) => {
-          console.log("error");
-          console.log(error);
-        });
-    }
+					// 如果沒下一頁就處理
+					if (!result.hasNextPage) {
+						btn_more_parent.innerText = "沒有更多留言了！";
+						btn_more_parent.disabled = true;
+					}
+				})
+				.catch((error) => {
+					console.log("error");
+					console.log(error);
+				});
+		}
 
-    if (e.target.closest(".btn_more_comments_child")) {
-      const btn_more_child = e.target.closest(".btn_more_comments_child");
-      btn_more_child.innerText = "載入中...";
+		if (e.target.closest(".btn_more_comments_child")) {
+			const btn_more_child = e.target.closest(".btn_more_comments_child");
+			btn_more_child.innerText = "載入中...";
 
-      // 收集數據
-      // 收集數據 -> 1. exhibition_id;
-      const path_name = window.location.pathname;
-      const last_slash_index = path_name.lastIndexOf("/");
-      const exhibition_id = path_name.substring(last_slash_index);
-      // 收集數據 -> 2. created_at;
-      // const created_at = btn_more_child.dataset.createdAt;
-      // 收集數據 -> 3. comment_id;
-      const comment_id = btn_more_child.dataset.commentId;
-      // 收集數據 -> 4. is_parent;
-      const parent_comment_id = btn_more_child.closest(
-        "div.review_strip_single"
-      ).dataset.commentId;
+			// 收集數據
+			// 收集數據 -> 1. exhibition_id;
+			const path_name = window.location.pathname;
+			const last_slash_index = path_name.lastIndexOf("/");
+			const exhibition_id = path_name.substring(last_slash_index);
+			// 收集數據 -> 2. created_at;
+			// const created_at = btn_more_child.dataset.createdAt;
+			// 收集數據 -> 3. comment_id;
+			const comment_id = btn_more_child.dataset.commentId;
+			// 收集數據 -> 4. is_parent;
+			const parent_comment_id = btn_more_child.closest(
+				"div.review_strip_single"
+			).dataset.commentId;
 
-      const send_data = {
-        exhibitionId: 2, // test
-        // createdAt: created_at, // cursor 用
-        commentId: comment_id, // cursor 用
-        parentCommentId: parent_comment_id, // 抓 div.reivew_strip_single 的值
-      };
-      console.log("send_data");
-      console.log(send_data);
+			const send_data = {
+				exhibitionId: 2, // test
+				// createdAt: created_at, // cursor 用
+				commentId: comment_id, // cursor 用
+				parentCommentId: parent_comment_id, // 抓 div.reivew_strip_single 的值
+			};
+			console.log("send_data");
+			console.log(send_data);
 
-      fetch("http://localhost:8088/api/comment/loadComment", {
-        method: "POST",
-        headers: {
-          "CONTENT-TYPE": "application/json",
-        },
-        body: JSON.stringify(send_data),
-      })
-        .then((res) => {
-          if (!res.ok) throw new Error("NOT OK");
-          return res.json();
-        })
-        .then((result) => {
-          // status, message, list, mapReaction, hasNextPage
-          console.log(result);
-          const replyBlock = btn_more_child.closest(".reply_block");
-          // let to_created_at;
-          let to_comment_id;
-          result.list.forEach((r) => {
-            console.log(r);
-            const div = document.createElement("div");
-            div.className = "reply_body";
-            div.dataset.commentId = r.commentId; // div.reply_body
-            // 圖片與會員姓名還沒處理 !!!!!!!
-            div.innerHTML = `
+			csrfFetch("/api/front-end/comment/loadComment", {
+				method: "POST",
+				headers: {
+					"CONTENT-TYPE": "application/json",
+				},
+				body: JSON.stringify(send_data),
+			})
+				.then((res) => {
+					if (!res.ok) throw new Error("loadComment: Not 2XX");
+					return res.json();
+				})
+				.then((result) => {
+					// status, message, list, mapReaction, hasNextPage
+					console.log(result);
+					const replyBlock = btn_more_child.closest(".reply_block");
+					// let to_created_at;
+					let to_comment_id;
+					result.list.forEach((r) => {
+						console.log(r);
+						const div = document.createElement("div");
+						div.className = "reply_body";
+						div.dataset.commentId = r.commentId; // div.reply_body
+						// 圖片與會員姓名還沒處理 !!!!!!!
+						div.innerHTML = `
           <!-- 單個回覆 -->
                         <img
                           src="./img/avatar1.jpg"
@@ -524,84 +523,81 @@ document.addEventListener("DOMContentLoaded", function () {
                         </div>
                         <p>${r.content}</p>
                         <button class="btn_like">
-                          <i class="icon-thumbs-up"></i>&nbsp;<span>${
-                            r.likeCount
-                          }</span>
+                          <i class="icon-thumbs-up"></i>&nbsp;<span>${r.likeCount
+							}</span>
                         </button>
                         <button class="btn_dislike">
-                          <i class="icon-thumbs-down"></i>&nbsp;<span>${
-                            r.dislikeCount
-                          }</span>
+                          <i class="icon-thumbs-down"></i>&nbsp;<span>${r.dislikeCount
+							}</span>
                         </button>
       `;
-            replyBlock.insertBefore(div, btn_more_child);
-            // to_created_at = r.createdAt;
-            to_comment_id = r.commentId;
+						replyBlock.insertBefore(div, btn_more_child);
+						// to_created_at = r.createdAt;
+						to_comment_id = r.commentId;
 
-            // 調整 member_id 此人的按讚與倒讚狀況
-            const icon_like = div.querySelector("i.icon-thumbs-up");
-            const icon_dislike = div.querySelector("i.icon-thumbs-down");
+						// 調整 member_id 此人的按讚與倒讚狀況
+						const icon_like = div.querySelector("i.icon-thumbs-up");
+						const icon_dislike = div.querySelector("i.icon-thumbs-down");
 
-            // undefined / LIKE / DISLIKE
-            const member_reaction = result.mapReaction[r.commentId];
-            if (member_reaction === "LIKE") icon_like.classList.add("-on");
-            else if (member_reaction === "DISLIKE")
-              icon_dislike.classList.add("-on");
+						// undefined / LIKE / DISLIKE
+						const member_reaction = result.mapReaction[r.commentId];
+						if (member_reaction === "LIKE") icon_like.classList.add("-on");
+						else if (member_reaction === "DISLIKE")
+							icon_dislike.classList.add("-on");
 
-            // 小心 max-height 問題...
-          });
+						// 小心 max-height 問題...
+					});
 
-          // 現在按鈕都會先變成 true -> false 看要不要再調整
-          btn_more_child.innerText = "查看更多回覆";
-          // btn_more_child.dataset.createdAt = to_created_at;
-          btn_more_child.dataset.commentId = to_comment_id;
+					// 現在按鈕都會先變成 true -> false 看要不要再調整
+					btn_more_child.innerText = "查看更多回覆";
+					// btn_more_child.dataset.createdAt = to_created_at;
+					btn_more_child.dataset.commentId = to_comment_id;
 
-          // 如果沒下一頁就執行
-          if (!result.hasNextPage) {
-            btn_more_child.innerText = "沒有更多回覆了！";
-            btn_more_child.disabled = true;
-          }
-        })
-        .catch((error) => {
-          console.log("error");
-          console.log(error);
-          btn_more_child.innerText = "載入失敗，請重試"; // 顯示錯誤訊息
-          btn_more_child.disabled = false; // 允許再次點擊嘗試
-        });
-    }
+					// 如果沒下一頁就執行
+					if (!result.hasNextPage) {
+						btn_more_child.innerText = "沒有更多回覆了！";
+						btn_more_child.disabled = true;
+					}
+				})
+				.catch((error) => {
+					console.log(error);
+					btn_more_child.innerText = "載入失敗，請重試"; // 顯示錯誤訊息
+					btn_more_child.disabled = false; // 允許再次點擊嘗試
+				});
+		}
 
-    // 點擊回覆 也要相當於點了一次 查看更多回復
-    if (e.target.closest(".btn_reply")) {
-      const btn_reply = e.target.closest(".btn_reply");
-      const section_reply = btn_reply
-        .closest("div.review_strip_single")
-        .querySelector("section.replies");
-      const i_el = btn_reply.querySelector("i");
+		// 點擊回覆 也要相當於點了一次 查看更多回復
+		if (e.target.closest(".btn_reply")) {
+			const btn_reply = e.target.closest(".btn_reply");
+			const section_reply = btn_reply
+				.closest("div.review_strip_single")
+				.querySelector("section.replies");
+			const i_el = btn_reply.querySelector("i");
 
-      if (!section_reply.classList.contains("open")) {
-        section_reply.classList.add("open");
-        // 展開回覆當下 -> （子層）模擬實際點了一次「查看更多回覆」
-        btn_reply
-          .closest("div.review_strip_single")
-          .querySelector(".btn_more_comments_child")
-          .click();
-        i_el.classList = "icon-up-open-big";
-      } else {
-        section_reply.classList.remove("open");
-        i_el.classList = "icon-down-open-big";
-      }
-    }
-  });
-  // 頁面載入當下 -> （父層）模擬實際點了一次「查看更多留言」
-  document.querySelector(".btn_more_comments_parent").click();
+			if (!section_reply.classList.contains("open")) {
+				section_reply.classList.add("open");
+				// 展開回覆當下 -> （子層）模擬實際點了一次「查看更多回覆」
+				btn_reply
+					.closest("div.review_strip_single")
+					.querySelector(".btn_more_comments_child")
+					.click();
+				i_el.classList = "icon-up-open-big";
+			} else {
+				section_reply.classList.remove("open");
+				i_el.classList = "icon-down-open-big";
+			}
+		}
+	});
+	// 頁面載入當下 -> （父層）模擬實際點了一次「查看更多留言」
+	document.querySelector(".btn_more_comments_parent").click();
 
-  // 側欄 查看更多
-  const sidebar_more_related_exhib_btn = document.querySelector(
-    "div#more_related_exhib > button.btn_full_exhib"
-  );
-  sidebar_more_related_exhib_btn.addEventListener("click", function () {
-    // fetch
-    const more_exhib_block_html = `              <hr />
+	// 側欄 查看更多
+	const sidebar_more_related_exhib_btn = document.querySelector(
+		"div#more_related_exhib > button.btn_full_exhib"
+	);
+	sidebar_more_related_exhib_btn.addEventListener("click", function() {
+		// fetch
+		const more_exhib_block_html = `              <hr />
               <div>
                 <div class="sidebar_exhib_block">
                   <a href="">
@@ -632,555 +628,589 @@ document.addEventListener("DOMContentLoaded", function () {
                 </div>
               </div>`;
 
-    // 只是模擬一次多個展覽（之後改成實際 fetch 到的筆數）
-    for (let i = 0; i < 3; i++) {
-      this.closest("div#more_related_exhib").insertAdjacentHTML(
-        "beforebegin",
-        more_exhib_block_html
-      );
-    }
-    this.innerText = "已經到底了！";
-    this.disabled = true;
-  });
+		// 只是模擬一次多個展覽（之後改成實際 fetch 到的筆數）
+		for (let i = 0; i < 3; i++) {
+			this.closest("div#more_related_exhib").insertAdjacentHTML(
+				"beforebegin",
+				more_exhib_block_html
+			);
+		}
+		this.innerText = "已經到底了！";
+		this.disabled = true;
+	});
 
-  /////////////////////////////////////////////////////////////////////
-  /////////////////////////////////////////////////////////////////////
-  /////////////////////////////////////////////////////////////////////
-  /////////////////////////////////////////////////////////////////////
-  /////////////////////////////////////////////////////////////////////
-  /////////////////////////////////////////////////////////////////////
+	/////////////////////////////////////////////////////////////////////
+	/////////////////////////////////////////////////////////////////////
+	/////////////////////////////////////////////////////////////////////
+	/////////////////////////////////////////////////////////////////////
+	/////////////////////////////////////////////////////////////////////
+	/////////////////////////////////////////////////////////////////////
 
-  // fetch 2: /api/cartItem/* -> 處理 新增購物車 按鈕
+	// fetch 2: /api/cartItem/* -> 處理 新增購物車 按鈕
 
-  // 以下為購物車 toast 使用
-  // 安全強化版：自動消失 + 點擊關閉 + 滑過暫停(可選) + 動畫備援
-  function showToast(
-    message,
-    type = "success",
-    {
-      duration = 2400, // 顯示時間
-      pauseOnHover = true, // 滑過暫停
-      withProgress = false, // 是否顯示底部進度條
-    } = {}
-  ) {
-    // 確保容器存在，且掛在 <body> 底下避免被 stacking context 影響
-    let container = document.getElementById("toast-container");
-    if (!container) {
-      container = document.createElement("div");
-      container.id = "toast-container";
-      document.body.appendChild(container);
-    }
+	// 以下為購物車 toast 使用
+	// 安全強化版：自動消失 + 點擊關閉 + 滑過暫停(可選) + 動畫備援
+	function showToast(
+		message,
+		type = "success",
+		{
+			duration = 2400, // 顯示時間
+			pauseOnHover = true, // 滑過暫停
+			withProgress = false, // 是否顯示底部進度條
+		} = {}
+	) {
+		// 確保容器存在，且掛在 <body> 底下避免被 stacking context 影響
+		let container = document.getElementById("toast-container");
+		if (!container) {
+			container = document.createElement("div");
+			container.id = "toast-container";
+			document.body.appendChild(container);
+		}
 
-    const toast = document.createElement("div");
-    toast.className = `ct-toast ct-toast--${type}`;
-    toast.setAttribute("role", "status");
-    toast.setAttribute("aria-live", "polite");
+		const toast = document.createElement("div");
+		toast.className = `ct-toast ct-toast--${type}`;
+		toast.setAttribute("role", "status");
+		toast.setAttribute("aria-live", "polite");
 
-    const icon = document.createElement("span");
-    icon.className = "ct-toast__icon";
-    icon.textContent = type === "success" ? "✓" : "×";
+		const icon = document.createElement("span");
+		icon.className = "ct-toast__icon";
+		icon.textContent = type === "success" ? "✓" : "×";
 
-    const text = document.createElement("div");
-    text.className = "ct-toast__msg";
-    text.textContent = message;
+		const text = document.createElement("div");
+		text.className = "ct-toast__msg";
+		text.textContent = message;
 
-    toast.append(icon, text);
+		toast.append(icon, text);
 
-    // 可選：進度條
-    let progressEl,
-      startTs = Date.now();
-    if (withProgress) {
-      progressEl = document.createElement("div");
-      progressEl.style.cssText =
-        "position:absolute;left:0;bottom:0;height:3px;width:100%;background:rgba(0,0,0,.08);overflow:hidden;border-bottom-left-radius:10px;border-bottom-right-radius:10px;";
-      const bar = document.createElement("div");
-      bar.style.cssText =
-        "height:100%;width:100%;background:#16a34a;transform-origin:left center;transform:scaleX(1);transition:transform linear;";
-      // 播放進度動畫
-      requestAnimationFrame(() => {
-        bar.style.transitionDuration = duration + "ms";
-        bar.style.transform = "scaleX(0)";
-      });
-      progressEl.appendChild(bar);
-      toast.style.position = "relative";
-      toast.appendChild(progressEl);
-    }
+		// 可選：進度條
+		let progressEl,
+			startTs = Date.now();
+		if (withProgress) {
+			progressEl = document.createElement("div");
+			progressEl.style.cssText =
+				"position:absolute;left:0;bottom:0;height:3px;width:100%;background:rgba(0,0,0,.08);overflow:hidden;border-bottom-left-radius:10px;border-bottom-right-radius:10px;";
+			const bar = document.createElement("div");
+			bar.style.cssText =
+				"height:100%;width:100%;background:#16a34a;transform-origin:left center;transform:scaleX(1);transition:transform linear;";
+			// 播放進度動畫
+			requestAnimationFrame(() => {
+				bar.style.transitionDuration = duration + "ms";
+				bar.style.transform = "scaleX(0)";
+			});
+			progressEl.appendChild(bar);
+			toast.style.position = "relative";
+			toast.appendChild(progressEl);
+		}
 
-    container.appendChild(toast);
+		container.appendChild(toast);
 
-    // ---- 自動關閉 + 備援 ----
-    let remaining = duration;
-    let autoTimer = setTimeout(dismiss, remaining);
+		// ---- 自動關閉 + 備援 ----
+		let remaining = duration;
+		let autoTimer = setTimeout(dismiss, remaining);
 
-    // 滑過暫停
-    let hoverTs = 0;
-    if (pauseOnHover) {
-      toast.addEventListener("mouseenter", () => {
-        clearTimeout(autoTimer);
-        hoverTs = Date.now();
-        // 停止進度條動畫
-        if (progressEl) {
-          const bar = progressEl.firstChild;
-          const elapsed = Date.now() - startTs;
-          const doneRatio = Math.min(elapsed / duration, 1);
-          bar.style.transitionDuration = "0ms";
-          bar.style.transform = `scaleX(${Math.max(1 - doneRatio, 0)})`;
-        }
-      });
-      toast.addEventListener("mouseleave", () => {
-        const paused = Date.now() - hoverTs;
-        remaining = Math.max(remaining - paused, 0);
-        startTs = Date.now(); // 重新計時起點
-        autoTimer = setTimeout(dismiss, remaining);
-        // 續播進度條
-        if (progressEl) {
-          const bar = progressEl.firstChild;
-          bar.style.transitionDuration = remaining + "ms";
-          requestAnimationFrame(() => (bar.style.transform = "scaleX(0)"));
-        }
-      });
-    }
+		// 滑過暫停
+		let hoverTs = 0;
+		if (pauseOnHover) {
+			toast.addEventListener("mouseenter", () => {
+				clearTimeout(autoTimer);
+				hoverTs = Date.now();
+				// 停止進度條動畫
+				if (progressEl) {
+					const bar = progressEl.firstChild;
+					const elapsed = Date.now() - startTs;
+					const doneRatio = Math.min(elapsed / duration, 1);
+					bar.style.transitionDuration = "0ms";
+					bar.style.transform = `scaleX(${Math.max(1 - doneRatio, 0)})`;
+				}
+			});
+			toast.addEventListener("mouseleave", () => {
+				const paused = Date.now() - hoverTs;
+				remaining = Math.max(remaining - paused, 0);
+				startTs = Date.now(); // 重新計時起點
+				autoTimer = setTimeout(dismiss, remaining);
+				// 續播進度條
+				if (progressEl) {
+					const bar = progressEl.firstChild;
+					bar.style.transitionDuration = remaining + "ms";
+					requestAnimationFrame(() => (bar.style.transform = "scaleX(0)"));
+				}
+			});
+		}
 
-    // 點擊立即關閉
-    toast.addEventListener("click", dismiss);
+		// 點擊立即關閉
+		toast.addEventListener("click", dismiss);
 
-    function dismiss() {
-      clearTimeout(autoTimer);
-      toast.classList.add("hide");
+		function dismiss() {
+			clearTimeout(autoTimer);
+			toast.classList.add("hide");
 
-      // 主要：等動畫結束再移除
-      let removed = false;
-      toast.addEventListener(
-        "animationend",
-        () => {
-          if (removed) return;
-          removed = true;
-          toast.remove();
-        },
-        { once: true }
-      );
+			// 主要：等動畫結束再移除
+			let removed = false;
+			toast.addEventListener(
+				"animationend",
+				() => {
+					if (removed) return;
+					removed = true;
+					toast.remove();
+				},
+				{ once: true }
+			);
 
-      // 備援：若動畫事件沒觸發，保底在 400ms 後移除
-      setTimeout(() => {
-        if (removed) return;
-        removed = true;
-        toast.remove();
-      }, 400);
-    }
-  }
+			// 備援：若動畫事件沒觸發，保底在 400ms 後移除
+			setTimeout(() => {
+				if (removed) return;
+				removed = true;
+				toast.remove();
+			}, 400);
+		}
+	}
 
-  const btn_add_cart = document.querySelector("a#add_cart");
+	const addCartItem = function(send_data) {
+		const adults_el = document.querySelector("input#adults");
+		const students_el = document.querySelector("input#students");
+		const elderly_el = document.querySelector("input#elderly");
+		const disabled_el = document.querySelector("input#disabled");
+		const mili_and_police_el = document.querySelector("input#mili_and_police");
 
-  btn_add_cart.addEventListener("click", function (e) {
-    e.preventDefault();
+		csrfFetch("/api/front-end/protected/cartItem/addCartItem", {
+			method: "POST",
+			headers: {
+				"Content-Type": "application/json",
+			},
+			body: JSON.stringify(send_data),
+		})
+			.then((res) => {
+				if (res.status === 401) {
+					// 存入localStorage
+					sessionStorage.setItem("redirect", window.location.pathname);
+					sessionStorage.setItem("send_data", JSON.stringify(send_data));
+					// 再轉導
+					window.location.href = "/front-end/login";
+				}
+				if (!res.ok) {
+					throw new Error("addCartItem: Not 2XX or 401");
+				}
+				return res.text();
+			})
+			.then((result) => {
+				// if (result.status === "success") {
+				showToast("已加入購物車", "success");
+				console.log(result);
+				// } else if (result.status === "failed") {
+				// showToast("加入購物車失敗", "error");
+				// }
+				adults_el.value =
+					students_el.value =
+					elderly_el.value =
+					disabled_el.value =
+					mili_and_police_el.value =
+					"0";
+				recalcTotal();
+				clearTable();
+			})
+			.catch((error) => {
+				console.log("error");
+				console.log(error);
+				showToast("連線異常，請稍後再試", "error");
+			});
+	}
 
-    // 收集數據
-    // 收集數據 -> 1. exhibition_id;
-    const path_name = window.location.pathname;
-    const last_slash_index = path_name.lastIndexOf("/");
-    const exhibition_id = path_name.substring(last_slash_index);
-    // 收集數據 -> 2. ticket_datas;
-    const adults_el = document.querySelector("input#adults");
-    const students_el = document.querySelector("input#students");
-    const elderly_el = document.querySelector("input#elderly");
-    const disabled_el = document.querySelector("input#disabled");
-    const mili_and_police_el = document.querySelector("input#mili_and_police");
-    const adults = Number(adults_el.value);
-    const students = Number(students_el.value);
-    const elderly = Number(elderly_el.value);
-    const disabled = Number(disabled_el.value);
-    const mili_and_police = Number(mili_and_police_el.value);
-    if (
-      adults === 0 &&
-      students === 0 &&
-      (elderly === 0) & (disabled === 0) & (mili_and_police === 0)
-    ) {
-      showToast("請選擇購買票種數量！", "error");
-      return;
-    }
-    let ticket_datas = {};
-    if (adults > 0) ticket_datas[1] = adults;
-    if (students > 0) ticket_datas[2] = students;
-    if (elderly > 0) ticket_datas[3] = elderly;
-    if (disabled > 0) ticket_datas[4] = disabled;
-    if (mili_and_police > 0) ticket_datas[5] = mili_and_police;
-    // 先寫死給後端取 ticket_type_id
+	const redirect_send_data = sessionStorage.getItem("send_data");
+	if (redirect_send_data) {
+		if (!sessionStorage.getItem("redirect")) {
+			addCartItem(JSON.parse(redirect_send_data));
+			sessionStorage.removeItem("send_data");
+		}
+	}
 
-    // const ticket_datas = {
-    //   1: adults,
-    //   2: students,
-    //   3: elderly,
-    //   4: disabled,
-    //   5: mili_and_police,
-    // };
-    // 1全票，2學生票，3敬老票，4身心障礙者票，5軍警票
+	const btn_add_cart = document.querySelector("a#add_cart");
 
-    const send_data = {
-      exhibitionId: 2, // test
-      ticketDatas: ticket_datas,
-    };
+	btn_add_cart.addEventListener("click", function(e) {
+		e.preventDefault();
 
-    fetch("http://localhost:8088/api/cartItem/addCartItem", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(send_data),
-    })
-      .then((res) => {
-        if (!res.ok) {
-          throw new Error("Network response was not ok");
-        }
-        return res.text();
-      })
-      .then((result) => {
-        // if (result.status === "success") {
-        showToast("已加入購物車", "success");
-        console.log(result);
-        // } else if (result.status === "failed") {
-        // showToast("加入購物車失敗", "error");
-        // }
-        adults_el.value =
-          students_el.value =
-          elderly_el.value =
-          disabled_el.value =
-          mili_and_police_el.value =
-            "0";
-        recalcTotal();
-        clearTable();
-      })
-      .catch((error) => {
-        console.log("error");
-        console.log(error);
-        showToast("連線異常，請稍後再試", "error");
-      });
-  });
+		// 收集數據
+		// 收集數據 -> 1. exhibition_id;
+		const path_name = window.location.pathname;
+		const last_slash_index = path_name.lastIndexOf("/");
+		const exhibition_id = path_name.substring(last_slash_index + 1);
+		// 收集數據 -> 2. ticket_datas;
+		const adults_el = document.querySelector("input#adults");
+		const students_el = document.querySelector("input#students");
+		const elderly_el = document.querySelector("input#elderly");
+		const disabled_el = document.querySelector("input#disabled");
+		const mili_and_police_el = document.querySelector("input#mili_and_police");
+		const adults = Number(adults_el.value);
+		const students = Number(students_el.value);
+		const elderly = Number(elderly_el.value);
+		const disabled = Number(disabled_el.value);
+		const mili_and_police = Number(mili_and_police_el.value);
+		if (
+			adults === 0 &&
+			students === 0 &&
+			(elderly === 0) & (disabled === 0) & (mili_and_police === 0)
+		) {
+			showToast("請選擇購買票種數量！", "error");
+			return;
+		}
+		let ticket_datas = {};
+		if (adults > 0) ticket_datas[1] = adults;
+		if (students > 0) ticket_datas[2] = students;
+		if (elderly > 0) ticket_datas[3] = elderly;
+		if (disabled > 0) ticket_datas[4] = disabled;
+		if (mili_and_police > 0) ticket_datas[5] = mili_and_police;
+		// 先寫死給後端取 ticket_type_id
 
-  const btn_add_cart_and_go = document.querySelector("a#add_cart_and_go");
+		// const ticket_datas = {
+		//   1: adults,
+		//   2: students,
+		//   3: elderly,
+		//   4: disabled,
+		//   5: mili_and_police,
+		// };
+		// 1全票，2學生票，3敬老票，4身心障礙者票，5軍警票
 
-  btn_add_cart_and_go.addEventListener("click", function (e) {
-    e.preventDefault();
-    btn_add_cart.click();
-    location.href = "http://localhost:8088/front-end/cart";
-  });
-  // JavaScript 動態取得路徑的方法 by 小吳
+		const send_data = {
+			exhibitionId: 2, // test
+			ticketDatas: ticket_datas,
+		};
 
-  // const pathname = window.location.pathname;
-  // const contextPath =
-  //   window.location.origin + pathname.substring(0, pathname.lastIndexOf("/") + 1);
-  // const container = document.getElementById("book-container");
+		addCartItem(send_data);
+	});
 
-  // function fetchAllBooks() {
-  //   // fetch API
-  //   fetch(contextPath + "api/book/all")
-  //     .then((response) => {
-  //       if (!response.ok) {
-  //         throw new Error("Network response was not ok");
-  //       }
-  //       return response.json();
-  //     })
+	const btn_add_cart_and_go = document.querySelector("a#add_cart_and_go");
 
-  //     .then((data) => {
-  //       console.log(data);
-  //       data.forEach((book) => {
-  //         const bookCard = document.createElement("div");
-  //         bookCard.classList.add("book-card");
-  //         bookCard.innerHTML = `
-  // 					                <h2>${book.name}</h2>
-  // 					                <p>${book.author}</p>
-  // 					                <div class="price">${book.price}</div>
-  // 									<img src=${contextPath}api/bookpic/${book.id} alt="書籍封面" height="240px" weight="120px">
-  // 					                <button>加入購物車</button>
-  // 					            `;
-  //         container.appendChild(bookCard);
-  //       });
-  //     })
+	// 其實這裡沒寫好，沒清掉票數就跑掉，要是 async 去寫比較邏輯正確
+	btn_add_cart_and_go.addEventListener("click", function(e) {
+		e.preventDefault();
+		btn_add_cart.click();
+		location.href = "/front-end/cart";
+	});
+	// JavaScript 動態取得路徑的方法 by 小吳
 
-  //     .catch((error) => {
-  //       console.error(
-  //         'There was a problem with the fetch "all books" operation:',
-  //         error
-  //       );
-  //     });
-  // }
+	// const pathname = window.location.pathname;
+	// const contextPath =
+	//   window.location.origin + pathname.substring(0, pathname.lastIndexOf("/") + 1);
+	// const container = document.getElementById("book-container");
 
-  // fetch 3: /api/comment/* -> 處理 按讚／倒讚 按鈕
-  // 同個 member_id 只能按一個，不能同時按讚 + 倒讚。
-  document.addEventListener("click", function (e) {
-    const btn_like = e.target.closest("button.btn_like");
-    const btn_dislike = e.target.closest("button.btn_dislike");
-    if (!btn_like && !btn_dislike) return;
-    const btn = btn_like ? btn_like : btn_dislike;
-    const another_btn = btn_like
-      ? btn.nextElementSibling
-      : btn.previousElementSibling;
-    const span = btn.querySelector("span");
-    const another_span = another_btn.querySelector("span");
+	// function fetchAllBooks() {
+	//   // fetch API
+	//   fetch(contextPath + "api/book/all")
+	//     .then((response) => {
+	//       if (!response.ok) {
+	//         throw new Error("Network response was not ok");
+	//       }
+	//       return response.json();
+	//     })
 
-    // comment_id / member_id（後） / reaction
-    // 收集數據
-    // 收集數據 -> 1. comment_id;
-    let comment_id;
-    if (btn.closest("div.reply_body"))
-      comment_id = btn.closest("div.reply_body").dataset.commentId;
-    // ? 好像在 eclipse 不能寫
-    else comment_id = btn.closest("div.review_strip_single").dataset.commentId;
+	//     .then((data) => {
+	//       console.log(data);
+	//       data.forEach((book) => {
+	//         const bookCard = document.createElement("div");
+	//         bookCard.classList.add("book-card");
+	//         bookCard.innerHTML = `
+	// 					                <h2>${book.name}</h2>
+	// 					                <p>${book.author}</p>
+	// 					                <div class="price">${book.price}</div>
+	// 									<img src=${contextPath}api/bookpic/${book.id} alt="書籍封面" height="240px" weight="120px">
+	// 					                <button>加入購物車</button>
+	// 					            `;
+	//         container.appendChild(bookCard);
+	//       });
+	//     })
 
-    // 收集數據 -> 2. reaction;
-    let reaction;
-    if (btn_like) reaction = "LIKE";
-    else if (btn_dislike) reaction = "DISLIKE";
+	//     .catch((error) => {
+	//       console.error(
+	//         'There was a problem with the fetch "all books" operation:',
+	//         error
+	//       );
+	//     });
+	// }
 
-    const send_data = {
-      commentId: comment_id,
-      reaction,
-    };
-    fetch("http://localhost:8088/api/commentReaction/updateReaction", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(send_data),
-    })
-      .then((res) => {
-        if (!res.ok) throw new Error("Network response was not ok");
-        return res.json();
-      })
-      .then((result) => {
-        // status, currentReaction, like_count, dislike_count;
-        console.log(result.currentReaction);
-        console.log("like: " + result.likeCount);
-        console.log("dislike: " + result.dislikeCount);
+	// fetch 3: /api/comment/* -> 處理 按讚／倒讚 按鈕
+	// 同個 member_id 只能按一個，不能同時按讚 + 倒讚。
+	document.addEventListener("click", function(e) {
+		const btn_like = e.target.closest("button.btn_like");
+		const btn_dislike = e.target.closest("button.btn_dislike");
+		if (!btn_like && !btn_dislike) return;
+		const btn = btn_like ? btn_like : btn_dislike;
+		const another_btn = btn_like
+			? btn.nextElementSibling
+			: btn.previousElementSibling;
+		const span = btn.querySelector("span");
+		const another_span = another_btn.querySelector("span");
 
-        const icon_to_on = btn.querySelector("i");
-        const icon_to_off = another_btn.querySelector("i");
-        if (result.currentReaction === null) {
-          icon_to_on.classList.remove("-on");
-        } else {
-          icon_to_on.classList.add("-on");
-          icon_to_off.classList.remove("-on");
-        }
+		// comment_id / member_id（後） / reaction
+		// 收集數據
+		// 收集數據 -> 1. comment_id;
+		let comment_id;
+		if (btn.closest("div.reply_body"))
+			comment_id = btn.closest("div.reply_body").dataset.commentId;
+		// ? 好像在 eclipse 不能寫
+		else comment_id = btn.closest("div.review_strip_single").dataset.commentId;
 
-        if (btn === btn_like) {
-          span.innerText = result.likeCount;
-          another_span.innerText = result.dislikeCount;
-        } else if (btn === btn_dislike) {
-          span.innerText = result.dislikeCount;
-          another_span.innerText = result.likeCount;
-        }
-      })
-      .catch((error) => {
-        console.log("error");
-        console.log(error);
-      });
-  });
+		// 收集數據 -> 2. reaction;
+		let reaction;
+		if (btn_like) reaction = "LIKE";
+		else if (btn_dislike) reaction = "DISLIKE";
 
-  //  評價 收藏 anchors
-  const modal = document.getElementById("rate_modal");
-  const backdrop = document.getElementById("modal_backdrop");
-  const btnCancel = modal.querySelector(".btn_cancel");
-  const formRate = modal.querySelector("#rate_form");
+		const send_data = {
+			commentId: comment_id,
+			reaction,
+		};
+		csrfFetch("/api/front-end/protected/commentReaction/updateReaction", {
+			method: "POST",
+			headers: {
+				"Content-Type": "application/json",
+			},
+			body: JSON.stringify(send_data),
+		})
+			.then((res) => {
+				if (res.status === 401) {
+					sessionStorage.setItem("redirect", window.location.pathname);
+					location.href = "/front-end/login";
+				}
+				if (!res.ok) throw new Error("updateReaction: Not 2XX or 401");
+				return res.json();
+			})
+			.then((result) => {
+				// status, currentReaction, like_count, dislike_count;
+				console.log(result.currentReaction);
+				console.log("like: " + result.likeCount);
+				console.log("dislike: " + result.dislikeCount);
 
-  function openRate() {
-    modal.classList.remove("hidden");
-    backdrop.classList.add("show");
-    // 加一點延遲再加 show class，才能有動畫
-    requestAnimationFrame(() => {
-      modal.classList.add("show");
-    });
-  }
+				const icon_to_on = btn.querySelector("i");
+				const icon_to_off = another_btn.querySelector("i");
+				if (result.currentReaction === null) {
+					icon_to_on.classList.remove("-on");
+				} else {
+					icon_to_on.classList.add("-on");
+					icon_to_off.classList.remove("-on");
+				}
 
-  function closeRate() {
-    modal.classList.remove("show");
-    backdrop.classList.remove("show");
-    // 等動畫結束再真正隱藏
-    setTimeout(() => modal.classList.add("hidden"), 300);
-  }
+				if (btn === btn_like) {
+					span.innerText = result.likeCount;
+					another_span.innerText = result.dislikeCount;
+				} else if (btn === btn_dislike) {
+					span.innerText = result.dislikeCount;
+					another_span.innerText = result.likeCount;
+				}
+			})
+			.catch((error) => {
+				console.log("error");
+				console.log(error);
+			});
+	});
 
-  // 2) 關閉
-  btnCancel.addEventListener("click", closeRate);
-  backdrop.addEventListener("click", closeRate);
-  document.addEventListener("keydown", (e) => {
-    if (e.key === "Escape") closeRate();
-  });
+	//  評價 收藏 anchors
+	const modal = document.getElementById("rate_modal");
+	const backdrop = document.getElementById("modal_backdrop");
+	const btnCancel = modal.querySelector(".btn_cancel");
+	const formRate = modal.querySelector("#rate_form");
 
-  // 評價彈窗打開以後的邏輯
+	function openRate() {
+		modal.classList.remove("hidden");
+		backdrop.classList.add("show");
+		// 加一點延遲再加 show class，才能有動畫
+		requestAnimationFrame(() => {
+			modal.classList.add("show");
+		});
+	}
 
-  // Elements
-  const btnSubmitRate = document.querySelector("#rate_form .btn_submit");
-  const divCannotRate = document.querySelector("#cannot_rate");
-  const divOriginalRating = document.querySelector("#original_rating");
-  const divStars = document.querySelector("#rate_form .stars");
+	function closeRate() {
+		modal.classList.remove("show");
+		backdrop.classList.remove("show");
+		// 等動畫結束再真正隱藏
+		setTimeout(() => modal.classList.add("hidden"), 300);
+	}
 
-  /**
-   * 顯示「不能評價」狀態
-   */
-  function showCannotRate() {
-    divOriginalRating.style.display = "none";
-    btnSubmitRate.disabled = true;
-    divCannotRate.classList.add("-on");
-    divStars.classList.remove("-on");
-  }
+	// 2) 關閉
+	btnCancel.addEventListener("click", closeRate);
+	backdrop.addEventListener("click", closeRate);
+	document.addEventListener("keydown", (e) => {
+		if (e.key === "Escape") closeRate();
+	});
 
-  /**
-   * 顯示「可以評價」狀態
-   * @param {number|null} originalRating - 使用者之前的評分
-   */
-  function showCanRate(originalRating) {
-    if (originalRating !== null) {
-      divOriginalRating.style.display = "block";
-      divOriginalRating.innerHTML = `您上次給此展覽 <strong><span>${originalRating}</span></strong> 顆星!`;
-    } else {
-      divOriginalRating.style.display = "none";
-    }
+	// 評價彈窗打開以後的邏輯
 
-    btnSubmitRate.disabled = false;
-    divCannotRate.classList.remove("-on");
-    divStars.classList.add("-on");
-  }
+	// Elements
+	const btnSubmitRate = document.querySelector("#rate_form .btn_submit");
+	const divCannotRate = document.querySelector("#cannot_rate");
+	const divOriginalRating = document.querySelector("#original_rating");
+	const divStars = document.querySelector("#rate_form .stars");
 
-  // 確保星星按下去後可以固定住（ 解決無法觸發 checked 問題 ）
-  divStars.addEventListener("click", (e) => {
-    const label = e.target.closest("label");
-    if (!label || !divStars.classList.contains("-on")) return; // 只有啟用時才作用
-    const id = label.getAttribute("for");
-    const radio = document.getElementById(id);
-    if (radio) {
-      radio.checked = true; // 真的切 checked
-      radio.dispatchEvent(
-        new Event("change", {
-          // 若你後面要用 change 事件
-          bubbles: true,
-        })
-      );
-    }
-  });
+	/**
+	 * 顯示「不能評價」狀態
+	 */
+	function showCannotRate() {
+		divOriginalRating.style.display = "none";
+		btnSubmitRate.disabled = true;
+		divCannotRate.classList.add("-on");
+		divStars.classList.remove("-on");
+	}
 
-  // fetch: /api/rating/* -> 處理 取評價 按鈕
-  document.addEventListener("click", function (e) {
-    // 評價按鈕
-    const btn_open_rate_modal = e.target.closest("button#btn_open_rate_modal");
-    if (!btn_open_rate_modal) return;
-    openRate();
-    // 收集數據
-    // 收集數據 -> 1. exhibition_id;
-    const path_name = window.location.pathname;
-    const last_slash_index = path_name.lastIndexOf("/");
-    const exhibition_id = path_name.substring(last_slash_index);
+	/**
+	 * 顯示「可以評價」狀態
+	 * @param {number|null} originalRating - 使用者之前的評分
+	 */
+	function showCanRate(originalRating) {
+		if (originalRating !== null) {
+			divOriginalRating.style.display = "block";
+			divOriginalRating.innerHTML = `您上次給此展覽 <strong><span>${originalRating}</span></strong> 顆星!`;
+		} else {
+			divOriginalRating.style.display = "none";
+		}
 
-    // 測試先放 2
-    fetch("http://localhost:8088/api/rating/getMyRating?exhibitionId=" + "2", {
-      method: "GET",
-    })
-      .then((res) => {
-        if (!res.ok) throw new Error("NOT OK");
-        return res.json();
-      })
-      .then((result) => {
-        console.log(result);
-        // status, canRate, originalRating
-        // Main logic
-        if (result.canRate === false) {
-          showCannotRate();
-        } else if (result.canRate === true) {
-          showCanRate(result.originalRating);
-        }
-      })
-      .catch((error) => {
-        console.log("error");
-        console.log(error);
-      });
-  });
+		btnSubmitRate.disabled = false;
+		divCannotRate.classList.remove("-on");
+		divStars.classList.add("-on");
+	}
 
-  // 每次送出評價後重新渲染 展覽頁面的星星（要不要亮...）
-  function renderAverageStars(score, stars) {
-    let s = Number(score);
-    if (!Number.isFinite(s)) s = 0;
-    s = Math.max(0, Math.min(5, s)); // 夾在 0..5
+	// 確保星星按下去後可以固定住（ 解決無法觸發 checked 問題 ）
+	divStars.addEventListener("click", (e) => {
+		const label = e.target.closest("label");
+		if (!label || !divStars.classList.contains("-on")) return; // 只有啟用時才作用
+		const id = label.getAttribute("for");
+		const radio = document.getElementById(id);
+		if (radio) {
+			radio.checked = true; // 真的切 checked
+			radio.dispatchEvent(
+				new Event("change", {
+					// 若你後面要用 change 事件
+					bubbles: true,
+				})
+			);
+		}
+	});
 
-    const full = Math.floor(s); // 幾顆全滿
-    const hasHalf = s - full > 0; // 你原本是「有小數就半顆」，所以門檻用 > 0
-    let usedHalf = false;
+	// fetch: /api/rating/* -> 處理 取評價 按鈕
+	document.addEventListener("click", function(e) {
+		// 評價按鈕
+		const btn_open_rate_modal = e.target.closest("button#btn_open_rate_modal");
+		if (!btn_open_rate_modal) return;
+		openRate();
+		// 收集數據
+		// 收集數據 -> 1. exhibition_id;
+		const path_name = window.location.pathname;
+		const last_slash_index = path_name.lastIndexOf("/");
+		const exhibition_id = path_name.substring(last_slash_index);
 
-    stars.forEach((star, idx) => {
-      const pos = idx + 1; // 左到右第幾顆（若你的 DOM 是反的就改成 stars.length - idx）
-      // 先清乾淨
-      star.classList.remove("voted", "icon-star-half-alt");
-      star.classList.add("icon-star");
+		// 測試先放 2
+		csrfFetch("/api/front-end/rating/getMyRating?exhibitionId=" + "2", {
+			method: "GET",
+		})
+			.then((res) => {
+				if (!res.ok) throw new Error("getMyRating: Not 2XX");
+				return res.json();
+			})
+			.then((result) => {
+				console.log(result);
+				// status, canRate, originalRating
+				// Main logic
+				if (result.canRate === false) {
+					showCannotRate();
+				} else if (result.canRate === true) {
+					showCanRate(result.originalRating);
+				}
+			})
+			.catch((error) => {
+				console.log(error);
+			});
+	});
 
-      if (pos <= full) {
-        // 全滿
-        star.classList.add("voted");
-      } else if (pos === full + 1 && hasHalf && !usedHalf) {
-        // 半顆
-        star.classList.add("voted");
-        star.classList.remove("icon-star");
-        star.classList.add("icon-star-half-alt");
-        usedHalf = true;
-      } // 其餘保持空星（不加 voted）
-    });
-  }
+	// 每次送出評價後重新渲染 展覽頁面的星星（要不要亮...）
+	function renderAverageStars(score, stars) {
+		let s = Number(score);
+		if (!Number.isFinite(s)) s = 0;
+		s = Math.max(0, Math.min(5, s)); // 夾在 0..5
 
-  document.addEventListener("click", function (e) {
-    e.preventDefault();
-    const btn_submit_rate = e.target.closest("#rate_form .btn_submit");
-    if (!btn_submit_rate) return;
+		const full = Math.floor(s); // 幾顆全滿
+		const hasHalf = s - full > 0; // 你原本是「有小數就半顆」，所以門檻用 > 0
+		let usedHalf = false;
 
-    const ratingScore_el = formRate.querySelector(
-      "input[name='rating']:checked"
-    );
-    if (!ratingScore_el) {
-      alert("請選擇星等");
-      return;
-    }
-    const ratingScore = ratingScore_el.value;
+		stars.forEach((star, idx) => {
+			const pos = idx + 1; // 左到右第幾顆（若你的 DOM 是反的就改成 stars.length - idx）
+			// 先清乾淨
+			star.classList.remove("voted", "icon-star-half-alt");
+			star.classList.add("icon-star");
 
-    const span_el_originalRatingScore = document.querySelector(
-      "#original_rating span"
-    );
-    let originalRatingScore;
-    if (span_el_originalRatingScore)
-      originalRatingScore = Number(span_el_originalRatingScore.innerText);
+			if (pos <= full) {
+				// 全滿
+				star.classList.add("voted");
+			} else if (pos === full + 1 && hasHalf && !usedHalf) {
+				// 半顆
+				star.classList.add("voted");
+				star.classList.remove("icon-star");
+				star.classList.add("icon-star-half-alt");
+				usedHalf = true;
+			} // 其餘保持空星（不加 voted）
+		});
+	}
 
-    console.log(originalRatingScore);
+	document.addEventListener("click", function(e) {
+		e.preventDefault();
+		const btn_submit_rate = e.target.closest("#rate_form .btn_submit");
+		if (!btn_submit_rate) return;
 
-    if (ratingScore === originalRatingScore) return;
+		const ratingScore_el = formRate.querySelector(
+			"input[name='rating']:checked"
+		);
+		if (!ratingScore_el) {
+			alert("請選擇星等");
+			return;
+		}
+		const ratingScore = ratingScore_el.value;
 
-    fetch(
-      "http://localhost:8088/api/rating/upsertRating?exhibitionId=" +
-        2 + // test
-        "&ratingScore=" +
-        ratingScore,
-      {
-        method: "PUT",
-      }
-    )
-      .then((res) => {
-        if (!res.ok) throw new Error("NOT OK");
-        return res.json();
-      })
-      .then((result) => {
-        // status, totalRatingCount, averageRatingScore
-        console.log(result);
-        closeRate();
+		const span_el_originalRatingScore = document.querySelector(
+			"#original_rating span"
+		);
+		let originalRatingScore;
+		if (span_el_originalRatingScore)
+			originalRatingScore = Number(span_el_originalRatingScore.innerText);
 
-        const span_rating = document.querySelector("span#span_rating");
+		console.log(originalRatingScore);
 
-        const rating_el = span_rating.querySelector("small");
-        rating_el.innerHTML = `${result.averageRatingScore.toFixed(
-          1
-        )}&nbsp;&nbsp;(${result.totalRatingCount})`;
+		if (ratingScore === originalRatingScore) return;
 
-        const stars = span_rating.querySelectorAll("i");
+		csrfFetch(
+			"/api/front-end/protected/rating/upsertRating?exhibitionId=" +
+			2 + // test
+			"&ratingScore=" +
+			ratingScore,
+			{
+				method: "PUT",
+			}
+		)
+			.then((res) => {
+				if (!res.ok) throw new Error("upsertRating: Not 2XX or 401");
+				// 其實前端已經擋不該評價的（包含未登入），但還是寫一次邏輯怕有人路徑亂送，後端取不到 Authentication 可能出錯
+				if (res.status === 401) {
+					sessionStorage.setItem("redirect", window.location.pathname);
+					location.href = "/front-end/login";
+				}
+				return res.json();
+			})
+			.then((result) => {
+				// status, totalRatingCount, averageRatingScore
+				console.log(result);
+				closeRate();
 
-        renderAverageStars(result.averageRatingScore, stars);
-        // ...
-      })
-      .catch((error) => {
-        console.log("error");
-        console.log(error);
-      });
-  });
+				const span_rating = document.querySelector("span#span_rating");
+
+				const rating_el = span_rating.querySelector("small");
+				rating_el.innerHTML = `${result.averageRatingScore.toFixed(
+					1
+				)}&nbsp;&nbsp;(${result.totalRatingCount})`;
+
+				const stars = span_rating.querySelectorAll("i");
+
+				renderAverageStars(result.averageRatingScore, stars);
+				// ...
+			})
+			.catch((error) => {
+				console.log("error");
+				console.log(error);
+			});
+	});
 });
 
 // 待 fetch 清單

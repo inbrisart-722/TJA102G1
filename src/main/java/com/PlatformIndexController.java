@@ -11,27 +11,15 @@ import com.eventra.exhibitor.model.ExhibitorRepository;
 @RequestMapping("/")
 public class PlatformIndexController {
 	
-	@Autowired
-	ExhibitorRepository ep;
 
 	@GetMapping("/platform/login")
 	public String login() {
 		return "platform/login";
 	}
 	
-	@GetMapping("/back-end/exhibitor_login")
-	public String login2() {
-		return "back-end/exhibitor_login";
+	@GetMapping("/platform/comment")
+	public String comment() {
+		return "platform/comment";
 	}
 	
-	@GetMapping("/back-end/event_list")
-	public String createEvent() {
-//		System.out.println(ep.findByBusinessIdNumber(SecurityContextHolder.getContext().getAuthentication().getName()).orElseThrow().getCompanyName());
-		return "back-end/event_list";
-	}
-	
-	@GetMapping("/back-end/back_end_homepage")
-	public String backEndHomepage() {
-		return "back-end/back_end_homepage";
-	}
 }

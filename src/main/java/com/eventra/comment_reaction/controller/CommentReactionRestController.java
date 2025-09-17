@@ -10,7 +10,7 @@ import com.eventra.comment_reaction.model.UpdateCommentReactionReqDTO;
 import com.eventra.comment_reaction.model.UpdateCommentReactionResDTO;
 
 @RestController
-@RequestMapping("api/commentReaction")
+@RequestMapping("api/front-end/protected/commentReaction")
 public class CommentReactionRestController {
 	
 	private final CommentReactionService COMMENT_REACTION_SERVICE;
@@ -20,7 +20,7 @@ public class CommentReactionRestController {
 		this.COMMENT_REACTION_SERVICE = commentReactionService;
 	}
 	
-	@PostMapping("updateReaction")
+	@PostMapping("/updateReaction")
 	public UpdateCommentReactionResDTO updateReaction(@RequestBody UpdateCommentReactionReqDTO req) {
 		return COMMENT_REACTION_SERVICE.updateCommentReaction(req, TEST_MEMBER);
 	}

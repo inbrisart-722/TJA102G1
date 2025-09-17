@@ -21,10 +21,9 @@ import com.eventra.order.model.GetAllOrderResDTO;
 import com.eventra.order.model.OrderService;
 
 @RestController
-@RequestMapping("/api/order")
+@RequestMapping("/api/front-end")
 public class OrderRestController {
 
-	private static final String MERCHANT_ID = "2000132";
 	private static final Integer TEST_MEMBER = 3;
 	
 	private final OrderService ORDER_SERVICE;
@@ -35,20 +34,20 @@ public class OrderRestController {
 		this.CART_ITEM_SERVICE = cartItemService; 
 	}
 	
-	@GetMapping("getAllOrder")
+	@GetMapping("/protected/order/getAllOrder")
 	public List<GetAllOrderResDTO> getAllOrder(){
 		return ORDER_SERVICE.getAllOrderByMemberId(TEST_MEMBER);
 	}
 	
 /* ************************* 以下皆與綠界相關 ************************* */
-	@PostMapping("ECPay/resending")
+	@PostMapping("/protected/order/ECPay/resending")
 	public ECPaySendingResDTO ECPayResending(@RequestBody String orderUlid) {
 		System.out.println("re-sending");
 		ECPaySendingResDTO res = ORDER_SERVICE.ECPayResending(orderUlid);
 		return res;
 	}
 	
-	@PostMapping("ECPay/sending")
+	@PostMapping("/protected/order/ECPay/sending")
 	public ECPaySendingResDTO ECPaySending(@RequestBody ECPaySendingReqDTO req) {
 		System.out.println("sending");
 		ECPaySendingResDTO res = ORDER_SERVICE.ECPaySending(req, TEST_MEMBER);
@@ -57,7 +56,7 @@ public class OrderRestController {
 	// 前端 送 CartItemIds -> List<Integer> 
 	// 後端 回 status + action + method + fields 給前端拼 form -> form.submit() -> 進綠界
 	
-	@PostMapping("ECPay/ReturnURL") // 對應 ECPay -> ReturnURL server-to-server
+	@PostMapping("/order/ECPay/ReturnURL") // 對應 ECPay -> ReturnURL server-to-server
 	public String ECPayReturnURL(@ModelAttribute ECPayCallbackReqDTO req) {
 		System.out.println("ReturnURL, processing...");
 		
@@ -73,7 +72,7 @@ public class OrderRestController {
 		return "1|OK";
 	}
 	
-	@GetMapping("checkOrderStatus")
+	@GetMapping("/protected/order/checkOrderStatus")
 	public ResponseEntity<Map<String, String>> checkOrderStatus(@RequestParam("merchantTradeNo") String merchantTradeNo) {
 		System.out.println("checking order status...");
 		
