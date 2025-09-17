@@ -8,8 +8,6 @@ import java.util.Objects;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
-import jakarta.persistence.Access;
-import jakarta.persistence.AccessType;
 import jakarta.persistence.Basic;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -30,13 +28,14 @@ import jakarta.validation.constraints.Size;
  * ver3：email/nickname 唯一、password_hash 使用 ASCII + ascii_bin。
  */
 @Entity // 要加上@Entity才能成為JPA的一個Entity類別
-@Access(AccessType.FIELD)
+
 
 //代表這個class是對應到資料庫的實體table，目前對應的table是member 
-@Table(name = "member", uniqueConstraints = { @UniqueConstraint(name = "uk_member_email", columnNames = "email"),
-		@UniqueConstraint(name = "uk_member_nickname", columnNames = "nickname") }, indexes = {
-				@Index(name = "idx_member_email", columnList = "email"),
-				@Index(name = "idx_member_nickname", columnList = "nickname") })
+@Table(name = "member", uniqueConstraints = { 
+	@UniqueConstraint(name = "uk_member_email", columnNames = "email"),
+	@UniqueConstraint(name = "uk_member_nickname", columnNames = "nickname") }, indexes = {
+		@Index(name = "idx_member_email", columnList = "email"),
+		@Index(name = "idx_member_nickname", columnList = "nickname") })
 public class MemberVO implements Serializable {
 
 	private static final long serialVersionUID = 1L;
@@ -56,6 +55,7 @@ public class MemberVO implements Serializable {
 
 	// ===== 主鍵 =====
 	@Id
+	
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name = "member_id", updatable = false, nullable = false)
 
