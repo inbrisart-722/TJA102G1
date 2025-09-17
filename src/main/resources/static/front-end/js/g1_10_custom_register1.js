@@ -143,7 +143,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // 檢查是否為會員的函式，回傳 Promise
   const check_member = function (email) {
-    return fetch("http://localhost:8081/eventra/api/auth/checkMember", {
+    return csrfFetch("http://localhost:8081/eventra/api/auth/checkMember", {
       method: "POST",
       headers: {
         "CONTENT-TYPE": "application/json",
@@ -198,7 +198,7 @@ document.addEventListener("DOMContentLoaded", () => {
         const authType = "registration";
         const send_data = { email, authType };
 
-        return fetch("http://localhost:8081/eventra/api/auth/getVerif", {
+        return csrfFetch("http://localhost:8081/eventra/api/auth/getVerif", {
           method: "POST",
           headers: {
             "CONTENT-TYPE": "application/json",

@@ -6,6 +6,8 @@ import java.util.Date;           // Java 的 Date 類別，用於 JWT 的簽發�
 
 import org.springframework.stereotype.Component; // Spring 註解，表示這是一個可被掃描的 Spring Bean
 
+import com.properties.JwtProperties;
+
 import io.jsonwebtoken.JwtException;          // JWT 處理時可能丟出的例外
 import io.jsonwebtoken.Jwts;                  // JJWT (io.jsonwebtoken) 的核心工具類，負責建構/解析 Token
 import io.jsonwebtoken.SignatureAlgorithm;    // 簽章演算法的 Enum，這裡會用 HS256
@@ -23,15 +25,19 @@ public class JwtUtil {
 	
     // ⚠️ 秘密金鑰（對稱式）: 實務上不要硬編碼在程式裡！
     // 應改用環境變數、Vault、KMS 等安全來源
-    // JWT 的 HMAC-SHA256 要求至少 256-bit 長度，這裡示範放一個長字串
-    private static final String SECRET = "replace-with-a-very-long-random-secret-256bit-aaaaaaaaaaaa";
-
+    // JWT 的 HMAC-SHA256 要求至少 256-bit 長度
+    private final String SECRET;
     // Token 的 "iss" (Issuer) 欄位，通常用來標識簽發者（可用系統名稱/公司名稱）
-    private static final String ISSUER = "eventra-demo";
+    private final String ISSUER;
 
     // 建立金鑰物件，使用 SECRET 轉換成 byte[]，再交給 JJWT 的工具類 Keys 產生 HMAC-SHA 金鑰
-    private final Key key = Keys.hmacShaKeyFor(SECRET.getBytes());
+    private final Key key;
 
+    public JwtUtil(JwtProperties jwtProps) {
+    	this.SECRET = jwtProps.secret();
+    	this.ISSUER = jwtProps.issuer();
+    	this.key = Keys.hmacShaKeyFor(SECRET.getBytes());
+    }
     // ============================
     // 產生 Access Token（短效用，例如 15 分鐘）
     // ============================

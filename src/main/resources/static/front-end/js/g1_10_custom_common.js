@@ -318,11 +318,12 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   // 右上角背景購物車時間
-  fetch("http://localhost:8088/api/cartItem/getMyExpiration", {
+  csrfFetch("/api/front-end/protected/cartItem/getMyExpiration", {
     method: "GET",
   })
     .then((res) => {
-      if (!res.ok) throw new Error("NOT OK");
+//	  if(res.status === "401") throw new Error("getMyExpiration: Authorization failed"); // 不轉導
+      if (!res.ok) throw new Error("getMyExpiration: Not 2XX or 401");
       return res.json();
     })
     .then((result) => {
@@ -351,7 +352,6 @@ document.addEventListener("DOMContentLoaded", function () {
       }
     })
     .catch((error) => {
-      console.log("error");
       console.log(error);
     });
 });

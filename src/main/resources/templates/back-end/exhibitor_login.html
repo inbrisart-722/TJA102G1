@@ -243,7 +243,7 @@ body {
     	username: vatIpt.value,
     	password: pwdIpt.value,
       };
-	  fetch("/api/auth/login", {
+	  fetch("/api/auth/login/exhibitor", {
 		  method: "POST",
 		  headers: {
 			  "Content-Type": "application/json",
@@ -251,23 +251,32 @@ body {
 		  body: JSON.stringify(send_data),
 	  })
 	  	  .then((res) => {
-	        if (!res.ok) throw new Error("NOT OK");
+	        if (!res.ok) throw new Error("Login failed");
 	        return res.json();
 	      })
 	      .then((result) => {
 	        console.log(result);
-			location.href = "/back-end/event_list";
+	        
+	        // api - redirect
+			const redirect_api = sessionStorage.getItem("redirect");
+			sessionStorage.removeItem("redirect");
+			
+			// ssr/page - redirect
+			const params = new URLSearchParams(window.location.search);
+			let redirect_ssr = params.get("redirect");
+			if(redirect_ssr && !redirect_ssr.startsWith("/back-end/"))
+				redirect_ssr = null;
+			
+			if(!redirect_ssr && !redirect_api)
+				window.location.href = "/back-end/exhibitor/back_end_homepage";
+			else if(redirect_api) window.location.href = redirect_api;
+			else if(redirect_ssr) window.location.href = redirect_ssr;
 	      })
 	      .catch((error) => {
-	        console.log("error");
 	        console.log(error);
 	      });
 
       // 導向活動列表（可改成你的路徑）
-<<<<<<< Upstream, based on branch 'master' of https://github.com/inbrisart-722/TJA102G1.git
-//       window.location.href = './back_end_homepage.html';
-=======
->>>>>>> f9a51d0 Spring Security 過渡版本 commit 後 並且 solve 衝突
     });
     
   </script>

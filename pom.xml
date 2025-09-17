@@ -22,10 +22,10 @@
 		<!-- 柏燁 start -->
 		
 		<!-- Spring Security -->
-<!--		<dependency>-->
-<!--			<groupId>org.springframework.boot</groupId>-->
-<!--			<artifactId>spring-boot-starter-security</artifactId>-->
-<!--		</dependency>-->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-security</artifactId>
+		</dependency>
 		<!-- JWT library (常用 jjwt) -->
 		<dependency>
 			<groupId>io.jsonwebtoken</groupId>

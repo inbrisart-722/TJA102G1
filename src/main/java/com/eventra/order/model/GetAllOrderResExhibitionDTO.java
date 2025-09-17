@@ -1,13 +1,14 @@
 package com.eventra.order.model;
 
 import java.sql.Timestamp;
+import java.time.LocalDateTime;
 
 public class GetAllOrderResExhibitionDTO {
 //	private String photoPortrait;
 	private String exhibitionName;
 	private String location;
-	private Timestamp startTime;
-	private Timestamp endTime;
+	private LocalDateTime startTime;
+	private LocalDateTime endTime;
 	
 	public String getExhibitionName() {
 		return exhibitionName;
@@ -23,17 +24,17 @@ public class GetAllOrderResExhibitionDTO {
 		this.location = location;
 		return this;
 	}
-	public Timestamp getStartTime() {
+	public LocalDateTime getStartTime() {
 		return startTime;
 	}
-	public GetAllOrderResExhibitionDTO setStartTime(Timestamp startTime) {
+	public GetAllOrderResExhibitionDTO setStartTime (LocalDateTime startTime) {
 		this.startTime = startTime;
 		return this;
 	}
-	public Timestamp getEndTime() {
+	public LocalDateTime getEndTime() {
 		return endTime;
 	}
-	public GetAllOrderResExhibitionDTO setEndTime(Timestamp endTime) {
+	public GetAllOrderResExhibitionDTO setEndTime (LocalDateTime endTime) {
 		this.endTime = endTime;
 		return this;
 	}

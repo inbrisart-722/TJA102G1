@@ -13,7 +13,7 @@ import com.eventra.comment.model.LoadCommentReqDTO;
 import com.eventra.comment.model.LoadCommentResDTO;
 
 @RestController
-@RequestMapping("/api/comment")
+@RequestMapping("/api/front-end")
 public class CommentRestController {
 
 	private final CommentService COMMENT_SERVICE;
@@ -25,14 +25,14 @@ public class CommentRestController {
 	
 	// encoding ... listener
 	
-	@PostMapping("addComment")
+	@PostMapping("/protected/comment/addComment")
 	public AddCommentResDTO addComment(@RequestBody AddCommentReqDTO req) {
 		return COMMENT_SERVICE.addComment(req, TEST_MEMBER);
 	}
 	// 前端給：exhibitionId, parentCommentId(nullable), content => addCommentReqDTO
 	// 後端回：status, commentVO, commentCount, replyCount => addCommentResDTO
 	
-	@PostMapping("loadComment")
+	@PostMapping("/comment/loadComment")
 	public LoadCommentResDTO loadComment(@RequestBody LoadCommentReqDTO req) {
 		return COMMENT_SERVICE.loadComment(req, TEST_MEMBER);
 	}

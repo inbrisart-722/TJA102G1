@@ -10,7 +10,7 @@ document.addEventListener("DOMContentLoaded", function () {
       username: input_email.value,
       password: input_password.value,
     };
-    fetch("/api/auth/login", {
+    fetch("/api/auth/login/member", {
       method: "POST",
       headers: {
         "CONTENT-TYPE": "application/json",
@@ -18,20 +18,28 @@ document.addEventListener("DOMContentLoaded", function () {
       body: JSON.stringify(send_data),
     })
       .then((res) => {
-        if (!res.ok) throw new Error("NOT OK");
+        if (!res.ok) throw new Error("Login failed");
         return res.json();
       })
       .then((result) => {
         console.log(result);
-        if (result.status === "success") {
-          console.log("login success, 預計之後後端 forward？");
-        } else if (result.status === "failed") {
-          console.log("login failed");
-        }
-		location.href = "/front-end/cart";
+		
+		// api - redirect
+		const redirect_api = sessionStorage.getItem("redirect");
+		sessionStorage.removeItem("redirect");
+		
+		// ssr/page - redirect
+		const params = new URLSearchParams(window.location.search);
+		let redirect_ssr = params.get("redirect");
+		if(redirect_ssr && !redirect_ssr.startsWith("/front-end/"))
+			redirect_ssr = null;
+		
+		if(!redirect_ssr && !redirect_api)
+			window.location.href = "/front-end/index";
+		else if(redirect_api) window.location.href = redirect_api;
+		else if(redirect_ssr) window.location.href = redirect_ssr;
       })
       .catch((error) => {
-        console.log("error");
         console.log(error);
       });
   });

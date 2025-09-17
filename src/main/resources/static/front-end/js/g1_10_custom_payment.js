@@ -11,7 +11,7 @@ document.addEventListener("DOMContentLoaded", function() {
 			send_data["cartItemIds"].push(tr.dataset.cartItemId);
 		})
 
-		fetch("/api/order/ECPay/sending", {
+		csrfFetch("/api/front-end/protected/order/ECPay/sending", {
 			method: "POST",
 			headers: {
 				"CONTENT-TYPE": "application/json",
@@ -19,7 +19,11 @@ document.addEventListener("DOMContentLoaded", function() {
 			body: JSON.stringify(send_data),
 		})
 			.then((res) => {
-				if (!res.ok) throw new Error("NOT OK");
+				if (res.status === 401) {
+				        sessionStorage.setItem("redirect", window.location.pathname);
+				        location.href = "/front-end/login";
+				}
+				if (!res.ok) throw new Error("ECPay/sending: Not 2XX or 401");
 				return res.json();
 			})
 			.then((result) => {
