@@ -1,11 +1,9 @@
 package com.eventra.member.model;
 
-import java.util.List;
 import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
-import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 //  SRP：僅定義 MemberVO 的持久化查詢介面（不含商業規則）。
@@ -23,10 +21,16 @@ public interface MemberRepository extends JpaRepository<MemberVO, Integer>, JpaS
 	/** 檢查 email 是否已存在（唯一性預檢）。 */
 	boolean existsByEmail(String email);
 
+	Optional<MemberVO> findByNickname(String trim);
+	boolean existsByNickname(String trimmedNickname);
 	
 //	//● (自訂)條件查詢
-	@Query(value = "from MemberVO where memberId=?1 and fullName like ? 2 and hiredate=?3 order by memberId")
-	List<MemberVO> findByOthers(int memberId , String fullName , java.sql.Date hiredate);
+//	@Query(value = "from MemberVO where memberId=?1 and fullName like ? 2 and hiredate=?3 order by memberId")
+//	List<MemberVO> findByOthers(int memberId , String fullName , java.sql.Date hiredate);
+
+	
+
+	
 	
 	
 }
