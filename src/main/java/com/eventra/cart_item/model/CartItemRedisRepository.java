@@ -25,7 +25,6 @@ public class CartItemRedisRepository {
 
 	private static final Integer WEAK_TTL_IN_SECONDS = 31 * 60; // 31mins（整台車用，小 buffer）
 	private static final Long TTL_IN_MILLISECONDS = 30 * 60 * 1000L; // 30mins（單筆明細用）
-//	private static final 
 	
 	private String hKey(Integer memberId) {return "cart:items:" + memberId;}
 	private String zKey(Integer memberId) {return "cart:items:exp:" + memberId;}

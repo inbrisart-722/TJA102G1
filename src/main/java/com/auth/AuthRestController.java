@@ -78,7 +78,7 @@ public class AuthRestController {
         //    - maxAge：存活時間（瀏覽器端生命週期）
         ResponseCookie accessCookie = ResponseCookie.from(SecurityConfig.MEM_ACCESS_COOKIE, access)
             .httpOnly(true)   // JS 讀不到 → 防 XSS 竊取
-            .secure(true)     // 僅 HTTPS 請求可送出 ；本地開發可暫時 false，上線必須是 true -> localhost 可以通過 true, 但 127.0.0.1 不行
+            .secure(false)     // 僅 HTTPS 請求可送出 ；本地開發可暫時 false，上線必須是 true -> localhost 可以通過 true, 但 127.0.0.1 不行
             						// Secure 主要是防止 Cookie 在 HTTP 傳輸時被竊聽（防中間人攻擊）。
             						// 基礎安全
             .sameSite("Lax")  // 決定 Cookie 是否能在「跨站請求」中被自動帶上。這就是 CSRF 攻擊的核心點。-> 補充：其實我們專案用 Strict 也沒差（同網域）
@@ -97,7 +97,7 @@ public class AuthRestController {
         //    - 通常 Refresh 只在「同站的 /api/auth/refresh」時才會被用到
         ResponseCookie refreshCookie = ResponseCookie.from(SecurityConfig.MEM_REFRESH_COOKIE, refresh)
             .httpOnly(true)
-            .secure(true)
+            .secure(false)
             .sameSite("Strict") // 🔒 比 Lax 更嚴：避免第三方導流時夾帶刷新
             .path("/")
             .maxAge(MEM_REFRESH_TTL) // ⏰ 7 天

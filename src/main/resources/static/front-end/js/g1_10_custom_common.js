@@ -12,7 +12,7 @@ document.addEventListener("DOMContentLoaded", function () {
         <div class="row" id="header-row">
           <div class="col-md-2">
             <div id="logo">
-              <a href="index.html"
+              <a href="/front-end/index"
                 ><img
                   src="img/logo.png"
                   width="160"
@@ -20,7 +20,7 @@ document.addEventListener("DOMContentLoaded", function () {
                   alt="City tours"
                   class="logo_normal"
               /></a>
-              <a href="index.html"
+              <a href="/front-end/index"
                 ><img
                   src="img/logo_sticky.png"
                   width="160"
@@ -50,17 +50,17 @@ document.addEventListener("DOMContentLoaded", function () {
               ></a>
               <ul>
                 <li class="submenu">
-                  <a href="/html/index.html" class="show-submenu">首頁</a>
+                  <a href="/front-end/index" class="show-submenu">首頁</a>
                 </li>
                 <li class="submenu">
                   <a
-                    href="/html/all_tours_map_listing.html"
+                    href="/front-end/map_explore"
                     class="show-submenu"
                     >地圖探索</a
                   >
                 </li>
                 <li class="submenu">
-                  <a href="/html/all_tours_list.html" class="show-submenu"
+                  <a href="/front-end/exhibitions_popular" class="show-submenu"
                     >推薦展覽</a
                   >
                 </li>
@@ -77,20 +77,21 @@ document.addEventListener("DOMContentLoaded", function () {
                 type="text"
                 id="nav_search"
                 placeholder=" 搜尋展覽或主辦名稱"
+				readonly
               />
             </div>
             <!-- 搜尋專用 end -->
             <ul id="top_tools">
               <li id="nav_icon_2">
-                <a href="/html/cart.html" class="cart_bt"
+                <a href="/front-end/cart" class="cart_bt"
                   ><i class="icon-cart"></i><strong id="cart_timer"></strong></a
                 >
               </li>
               <li id="nav_icon_3">
-                <a href="#"><i class="icon-ticket-2"></i></a>
+                <a href="/front-end/admin"><i class="icon-ticket-2"></i></a>
               </li>
               <li id="nav_icon_4">
-                <a href="#"><i class="icon-user"></i></a>
+                <a href="/front-end/admin"><i class="icon-user"></i></a>
               </li>
             </ul>
           </nav>

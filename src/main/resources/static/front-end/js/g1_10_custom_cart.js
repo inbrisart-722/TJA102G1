@@ -30,7 +30,7 @@ function updateCartSummary() {
 
 		const amount = parseIntSafe(subEl?.textContent || 0);
 
-		totalQty += 1;
+		totalQty += Number(row.querySelector("span.quantity").innerText);
 		totalAmount += amount;
 	});
 
@@ -66,12 +66,12 @@ function toggleCheckoutButton(enabled) {
 
 // 阻止被停用的結帳按鈕導航
 document.addEventListener("click", (e) => {
-	e.preventDefault();
 	const a = e.target.closest("#send_payment");
 	if (!a) return;
-	if (a && a.getAttribute("aria-disabled") === "true") {
 		e.preventDefault();
-	}
+		
+//	if (a && a.getAttribute("aria-disabled") === "true") {
+//	}
 
 	const all_icon_checked = document.querySelectorAll("i.icon-check");
 	let cartItemIds = [];

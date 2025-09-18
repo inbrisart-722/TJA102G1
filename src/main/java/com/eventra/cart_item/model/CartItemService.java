@@ -6,12 +6,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.eventra.exhibition.model.ExhibitionRepository;
 import com.eventra.exhibitiontickettype.model.ExhibitionTicketTypeRepository;
 import com.eventra.exhibitiontickettype.model.ExhibitionTicketTypeVO;
+import com.eventra.member.model.MemberRepository;
 import com.util.MillisToMinutesSecondsUtil;
 
 @Service
@@ -20,12 +22,14 @@ public class CartItemService {
 
 	private static final long CART_EXPIRY_MILLIS = 30 * 60 * 1000L;
 
+	private final MemberRepository MEMBER_REPO;
 	private final CartItemRedisRepository CART_ITEM_REDIS_REPO;
 	private final ExhibitionRepository EXHIBITION_REPO;
 	private final ExhibitionTicketTypeRepository EXHIBITION_TICKET_TYPE_REPO;
 
-	public CartItemService(CartItemRedisRepository cartItemRedisRepository, ExhibitionRepository exhibitionRepository,
+	public CartItemService(MemberRepository memberRepository, CartItemRedisRepository cartItemRedisRepository, ExhibitionRepository exhibitionRepository,
 			ExhibitionTicketTypeRepository exhibitionTicketTypeRepository) {
+		this.MEMBER_REPO = memberRepository;
 		this.CART_ITEM_REDIS_REPO = cartItemRedisRepository;
 		this.EXHIBITION_REPO = exhibitionRepository;
 		this.EXHIBITION_TICKET_TYPE_REPO = exhibitionTicketTypeRepository;
@@ -45,6 +49,8 @@ public class CartItemService {
 	}
 
 	public void addCartItem(AddCartItemReqDTO req, Integer memberId) {
+//		Integer memberId = MEMBER_REPO.findByEmail(SecurityContextHolder.getContext().getAuthentication().getName()).orElse(null).getMemberId();
+		
 		cleanupExpired(memberId, System.currentTimeMillis());
 		// AddCartItemRequDTO -> exhibitionId, ticketDatas
 		Integer exhibitionId = req.getExhibitionId();

@@ -16,7 +16,7 @@ public class WebConfig implements WebMvcConfigurer {
             "http://localhost:8080",
             "http://localhost:8088",
             "http://127.0.0.1:*", // 瀏覽器的 Origin 判斷非常嚴格, 如果前端有時用 localhost，有時用 127.0.0.1 開發 → 兩個都加進白名單較好。
-            "https://70bb0d547e2c.ngrok-free.app" // ngrok to 外網 testing
+            "https://1d515114139f.ngrok-free.app" // ngrok to 外網 testing
         )
         .allowedMethods("GET","POST","PUT","PATCH","DELETE","OPTIONS")
         .allowedHeaders("Content-Type","Authorization","X-Requested-With")
