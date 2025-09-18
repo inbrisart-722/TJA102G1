@@ -30,6 +30,7 @@ import com.eventra.member.model.MemberVO;
 import com.eventra.order_item.model.OrderItemRepository;
 import com.eventra.order_item.model.OrderItemVO;
 import com.eventra.payment_attempt.model.PaymentAttemptRepository;
+import com.eventra.payment_attempt.model.PaymentAttemptStatus;
 import com.eventra.payment_attempt.model.PaymentAttemptVO;
 import com.github.f4b6a3.ulid.UlidCreator;
 import com.properties.ECPayProperties;
@@ -181,8 +182,8 @@ public class OrderService {
 			OrderVO orderVO = vo.getOrder();
 			switch (res.get("TradeStatus")){
 			case "1":
-				vo.setPaymentAttemptStatus("success");
-				orderVO.setOrderStatus("已付款");
+				vo.setPaymentAttemptStatus(PaymentAttemptStatus.SUCCESS);
+				orderVO.setOrderStatus(OrderStatus.已付款);
 				/* ********* 支線 : 更新 OrderItem 寫入 ticketCode ********* */
 				Set<OrderItemVO> orderItemVOs = orderVO.getOrderItems();
 				for (OrderItemVO item : orderItemVOs)
@@ -190,17 +191,17 @@ public class OrderService {
 //				ORDER_ITEM_REPO.saveAll(orderItemVOs);
 				break;
 			case "0":
-				vo.setPaymentAttemptStatus("expired");
-				orderVO.setOrderStatus("付款失敗");
+				vo.setPaymentAttemptStatus(PaymentAttemptStatus.EXPIRED);
+				orderVO.setOrderStatus(OrderStatus.付款失敗);
 				break;
 			default:
-				vo.setPaymentAttemptStatus("failed");
-				orderVO.setOrderStatus("付款失敗");
+				vo.setPaymentAttemptStatus(PaymentAttemptStatus.FAILURE);
+				orderVO.setOrderStatus(OrderStatus.付款失敗);
 				break;
 			}
 			Long createdAt = orderVO.getCreatedAt().getTime();
 			if (System.currentTimeMillis() - createdAt > 120 * 60 * 1000) {
-				orderVO.setOrderStatus("付款逾時");
+				orderVO.setOrderStatus(OrderStatus.付款逾時);
 				// 釋出票出口 1
 				Map<Integer, Integer> releaseMap = orderVO.getOrderItems().stream().collect(Collectors
 						.groupingBy(item -> item.getExhibitionTicketType().getExhibitionId(), Collectors.summingInt(item -> 1)));
@@ -219,10 +220,10 @@ public class OrderService {
 		 * paymentAttempt status = "pending" 的 訂單 *********
 		 */
 		Timestamp threshold = new Timestamp(System.currentTimeMillis() - 120 * 60 * 1000); // 120mins
-		List<OrderVO> expiredOrders = ORDER_REPO.findExpiredOrders(threshold, Set.of("付款中", "付款失敗"));
+		List<OrderVO> expiredOrders = ORDER_REPO.findExpiredOrders(threshold, Set.of(OrderStatus.付款中, OrderStatus.付款失敗));
 		/* ********* 2rd part : 調整訂單狀態 order orderStatus -> 付款失敗 ********* */
 		for (OrderVO vo : expiredOrders)
-			vo.setOrderStatus("付款逾時");
+			vo.setOrderStatus(OrderStatus.付款逾時);
 		/* ********* 3rd part : 庫存釋放 ********* */
 		// 釋出票出口 2
 		Map<Integer, Integer> releaseMap = expiredOrders.stream().flatMap(order -> order.getOrderItems().stream())
@@ -234,8 +235,8 @@ public class OrderService {
 			EXHIBITION_REPO.updateSoldTicketQuantity(entry.getKey(), -entry.getValue());
 	}
 	
-	public String checkOrderStatus(String merchantTradeNo) {
-		String orderStatus = PAYMENT_ATTEMPT_REPO.findByMerchantTradeNo(merchantTradeNo).orElseThrow().getOrder()
+	public OrderStatus checkOrderStatus(String merchantTradeNo) {
+		OrderStatus orderStatus = PAYMENT_ATTEMPT_REPO.findByMerchantTradeNo(merchantTradeNo).orElseThrow().getOrder()
 				.getOrderStatus();
 		return orderStatus;
 	}
@@ -267,7 +268,7 @@ public class OrderService {
 			return "0|FAILED";
 		
 		/* ********* *rd part : 以防 ECPay 多次送出同樣的 ReturnURL ********* */
-		if(!"pending".equals(paVO.getPaymentAttemptStatus())) return "1|OK";
+		if(!PaymentAttemptStatus.PENDING.equals(paVO.getPaymentAttemptStatus())) return "1|OK";
 		
 		/* ********* 4th part: 先更新共用欄位 ********* */
 		paVO.setStoreId(req.getStoreID());
@@ -284,9 +285,9 @@ public class OrderService {
 		if ("1".equals(req.getRtnCode())) {
 			System.out.println("payment succeeded");
 			/* ********* 5-1 part : 更新 PaymentAttempt 填入多項明細 ********* */
-			paVO.setPaymentAttemptStatus("success");
+			paVO.setPaymentAttemptStatus(PaymentAttemptStatus.SUCCESS);
 			/* ********* 5-2 part : 更新 Order 調整 orderStatus ********* */
-			orderVO.setOrderStatus("已付款");
+			orderVO.setOrderStatus(OrderStatus.已付款);
 //			ORDER_REPO.save(orderVO);
 			/* ********* 5-3 part : 更新 OrderItem 寫入 ticketCode ********* */
 			Set<OrderItemVO> orderItemVOs = orderVO.getOrderItems();
@@ -300,13 +301,13 @@ public class OrderService {
 		else if(!"10300066".equals(req.getRtnCode())){
 			System.out.println("payment failed");
 			/* ********* 6-1 part : 更新 PaymentAttempt 填入多項明細 ********* */
-			paVO.setPaymentAttemptStatus("failed");
+			paVO.setPaymentAttemptStatus(PaymentAttemptStatus.FAILURE);
 			/* ********* 6-2 part : 更新 Order 調整 orderStatus ********* */
-			orderVO.setOrderStatus("付款失敗");
+			orderVO.setOrderStatus(OrderStatus.付款失敗);
 			/* ********* 6-3 part : 額外確認此訂單是否過期 ********* */
 			Long createdAt = orderVO.getCreatedAt().getTime();
 			if (System.currentTimeMillis() - createdAt > 120 * 60 * 1000) {
-				orderVO.setOrderStatus("付款逾時");
+				orderVO.setOrderStatus(OrderStatus.付款逾時);
 				// 釋出票出口 3
 				Map<Integer, Integer> releaseMap = orderVO.getOrderItems().stream().collect(Collectors
 						.groupingBy(item -> item.getExhibitionTicketType().getExhibitionId(), Collectors.summingInt(item -> 1)));
@@ -325,9 +326,9 @@ public class OrderService {
 		OrderVO orderVO = ORDER_REPO.findByOrderUlid(orderUlid);
 		Integer orderId = orderVO != null ? orderVO.getOrderId() : null;
 		if(orderId == null) return null; // 送錯或亂送 ulid 會造成此狀況！不要亂送！
-		if(!"付款失敗".equals(orderVO.getOrderStatus())) return null; // 狀態不是指定狀態！不要亂送！
+		if(!OrderStatus.付款失敗.equals(orderVO.getOrderStatus())) return null; // 狀態不是指定狀態！不要亂送！
 		
-		orderVO.setOrderStatus("付款中");
+		orderVO.setOrderStatus(OrderStatus.付款中);
 		
 		// no value present ？ 這裡 throw 有機會丟錯嗎 ？
 		PaymentAttemptVO paVO = PAYMENT_ATTEMPT_REPO.findTopByOrderIdOrderByCreatedAtDesc(orderId).orElseThrow();
@@ -345,7 +346,7 @@ public class OrderService {
 				.fields(fieldsBuilder(merchantTradeNo, merchantTradeDate, totalAmount, itemName)).build();
 		/* ********* 2th part : 新增 payment attempt 並回傳 ********* */
 		// 需要 order, merchantTradeNo, merchantId, tradeAmt, paymentType, checkMacValue
-		PaymentAttemptVO paymentAttemptVO = new PaymentAttemptVO.Builder().paymentAttemptStatus("pending")
+		PaymentAttemptVO paymentAttemptVO = new PaymentAttemptVO.Builder().paymentAttemptStatus(PaymentAttemptStatus.PENDING)
 				.order(orderVO).merchantTradeNo(merchantTradeNo).merchantId(ECPAY_PROPS.merchantId()).tradeAmt(totalAmount)
 //			.paymentType("Credit") // Callback 寫不一樣的...
 				.tradeDate(merchantTradeDate).build();
@@ -377,7 +378,7 @@ public class OrderService {
 
 		/* ********* 2nd part : 新增 order ********* */
 		// 需要 orderUlid, orderStatus, member, totalAmount, totalQuantity
-		OrderVO orderVO = ORDER_REPO.save(new OrderVO.Builder().orderUlid(ulid).orderStatus("付款中")
+		OrderVO orderVO = ORDER_REPO.save(new OrderVO.Builder().orderUlid(ulid).orderStatus(OrderStatus.付款中)
 				.member(entityManager.getReference(MemberVO.class, memberId)).totalAmount(totalAmount)
 				.totalQuantity(totalQuantity).build());
 
@@ -404,7 +405,7 @@ public class OrderService {
 				.fields(fieldsBuilder(merchantTradeNo, merchantTradeDate, totalAmount, itemName)).build();
 		/* ********* 5th part : 新增 payment attempt 並回傳 ********* */
 		// 需要 order, merchantTradeNo, merchantId, tradeAmt, paymentType, checkMacValue
-		PaymentAttemptVO paymentAttemptVO = new PaymentAttemptVO.Builder().paymentAttemptStatus("pending")
+		PaymentAttemptVO paymentAttemptVO = new PaymentAttemptVO.Builder().paymentAttemptStatus(PaymentAttemptStatus.PENDING)
 				.order(orderVO).merchantTradeNo(merchantTradeNo).merchantId(ECPAY_PROPS.merchantId()).tradeAmt(totalAmount)
 //				.paymentType("Credit") // Callback 寫不一樣的...
 				.tradeDate(merchantTradeDate).itemName(itemName).build();

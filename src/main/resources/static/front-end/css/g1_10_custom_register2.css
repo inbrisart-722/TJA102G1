@@ -126,3 +126,10 @@ select#gender {
   /* 如果你的模板有 transition，你可能需要在這裡也設定 transition: none; */
   /* transition: none; */
 }
+
+div.form-group i {
+	position: absolute;
+	cursor: pointer;
+	right: 10px;
+	top: 37.5px;
+}

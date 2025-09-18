@@ -11,6 +11,8 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -40,8 +42,9 @@ public class OrderVO implements Serializable{
 	@OneToMany(mappedBy="order")
 	private Set<PaymentAttemptVO> paymentAttempts;
 
+	@Enumerated(EnumType.STRING)
 	@Column(name = "order_status")
-	private String orderStatus; // 5種: 付款中、付款失敗、付款逾時、已付款、已退款
+	private OrderStatus orderStatus; // 5種: 付款中、付款失敗、付款逾時、已付款、已退款
 	
 	@Column(name = "member_id", insertable = false, updatable = false)
 	private Integer memberId;
@@ -74,10 +77,10 @@ public class OrderVO implements Serializable{
 	public void setOrderId(Integer orderId) {
 		this.orderId = orderId;
 	}
-	public String getOrderStatus() {
+	public OrderStatus getOrderStatus() {
 		return orderStatus;
 	}
-	public void setOrderStatus(String orderStatus) {
+	public void setOrderStatus(OrderStatus orderStatus) {
 		this.orderStatus = orderStatus;
 	}
 	public MemberVO getMember() {
@@ -149,7 +152,7 @@ public class OrderVO implements Serializable{
 
 	   public static class Builder {
 	        private String orderUlid;
-	        private String orderStatus;
+	        private OrderStatus orderStatus;
 	        private MemberVO member;
 	        private Integer totalAmount;
 	        private Integer totalQuantity;
@@ -158,7 +161,7 @@ public class OrderVO implements Serializable{
 	            this.orderUlid = orderUlid;
 	            return this;
 	        }
-	        public Builder orderStatus(String orderStatus) {
+	        public Builder orderStatus(OrderStatus orderStatus) {
 	            this.orderStatus = orderStatus;
 	            return this;
 	        }
