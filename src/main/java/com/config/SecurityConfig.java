@@ -223,7 +223,7 @@ public class SecurityConfig {
                         // 很多實務系統選擇把 refresh token 放在 HttpOnly Cookie 裡。因為 refresh token 的唯一用途就是「由瀏覽器自動帶上 → server 端驗證 → 換新 access token」，前端程式碼根本不需要直接讀取它。
                         new AntPathRequestMatcher("/api/auth/logout/*", "POST"),   // 登出：清 Cookie，攻擊者如果偽造 logout, 頂多只是讓使用者被迫登出
                         new AntPathRequestMatcher("/api/front-end/order/ECPay/ReturnURL"),
-                        new AntPathRequestMatcher("/front-end/ECPay/*")
+                        new AntPathRequestMatcher("/front-end/ECPay/*") // ClientBackURL + OrderResultURL
                         
                         
                 )
@@ -291,8 +291,11 @@ public class SecurityConfig {
                 // authorization
                 .accessDeniedHandler((req, res, exception) -> {
                 	String uri = req.getRequestURI();
-                	if(uri.startsWith("/back-end/")) {
-                		res.sendRedirect("/back-end/exhibitor/exhibitor_login");
+                	if(uri.startsWith("/back-end") || uri.startsWith("/api/back-end")) {
+                		res.sendRedirect("/back-end/exhibitor/exhibitor_login?redirect=" + req.getRequestURI());
+                	}
+                	else if(uri.startsWith("/front-end") || uri.startsWith("/api/front-end")) {
+                		res.sendRedirect("/front-end/login?redirect=" + req.getRequestURI());
                 	}
                 })
                 
@@ -315,7 +318,7 @@ public class SecurityConfig {
         http.authorizeHttpRequests(auth -> auth
         		// 1. 必須要用 / 開頭 去指定路徑
         		// 2.「愈前面的規則優先度愈高」。
-        		.requestMatchers("/front-end/ECPay/OrderResultURL", "/front-end/ECPay/ClientBackURL", "/ECPay/OrderResultURL", "/front-end/order_success", "/front-end/order_failure")
+        		.requestMatchers("/front-end/order_success", "/front-end/order_failure")
         		.hasRole("MEMBER")
                 .requestMatchers("/front-end/admin", "/front-end/cart", "/front-end/payment", "/api/front-end/protected/**")
                 .hasRole("MEMBER")

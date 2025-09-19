@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import com.eventra.cart_item.model.CartItemService;
 import com.eventra.cart_item.model.GetCartItemResDTO;
 import com.eventra.favorite.model.FavoriteService;
+import com.eventra.member.model.VerifService;
 
 @Controller
 @RequestMapping("/front-end")
@@ -27,6 +28,9 @@ public class FrontendIndexController {
 	
 	@Autowired
 	private CartItemService cartItemSvc;
+	
+	@Autowired
+	private VerifService verifSvc;
 	
 	private static final Integer TEST_MEMBER = 3;
 
@@ -61,9 +65,9 @@ public class FrontendIndexController {
 
 	@GetMapping("/index")
 	public String index(@AuthenticationPrincipal UserDetails user) {
-		System.out.println(user.getUsername());
-		System.out.println(user.getPassword());
-		System.out.println(user.getAuthorities());
+//		System.out.println(user.getUsername());
+//		System.out.println(user.getPassword());
+//		System.out.println(user.getAuthorities());
         return "front-end/index";
 	}
 	
@@ -78,18 +82,30 @@ public class FrontendIndexController {
 	}
 	
 	@GetMapping("/login")
-	public String login() {
+	public String loginPage() {
 		return "front-end/login";
 	}
 	
 	@GetMapping("/register1")
-	public String register1() {
+	public String register1Page() {
 		return "front-end/register1";
 	}
 	
 	@GetMapping("/register2")
-	public String register2() {
+	public String register2Page(@RequestParam("token") String token, Model model) {
+		String email = verifSvc.findEmailByToken(token);
+		model.addAttribute("email", email);
 		return "front-end/register2";
+	}
+	
+	@GetMapping("/verif-failure")
+	public String temp() {
+		return "front-end/verif_failure";
+	}
+	
+	@GetMapping("/verif-registration-mail")
+	public String verifRegistrationMail() {
+		return "front-end/verif_registration_mail";
 	}
 	
 	@GetMapping("/exhibitor_register")
@@ -97,5 +113,14 @@ public class FrontendIndexController {
 		return "front-end/exhibitor_register";
 	}
 	
-
+	@GetMapping("/map_explore")
+	public String mapExplorePage() {
+		return "front-end/map_explore";
+	}
+	
+	@GetMapping("/search_results")
+	public String searchResultsPage() {
+		return "front-end/search_results";
+	}
+	
 }

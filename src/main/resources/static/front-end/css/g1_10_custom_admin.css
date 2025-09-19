@@ -289,3 +289,50 @@ div.order_body > button:first-child {
 	margin: 20px 0 28px 0;
 }
 
+/* 給忘記密碼 */
+
+.password-wrapper {
+  position: relative;
+  transform: translateX(-200px);
+  display: inline;
+}
+
+.password-input {
+  font-size: 14px;
+/*   padding: 0px */
+  line-height: 1.4;
+  width: 200px;
+  box-sizing: border-box;
+  padding: 0 5px;
+  border-radius: 5px;
+  border: 1px solid gray;
+}
+
+.password-toggle {
+  position: absolute;
+  right: 5%;
+  top: 50%;
+  transform: translateX(-30px) translateY(-50%);
+  cursor: pointer;
+  color: #555;
+  font-size: 18px;
+}
+.password-toggle:hover {
+  color: #000;
+}
+
+.btn_save_new_password {
+	position: absolute;
+	background: rgb(218, 218, 218);
+	left: 200px;
+	bottom: 0px;
+	width: 80px;
+	border-radius: 5px;
+	border: 1px solid gray;
+	margin-left: 3%;
+	font-size: 13px;
+	height: 98%;
+	padding-bottom: 1px;
+}
+
+

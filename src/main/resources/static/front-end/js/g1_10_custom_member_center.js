@@ -7,8 +7,8 @@ document.addEventListener("DOMContentLoaded", function() {
 		method: "GET"
 	}).then((res) => {
 		if (res.status === 401) {
-		    sessionStorage.setItem("redirect", window.location.pathname);
-		    location.href = "/front-end/login";
+			sessionStorage.setItem("redirect", window.location.pathname);
+			location.href = "/front-end/login";
 		}
 		if (!res.ok) throw new Error("getAllOrder: Not 2XX or 401");
 		return res.json();
@@ -208,12 +208,12 @@ document.addEventListener("DOMContentLoaded", function() {
 		const canvas = qrcode_content.querySelector("canvas");
 		if (canvas) canvas.remove();
 	});
-	
+
 	// fetch 2 : 重送金流 /api/order/ECPay/resending
-	
-	document.addEventListener("click", function(e){
+
+	document.addEventListener("click", function(e) {
 		const btn_repay = e.target.closest("button.order_repay")
-		if(!btn_repay) return;
+		if (!btn_repay) return;
 		const order_ulid = btn_repay.closest("div.order_row").querySelector("span.order_id > span").innerText;
 		console.log(order_ulid);
 		csrfFetch("/api/front-end/protected/order/ECPay/resending", {
@@ -224,17 +224,17 @@ document.addEventListener("DOMContentLoaded", function() {
 			body: order_ulid
 		}).then((res) => {
 			if (res.status === 401) {
-			    sessionStorage.setItem("redirect", window.location.pathname);
-			    location.href = "/front-end/login";
+				sessionStorage.setItem("redirect", window.location.pathname);
+				location.href = "/front-end/login";
 			}
-			if(!res.ok) throw new Error("ECPay/resending: Not 2XX or 401");
+			if (!res.ok) throw new Error("ECPay/resending: Not 2XX or 401");
 			return res.json();
 		}).then((result) => {
-			if(result.status === "success"){
+			if (result.status === "success") {
 				const form = document.createElement("form");
 				form.method = (result.method || "POST").toUpperCase();
 				form.action = result.action;
-				
+
 				// .entries returns an array of key-value pairs
 				// Each pair is itself a small array
 				Object.entries(result.fields).forEach(([k, v]) => {
@@ -245,28 +245,28 @@ document.addEventListener("DOMContentLoaded", function() {
 					input.value = (v ?? "").toString();
 					form.appendChild(input);
 				});
-				
+
 				// noscript 保險（可選）
 				const btn = document.createElement("button");
 				btn.type = "submit";
 				btn.style.display = "none";
 				form.appendChild(btn);
-				
+
 				document.body.appendChild(form);
 				form.submit();
-			}else{
+			} else {
 				console.log("ECPay Re-sending failed")
 			}
 		}).catch((error) => {
-			console.log(error);		
+			console.log(error);
 		});
 
 	})
 
-	
-	
-	
-	
+
+
+
+
 });
 
 ////////////////////////////////////////////////////////////////
@@ -284,25 +284,97 @@ document.addEventListener("DOMContentLoaded", function() {
 
 	// 綁定更新頭像 file_input
 	file_input.addEventListener("change", function(e) {
-		const file = e.target.files[0];
-		if (file === null) return;
+		const user_photo = e.target.files[0];
+		if (user_photo === null) return;
 
-		const reader = new FileReader();
-		reader.addEventListener("load", function() {
-			user_img.src = `${reader.result}`;
-		});
-		reader.readAsDataURL(file);
+		const form_data = new Formdata();
+		form_data.append("user_photo", user_photo);
+
+		fetch("/api/front-end/protected/member/update-photo", {
+			method: "POST",
+			body: form_data,
+		})
+			.then((res) => {
+				if (!res.ok) throw new Error("Not 2XX or 401");
+				else return res.text();
+			})
+			.then((result) => {
+				console.log(result[0]);
+				user_img.src = `${result[1]}`;
+			})
+			.catch(error => console.log(error));
+		//		const reader = new FileReader();
+		//		reader.addEventListener("load", function() {
+		//			user_img.src = `${reader.result}`;
+		//		});
+		//		reader.readAsDataURL(file);
 	});
 
-	// 綁定恢復預設按鈕
-	const btn_recover = document.querySelector("#btn_recover");
+	///////////////////////////////////////////////////////////
+	///////////////////////////////////////////////////////////
+	///////////////////////////////////////////////////////////
+
+	function validateForm() {
+		const nickname = document.querySelector("#nickname").value.trim();
+		const phone_number = document.querySelector("#phone_number").value.trim();
+		const birth_date = document.querySelector("#birth_date").value.trim();
+		const address = document.querySelector("#address").value.trim();
+
+		let errors = {};
+
+		// 1. nickname：必填 + 長度 <= 50
+		if (!nickname) {
+			errors.nickname = "暱稱必填";
+		} else if (nickname.length > 50) {
+			errors.nickname = "暱稱不能超過 50 個字元";
+		}
+
+		// 2. phone_number：可選填，但若填必須符合台灣電話格式
+		const taiwanPhoneRegex = /^(09\d{8}|0\d{1,2}\d{6,8})$/;
+		if (phone_number) {
+			if (!taiwanPhoneRegex.test(phone_number)) {
+				errors.phone_number = "電話格式必須為台灣電話（09xxxxxxxx 或 市話）";
+			}
+			if (phone_number.length > 15) {
+				errors.phone_number = "電話號碼不能超過 15 碼";
+			}
+		}
+
+		// 3. address：可選填，但長度 <= 255
+		if (address && address.length > 255) {
+			errors.address = "地址不能超過 255 個字元";
+		}
+
+		return errors;
+	}
+
+	function showErrors(errors) {
+		// 先清除舊的錯誤訊息
+		document.querySelectorAll(".error-msg").forEach(el => el.remove());
+
+		for (const [field, message] of Object.entries(errors)) {
+			const input = document.querySelector(`#${field}`);
+			const formGroup = input.closest(".form-group");
+
+			// 在該 input 下方加錯誤提示
+			const small = document.createElement("small");
+			small.classList.add("text-danger", "error-msg");
+			small.innerText = message;
+			formGroup.appendChild(small);
+		}
+	}
+
 	const nickname = document.querySelector("#nickname");
 	const phone_number = document.querySelector("#phone_number");
 	const birth_date = document.querySelector("#birth_date");
 	const address = document.querySelector("#address");
 
+	// 綁定恢復預設按鈕
+	const btn_recover = document.querySelector("#btn_recover");
+
 	btn_recover.addEventListener("click", function() {
 		nickname.value = phone_number.value = birth_date.value = address.value = "";
+		document.querySelectorAll(".error-msg").forEach(el => el.remove());
 	});
 
 	// 綁定儲存變更按鈕
@@ -311,13 +383,113 @@ document.addEventListener("DOMContentLoaded", function() {
 	const saved_phone_number = document.querySelector("#saved_phone_number");
 	const saved_birth_date = document.querySelector("#saved_birth_date");
 	const saved_address = document.querySelector("#saved_address");
-	btn_save.addEventListener("click", function() {
-		saved_nickname.innerText = nickname.value;
-		saved_phone_number.innerText = phone_number.value;
-		saved_birth_date.innerText = birth_date.value;
-		saved_address.innerText = address.value;
+	btn_save.addEventListener("click", function(e) {
+		e.preventDefault();
+
+		const errors = validateForm();
+
+		if (Object.keys(errors).length > 0) {
+			showErrors(errors);
+			console.log("驗證失敗:", errors);
+			return;
+		} else {
+			console.log("驗證成功，可以送出！");
+		}
+
+		const form_data = new FormData();
+		form_data.append("nickname", nickname.value);
+		form_data.append("phoneNumber", phone_number.value);
+		form_data.append("birthDate", birth_date.value);
+		form_data.append("address", address.value);
+
+		csrfFetchToRedirect("/api/front-end/protected/member/update-info", {
+			method: "POST",
+			// FormData 不能搭配自己手動設定 Content-Type
+			// 也可採用 application/x-www-form-urlencoded + URLSearchParams();
+			body: form_data
+		})
+			.then((res) => {
+				if (!res.ok) throw new Error("Not 2XX or 401");
+				else return res.text();
+			})
+			.then((result) => {
+				console.log(result);
+				saved_nickname.innerText = nickname.value;
+				saved_phone_number.innerText = phone_number.value;
+				saved_birth_date.innerText = birth_date.value;
+				saved_address.innerText = address.value;
+			})
+			.catch(error => console.log(error));
 	});
 });
 
+document.addEventListener("DOMContentLoaded", function() {
 
+	document.addEventListener("click", function(e) {
+		const btn_reset_password = e.target.closest("button#reset_password");
+		if (!btn_reset_password) return;
+		e.preventDefault();
 
+		const span_password = document.querySelector("#saved_password");
+
+			// 清掉舊內容（把更改密碼按鈕移除）
+			span_password.innerHTML = "";
+
+			// 建立容器
+			const wrapper = document.createElement("span");
+			wrapper.classList.add("password-wrapper");
+
+			// 建立輸入框
+			const input_new_password = document.createElement("input");
+			input_new_password.type = "password";
+			input_new_password.placeholder = "請輸入新密碼";
+			input_new_password.classList.add("password-input");
+
+			// 建立眼睛 icon
+			const toggle_icon = document.createElement("span");
+			toggle_icon.innerHTML = `<i class="icon-eye-7"></i>`;
+			toggle_icon.classList.add("password-toggle");
+
+			// 切換顯示/隱藏密碼
+			toggle_icon.addEventListener("click", function() {
+				if (input_new_password.type === "password") {
+					input_new_password.type = "text";
+					toggle_icon.innerHTML = `<i class="icon-eye-off-1"></i>`;
+				} else {
+					input_new_password.type = "password";
+					toggle_icon.innerHTML = `<i class="icon-eye-7"></i>`;
+				}
+			});
+
+			// 建立送出按鈕
+			const btn_save_new_password = document.createElement("button");
+			btn_save_new_password.innerText = "儲存變更";
+			btn_save_new_password.classList.add("btn_save_new_password");
+
+			btn_save_new_password.addEventListener("click", function(e) {
+				e.preventDefault();
+
+				const newPassword = input_new_password.value;
+				if (!newPassword) {
+					alert("請輸入新密碼");
+					return;
+				}
+
+				// TODO: fetch API 呼叫後端更新密碼
+				console.log("送出新密碼:", newPassword);
+
+				// 清除 input 與確認按鈕，恢復原狀
+				span_password.innerHTML = `
+	    <button id="reset_password">更改密碼</button>
+	  `;
+			});
+
+			// 放進 wrapper
+			wrapper.appendChild(input_new_password);
+			wrapper.appendChild(toggle_icon);
+			wrapper.appendChild(btn_save_new_password);
+
+			// 放入頁面
+			span_password.appendChild(wrapper);
+		});
+});
