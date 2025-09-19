@@ -8,6 +8,8 @@ import org.hibernate.annotations.Formula;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import com.eventra.comment.model.CommentVO;
+import com.eventra.exhibitionstatus.model.ExhibitionStatus;
+import com.eventra.exhibitionstatus.model.ExhibitionStatusVO;
 import com.eventra.exhibitiontickettype.model.ExhibitionTicketTypeVO;
 import com.eventra.exhibitor.model.ExhibitorVO;
 import com.eventra.rating.model.RatingVO;
@@ -45,8 +47,12 @@ public class ExhibitionVO {
     @OneToMany(mappedBy = "exhibition")
     private Set<RatingVO> ratings;
 
-    @Column(name = "exhibition_status_id")
-	private Integer exhibitionStatusId;
+//    @Column(name = "exhibition_status_id")
+//	private Integer exhibitionStatusId;
+    
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "exhibition_status_id", insertable = false, updatable = false)
+    private ExhibitionStatusVO exhibitionStatus;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "exhibitor_id", nullable = false)
@@ -119,12 +125,12 @@ public class ExhibitionVO {
         this.exhibitionId = exhibitionId;
     }
 
-    public Integer getExhibitionStatusId() {
-        return exhibitionStatusId;
+    public ExhibitionStatusVO getExhibitionStatus() {
+        return exhibitionStatus;
     }
 
-    public void setExhibitionStatusId(Integer exhibitionStatusId) {
-        this.exhibitionStatusId = exhibitionStatusId;
+    public void setExhibitionStatus(ExhibitionStatusVO exhibitionStatus) {
+        this.exhibitionStatus = exhibitionStatus;
     }
 
     public ExhibitorVO getExhibitorVO() {

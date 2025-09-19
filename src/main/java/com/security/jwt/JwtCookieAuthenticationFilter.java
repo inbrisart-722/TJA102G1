@@ -243,6 +243,12 @@ public class JwtCookieAuthenticationFilter extends OncePerRequestFilter {
     	// 在 Spring Security 的設計裡
     	// SecurityContextHolder.getContext().setAuthentication(auth) 只能有一個 Authentication。
     	
+    	String path = req.getRequestURI();
+    	if (path.startsWith("/api/auth/login")) {
+    	    chain.doFilter(req, res);
+    	    return;
+    	}
+    	
     	if(req.getRequestURI().startsWith("/front-end") || req.getRequestURI().startsWith("/api/front-end")) {
         // 1) 嘗試處理會員 Token
     		handleTokenFlow(req, res,

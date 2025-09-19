@@ -18,9 +18,9 @@ public class ExhibitionCreateDTO {
 	/**
 	 * 接收使用者上傳的檔案（此時尚未處理成路徑）
 	 */
-	private List<MultipartFile> photoPortrait;
+	private MultipartFile photoPortrait;
 
-	private List<MultipartFile> photoLandscape;
+	private MultipartFile photoLandscape;
 	
 //	@JsonIgnore
     private Set<ExhibitionTicketTypeVO> exhibitionTicketTypes;
@@ -65,19 +65,19 @@ public class ExhibitionCreateDTO {
 		this.startTime = startTime;
 	}
 
-	public List<MultipartFile> getPhotoPortrait() {
+	public MultipartFile getPhotoPortrait() {
 		return photoPortrait;
 	}
 
-	public void setPhotoPortrait(List<MultipartFile> photoPortrait) {
+	public void setPhotoPortrait(MultipartFile photoPortrait) {
 		this.photoPortrait = photoPortrait;
 	}
 
-	public List<MultipartFile> getPhotoLandscape() {
+	public MultipartFile getPhotoLandscape() {
 		return photoLandscape;
 	}
 
-	public void setPhotoLandscape(List<MultipartFile> photoLandscape) {
+	public void setPhotoLandscape(MultipartFile photoLandscape) {
 		this.photoLandscape = photoLandscape;
 	}
 
