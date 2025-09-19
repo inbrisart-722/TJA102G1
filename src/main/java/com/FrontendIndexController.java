@@ -65,9 +65,9 @@ public class FrontendIndexController {
 
 	@GetMapping("/index")
 	public String index(@AuthenticationPrincipal UserDetails user) {
-		System.out.println(user.getUsername());
-		System.out.println(user.getPassword());
-		System.out.println(user.getAuthorities());
+//		System.out.println(user.getUsername());
+//		System.out.println(user.getPassword());
+//		System.out.println(user.getAuthorities());
         return "front-end/index";
 	}
 	
@@ -118,5 +118,9 @@ public class FrontendIndexController {
 		return "front-end/map_explore";
 	}
 	
-
+	@GetMapping("/search_results")
+	public String searchResultsPage() {
+		return "front-end/search_results";
+	}
+	
 }
