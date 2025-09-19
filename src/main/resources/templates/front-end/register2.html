@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -611,10 +611,11 @@
                     <!-- <h6 id="continue">信箱已驗證通過！請繼續完成註冊！</h6> -->
                     <label>電子信箱</label>
                     <input
+                      th:value="${email}"
                       id="email"
                       type="text"
                       class="form-control"
-                      placeholder="example@email.com"
+                      value="example@email.com"
                       disabled
                     />
                   </div>
@@ -626,6 +627,7 @@
                       id="password1"
                       placeholder="password"
                     />
+                    <i class="icon-eye-7"></i>
                     <span id="password1Error" class="validation-message"></span>
                   </div>
                   <div class="form-group">
@@ -636,6 +638,7 @@
                       id="password2"
                       placeholder="password"
                     />
+                    <i class="icon-eye-7"></i>
                     <span id="password2Error" class="validation-message"></span>
                   </div>
                   <div class="form-group">
