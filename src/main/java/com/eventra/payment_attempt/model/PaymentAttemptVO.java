@@ -8,6 +8,8 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -29,14 +31,19 @@ public class PaymentAttemptVO implements Serializable{
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name = "payment_attempt_id")
 	private Integer paymentAttemptId;
+	
+	@Enumerated(EnumType.STRING)
 	@Column(name = "payment_attempt_status")
-	private String paymentAttemptStatus; // pending, expired, success, failure
+	private PaymentAttemptStatus paymentAttemptStatus; // PENDING, EXPIRED, SUCCESS, FAILURE
+	
 	@Column(name = "order_id", insertable = false, updatable = false)
 	private Integer orderId;
+	
 	@JsonIgnore
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "order_id", referencedColumnName = "order_id", nullable = false)
 	private OrderVO order;
+	
 	@Column(name = "merchant_id")
 	private String merchantId;
 	@Column(name = "merchant_trade_no") // "EC" + base36(System.currentTimeMillis()) + rand4
@@ -80,10 +87,10 @@ public class PaymentAttemptVO implements Serializable{
 	public void setPaymentAttemptId(Integer paymentAttemptId) {
 		this.paymentAttemptId = paymentAttemptId;
 	}
-	public String getPaymentAttemptStatus() {
+	public PaymentAttemptStatus getPaymentAttemptStatus() {
 		return paymentAttemptStatus;
 	}
-	public void setPaymentAttemptStatus(String paymentAttemptStatus) {
+	public void setPaymentAttemptStatus(PaymentAttemptStatus paymentAttemptStatus) {
 		this.paymentAttemptStatus = paymentAttemptStatus;
 	}
 	public Integer getOrderId() {
@@ -195,7 +202,7 @@ public class PaymentAttemptVO implements Serializable{
 
 	// 送出前先 build 基本資訊
 	public static class Builder {
-		private String paymentAttemptStatus;
+		private PaymentAttemptStatus paymentAttemptStatus;
 		private OrderVO order;
 		private String merchantTradeNo;
 		private String merchantId;
@@ -204,7 +211,7 @@ public class PaymentAttemptVO implements Serializable{
 		private String tradeDate;
 		private String itemName;
 
-		public Builder paymentAttemptStatus(String paymentAttemptStatus) {
+		public Builder paymentAttemptStatus(PaymentAttemptStatus paymentAttemptStatus) {
 			this.paymentAttemptStatus = paymentAttemptStatus;
 			return this;
 		}

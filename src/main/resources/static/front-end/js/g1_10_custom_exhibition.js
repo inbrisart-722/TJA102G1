@@ -1147,9 +1147,9 @@ document.addEventListener("DOMContentLoaded", function() {
 	}
 
 	document.addEventListener("click", function(e) {
-		e.preventDefault();
 		const btn_submit_rate = e.target.closest("#rate_form .btn_submit");
 		if (!btn_submit_rate) return;
+		e.preventDefault();
 
 		const ratingScore_el = formRate.querySelector(
 			"input[name='rating']:checked"

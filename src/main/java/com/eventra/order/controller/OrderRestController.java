@@ -19,6 +19,7 @@ import com.eventra.order.model.ECPaySendingReqDTO;
 import com.eventra.order.model.ECPaySendingResDTO;
 import com.eventra.order.model.GetAllOrderResDTO;
 import com.eventra.order.model.OrderService;
+import com.eventra.order.model.OrderStatus;
 
 @RestController
 @RequestMapping("/api/front-end")
@@ -73,11 +74,11 @@ public class OrderRestController {
 	}
 	
 	@GetMapping("/protected/order/checkOrderStatus")
-	public ResponseEntity<Map<String, String>> checkOrderStatus(@RequestParam("merchantTradeNo") String merchantTradeNo) {
+	public ResponseEntity<Map<String, Object>> checkOrderStatus(@RequestParam("merchantTradeNo") String merchantTradeNo) {
 		System.out.println("checking order status...");
 		
-		Map<String, String> res = new HashMap<>();
-		String orderStatus = null;
+		Map<String, Object> res = new HashMap<>();
+		OrderStatus orderStatus = null;
 		
 		// 阻塞式 Long Polling（非 WebFlux）-> 高併發 效率不佳 -> SSE / WebSocket
 		for(int i = 0; i < 30; i++) {
