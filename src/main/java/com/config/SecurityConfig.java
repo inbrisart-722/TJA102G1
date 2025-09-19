@@ -223,7 +223,8 @@ public class SecurityConfig {
                         // 很多實務系統選擇把 refresh token 放在 HttpOnly Cookie 裡。因為 refresh token 的唯一用途就是「由瀏覽器自動帶上 → server 端驗證 → 換新 access token」，前端程式碼根本不需要直接讀取它。
                         new AntPathRequestMatcher("/api/auth/logout/*", "POST"),   // 登出：清 Cookie，攻擊者如果偽造 logout, 頂多只是讓使用者被迫登出
                         new AntPathRequestMatcher("/api/front-end/order/ECPay/ReturnURL"),
-                        new AntPathRequestMatcher("/front-end/ECPay/*") // ClientBackURL + OrderResultURL
+                        new AntPathRequestMatcher("/front-end/ECPay/*"), // ClientBackURL + OrderResultURL
+                        new AntPathRequestMatcher("/front-end/google/*") // 雖然目前只有 get
                         
                         
                 )
