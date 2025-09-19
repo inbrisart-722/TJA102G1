@@ -1,40 +1,35 @@
 package com.eventra.exhibitioncommon.dto;
 
 import java.sql.Timestamp;
+import java.time.LocalDateTime;
 
 public class ExhibitionListDTO {
-    private Integer exhibitionId;	// 展覽id
-    private String exhibitionName;	// 展覽名稱
-    private String photoLandscape;	// 展覽圖片
-    private Integer minPrice;		// 最低票價
-    private Integer maxPrice;		// 最高票價
-    private Timestamp startTime;	// 展覽開始時間
-    private Timestamp endTime;		// 展覽結束時間
-    private String location;		// 地點
-    private Integer totalViews;		// 展覽頁點擊總數, 熱門展覽排序用
-    private Integer ratingCount;	// 評價總數
+    private Integer exhibitionId;		// 展覽id
+    private String exhibitionName;		// 展覽名稱
+    private String photoLandscape;		// 展覽圖片
+    private Integer minPrice;			// 最低票價
+    private Integer maxPrice;			// 最高票價
+    private LocalDateTime startTime;   	// 展覽開始時間, 型別對應VO
+    private LocalDateTime endTime;     	// 展覽結束時間, 型別對應VO
+    private String location;			// 地點
+    private Integer totalViews;			// 展覽頁點擊總數, 熱門展覽排序用
+    private Integer ratingCount;		// 評價總數
     
-    // 無建構子參數
-    public ExhibitionListDTO() {
-		super();
-	}
+    // [Repository / Service, setter方式時需要用] 無參數建構子
+    public ExhibitionListDTO() {}
 
-	// 有建構子參數
-	public ExhibitionListDTO(Integer exhibitionId, String exhibitionName, String photoLandscape, Integer minPrice,
-			Integer maxPrice, Timestamp startTime, Timestamp endTime, String location, Integer totalViews,
-			Integer ratingCount) {
-		super();
-		this.exhibitionId = exhibitionId;
-		this.exhibitionName = exhibitionName;
-		this.photoLandscape = photoLandscape;
-		this.minPrice = minPrice;
-		this.maxPrice = maxPrice;
-		this.startTime = startTime;
-		this.endTime = endTime;
-		this.location = location;
-		this.totalViews = totalViews;
-		this.ratingCount = ratingCount;
-	}
+    // [搜尋頁用] 9個參數建構子(不含 totalViews)
+    public ExhibitionListDTO(Integer exhibitionId, String exhibitionName, String photoLandscape, Integer minPrice, Integer maxPrice, LocalDateTime startTime, LocalDateTime endTime, String location, Integer ratingCount) {
+        this.exhibitionId = exhibitionId;
+        this.exhibitionName = exhibitionName;
+        this.photoLandscape = photoLandscape;
+        this.minPrice = minPrice;
+        this.maxPrice = maxPrice;
+        this.startTime = startTime;
+        this.endTime = endTime;
+        this.location = location;
+        this.ratingCount = ratingCount;
+    }
 
 	//getter/setter
 	public Integer getExhibitionId() {
@@ -77,19 +72,19 @@ public class ExhibitionListDTO {
 		this.maxPrice = maxPrice;
 	}
 
-	public Timestamp getStartTime() {
+	public LocalDateTime getStartTime() {
 		return startTime;
 	}
 
-	public void setStartTime(Timestamp startTime) {
+	public void setStartTime(LocalDateTime startTime) {
 		this.startTime = startTime;
 	}
 
-	public Timestamp getEndTime() {
+	public LocalDateTime getEndTime() {
 		return endTime;
 	}
 
-	public void setEndTime(Timestamp endTime) {
+	public void setEndTime(LocalDateTime endTime) {
 		this.endTime = endTime;
 	}
 

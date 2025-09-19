@@ -126,12 +126,12 @@ document.addEventListener("DOMContentLoaded", function () {
 					</div>
 					<div class="region-section">
 						<div class="region-options">
-							<button class="region-btn" data-region="台北市" type="button">台北市</button>
-							<button class="region-btn" data-region="新北市" type="button">新北市</button>
-							<button class="region-btn" data-region="桃園市" type="button">桃園市</button>
-							<button class="region-btn" data-region="台中市" type="button">台中市</button>
-							<button class="region-btn" data-region="台南市" type="button">台南市</button>
-							<button class="region-btn" data-region="高雄市" type="button">高雄市</button>
+							<button class="region-btn" data-region="台北" type="button">台北</button> <!-- 3字修改2字 -->
+							<button class="region-btn" data-region="新北" type="button">新北</button>
+							<button class="region-btn" data-region="桃園" type="button">桃園</button>
+							<button class="region-btn" data-region="台中" type="button">台中</button>
+							<button class="region-btn" data-region="台南" type="button">台南</button>
+							<button class="region-btn" data-region="高雄" type="button">高雄</button>
 						</div>
 					</div>
 					<div class="region-footer">
