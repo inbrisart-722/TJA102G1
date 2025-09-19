@@ -14,7 +14,6 @@ import jakarta.persistence.Table;
 @Table(name = "member")
 public class MemberVO {
 
-	@Id
 	@GeneratedValue(strategy=GenerationType.IDENTITY)
 	@Column(name = "member_id")
     private Integer memberId;

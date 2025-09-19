@@ -7,4 +7,5 @@ import org.springframework.data.jpa.repository.JpaRepository;
 public interface MemberRepository extends JpaRepository<MemberVO, Integer>{
 
 	Optional<MemberVO> findByEmail(String email);
+  
 }
