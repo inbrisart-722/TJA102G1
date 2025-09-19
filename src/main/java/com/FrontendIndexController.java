@@ -48,9 +48,9 @@ public class FrontendIndexController {
 
 	@GetMapping("/cart")
 	public String cartPage(Model model, Authentication auth) {
-		System.out.println(auth);
-		System.out.println("Hello, " + auth.getName() + ": " + auth.getAuthorities());
-		System.out.println(SecurityContextHolder.getContext().getAuthentication().getName());
+//		System.out.println(auth);
+//		System.out.println("Hello, " + auth.getName() + ": " + auth.getAuthorities());
+//		System.out.println(SecurityContextHolder.getContext().getAuthentication().getName());
 		return "front-end/cart";
 	}
 

@@ -1,4 +1,5 @@
 document.addEventListener("DOMContentLoaded", function () {
+  // 1. 登入按鈕本身
   const btn_login = document.querySelector("a#btn_login");
   btn_login.addEventListener("click", function (e) {
     e.preventDefault();
@@ -43,4 +44,8 @@ document.addEventListener("DOMContentLoaded", function () {
         console.log(error);
       });
   });
+  
+  // 2. google 第三方登入
+  
+  
 });
