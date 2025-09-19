@@ -30,7 +30,7 @@ import jakarta.validation.constraints.Size;
  * ver3：email/nickname 唯一、password_hash 使用 ASCII + ascii_bin。
  */
 @Entity // 要加上@Entity才能成為JPA的一個Entity類別
-@Access(AccessType.FIELD)
+//@Access(AccessType.FIELD)
 
 //代表這個class是對應到資料庫的實體table，目前對應的table是member 
 @Table(name = "member", uniqueConstraints = { @UniqueConstraint(name = "uk_member_email", columnNames = "email"),
@@ -58,7 +58,6 @@ public class MemberVO implements Serializable {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name = "member_id", updatable = false, nullable = false)
-
 	public Integer getMemberId() {
 		return memberId;
 	}

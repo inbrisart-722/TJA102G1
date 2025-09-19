@@ -25,8 +25,8 @@ public interface MemberRepository extends JpaRepository<MemberVO, Integer>, JpaS
 
 	
 //	//● (自訂)條件查詢
-	@Query(value = "from MemberVO where memberId=?1 and fullName like ? 2 and hiredate=?3 order by memberId")
-	List<MemberVO> findByOthers(int memberId , String fullName , java.sql.Date hiredate);
-	
+//	@Query(value = "from MemberVO where memberId=?1 and fullName like ? 2 and hiredate=?3 order by memberId")
+//	List<MemberVO> findByOthers(int memberId , String fullName , java.sql.Date hiredate);
+//	
 	
 }

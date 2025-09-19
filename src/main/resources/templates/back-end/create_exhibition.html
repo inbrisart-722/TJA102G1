@@ -1,311 +1,401 @@
 <!doctype html>
 <html xmlns:th="http://www.thymeleaf.org" lang="zh-Hant">
 <head>
-    <meta charset="utf-8"/>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes"/>
-    <title>Exhibitor | 建立展覽</title>
+<meta charset="utf-8" />
+<meta name="viewport"
+	content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+<title>Exhibitor | 建立展覽</title>
 
-    <!-- CSS：順序很重要 -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css"/>
-    <link href="https://cdn.jsdelivr.net/npm/summernote@0.8.20/dist/summernote-bs5.min.css" rel="stylesheet">
-    <link rel="preload" href="/back-end/css/adminlte.css" as="style"/>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/source-sans-3@5.0.12/index.css"
-          crossorigin="anonymous" media="print" onload="this.media='all'"/>
-    <link rel="stylesheet"
-          href="https://cdn.jsdelivr.net/npm/overlayscrollbars@2.11.0/styles/overlayscrollbars.min.css"/>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css"/>
-    <link rel="stylesheet" href="/back-end/css/adminlte.css"/>
+<!-- CSS：順序很重要 -->
+<link rel="stylesheet"
+	href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css" />
+<link
+	href="https://cdn.jsdelivr.net/npm/summernote@0.8.20/dist/summernote-bs5.min.css"
+	rel="stylesheet">
+<link rel="preload" href="/back-end/css/adminlte.css" as="style" />
+<link rel="stylesheet"
+	href="https://cdn.jsdelivr.net/npm/@fontsource/source-sans-3@5.0.12/index.css"
+	crossorigin="anonymous" media="print" onload="this.media='all'" />
+<link rel="stylesheet"
+	href="https://cdn.jsdelivr.net/npm/overlayscrollbars@2.11.0/styles/overlayscrollbars.min.css" />
+<link rel="stylesheet"
+	href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css" />
+<link rel="stylesheet" href="/back-end/css/adminlte.css" />
 
-    <style>
-        .cover-box{width:220px;height:280px;background:#adb5bd33;border:2px dashed #ced4da;border-radius:.75rem;display:flex;align-items:center;justify-content:center;overflow:hidden}
-        .cover-box img{max-width:100%;max-height:100%;object-fit:cover}
-        .ticket-row .form-control{min-width:90px}
-        .ticket-row .remove{visibility:hidden}
-        .ticket-row:hover .remove{visibility:visible}
-        .help-text{font-size:.825rem;color:var(--bs-secondary-color)}
+<style>
+.cover-box {
+	width: 220px;
+	height: 280px;
+	background: #adb5bd33;
+	border: 2px dashed #ced4da;
+	border-radius: .75rem;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	overflow: hidden
+}
 
-        /* Summernote 漂浮層避免被蓋住或裁切 */
-        .note-editor .note-toolbar,
-        .note-editor .note-popover,
-        .note-modal,
-        .note-dropdown-menu { z-index:1085 !important; }
-        .note-editor { overflow: visible !important; }
+.cover-box img {
+	max-width: 100%;
+	max-height: 100%;
+	object-fit: cover
+}
 
-      .ticket-row .form-control{min-width:90px}
-      .ticket-row.inactive{opacity:.55}
-      .ticket-row.inactive input{pointer-events:none}
-      .ticket-row .toggle-active.btn{--bs-btn-padding-y:.25rem;--bs-btn-padding-x:.55rem;--bs-btn-font-size:.8rem}
+.ticket-row .form-control {
+	min-width: 90px
+}
 
-      /* 通用：等比例預覽盒（用 CSS 變數控制長寬比） */
-    .ratio-uploader {
-      --ar: 4/3;                 /* 預設比例，可由行內 style 覆蓋 */
-      width: 100%;
-      max-width: 620px;
-      background: #adb5bd33;
-      border: 2px dashed #ced4da;
-      border-radius: .75rem;
-      position: relative;
-      overflow: hidden;
-      display: grid;
-      place-items: center;
-    }
-    .ratio-uploader::before {
-      content: "";
-      display: block;
-      width: 100%;
-      aspect-ratio: var(--ar);
-    }
-    .ratio-uploader > .preview {
-      position: absolute;
-      inset: 0;
-      display: grid;
-      place-items: center;
-    }
-    .ratio-uploader img {
-      max-width: 100%;
-      max-height: 100%;
-      object-fit: cover;
-    }
+.ticket-row .remove {
+	visibility: hidden
+}
 
-    /* 小提示字 */
-    .help-text{font-size:.825rem;color:var(--bs-secondary-color)}
+.ticket-row:hover .remove {
+	visibility: visible
+}
 
+.help-text {
+	font-size: .825rem;
+	color: var(--bs-secondary-color)
+}
 
-    </style>
+/* Summernote 漂浮層避免被蓋住或裁切 */
+.note-editor .note-toolbar, .note-editor .note-popover, .note-modal,
+	.note-dropdown-menu {
+	z-index: 1085 !important;
+}
+
+.note-editor {
+	overflow: visible !important;
+}
+
+.ticket-row .form-control {
+	min-width: 90px
+}
+
+.ticket-row.inactive {
+	opacity: .55
+}
+
+.ticket-row.inactive input {
+	pointer-events: none
+}
+
+.ticket-row .toggle-active.btn {
+	--bs-btn-padding-y: .25rem;
+	--bs-btn-padding-x: .55rem;
+	--bs-btn-font-size: .8rem
+}
+
+/* 通用：等比例預覽盒（用 CSS 變數控制長寬比） */
+.ratio-uploader {
+	--ar: 4/3; /* 預設比例，可由行內 style 覆蓋 */
+	width: 100%;
+	max-width: 620px;
+	background: #adb5bd33;
+	border: 2px dashed #ced4da;
+	border-radius: .75rem;
+	position: relative;
+	overflow: hidden;
+	display: grid;
+	place-items: center;
+}
+
+.ratio-uploader::before {
+	content: "";
+	display: block;
+	width: 100%;
+	aspect-ratio: var(--ar);
+}
+
+.ratio-uploader>.preview {
+	position: absolute;
+	inset: 0;
+	display: grid;
+	place-items: center;
+}
+
+.ratio-uploader img {
+	max-width: 100%;
+	max-height: 100%;
+	object-fit: cover;
+}
+
+/* 小提示字 */
+.help-text {
+	font-size: .825rem;
+	color: var(--bs-secondary-color)
+}
+</style>
 </head>
 <body class="layout-fixed sidebar-expand-lg bg-body-tertiary">
-<div class="app-wrapper">
-    <!-- Header（自動注入） -->
-   <!--  <div data-include="/back-end/header.html"></div> -->
+	<div class="app-wrapper">
+		<!-- Header（自動注入） -->
+		<!--  <div data-include="/back-end/header.html"></div> -->
 
 
-    <!-- Sidebar -->
-    <aside class="app-sidebar bg-body-secondary" data-bs-theme="dark">
-        <div class="sidebar-brand">
-            <a href="#" class="brand-link">
-                <img src="/back-end/img/AdminLTELogo.png" alt="AdminLTE Logo" class="brand-image opacity-75 shadow"/>
-                <span class="brand-text fw-light">eventra</span>
-            </a>
-        </div>
-        <div class="sidebar-wrapper">
-            <nav class="mt-2">
-                <ul class="nav sidebar-menu flex-column" data-lte-toggle="treeview" role="navigation"
-                    data-accordion="false">
-                    <li class="nav-item"><a class="nav-link"><p>展商後台</p></a></li>
-                    <li class="nav-item menu-open">
-                        <a href="#" class="nav-link"><i class="nav-icon bi bi-circle-fill"></i>
-                            <p>展覽管理</p></a>
-                        <ul class="nav nav-treeview">
-                            <li class="nav-item"><a href="/back-end/exhibitor/exhibition_list" class="nav-link"><p>展覽列表</p></a></li>
-                        </ul>
-                    </li>
-                    <li class="nav-item menu-open">
-                        <a href="#" class="nav-link"><i class="nav-icon bi bi-circle-fill"></i>
-                            <p>銷售管理</p></a>
-                        <ul class="nav nav-treeview">
-                            <li class="nav-item"><a href="/back-end/exhibitor/order_list" class="nav-link"><p>訂單列表</p></a></li>
-                            <li class="nav-item"><a href="#" class="nav-link"><p>銷售列表</p></a></li>
-                        </ul>
-                    </li>
-                    <li class="nav-item menu-open">
-                        <a href="#" class="nav-link"><i class="nav-icon bi bi-circle-fill"></i>
-                            <p>會員中心</p></a>
-                        <ul class="nav nav-treeview">
-                            <li class="nav-item"><a href="/back-end/exhibitor/exhibitor_info" class="nav-link"><p>展商資訊</p></a>
-                            </li>
-                            <li class="nav-item"><a href="/back-end/exhibitor/exhibitor_account_data" class="nav-link"><p>
-                                帳戶資料</p></a></li>
-                        </ul>
-                    </li>
-                </ul>
-            </nav>
-            <!-- 底部：登出連結 -->
-            <div class="p-3 border-top">
-                <a href="/back-end/exhibitor/exhibitor_login" id="logoutLink" class="nav-link text-danger">
-                    <i class="bi bi-box-arrow-right me-1"></i> 登出
-                </a>
-            </div>
-        </div>
-    </aside>
+		<!-- Sidebar -->
+		<aside class="app-sidebar bg-body-secondary" data-bs-theme="dark">
+			<div class="sidebar-brand">
+				<a href="#" class="brand-link"> <img
+					src="/back-end/img/AdminLTELogo.png" alt="AdminLTE Logo"
+					class="brand-image opacity-75 shadow" /> <span
+					class="brand-text fw-light">eventra</span>
+				</a>
+			</div>
+			<div class="sidebar-wrapper">
+				<nav class="mt-2">
+					<ul class="nav sidebar-menu flex-column" data-lte-toggle="treeview"
+						role="navigation" data-accordion="false">
+						<li class="nav-item"><a class="nav-link"><p>展商後台</p></a></li>
+						<li class="nav-item menu-open"><a href="#" class="nav-link"><i
+								class="nav-icon bi bi-circle-fill"></i>
+								<p>展覽管理</p></a>
+							<ul class="nav nav-treeview">
+								<li class="nav-item"><a
+									href="/back-end/exhibitor/exhibition_list" class="nav-link"><p>展覽列表</p></a></li>
+							</ul></li>
+						<li class="nav-item menu-open"><a href="#" class="nav-link"><i
+								class="nav-icon bi bi-circle-fill"></i>
+								<p>銷售管理</p></a>
+							<ul class="nav nav-treeview">
+								<li class="nav-item"><a
+									href="/back-end/exhibitor/order_list" class="nav-link"><p>訂單列表</p></a></li>
+								<li class="nav-item"><a href="#" class="nav-link"><p>銷售列表</p></a></li>
+							</ul></li>
+						<li class="nav-item menu-open"><a href="#" class="nav-link"><i
+								class="nav-icon bi bi-circle-fill"></i>
+								<p>會員中心</p></a>
+							<ul class="nav nav-treeview">
+								<li class="nav-item"><a
+									href="/back-end/exhibitor/exhibitor_info" class="nav-link"><p>展商資訊</p></a>
+								</li>
+								<li class="nav-item"><a
+									href="/back-end/exhibitor/exhibitor_account_data"
+									class="nav-link"><p>帳戶資料</p></a></li>
+							</ul></li>
+					</ul>
+				</nav>
+				<!-- 底部：登出連結 -->
+				<div class="p-3 border-top">
+					<a href="/back-end/exhibitor/exhibitor_login" id="myLogout"
+						class="nav-link text-danger"> <i
+						class="bi bi-box-arrow-right me-1"></i> 登出
+					</a>
+				</div>
+			</div>
+		</aside>
 
-    <!-- Main -->
-    <main class="app-main">
-        <div class="app-content-header">
-            <div class="container-fluid">
-                <div class="row align-items-center">
-                    <div class="col-sm-6"><h3 class="mb-0">建立展覽</h3></div>
-                    <div class="col-sm-6 text-sm-end mt-2 mt-sm-0">
-                        <a href="/back-end/exhibitor/exhibition_list" class="btn btn-outline-secondary btn-sm"><i
-                                class="bi bi-arrow-left-short me-1"></i>返回列表</a>
-                    </div>
-                </div>
-            </div>
-        </div>
+		<!-- Main -->
+		<main class="app-main">
+			<div class="app-content-header">
+				<div class="container-fluid">
+					<div class="row align-items-center">
+						<div class="col-sm-6">
+							<h3 class="mb-0">建立展覽</h3>
+						</div>
+						<div class="col-sm-6 text-sm-end mt-2 mt-sm-0">
+							<a href="/back-end/exhibitor/exhibition_list"
+								class="btn btn-outline-secondary btn-sm"><i
+								class="bi bi-arrow-left-short me-1"></i>返回列表</a>
+						</div>
+					</div>
+				</div>
+			</div>
 
-                <form id="eventForm" th:action="@{/back-end/exhibitor/insert_exhibition}"
-                					 th:object="${exhibitionCreateDTO}" 
-                					 method="post" 
-                					 enctype="multipart/form-data">
-        <div class="app-content">
-            <div class="container-fluid">
+			<form id="eventForm"
+				th:action="@{/back-end/exhibitor/insert_exhibition}"
+				th:object="${exhibitionCreateDTO}" method="post"
+				enctype="multipart/form-data">
+				<div class="app-content">
+					<div class="container-fluid">
 
-                    <!-- 基本資訊 -->
-                    <div class="col-lg-4 d-flex flex-column align-items-center gap-2">
-                        <!-- 800×533 封面 -->
-                        <div class="ratio-uploader" id="coverBox" style="--ar: 800/533;">
-                            <div class="preview"><span class="text-secondary">上傳圖片</span></div>
-                        </div>
-                        <div class="d-flex gap-2">
-                            <input class="form-control form-control-sm" id="coverInput" name="coverImage" type="file" th:field="*{photoPortrait}" multiple="multiple" accept="image/*">
-                            <button type="button" class="btn btn-outline-secondary btn-sm" id="btnClearCover">清除
-                            </button>
-                        </div>
-                        <div class="help-text">建議尺寸：800×533（JPG/PNG）</div>
-                    </div>
+						<!-- 基本資訊 -->
+						<div class="col-lg-4 d-flex flex-column align-items-center gap-2">
+							<!-- 800×533 封面 -->
+							<div class="ratio-uploader" id="coverBox" style="--ar: 800/533;">
+								<div class="preview">
+									<span class="text-secondary">上傳圖片</span>
+								</div>
+							</div>
+							<div class="d-flex gap-2">
+								<input class="form-control form-control-sm" id="coverInput"
+									name="coverImage" type="file" th:field="*{photoPortrait}"
+									accept="image/*">
+								<button type="button" class="btn btn-outline-secondary btn-sm"
+									id="btnClearCover">清除</button>
+							</div>
+							<div class="help-text">建議尺寸：800×533（JPG/PNG）</div>
+						</div>
 
 
-                    <div class="col-lg-8">
-                        <div class="row g-3">
-                            <div class="col-12">
-                                <label class="form-label">展覽名稱</label>
-                                <input type="text" th:field="*{exhibitionName}" class="form-control" id="evName" name ="name" placeholder="輸入展覽名稱" required>
-                            </div>
-                            <div class="col-md-6">
-                                <label class="form-label">開始時間</label>
-                                <input type="datetime-local" th:field="*{startTime}" class="form-control" id="startAt" name="startAt" required>
-                            </div>
-                            <div class="col-md-6">
-                                <label class="form-label">結束時間</label>
-                                <input type="datetime-local" th:field="*{endTime}" class="form-control" id="endAt" name="endAt" required>
-                            </div>
-                            <div class="col-md-6">
-                                <label class="form-label">展覽地點</label>
-                                <input type="text" th:field="*{location}" class="form-control" id="location" name="location" placeholder="輸入展覽地點">
-                            </div>
-                            <!-- <div class="col-md-6">
+						<div class="col-lg-8">
+							<div class="row g-3">
+								<div class="col-12">
+									<label class="form-label">展覽名稱</label> <input type="text"
+										th:field="*{exhibitionName}" class="form-control" id="evName"
+										name="name" placeholder="輸入展覽名稱" required>
+								</div>
+								<div class="col-md-6">
+									<label class="form-label">開始時間</label> <input
+										type="datetime-local" th:field="*{startTime}"
+										class="form-control" id="startAt" name="startAt" required>
+								</div>
+								<div class="col-md-6">
+									<label class="form-label">結束時間</label> <input
+										type="datetime-local" th:field="*{endTime}"
+										class="form-control" id="endAt" name="endAt" required>
+								</div>
+								<div class="col-md-6">
+									<label class="form-label">展覽地點</label> <input type="text"
+										th:field="*{location}" class="form-control" id="location"
+										name="location" placeholder="輸入展覽地點">
+								</div>
+								<!-- <div class="col-md-6">
                                 <label class="form-label">主辦單位</label>
                                 <input type="text" class="form-control" id="organizer" name="organizer" placeholder="展覽主辦方">
                             </div> -->
-                            <div class="col-md-6">
-                                <label class="form-label">總票數</label>
-                                <input type="number" th:field="*{totalTicketQuantity}" min="0" class="form-control" name="totalTickets" id="totalTickets"
-                                       placeholder="輸入總票數">
-                            </div>
-                            <div class="col-md-6">
-                                <label class="form-label">開賣日</label>
-                                <input type="datetime-local" th:field="*{ticketStartTime}" class="form-control" id="saleOpenAt" name="saleOpenAt">
-                            </div>
-                        </div>
-                    </div>
-                
-            </div>
-        </div>
+								<div class="col-md-6">
+									<label class="form-label">總票數</label> <input type="number"
+										th:field="*{totalTicketQuantity}" min="0" class="form-control"
+										name="totalTickets" id="totalTickets" placeholder="輸入總票數">
+								</div>
+								<div class="col-md-6">
+									<label class="form-label">開賣日</label> <input
+										type="datetime-local" th:field="*{ticketStartTime}"
+										class="form-control" id="saleOpenAt" name="saleOpenAt">
+								</div>
+							</div>
+						</div>
 
-        <!-- 票種設定 -->
-        <div class="card mt-4 mb-4">
-            <div class="card-header d-flex align-items-center justify-content-between flex-wrap gap-2">
-                <h5 class="card-title mb-0">票種設定</h5>
-                <!-- 依需求：拔掉新增票種；若不需要常用票種，下行也可整段移除 -->
-                <div class="btn-group d-none">
-                    <button class="btn btn-outline-secondary btn-sm dropdown-toggle" data-bs-toggle="dropdown">
-                        <i class="bi bi-tags me-1"></i>常用票種
-                    </button>
-                    <ul class="dropdown-menu" id="presetMenu">
-                        <li><a class="dropdown-item" data-name="全票">全票</a></li>
-                        <li><a class="dropdown-item" data-name="學生票">學生票</a></li>
-                        <li><a class="dropdown-item" data-name="敬老票">敬老票</a></li>
-                        <li><a class="dropdown-item" data-name="身心障礙者票">身心障礙者票</a></li>
-                        <li><a class="dropdown-item" data-name="軍警票">軍警票</a></li>
-                    </ul>
-                </div>
-            </div>
+					</div>
+				</div>
 
-            <div class="card-body">
-                <div class="row fw-semibold text-secondary d-none d-lg-flex px-2">
-                    <div class="col-lg-6">票種名稱</div>
-                    <div class="col-lg-4">金額</div>
-                    <div class="col-lg-2 text-end">操作</div>
-                </div>
-                <div id="ticketList" class="mt-2"></div>
-            </div>
-        </div>
+				<!-- 票種設定 -->
+				<div class="card mt-4 mb-4">
+					<div
+						class="card-header d-flex align-items-center justify-content-between flex-wrap gap-2">
+						<h5 class="card-title mb-0">票種設定</h5>
+						<!-- 依需求：拔掉新增票種；若不需要常用票種，下行也可整段移除 -->
+						<div class="btn-group d-none">
+							<button class="btn btn-outline-secondary btn-sm dropdown-toggle"
+								data-bs-toggle="dropdown">
+								<i class="bi bi-tags me-1"></i>常用票種
+							</button>
+							<ul class="dropdown-menu" id="presetMenu">
+								<li><a class="dropdown-item" data-name="全票">全票</a></li>
+								<li><a class="dropdown-item" data-name="學生票">學生票</a></li>
+								<li><a class="dropdown-item" data-name="敬老票">敬老票</a></li>
+								<li><a class="dropdown-item" data-name="身心障礙者票">身心障礙者票</a></li>
+								<li><a class="dropdown-item" data-name="軍警票">軍警票</a></li>
+							</ul>
+						</div>
+					</div>
 
-        <!-- 展覽橫幅（1400×470） -->
-        <div class="card mb-4">
-            <div class="card-header">
-                <h5 class="card-title mb-0">展覽橫幅</h5>
-            </div>
-            <div class="card-body">
-                <div class="d-flex flex-column align-items-start gap-2">
-                    <div class="ratio-uploader" id="bannerBox" style="--ar: 1400/470;">
-                        <div class="preview"><span class="text-secondary">上傳橫幅</span></div>
-                    </div>
-                    <div class="d-flex gap-2">
-                        <input class="form-control form-control-sm" th:field="*{photoLandscape}" id="bannerInput" name="bannerImage" type="file" accept="image/*">
-                        <button type="button" class="btn btn-outline-secondary btn-sm" id="btnClearBanner">清除</button>
-                    </div>
-                    <div class="help-text">建議尺寸：1400×470（JPG/PNG）</div>
-                </div>
-            </div>
-        </div>
+					<div class="card-body">
+						<div class="row fw-semibold text-secondary d-none d-lg-flex px-2">
+							<div class="col-lg-6">票種名稱</div>
+							<div class="col-lg-4">金額</div>
+							<div class="col-lg-2 text-end">操作</div>
+						</div>
+						<div id="ticketList" class="mt-2"></div>
+					</div>
+				</div>
 
-
-        <!-- 展覽資訊（Summernote） -->
-        <div class="card mb-4">
-            <div class="card-header">
-                <h5 class="card-title mb-0">展覽資訊</h5>
-            </div>
-            <div class="card-body">
-                <div id="editor"></div>
-                <textarea id="editor" name="description"></textarea>
-            </div>
-        </div>
-
-       
-        <!-- 操作按鈕 -->
-        <div class="d-flex flex-wrap gap-2 justify-content-end mb-5">
-            <button class="btn btn-outline-secondary" id="btnPreview"><i class="bi bi-eye me-1"></i>預覽</button>
-            <button class="btn btn-primary" id="btnSaveDraft"><i class="bi bi-save me-1"></i>儲存為草稿</button>
-            <button type="submit" class="btn btn-success" ><i class="bi bi-check2-circle me-1"></i>完成</button>
-        </div>
-        </form>
+				<!-- 展覽橫幅（1400×470） -->
+				<div class="card mb-4">
+					<div class="card-header">
+						<h5 class="card-title mb-0">展覽橫幅</h5>
+					</div>
+					<div class="card-body">
+						<div class="d-flex flex-column align-items-start gap-2">
+							<div class="ratio-uploader" id="bannerBox"
+								style="--ar: 1400/470;">
+								<div class="preview">
+									<span class="text-secondary">上傳橫幅</span>
+								</div>
+							</div>
+							<div class="d-flex gap-2">
+								<input class="form-control form-control-sm"
+									th:field="*{photoLandscape}" id="bannerInput"
+									name="bannerImage" type="file" accept="image/*">
+								<button type="button" class="btn btn-outline-secondary btn-sm"
+									id="btnClearBanner">清除</button>
+							</div>
+							<div class="help-text">建議尺寸：1400×470（JPG/PNG）</div>
+						</div>
+					</div>
+				</div>
 
 
+				<!-- 展覽資訊（Summernote） -->
+				<div class="card mb-4">
+					<div class="card-header">
+						<h5 class="card-title mb-0">展覽資訊</h5>
+					</div>
+					<div class="card-body">
+						<div id="editor"></div>
+						<textarea id="editor" name="description"></textarea>
+					</div>
+				</div>
 
-</main>
 
-<footer class="app-footer"></footer>
-</div>
+				<!-- 操作按鈕 -->
+				<div class="d-flex flex-wrap gap-2 justify-content-end mb-5">
+					<button class="btn btn-outline-secondary" id="btnPreview">
+						<i class="bi bi-eye me-1"></i>預覽
+					</button>
+					<button class="btn btn-primary" id="btnSaveDraft">
+						<i class="bi bi-save me-1"></i>儲存為草稿
+					</button>
+					<button type="submit" class="btn btn-success">
+						<i class="bi bi-check2-circle me-1"></i>完成
+					</button>
+				</div>
+			</form>
 
-<!-- Preview Modal -->
-<div class="modal fade" id="previewModal" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-lg modal-dialog-centered">
-        <div class="modal-content">
-            <div class="modal-header"><h5 class="modal-title">預覽</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-            </div>
-            <div class="modal-body">
-                <div id="previewArea"></div>
-            </div>
-        </div>
-    </div>
-</div>
 
-<!-- JS：順序很重要（jQuery -> Bootstrap.bundle -> Summernote -> 其他 -> AdminLTE 最後） -->
-<script src="https://cdn.jsdelivr.net/npm/jquery@3.7.1/dist/jquery.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.bundle.min.js"></script>
 
-<script>
+		</main>
+
+		<footer class="app-footer"></footer>
+	</div>
+
+	<!-- Preview Modal -->
+	<div class="modal fade" id="previewModal" tabindex="-1"
+		aria-hidden="true">
+		<div class="modal-dialog modal-lg modal-dialog-centered">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h5 class="modal-title">預覽</h5>
+					<button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+				</div>
+				<div class="modal-body">
+					<div id="previewArea"></div>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<!-- JS：順序很重要（jQuery -> Bootstrap.bundle -> Summernote -> 其他 -> AdminLTE 最後） -->
+	<script
+		src="https://cdn.jsdelivr.net/npm/jquery@3.7.1/dist/jquery.min.js"></script>
+	<script
+		src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.bundle.min.js"></script>
+
+	<script>
     // 有些環境 bootstrap 不是掛在全域，補上給 Summernote 取用
     window.jQuery = window.$ = jQuery;
     if (typeof bootstrap !== 'undefined') window.bootstrap = bootstrap;
 </script>
 
-<script src="https://cdn.jsdelivr.net/npm/summernote@0.8.20/dist/summernote-bs5.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/overlayscrollbars@2.11.0/browser/overlayscrollbars.browser.es6.min.js"></script>
-<script src="./js/adminlte.js"></script>
+	<script
+		src="https://cdn.jsdelivr.net/npm/summernote@0.8.20/dist/summernote-bs5.min.js"></script>
+	<script
+		src="https://cdn.jsdelivr.net/npm/overlayscrollbars@2.11.0/browser/overlayscrollbars.browser.es6.min.js"></script>
+	<script src="/back-end/js/adminlte.min.js"></script>
+	<script src="/front-end/js/g1_10_custom_common_csrf.js"></script>
 
-<script>
+	<script>
     // --- Summernote 初始化（不呼叫 focus，避免自動捲動） ---
     $(function () {
       const $ed = $('#editor');
@@ -509,18 +599,15 @@
     }
 
     document.getElementById('btnSaveDraft').addEventListener('click', () => saveEventAndBack(true));
-    document.getElementById('btnSubmit').addEventListener('click',    () => saveEventAndBack(false));
 </script>
-<script>
-    document.getElementById('logoutLink')?.addEventListener('click', (e) => {
-      e.preventDefault();
-      // 清除登入紀錄
-      sessionStorage.removeItem('exhibitorSession');
-      // 導回登入頁
-      window.location.href = '/back-end/exhibitor/exhibitor_login';
-    });
+	<script>
+document.getElementById("myLogout")?.addEventListener("click", (e) => {
+	  e.preventDefault();
+	  sessionStorage.clear();
+	  window.location.href = "/back-end/exhibitor/exhibitor_login";
+	});
 </script>
-<script>
+	<script>
     (async () => {
       // 讓放了 data-include 的容器先隱藏，避免 FOUC
       document.querySelectorAll('[data-include]').forEach(el => el.style.visibility = 'hidden');
@@ -531,7 +618,7 @@
         const bust = `v=${encodeURIComponent((window.__PARTIALS_VERSION__) || '1')}`; // 可手動改版本清快取
         const src = url.includes('?') ? `${url}&${bust}` : `${url}?${bust}`;
         try {
-          const res = await fetch(src, { cache: 'no-store' });
+          const res = await csrfFetchToRedirect(src, { cache: 'no-store' });
           if (!res.ok) throw new Error(res.statusText);
           el.innerHTML = await res.text();
           el.style.visibility = 'visible';
