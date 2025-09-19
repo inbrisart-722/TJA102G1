@@ -149,14 +149,14 @@
 
   <script>
   // ===================== 1) 讀資料（demo + localStorage 合併） =====================
-  /*  const demoEvents = [
+  const demoEvents = [
     {id:1,name:'活動1', startAt:'2025-07-18T10:00', endAt:'2025-07-20T18:00', saleOpenAt:'2025-07-01', status:'售票中',  remain:98, total:100, audit:'已通過'},
     {id:2,name:'活動2', startAt:'2025-07-25T09:00', endAt:'2025-07-25T17:00', saleOpenAt:'',           status:'籌備中',  remain:null, total:null, audit:'已通過'},
     {id:3,name:'活動3', startAt:'2025-07-01T09:00', endAt:'2025-07-05T17:00', saleOpenAt:'2025-06-01', status:'已結束',  remain:0,   total:200, audit:'已通過'},
     {id:4,name:'活動4', startAt:'',                 endAt:'',                 saleOpenAt:'',           status:'草稿',    remain:null, total:null, audit:''},
     {id:5,name:'活動5', startAt:'2025-08-10T10:00', endAt:'2025-08-12T18:00', saleOpenAt:'2025-08-05', status:'尚未開賣', remain:null, total:null, audit:'待審核'},
     {id:6,name:'活動6', startAt:'2024-06-04T10:00', endAt:'2024-06-06T18:00', saleOpenAt:'2024-05-20', status:'草稿',    remain:null, total:null, audit:'未通過'},
-  ];  */
+  ]; 
   
 
   const stored = JSON.parse(localStorage.getItem('events') || '[]');

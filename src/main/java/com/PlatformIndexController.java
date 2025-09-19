@@ -22,4 +22,5 @@ public class PlatformIndexController {
 		return "platform/comment";
 	}
 	
+	
 }
