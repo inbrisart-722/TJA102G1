@@ -44,9 +44,10 @@ public class JwtUtil {
 	// ============================
 	public String generateAccess(String subject, Duration ttl) {
 		long now = System.currentTimeMillis(); // 取得當下時間 (毫秒)
+		System.out.println("=============" + subject + "=============");
 
 		return Jwts.builder() // 建立 JWT 的 builder
-				.setSubject(subject) // 設定 Token 主體 (通常是 username 或 userId)
+				.setSubject(subject) // 設定 Token 主體 (目前改存 memberId)
 				.setIssuer(ISSUER) // 設定簽發者 (iss 欄位)
 				.setIssuedAt(new Date(now)) // 簽發時間 (iat 欄位)
 				.setExpiration(new Date(now + ttl.toMillis())) // 過期時間 (exp 欄位)

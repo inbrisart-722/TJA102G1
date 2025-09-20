@@ -40,7 +40,44 @@ public class MemberVO {
     @Column(name = "updated_at", insertable = false, updatable = false)
     private Timestamp updatedAt;
     
-    public Integer getMemberId() {
+    /* OAuth2 專用欄位 */
+    
+    @Column(name = "google_id")
+    private String googleId;
+    @Column(name = "github_id")
+    private String githubId;
+    @Column(name = "facebook_id")
+    private String facebookId;
+    @Column(name = "asid")
+    private String asid;
+    
+    /* getter | setter */
+    
+    public String getAsid() {
+		return asid;
+	}
+	public void setAsid(String asid) {
+		this.asid = asid;
+	}
+	public String getFacebookId() {
+		return facebookId;
+	}
+	public void setFacebookId(String facebookId) {
+    	this.facebookId = facebookId;
+    }
+    public String getGoogleId() {
+    	return googleId;
+    }
+	public void setGoogleId(String googleId) {
+    	this.googleId = googleId;
+    }
+    public String getGithubId() {
+    	return githubId;
+    }
+    public void setGithubId(String githubId) {
+    	this.githubId = githubId;
+    }
+	public Integer getMemberId() {
 		return memberId;
 	}
 	public void setMemberId(Integer memberId) {

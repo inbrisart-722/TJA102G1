@@ -186,7 +186,7 @@ document.addEventListener("DOMContentLoaded", () => {
 			.then((isMember) => {
 				// 如果是會員，顯示錯誤訊息並停止後續流程
 				if (isMember) {
-					emailError.textContent = "您已經是會員囉！";
+					emailError.textContent = "您已經是會員囉！（一般會員 或 透過第三方登入綁定）";
 					emailInput.classList.add("is-invalid");
 					getVerificationCodeBtn.disabled = false;
 					// 使用 Promise.reject() 停止 Promise 鏈，將控制權交給 .catch

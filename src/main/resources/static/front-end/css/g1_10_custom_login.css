@@ -28,3 +28,14 @@ input.form-control {
   margin-top: 5%;
   margin-bottom: 10%; */
 /* } */
+
+#btn_github_login{
+	background: #251D1C;
+	position: relative;
+}
+#btn_github_login > i{
+	position: absolute;
+	left: 5px;
+	top: 7px;
+	font-size: 22px;
+}
