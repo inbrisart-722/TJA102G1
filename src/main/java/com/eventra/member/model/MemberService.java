@@ -1,24 +1,32 @@
 package com.eventra.member.model;
 
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Objects;
 
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.eventra.member.model.MemberVO;
+import com.util.RandomRawPasswordGenerator;
 
 @Service
 @Transactional
 public class MemberService {
 	
+//	@PersistenceContext
+//	private EntityManager entityManager;
+	
 	private final MemberRepository MEMBER_REPO;
 	private final MemberRedisRepository MEMBER_REDIS_REPO;
-	private final BCryptPasswordEncoder PASSWORD_ENCODER; 
+	private final PasswordEncoder PASSWORD_ENCODER; 
 	
-	public MemberService(MemberRepository memberRepository, MemberRedisRepository memberRedisRepository, BCryptPasswordEncoder passwordEncoder) {
+	public MemberService(MemberRepository memberRepository, MemberRedisRepository memberRedisRepository, PasswordEncoder passwordEncoder) {
 		this.MEMBER_REPO = memberRepository;
 		this.MEMBER_REDIS_REPO = memberRedisRepository;
 		this.PASSWORD_ENCODER = passwordEncoder;
@@ -67,6 +75,102 @@ public class MemberService {
 		MEMBER_REPO.save(member);
 	}
 	
+	public MemberVO loadOrCreateFromOAuth2(String provider, OAuth2User user) {
+		
+		/* =========== 1. 嘗試用 provider ID 從資料庫中找出 memberVO，有就直接回傳 =========== */
+		MemberVO memberVO = null;
+		String providerId = null; 
+		
+		switch(provider) {
+			case "google" -> {
+				providerId = user.getAttributes().get("sub").toString();
+				memberVO = MEMBER_REPO.findByGoogleId(providerId).orElse(null);
+			}
+			case "github" -> {
+				providerId = user.getAttributes().get("id").toString();
+				memberVO = MEMBER_REPO.findByGithubId(providerId).orElse(null);
+			}
+			case "facebook" -> {
+				providerId = user.getAttributes().get("id").toString();
+				memberVO = MEMBER_REPO.findByFacebookId(providerId).orElse(null);
+			}
+		}
+		
+		if(memberVO != null) return memberVO;
+		
+		/* =========== 2. provider ID 找不到！試看看透過 email 去找，且 merge =========== */
+		
+		String email = null;
+		
+		switch(provider) {
+			case "google" -> {
+				if( Boolean.TRUE.equals(user.getAttribute("email_verified")) ) {
+					email = user.getAttribute("email");
+					memberVO = MEMBER_REPO.findByEmail(email).orElse(null);
+				}
+			}
+			// github 的 email 只放 scope = read:user 沒辦法驗證，不能亂 merge
+		}
+		
+		if(memberVO != null) {
+			if(memberVO.getGoogleId() == null) {
+				memberVO.setGoogleId(providerId);
+				MEMBER_REPO.save(memberVO);
+			}
+			return memberVO;
+		}
+		
+		/* =========== 3. email 也找不到！所以以下開始建立新 member 並塞入資料 =========== */
+		memberVO = new MemberVO();
+		
+		Map<String, Object> infoMap = user.getAttributes();
+		
+		switch(provider) {
+		
+			case "google" -> {
+				memberVO.setGoogleId(providerId);
+				if( Boolean.TRUE.equals(user.getAttribute("email_verified")) ) 
+					memberVO.setEmail( (String) infoMap.get("email") );
+				memberVO.setFullName( (String) infoMap.get("name") );
+				memberVO.setNickname( Objects.toString(infoMap.get("given_name"), "Google 匿名使用者" ));
+				memberVO.setProfilePic( (String) infoMap.get("picture") );
+				memberVO.setPasswordHash(getRandomEncodedPassword());
+			}
+			case "github" -> {
+				memberVO.setGithubId(providerId);
+				memberVO.setNickname( Objects.toString(infoMap.get("name"), Objects.toString(infoMap.get("login"), "GitHub 匿名使用者" )));
+				memberVO.setProfilePic( (String) infoMap.get("avatar_url") );
+				memberVO.setPasswordHash(getRandomEncodedPassword());
+			}
+			case "facebook" -> {
+				memberVO.setFacebookId(providerId);
+				memberVO.setNickname( (Objects.toString(infoMap.get("name"), "Facebook 匿名使用者")) );
+				
+				// Facebook 直接存 uri 會過期，其實要存其中的 ASID
+					// GET https://graph.facebook.com/{asid}/picture?type=large&redirect=false&access_token={user_access_token}
+						//  回應範例(json擷取部分）: "url": "https://scontent.xx.fbcdn.net/v/t1.6435-9/abc123...jpg" ...
+				
+				Map<String, Object> picture = (Map<String, Object>) infoMap.get("picture");
+				if (picture != null) {
+				    Map<String, Object> data = (Map<String, Object>) picture.get("data");
+				    if (data != null) {
+				        String url = (String) data.get("url"); // <-- 這裡才是字串（ fb 回來要取圖片 包了很多層 )
+				        memberVO.setProfilePic(url);
+
+				        String asid = getAsid(url);
+				        memberVO.setAsid(asid);
+				    }
+				}
+				
+				memberVO.setPasswordHash(getRandomEncodedPassword());
+			}
+		}
+		
+		// 存回以後再回到 success handler in SecurityConfig
+		MEMBER_REPO.save(memberVO);
+		
+		return memberVO;
+	}
 	public MemberVO findByMemberId() {
 		return null;
 	}
@@ -76,4 +180,30 @@ public class MemberService {
 	}
 	
 	// ........
+	
+	// OAuth2 配合 Spring Security UsernamePasswordAuthenticationToken 的假密碼
+	private String getRandomEncodedPassword() {
+		String rawPassword = RandomRawPasswordGenerator.generateRandomPassword();
+		String encodedPassword = PASSWORD_ENCODER.encode(rawPassword);
+		return encodedPassword;
+	}
+	
+	// Facebook 配合圖片很快過期的問題，需要從 uri 提取的 asid（但這次專題應該會忽略後續的操作，基本 10/18 後過期）
+	private String getAsid(String url) {
+		URI uri = null;
+		try {uri = new URI(url);}
+		catch(URISyntaxException e) {System.out.println(e.toString());}
+		
+		if(uri == null) return null;
+        String query = uri.getQuery(); // asid=4296615037228444&height=50&...
+        
+        if(query == null) return null;
+        Map<String, String> params = new HashMap<>();
+        for (String param : query.split("&")) {
+            String[] kv = param.split("=");
+            params.put(kv[0], kv[1]);
+        }
+        
+        return params.get("asid");
+	}
 }

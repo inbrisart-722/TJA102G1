@@ -4,8 +4,8 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -48,9 +48,9 @@ public class FrontendIndexController {
 
 	@GetMapping("/cart")
 	public String cartPage(Model model, Authentication auth) {
-		System.out.println(auth);
-		System.out.println("Hello, " + auth.getName() + ": " + auth.getAuthorities());
-		System.out.println(SecurityContextHolder.getContext().getAuthentication().getName());
+//		System.out.println(auth);
+//		System.out.println("Hello, " + auth.getName() + ": " + auth.getAuthorities());
+//		System.out.println(SecurityContextHolder.getContext().getAuthentication().getName());
 		return "front-end/cart";
 	}
 
@@ -82,7 +82,14 @@ public class FrontendIndexController {
 	}
 	
 	@GetMapping("/login")
-	public String loginPage() {
+	public String loginPage(@AuthenticationPrincipal UserDetails user) {
+		// 1. 使用者有帶 token，且有 MEMBER 身份，就不給進來登入頁面了，因為不然放他進來再次登入，要清 Token 再換發，不如就設計得先登出才放進來
+		if(user != null && user.getAuthorities().stream()
+				.map(GrantedAuthority::getAuthority)
+				.toList()
+				.contains("ROLE_MEMBER")) return "redirect:/front-end/index";
+		
+		// 2. 否則，歡迎！！！
 		return "front-end/login";
 	}
 	
