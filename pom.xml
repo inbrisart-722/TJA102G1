@@ -21,6 +21,19 @@
 	<dependencies>
 		<!-- 柏燁 start -->
 
+		<!-- Spring Security - OAuth2User -->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-oauth2-client</artifactId>
+		</dependency>
+
+		<!-- google api -->
+		<dependency>
+			<groupId>com.google.api-client</groupId>
+			<artifactId>google-api-client</artifactId>
+			<version>1.32.1</version>
+		</dependency>
+
 		<!-- jakarta.mail (JavaMail API) -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
