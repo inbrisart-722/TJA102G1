@@ -37,6 +37,8 @@ document.addEventListener("DOMContentLoaded", function() {
 	document.addEventListener("click", function(e) {
 		const btn = e.target.closest("button.tab_order");
 		if (!btn) return;
+		e.preventDefault();
+		
 		console.log(btn.textContent + ": btn is clicked");
 		clear_section1();
 		// 所有 btn 取消 -on
@@ -174,6 +176,7 @@ document.addEventListener("DOMContentLoaded", function() {
 	document.addEventListener("click", function(e) {
 		const btn = e.target.closest("div.order_item_ticket > button.qrcode");
 		if (!btn) return;
+		e.preventDefault();
 
 		if (qrcode_modal.classList.contains("open")) return;
 

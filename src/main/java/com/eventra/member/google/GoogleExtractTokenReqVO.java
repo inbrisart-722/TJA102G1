@@ -1,8 +1,8 @@
-package com.eventra.member.model;
+package com.eventra.member.google;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-public class ExtractTokenReqVO {
+public class GoogleExtractTokenReqVO {
 
 	// JsonProperty 也可以使用
 	

@@ -28,12 +28,25 @@ public class CustomUserDetailsService implements UserDetailsService {
     @Override
     // 這個 username 不一定真的是「帳號名稱」，只是個 唯一識別字串。可以用 email、手機號、memberId ... ...
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        MemberVO member = MEMBER_REPO.findByEmail(username).orElse(null);
+    	
+    	// 0) JwtCookieAuthentication + AuthRestController 配合處理
+    	
+    	// 1) 你是想要塞入 member token 嗎
+    	MemberVO member = null;
+    	// username (1) 從jwt進來，拿 memberId 送 (2) authRestController 送 email 進來
+    	if (username.matches("\\d+")) { // 字串正規表達式比對，用來檢查字串是不是純數字。
+    		member = MEMBER_REPO.findById(Integer.valueOf(username)).orElse(null);
+    	}
+    	else {
+    		member = MEMBER_REPO.findByEmail(username).orElse(null);
+    	}
+    	
+    	// 2) 還是你是想要塞入 exhibitor token 呢
         ExhibitorVO exhibitor = EXHIBITOR_REPO.findByBusinessIdNumber(username).orElse(null);
         
         if(member != null) {
         		return org.springframework.security.core.userdetails.User
-        				.withUsername(member.getEmail())
+        				.withUsername(String.valueOf(member.getMemberId()))
         				.password(member.getPasswordHash())
         				.roles("MEMBER")
         				.build();

@@ -242,6 +242,7 @@ public class JwtCookieAuthenticationFilter extends OncePerRequestFilter {
 		// SecurityContextHolder.getContext().setAuthentication(auth) 只能有一個
 		// Authentication。
 
+		// 設計成 路徑進去哪裡，我們就塞哪個 token -> uds 中 必定有一身份為 null 回傳的 authentication(token) 也就是我們希望的身份
 		String path = req.getRequestURI();
 		// 1) 嘗試處理會員 Token
 		if (path.startsWith("/front-end") || path.startsWith("/api/front-end")) {

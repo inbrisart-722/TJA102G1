@@ -1,15 +1,24 @@
 package com.config; // 專案內的設定類別都放在 com.config 套件
 
+import java.time.Duration;
+
 import org.springframework.context.annotation.Bean; // 宣告 Spring Bean 用
 import org.springframework.context.annotation.Configuration; // 表示這是一個設定類別
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.ResponseCookie;
 import org.springframework.security.authentication.AuthenticationManager; // 驗證帳密的核心元件
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider; // 使用資料庫帳號密碼的驗證提供者
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration; // 取得 AuthenticationManager 用
 import org.springframework.security.config.annotation.web.builders.HttpSecurity; // 建構 SecurityFilterChain 的 DSL
 import org.springframework.security.config.http.SessionCreationPolicy; // 設定 Session 策略
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.User;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService; // 載入使用者（你實作的 CustomUserDetailsService）
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder; // BCrypt 密碼雜湊
 import org.springframework.security.crypto.password.PasswordEncoder; // 密碼編碼介面
+import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
+import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.security.web.SecurityFilterChain; // Spring Security 的過濾鏈
 import org.springframework.security.web.authentication.LoginUrlAuthenticationEntryPoint; // 未登入導頁用（給頁面）
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter; // 參考定位自訂 Filter 的相對位置
@@ -20,7 +29,11 @@ import org.springframework.security.web.csrf.CsrfTokenRequestAttributeHandler;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher; // 比對路徑/HTTP 方法用
 import org.springframework.security.web.util.matcher.OrRequestMatcher;
 
+import com.eventra.member.model.MemberService;
+import com.eventra.member.model.MemberVO;
+import com.properties.JwtProperties;
 import com.security.jwt.JwtCookieAuthenticationFilter; // 你自訂：從 HttpOnly Cookie 讀取 JWT 的 Filter
+import com.security.jwt.JwtUtil;
 import com.security.jwt.RestAuthenticationEntryPoint; // 你自訂：API 端未認證時回 401 JSON
 
 @Configuration // 告訴 Spring：這是一個設定類別，會產生 Bean
@@ -39,8 +52,18 @@ public class SecurityConfig {
 //    public static final Duration EXHIB_ACCESS_TTL  = Duration.ofMinutes(10);
 //    public static final Duration EXHIB_REFRESH_TTL = Duration.ofDays(3);
 
+    private final Duration MEM_ACCESS_TTL;
+    private final Duration MEM_REFRESH_TTL;
+    private final JwtUtil JWT_UTIL;
+    private final MemberService MEMBER_SERVICE;
+    
+    public SecurityConfig(JwtProperties jwtProps, JwtUtil jwtUtil, MemberService memberService) {
+    	this.MEM_ACCESS_TTL = jwtProps.memAccessTtl();
+    	this.MEM_REFRESH_TTL = jwtProps.memRefreshTtl();
+    	this.JWT_UTIL = jwtUtil;
+    	this.MEMBER_SERVICE = memberService;
+    }
     // ===================== Bean：PasswordEncoder =====================
-    @Bean 
     // 對外提供一顆 PasswordEncoder Bean，給註冊/改密碼/驗證共用
     // Service 層處理註冊需一併統一使用 Spring Security 提供的 BCryptPasswordEncoder
     // -> 之後登入時，Spring Security 的 DaoAuthenticationProvider 會自動用一個 PasswordEncoder 驗證密碼。就不用自己實作比對 raw vs hash...
@@ -48,9 +71,12 @@ public class SecurityConfig {
     // public void registerUser(String username, String rawPassword) {
     // 		repo.save(new User().setUsername(username).setPassword(passwordEncoder.encode(rawPassword))); // 用 BCrypt 雜湊後存入 DB
     // }
-    public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder(); // 使用 BCrypt（有鹽、強度足夠）
-    }
+    
+    // 避免循環注入（with MEMBER_SVC），移動至分開的配置檔
+//    @Bean 
+//    public PasswordEncoder passwordEncoder() {
+//        return new BCryptPasswordEncoder(); 
+//    }
 
     // ===================== Bean：DaoAuthenticationProvider =====================
     @Bean 
@@ -332,7 +358,12 @@ public class SecurityConfig {
 //                .requestMatchers("/platform/**", "/api/platform/**")
 //                .authenticated()
                 // .requestMatchers("/api/auth/**") // 不用顯式寫出，底下預設 permit，是給 AuthRestController 用的！
-                // .permitAll() 
+                // .permitAll()
+                
+                // 怕不小心擋掉，暫時顯式放行，讓 Spring Security 永遠允許 OAuth2 相關路徑進來
+                .requestMatchers("/oauth2/**", "/login/oauth2/**")
+                .permitAll()
+                
                 .anyRequest()
                 .permitAll()
                 
@@ -425,6 +456,81 @@ public class SecurityConfig {
         	// 所以如果你是 前後端分離（不同 domain，例如 frontend.com ↔ api.backend.com），就必須顯式指定：credentials: "include"
         	// Cookie 本身就是存在瀏覽器裡的小資料。
         	// 「要不要帶 Cookie 給某個請求」這件事，由 credentials 控制。	-> omit | same-origin | include 三種值
+
+        // OAuth2 login 成功後
+        // 1. Spring Security 的 OAuth2LoginAuthenticationFilter 收到 Google/GitHub callback (/login/oauth2/code/{id})
+        // 2. 它會協助換取 token + 取回 user info（等細節都封裝，並且組成一顆 OAuth2AuthenticationToken
+        // 3. 這顆 token 預設會被放入
+        	// SecurityContextHolder.getContext().setAuthentication(authentication);
+        // 4. 接著呼叫此處預設的 successHandler 
+        http.oauth2Login(oauth -> oauth
+                .successHandler((request, response, authentication) -> {
+                    OAuth2User oauthUser = (OAuth2User) authentication.getPrincipal();
+                    // google / github / meta
+                    String provider = ((OAuth2AuthenticationToken) authentication).getAuthorizedClientRegistrationId();
+
+                    // DB 查或建會員
+                    MemberVO member = MEMBER_SERVICE.loadOrCreateFromOAuth2(provider, oauthUser);
+
+                    // OAuth2 成功 → 清掉舊的 JWT Cookie → 發新的 Token（Access+Refresh） → 之後都用這一組。這樣最乾淨，也不會衝突。
+                    
+                    // 發 JWT（用 memberId 當 subject）
+                    // 與 AuthRestController 登入時 核發機制完全一模一樣
+                    String access = JWT_UTIL.generateAccess(member.getMemberId().toString(), MEM_ACCESS_TTL);
+                    String refresh = JWT_UTIL.generateRefresh(member.getMemberId().toString(), MEM_REFRESH_TTL);
+
+                    response.addHeader(HttpHeaders.SET_COOKIE,
+                        ResponseCookie.from(MEM_ACCESS_COOKIE, access)
+                            .httpOnly(true)
+                            .secure(false)
+                            .sameSite("Lax")
+                            .path("/")
+                            .maxAge(MEM_ACCESS_TTL)
+                            .build()
+                            .toString());
+
+                    response.addHeader(HttpHeaders.SET_COOKIE,
+                        ResponseCookie.from(MEM_REFRESH_COOKIE, refresh)
+                            .httpOnly(true)
+                            .secure(false)
+                            .sameSite("Strict")
+                            .path("/")
+                            .maxAge(MEM_REFRESH_TTL)
+                            .build()
+                            .toString());
+
+                    // 先把 member 包成 UserDetails 
+                    UserDetails memberToken = User
+                    		.withUsername(String.valueOf(member.getMemberId()))
+                    		.password(member.getPasswordHash()) // authenticated，就不帶了
+                    		.roles("MEMBER")
+                    		.build();
+                    
+                    // 覆蓋掉 OAuth2AuthenticationToken，統一 JWT
+                    SecurityContextHolder.getContext().setAuthentication(
+                    	new UsernamePasswordAuthenticationToken(memberToken, null, memberToken.getAuthorities())
+                    );
+                    
+                    // 🚩 成功後導到前端首頁
+                    response.sendRedirect("/front-end/index");
+                })
+                // VER. 失敗暫放（未測）
+                .failureHandler((request, response, exception) -> {
+                    // 🔴 OAuth2 流程失敗（使用者拒絕授權、redirect_uri 錯誤、token 交換失敗...）
+                    System.err.println("OAuth2 login failed: " + exception.getMessage());
+
+                    // 清除 Cookie，避免殘留舊的 access_token/refresh_token
+                    response.addHeader(HttpHeaders.SET_COOKIE,
+                        ResponseCookie.from(MEM_ACCESS_COOKIE, "")
+                            .httpOnly(true).secure(false).sameSite("Lax").path("/").maxAge(0).build().toString());
+                    response.addHeader(HttpHeaders.SET_COOKIE,
+                        ResponseCookie.from(MEM_REFRESH_COOKIE, "")
+                            .httpOnly(true).secure(false).sameSite("Strict").path("/").maxAge(0).build().toString());
+
+                    // 導回登入頁，附帶錯誤訊息
+                    response.sendRedirect("/front-end/login?error=oauth2_failed");
+                })
+            );
 
         return http.build(); // 建構並回傳 SecurityFilterChain
     }
