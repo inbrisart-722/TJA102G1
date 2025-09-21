@@ -37,7 +37,7 @@ public class FrontendIndexController {
 	private static final Integer TEST_MEMBER = 3;
 
 	// 從 application.properties 讀取 google.api.key
-	@Value("${google.api.key}")
+//	@Value("${google.api.key}") 
     private String googleApiKey;
 	
 	@GetMapping("/admin")
