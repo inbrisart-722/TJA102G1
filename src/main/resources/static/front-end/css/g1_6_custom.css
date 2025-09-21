@@ -529,15 +529,23 @@ div.search_block>a {
 
 /* ========================================================================= */
 /* 地圖探索頁				map_explore.html */
+.gm-style-iw,
+.gm-style-iw-c {
+  max-width: 310px !important;
+  max-height: none !important;
+}
+
 .marker_info {
-	width: 280px;
-	height: 360px;
+	width: auto;
+	height: auto;
 	border-radius: 5px;
 	text-align: center;
 	background-color: white !important;
 	position: relative;
 	z-index: 9999999;
 	font-family: "Montserrat", Arial, sans-serif;
+	max-width: 300px;     /* 卡片最大寬度 */
+  	word-wrap: break-word; /* 避免文字超出 */
 }
 
 .marker_info img {
@@ -548,7 +556,20 @@ div.search_block>a {
 	-moz-border-radius-topright: 3px;
 	border-top-left-radius: 3px;
 	border-top-right-radius: 3px;
+	width: 100%;          /* 讓圖片跟著卡片寬度縮放 */
+  	height: auto;         /* 維持比例 */
+  	object-fit: cover;    /* 裁切方式，避免圖片變形 */
+  	border-radius: 8px;   /* 視覺更好看，可選 */
 }
+
+.marker_info h3,
+.marker_info p {
+  white-space: normal;      /* 允許換行 */
+  word-wrap: break-word;    /* 長單字或網址強制換行 */
+  overflow-wrap: break-word;/* 現代瀏覽器支援 */
+  text-align: center;       /* (可選) 置中看起來更整齊 */
+}
+
 
 .marker_info h3 {
 	font-size: 16px;
