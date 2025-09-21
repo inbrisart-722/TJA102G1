@@ -363,6 +363,8 @@ public class SecurityConfig {
                 // 怕不小心擋掉，暫時顯式放行，讓 Spring Security 永遠允許 OAuth2 相關路徑進來
                 .requestMatchers("/oauth2/**", "/login/oauth2/**")
                 .permitAll()
+                .requestMatchers("/api/sse/**") // 顯式放行 sse
+                .permitAll()
                 
                 .anyRequest()
                 .permitAll()

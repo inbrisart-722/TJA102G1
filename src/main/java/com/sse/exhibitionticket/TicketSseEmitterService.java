@@ -2,6 +2,7 @@ package com.sse.exhibitionticket;
 
 import java.io.IOException;
 import java.util.Map;
+import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.springframework.stereotype.Service;
@@ -20,8 +21,8 @@ public class TicketSseEmitterService {
 		
 		// Spring 提供 SseEmitter 物件封裝處理 SSE
 		// 代表一個持續的連線（長連線）
-		SseEmitter emitter = new SseEmitter(0L); // 毫秒，代表永遠不會超時
-		String id = String.valueOf(System.currentTimeMillis());
+		SseEmitter emitter = new SseEmitter(0L); // 毫秒，代表永遠不會超時; 若為 5000L → 代表 5 秒沒事件就斷線。
+		String id = UUID.randomUUID().toString();
 		clients.put(id, emitter);
 		
 		// 三種 callback，確保「連線中斷時」可以移除該 client，避免 memory leak
