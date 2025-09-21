@@ -335,4 +335,14 @@ div.order_body > button:first-child {
 	padding-bottom: 1px;
 }
 
+a#logout::before {
+	background-color: white;
+}
+a#logout {
+	background-color: rgba(255, 153, 0, 0.8);
+}
+a#logout > span {
+	color: white;
+	font-weight: 800;
+}
 

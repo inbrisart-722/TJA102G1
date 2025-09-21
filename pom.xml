@@ -21,6 +21,13 @@
 	<dependencies>
 		<!-- 柏燁 start -->
 
+		<!-- Spring WebSocket -->
+		<!-- 原生 WebSocket endpoint -->
+		<!-- spring-websocket | spring-messaging | Stomp（協議）支援 -->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-websocket</artifactId>
+		</dependency>
 		<!-- Spring Security - OAuth2User -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>

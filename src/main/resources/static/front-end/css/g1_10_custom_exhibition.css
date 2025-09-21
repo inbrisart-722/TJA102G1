@@ -120,6 +120,23 @@ div#cannot_rate.-on {
 
 /* ************************************************ */
 div#original_rating {
-  text-align: center;
-  margin: 20px 0;
+	text-align: center;
+	margin: 20px 0;
+}
+/* ************************************************ */
+/* 20250921 為了 websocket 調整 header 版面 */
+div#price_single_main {
+	margin-top: 24px;
+}
+
+div#price_single_main>span:first-child {
+	margin-right: 30px;
+}
+
+div#price_single_main>span:first-child > sup{
+	margin: 0 px;
+}
+
+div#price_single_main>span {
+	font-size: 48px;
 }

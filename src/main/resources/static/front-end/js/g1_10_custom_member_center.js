@@ -1,5 +1,30 @@
 document.addEventListener("DOMContentLoaded", function() {
 
+	// 登出 這個特別用把事件冒泡改 capturing 套用同架構但避免 tabs.js 先取並且丟錯誤（沒section-5 等等）
+
+	document.querySelector("#logout").addEventListener("click", function(e) {
+		e.preventDefault();
+		e.stopPropagation(); // 阻止傳到 tabs.js
+
+		const wants_to_logout = confirm("確認登出嗎？");
+		
+		if(!wants_to_logout) return;
+			
+		// 免 csrf 有放行
+		fetch("/api/auth/logout/member", {
+			method: "POST",
+			credentials: "include",
+		})
+			.then((res) => {
+				if (!res.ok) throw new Error("Logout failed");
+				location.href = "/front-end/login";
+			})
+			.catch((error) => {
+				console.log(error);
+			});
+
+	}, true);
+
 	let ordersByStatus = {};
 
 	// fetch 1 次而已: 載入用戶所有訂單 => 後續動態呼叫一堆 addEventListener
@@ -38,7 +63,7 @@ document.addEventListener("DOMContentLoaded", function() {
 		const btn = e.target.closest("button.tab_order");
 		if (!btn) return;
 		e.preventDefault();
-		
+    
 		console.log(btn.textContent + ": btn is clicked");
 		clear_section1();
 		// 所有 btn 取消 -on

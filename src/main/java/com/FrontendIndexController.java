@@ -11,6 +11,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -46,10 +47,25 @@ public class FrontendIndexController {
 		return "front-end/admin";
 	}
 
+	// 1. 接住列表頁面 href: /front-end/exhibitions/
+	@GetMapping("/exhibitions/{exhibitionId}")
+	public String exhibitionsPageRedirect(@PathVariable("exhibitionId") Integer exhibitionId, Model model) {
+		return "redirect:/front-end/exhibitions?exhibitionId=" + exhibitionId;
+	}
+	
+	// 2. 為了同時確保 css, js 可取到，目前必要的轉導
+//	@GetMapping("/exhibitions")
+//	public String exhibitionsPage(@RequestParam("exhibitionId") Integer exhibitionId, Model model) {
+//		System.out.println(exhibitionId);
+//		return "front-end/exhibitions";
+//	}
+	
+	// 0. 靜態測試（之後得刪）
 	@GetMapping("/exhibitions")
-	public String exhibitionsPage(Model model) {
+	public String exhibitionsPageStatic(Model model) {
 		return "front-end/exhibitions";
 	}
+	
 
 	@GetMapping("/cart")
 	public String cartPage(Model model, Authentication auth) {
