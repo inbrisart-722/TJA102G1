@@ -50,7 +50,6 @@ document.addEventListener("DOMContentLoaded", function() {
 	//   let interval = setInterval();
 	//   fetch;
 	setTimeout(fetch_order_result, 5000);
-	
 });
 
 ///////////////////////////////////////////////////////////////

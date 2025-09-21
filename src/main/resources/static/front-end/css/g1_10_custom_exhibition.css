@@ -1,127 +1,121 @@
 i.icon-thumbs-up.-on {
-	color: darkcyan;
-	/* color: rgb(4, 4, 153); */
+  color: darkcyan;
+  /* color: rgb(4, 4, 153); */
 }
-
-i.icon-thumbs-up.-on+span {
-	color: darkcyan;
-	/* color: rgb(4, 4, 153); */
-	font-weight: 600;
+i.icon-thumbs-up.-on + span {
+  color: darkcyan;
+  /* color: rgb(4, 4, 153); */
+  font-weight: 600;
 }
-
 i.icon-thumbs-down.-on {
-	color: darkcyan;
-	/* color: rgb(4, 4, 153); */
+  color: darkcyan;
+  /* color: rgb(4, 4, 153); */
 }
-
-i.icon-thumbs-down.-on+span {
-	color: darkcyan;
-	/* color: rgb(4, 4, 153); */
-	font-weight: 600;
+i.icon-thumbs-down.-on + span {
+  color: darkcyan;
+  /* color: rgb(4, 4, 153); */
+  font-weight: 600;
 }
 
 /* 以下為 購物車 toast */
 /* 右上角容器 */
 #toast-container {
-	position: fixed;
-	bottom: 5%;
-	right: 3%;
-	z-index: 99999; /* 提高層級，避免被 header/overlay 蓋住 */
-	display: flex;
-	flex-direction: column;
-	gap: 10px;
-	pointer-events: none; /* 讓容器本身不擋點擊，單顆 toast 仍可點擊關閉 */
+  position: fixed;
+  bottom: 5%;
+  right: 3%;
+  z-index: 99999; /* 提高層級，避免被 header/overlay 蓋住 */
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  pointer-events: none; /* 讓容器本身不擋點擊，單顆 toast 仍可點擊關閉 */
 }
 
 /* 注意：類名改成 ct-toast，避免與 Bootstrap .toast 衝突 */
 #toast-container .ct-toast {
-	min-width: 220px;
-	max-width: 360px;
-	padding: 10px 14px;
-	border-radius: 10px;
-	font-size: 14px;
-	line-height: 1.5;
-	color: #0f172a;
-	background: #fff;
-	box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12), 0 2px 6px
-		rgba(0, 0, 0, 0.06);
-	display: flex;
-	align-items: center;
-	gap: 10px;
-	cursor: pointer;
-	opacity: 0;
-	transform: translateY(-8px) scale(0.98);
-	animation: ct-toast-in 0.28s ease-out forwards;
-	border-left: 4px solid transparent;
-	pointer-events: auto; /* 單顆可點擊關閉 */
+  min-width: 220px;
+  max-width: 360px;
+  padding: 10px 14px;
+  border-radius: 10px;
+  font-size: 14px;
+  line-height: 1.5;
+  color: #0f172a;
+  background: #fff;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12), 0 2px 6px rgba(0, 0, 0, 0.06);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+  opacity: 0;
+  transform: translateY(-8px) scale(0.98);
+  animation: ct-toast-in 0.28s ease-out forwards;
+  border-left: 4px solid transparent;
+  pointer-events: auto; /* 單顆可點擊關閉 */
 }
 
 #toast-container .ct-toast--success {
-	border-left-color: #16a34a;
+  border-left-color: #16a34a;
 }
-
 #toast-container .ct-toast--error {
-	border-left-color: #dc2626;
+  border-left-color: #dc2626;
 }
 
 .ct-toast__icon {
-	font-weight: 700;
-	width: 20px;
-	text-align: center;
+  font-weight: 700;
+  width: 20px;
+  text-align: center;
 }
-
 .ct-toast--success .ct-toast__icon {
-	color: #16a34a;
+  color: #16a34a;
 }
-
 .ct-toast--error .ct-toast__icon {
-	color: #dc2626;
+  color: #dc2626;
 }
 
 .ct-toast__msg {
-	flex: 1;
+  flex: 1;
 }
 
 .ct-toast.hide {
-	animation: ct-toast-out 0.22s ease-in forwards;
+  animation: ct-toast-out 0.22s ease-in forwards;
 }
 
-@keyframes ct-toast-in {to { opacity:1;
-	transform: translateY(0) scale(1);
+@keyframes ct-toast-in {
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
 }
-
-}
-@keyframes ct-toast-out {to { opacity:0;
-	transform: translateY(-8px) scale(0.98);
-}
-
+@keyframes ct-toast-out {
+  to {
+    opacity: 0;
+    transform: translateY(-8px) scale(0.98);
+  }
 }
 
 /* 禁用狀態：灰色、不可點 */
 button.btn_submit[disabled] {
-	background: #e5e7eb; /* 淺灰 */
-	color: #9ca3af; /* 字也變灰 */
-	border-color: #e5e7eb;
-	cursor: not-allowed;
-	box-shadow: none;
-	opacity: 1; /* 避免一些框架給的透明度 */
-	pointer-events: none; /* 保證不能點 */
+  background: #e5e7eb; /* 淺灰 */
+  color: #9ca3af; /* 字也變灰 */
+  border-color: #e5e7eb;
+  cursor: not-allowed;
+  box-shadow: none;
+  opacity: 1; /* 避免一些框架給的透明度 */
+  pointer-events: none; /* 保證不能點 */
 }
 
 /* 禁用時不要有 hover/focus 效果 */
 button.btn_submit[disabled]:hover {
-	filter: none;
-	outline: none;
+  filter: none;
+  outline: none;
 }
 
 div#cannot_rate {
-	text-align: center;
-	padding: 1% 0;
-	display: none;
+  text-align: center;
+  padding: 1% 0;
+  display: none;
 }
-
 div#cannot_rate.-on {
-	display: block;
+  display: block;
 }
 
 /* ************************************************ */

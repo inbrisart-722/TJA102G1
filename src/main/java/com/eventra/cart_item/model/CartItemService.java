@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -32,6 +33,7 @@ public class CartItemService {
 
 	public CartItemService(MemberRepository memberRepository, CartItemRedisRepository cartItemRedisRepository, ExhibitionRepository exhibitionRepository,
 			ExhibitionTicketTypeRepository exhibitionTicketTypeRepository, TicketSseEmitterService ticketSseService) {
+    
 		this.MEMBER_REPO = memberRepository;
 		this.CART_ITEM_REDIS_REPO = cartItemRedisRepository;
 		this.EXHIBITION_REPO = exhibitionRepository;
