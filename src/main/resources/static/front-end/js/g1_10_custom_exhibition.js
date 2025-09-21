@@ -1,5 +1,6 @@
 // 分開包了很多事件委派（但其實應該包一起）
 document.addEventListener("DOMContentLoaded", function() {
+	
 	// 父層留言 + 子層回覆 新增 start
 	document.addEventListener("click", function(e) {
 		const btn_send = e.target.closest("form.form_reply > button");
@@ -1213,5 +1214,19 @@ document.addEventListener("DOMContentLoaded", function() {
 	});
 });
 
-// 待 fetch 清單
-// fetch /api/cartItem/* -> 處理 新增評價
+document.addEventListener("DOMContentLoaded", function(){
+	// 瀏覽器會打開一條 持續不關閉的 HTTP GET 請求。
+	// 伺服器（Spring）回應的 body 就是一個 不斷追加資料的文字流（text/event-stream）。
+	// 瀏覽器內建解析器會讀這個流，每當遇到 \n\n 就觸發一個 message 事件。
+	const eventSource = new EventSource("/api/sse/exhibition-ticket/subscribe")
+	
+	// 後端 -> emitter.send(SseEmitter.event().name("ticket-update").data(remaining));
+	eventSource.addEventListener("ticket-update", function(event){
+		const remaining = event.data; // 後端送來的剩餘票數
+		document.querySelector("#sse_ticket_left").textContent = remaining; // 更新頁面
+	})
+	
+	eventSource.onerror = (err) => {
+		console.error("ticket-update SSE error: ", err);
+	}
+})

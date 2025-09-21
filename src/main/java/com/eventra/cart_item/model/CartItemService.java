@@ -6,7 +6,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -14,6 +13,7 @@ import com.eventra.exhibition.model.ExhibitionRepository;
 import com.eventra.exhibitiontickettype.model.ExhibitionTicketTypeRepository;
 import com.eventra.exhibitiontickettype.model.ExhibitionTicketTypeVO;
 import com.eventra.member.model.MemberRepository;
+import com.sse.exhibitionticket.TicketSseEmitterService;
 import com.util.MillisToMinutesSecondsUtil;
 
 @Service
@@ -26,13 +26,17 @@ public class CartItemService {
 	private final CartItemRedisRepository CART_ITEM_REDIS_REPO;
 	private final ExhibitionRepository EXHIBITION_REPO;
 	private final ExhibitionTicketTypeRepository EXHIBITION_TICKET_TYPE_REPO;
+	
+	// SSE 推票數用
+	private final TicketSseEmitterService TICKET_SSE_SERVICE;
 
 	public CartItemService(MemberRepository memberRepository, CartItemRedisRepository cartItemRedisRepository, ExhibitionRepository exhibitionRepository,
-			ExhibitionTicketTypeRepository exhibitionTicketTypeRepository) {
+			ExhibitionTicketTypeRepository exhibitionTicketTypeRepository, TicketSseEmitterService ticketSseService) {
 		this.MEMBER_REPO = memberRepository;
 		this.CART_ITEM_REDIS_REPO = cartItemRedisRepository;
 		this.EXHIBITION_REPO = exhibitionRepository;
 		this.EXHIBITION_TICKET_TYPE_REPO = exhibitionTicketTypeRepository;
+		this.TICKET_SSE_SERVICE = ticketSseService;
 	}
 
 	private void cleanupExpired(Integer memberId, Long now) {
@@ -73,6 +77,10 @@ public class CartItemService {
 
 			CART_ITEM_REDIS_REPO.addCartItem(cartItemRedisVO);
 		}
+		Integer totalTicketQuantity = EXHIBITION_REPO.findById(exhibitionId).orElseThrow().getTotalTicketQuantity();
+		Integer soldTicketQuantity = EXHIBITION_REPO.findById(exhibitionId).orElseThrow().getSoldTicketQuantity();
+
+		TICKET_SSE_SERVICE.broadcastTicketCount(totalTicketQuantity - soldTicketQuantity);
 		// 後端回應 ... 還有沒有票！！！（這邊很重要）updateSoldTicketQuantity 就可能失敗
 	}
 
