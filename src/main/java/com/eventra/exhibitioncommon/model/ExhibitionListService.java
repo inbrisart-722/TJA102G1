@@ -1,7 +1,6 @@
 package com.eventra.exhibitioncommon.model;
 
 import java.sql.Timestamp;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -9,17 +8,12 @@ import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.eventra.exhibition.model.ExhibitionVO;
 import com.eventra.exhibitioncommon.dto.ExhibitionListDTO;
 import com.eventra.exhibitioncommon.util.ExhibitionUtilCompositeQuery;
 
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.Query;
-import jakarta.persistence.criteria.CriteriaBuilder;
-import jakarta.persistence.criteria.CriteriaQuery;
-import jakarta.persistence.criteria.Predicate;
-import jakarta.persistence.criteria.Root;
 
 @Service
 public class ExhibitionListService {
