@@ -1,3 +1,7 @@
+if (typeof google === "undefined" || !google.maps) {
+  console.error("Google Maps API 尚未載入完成");
+}
+
 /**
  * @name InfoBox
  * @version 1.1.12 [December 11, 2012]
