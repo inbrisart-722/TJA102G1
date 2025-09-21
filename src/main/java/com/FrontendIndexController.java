@@ -3,6 +3,7 @@ package com;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -34,6 +35,10 @@ public class FrontendIndexController {
 	
 	private static final Integer TEST_MEMBER = 3;
 
+	// 從 application.properties 讀取 google.api.key
+	@Value("${google.api.key}")
+    private String googleApiKey;
+	
 	@GetMapping("/admin")
 	public String adminPage(Model model) {
 		// 載入收藏
@@ -121,9 +126,10 @@ public class FrontendIndexController {
 	}
 	
 	@GetMapping("/map_explore")
-	public String mapExplorePage() {
-		return "front-end/map_explore";
-	}
+    public String mapExplore(Model model) {
+        model.addAttribute("googleApiKey", googleApiKey);
+        return "front-end/map_explore";
+    }
 	
 	@GetMapping("/search_results")
 	public String searchResultsPage() {
