@@ -365,7 +365,11 @@ public class SecurityConfig {
                 .permitAll()
                 .requestMatchers("/api/sse/**") // 顯式放行 sse
                 .permitAll()
-                
+                // 就算你改成 DSL 寫法 (Spring Security 6.2 的新方式)，只要你想要對 STOMP 訊息 (@MessageMapping → /app/**，@SendTo → /topic/**) 做授權，就還是要引入 spring-security-messaging。
+                .requestMatchers("/app/chat") // 顯式放行 websocket
+                .hasRole("MEMBER")
+                .requestMatchers("/topic/messages")
+                .permitAll()
                 .anyRequest()
                 .permitAll()
                 

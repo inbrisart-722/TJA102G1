@@ -83,7 +83,7 @@ public class OrderRestController {
 		// 阻塞式 Long Polling（非 WebFlux）-> 高併發 效率不佳 -> SSE / WebSocket
 		for(int i = 0; i < 30; i++) {
 			orderStatus = ORDER_SERVICE.checkOrderStatus(merchantTradeNo);
-			if(!"待付款".equals(orderStatus)) {
+			if(orderStatus != OrderStatus.付款中) {
 				res.put("orderStatus", orderStatus);
 				return ResponseEntity.ok(res); 
 			}

@@ -1,121 +1,127 @@
 i.icon-thumbs-up.-on {
-  color: darkcyan;
-  /* color: rgb(4, 4, 153); */
+	color: darkcyan;
+	/* color: rgb(4, 4, 153); */
 }
-i.icon-thumbs-up.-on + span {
-  color: darkcyan;
-  /* color: rgb(4, 4, 153); */
-  font-weight: 600;
+
+i.icon-thumbs-up.-on+span {
+	color: darkcyan;
+	/* color: rgb(4, 4, 153); */
+	font-weight: 600;
 }
+
 i.icon-thumbs-down.-on {
-  color: darkcyan;
-  /* color: rgb(4, 4, 153); */
+	color: darkcyan;
+	/* color: rgb(4, 4, 153); */
 }
-i.icon-thumbs-down.-on + span {
-  color: darkcyan;
-  /* color: rgb(4, 4, 153); */
-  font-weight: 600;
+
+i.icon-thumbs-down.-on+span {
+	color: darkcyan;
+	/* color: rgb(4, 4, 153); */
+	font-weight: 600;
 }
 
 /* 以下為 購物車 toast */
 /* 右上角容器 */
 #toast-container {
-  position: fixed;
-  bottom: 5%;
-  right: 3%;
-  z-index: 99999; /* 提高層級，避免被 header/overlay 蓋住 */
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  pointer-events: none; /* 讓容器本身不擋點擊，單顆 toast 仍可點擊關閉 */
+	position: fixed;
+	bottom: 5%;
+	right: 3%;
+	z-index: 99999; /* 提高層級，避免被 header/overlay 蓋住 */
+	display: flex;
+	flex-direction: column;
+	gap: 10px;
+	pointer-events: none; /* 讓容器本身不擋點擊，單顆 toast 仍可點擊關閉 */
 }
 
 /* 注意：類名改成 ct-toast，避免與 Bootstrap .toast 衝突 */
 #toast-container .ct-toast {
-  min-width: 220px;
-  max-width: 360px;
-  padding: 10px 14px;
-  border-radius: 10px;
-  font-size: 14px;
-  line-height: 1.5;
-  color: #0f172a;
-  background: #fff;
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12), 0 2px 6px rgba(0, 0, 0, 0.06);
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  cursor: pointer;
-  opacity: 0;
-  transform: translateY(-8px) scale(0.98);
-  animation: ct-toast-in 0.28s ease-out forwards;
-  border-left: 4px solid transparent;
-  pointer-events: auto; /* 單顆可點擊關閉 */
+	min-width: 220px;
+	max-width: 360px;
+	padding: 10px 14px;
+	border-radius: 10px;
+	font-size: 14px;
+	line-height: 1.5;
+	color: #0f172a;
+	background: #fff;
+	box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12), 0 2px 6px
+		rgba(0, 0, 0, 0.06);
+	display: flex;
+	align-items: center;
+	gap: 10px;
+	cursor: pointer;
+	opacity: 0;
+	transform: translateY(-8px) scale(0.98);
+	animation: ct-toast-in 0.28s ease-out forwards;
+	border-left: 4px solid transparent;
+	pointer-events: auto; /* 單顆可點擊關閉 */
 }
 
 #toast-container .ct-toast--success {
-  border-left-color: #16a34a;
+	border-left-color: #16a34a;
 }
+
 #toast-container .ct-toast--error {
-  border-left-color: #dc2626;
+	border-left-color: #dc2626;
 }
 
 .ct-toast__icon {
-  font-weight: 700;
-  width: 20px;
-  text-align: center;
+	font-weight: 700;
+	width: 20px;
+	text-align: center;
 }
+
 .ct-toast--success .ct-toast__icon {
-  color: #16a34a;
+	color: #16a34a;
 }
+
 .ct-toast--error .ct-toast__icon {
-  color: #dc2626;
+	color: #dc2626;
 }
 
 .ct-toast__msg {
-  flex: 1;
+	flex: 1;
 }
 
 .ct-toast.hide {
-  animation: ct-toast-out 0.22s ease-in forwards;
+	animation: ct-toast-out 0.22s ease-in forwards;
 }
 
-@keyframes ct-toast-in {
-  to {
-    opacity: 1;
-    transform: translateY(0) scale(1);
-  }
+@keyframes ct-toast-in {to { opacity:1;
+	transform: translateY(0) scale(1);
 }
-@keyframes ct-toast-out {
-  to {
-    opacity: 0;
-    transform: translateY(-8px) scale(0.98);
-  }
+
+}
+@keyframes ct-toast-out {to { opacity:0;
+	transform: translateY(-8px) scale(0.98);
+}
+
 }
 
 /* 禁用狀態：灰色、不可點 */
 button.btn_submit[disabled] {
-  background: #e5e7eb; /* 淺灰 */
-  color: #9ca3af; /* 字也變灰 */
-  border-color: #e5e7eb;
-  cursor: not-allowed;
-  box-shadow: none;
-  opacity: 1; /* 避免一些框架給的透明度 */
-  pointer-events: none; /* 保證不能點 */
+	background: #e5e7eb; /* 淺灰 */
+	color: #9ca3af; /* 字也變灰 */
+	border-color: #e5e7eb;
+	cursor: not-allowed;
+	box-shadow: none;
+	opacity: 1; /* 避免一些框架給的透明度 */
+	pointer-events: none; /* 保證不能點 */
 }
 
 /* 禁用時不要有 hover/focus 效果 */
 button.btn_submit[disabled]:hover {
-  filter: none;
-  outline: none;
+	filter: none;
+	outline: none;
 }
 
 div#cannot_rate {
-  text-align: center;
-  padding: 1% 0;
-  display: none;
+	text-align: center;
+	padding: 1% 0;
+	display: none;
 }
+
 div#cannot_rate.-on {
-  display: block;
+	display: block;
 }
 
 /* ************************************************ */
@@ -133,10 +139,210 @@ div#price_single_main>span:first-child {
 	margin-right: 30px;
 }
 
-div#price_single_main>span:first-child > sup{
+div#price_single_main>span:first-child>sup {
 	margin: 0 px;
 }
 
 div#price_single_main>span {
 	font-size: 48px;
+}
+/* 20250921 為了 真人客服 調整版面 */
+#chat-toggle {
+	position: fixed;
+	bottom: 92px;
+	left: 24px;
+	width: 50px;
+	height: 50px;
+	border-radius: 50%;
+	border: none;
+	background: rgba(37, 29, 28, 0.65);
+	font-size: 24px;
+	cursor: pointer;
+	box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+	z-index: 12000;
+	color: white;
+}
+
+#chat-toggle>i {
+	font-size: 20px;
+	padding-right: 5px;
+	padding-bottom: 5px;
+}
+
+#chat-window {
+	font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+		"Helvetica Neue", Arial, sans-serif;
+	position: fixed;
+	bottom: 96px;
+	left: 92px;
+	width: 24rem;
+	height: 32rem;
+	background: #f9f9f9;
+	border-radius: 20px;
+	box-shadow: 0 6px 12px rgba(0, 0, 0, 0.25);
+	display: none;
+	flex-direction: column;
+	overflow: hidden;
+	z-index: 12000;
+}
+
+.chat-header {
+	background: rgba(28, 100, 242, 0.9);
+	color: white;
+	padding: 18px 10px;
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	font-size: 13.75px;
+}
+
+.chat-header>span {
+	margin-left: 2px;
+	font-weight: 800;
+}
+
+.chat-header>button {
+	margin-right: 3px;
+	color: white;
+	border: 0;
+	background: 0;
+	font-weight: 800;
+}
+
+.chat-body {
+	flex: 1;
+	padding: 20px;
+	overflow-y: auto;
+	display: flex;
+	flex-direction: column;
+	gap: 10px;
+}
+
+.message {
+	display: flex;
+	align-items: flex-end;
+	gap: 8px;
+	max-width: 80%;
+	margin: 3px 0;
+	word-break: break-all;
+}
+
+.message.others {
+	flex-direction: row;
+}
+
+.message.self {
+	flex-direction: row-reverse;
+	align-self: flex-end;
+}
+
+.avatar {
+	width: 32px;
+	height: 32px;
+	border-radius: 50%;
+}
+
+.bubble {
+	padding: 10px 14px;
+	border-radius: 15px;
+	background: #e5e5ea;
+	font-size: 14px;
+	line-height: 1.4;
+	/* 	word-break: break-all; */
+	overflow-wrap: break-word;
+}
+
+.bubble+time {
+	font-size: 12px;
+	width: 60px;
+}
+
+
+.bubble+time.self {
+	text-align: right;
+}
+
+.message.self .bubble {
+	background: rgba(28, 100, 242, 0.9);
+	color: white;
+}
+
+.chat-footer {
+	display: flex;
+	border-top: 1px solid #ddd;
+	height: 48px;
+}
+
+.chat-footer input {
+	flex: 1;
+	border: none;
+	padding: 10px;
+}
+
+.chat-footer input:focus {
+	outline: none;
+}
+
+.chat-footer button {
+	border: none;
+	background: rgba(28, 100, 242, 0.9);
+	color: white;
+	padding: 10px 15px 10px 15px;
+	cursor: pointer;
+}
+
+.chat-footer input:disabled {
+	background-color: grey !important;
+}
+
+.chat-footer input:disabled::placeholder {
+	color: darkgrey;
+}
+
+.chat-footer button:disabled {
+	background-color: grey !important;
+	color: darkgrey;
+	border-left: 1px solid darkgrey;
+	cursor: default;
+}
+
+/* 登入提示區塊 */
+#chat-overlay {
+	position: absolute;
+	bottom: 48px; /* 剛好在 chat-footer 上方 */
+	left: 0;
+	width: 100%;
+	height: 80px;
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	align-items: center;
+	background: linear-gradient(to top, rgba(249, 249, 249, 1) 70%,
+		rgba(249, 249, 249, 0));
+	/* 往上漸層消失 */
+	z-index: 5;
+	text-align: center;
+	font-size: 14px;
+	color: #333;
+}
+
+#chat-overlay button {
+	margin-bottom: 12px;
+	padding: 6px 14px;
+	border-radius: 6px;
+	cursor: pointer;
+	font-size: 13px;
+	font-weight: bold;
+	transition: all 0.2s ease-in-out;
+	background: darkgrey;
+	color: white;
+	border: 0;
+}
+
+#chat-overlay span {
+	margin-bottom: 8px;
+}
+
+#chat-overlay button:hover {
+	background: rgba(28, 100, 242, 0.9);
 }
