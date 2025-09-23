@@ -1,4 +1,4 @@
-package com.eventra.member.model;
+package com.eventra.member.verif.model;
 
 import java.time.LocalDate;
 

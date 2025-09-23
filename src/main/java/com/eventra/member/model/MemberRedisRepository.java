@@ -99,5 +99,9 @@ public class MemberRedisRepository {
 	public void deleteToken(String token) {
 		JEDIS.execute(jedis -> jedis.del("verif:token:" + token));
 	}
+	
+	public void deleteResendLimit(String email) {
+		JEDIS.execute(jedis -> jedis.del(resendLimitKey(email)));
+	}
 
 }

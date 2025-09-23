@@ -193,22 +193,40 @@ div.order_row
   margin: 10%;
   margin-top: 0;
 }
+
+div.order_item_head > img {
+  height: 60px;
+  border: 1px solid lightgray;
+}
+div.order_body > button:first-child {
+	background: darkcyan;
+	border: 1px solid gray;
+/* 	background-color: ;  */
+	color:white;
+	border-radius: 20px;
+	text-align: center;
+	position: relative;
+	left: 45%;
+	padding: 0.5% 1%;
+/* 	transform: tranlateX(-100%); */
+	margin: 20px 0 28px 0;
+}
+
 /* =============================================================== */
 /* =============================================================== */
 /* =============================================================== */
 
 /* 基本資料 */
 
-ul#profile_summary > li > span > button {
-  border: 0;
-  border-bottom: 1px solid gray;
-  /* box-shadow:1px 1px 5px rgb(136, 134, 134) */
-  background: rgb(218, 218, 218);
-}
-
 ul#profile_summary > li {
   width: 90%;
+  display: flex;
 }
+
+span#saved_password {
+  color: rgba(180, 180, 180, 1);
+}
+
 #related_account {
   margin: 6% 0 3% 0;
 }
@@ -271,69 +289,6 @@ div.row > div > button.btn_updateinfo {
   background: 0;
   color: darkgray;
 }
-div.order_item_head > img {
-  height: 60px;
-  border: 1px solid lightgray;
-}
-div.order_body > button:first-child {
-	background: darkcyan;
-	border: 1px solid gray;
-/* 	background-color: ;  */
-	color:white;
-	border-radius: 20px;
-	text-align: center;
-	position: relative;
-	left: 45%;
-	padding: 0.5% 1%;
-/* 	transform: tranlateX(-100%); */
-	margin: 20px 0 28px 0;
-}
-
-/* 給忘記密碼 */
-
-.password-wrapper {
-  position: relative;
-  transform: translateX(-200px);
-  display: inline;
-}
-
-.password-input {
-  font-size: 14px;
-/*   padding: 0px */
-  line-height: 1.4;
-  width: 200px;
-  box-sizing: border-box;
-  padding: 0 5px;
-  border-radius: 5px;
-  border: 1px solid gray;
-}
-
-.password-toggle {
-  position: absolute;
-  right: 5%;
-  top: 50%;
-  transform: translateX(-30px) translateY(-50%);
-  cursor: pointer;
-  color: #555;
-  font-size: 18px;
-}
-.password-toggle:hover {
-  color: #000;
-}
-
-.btn_save_new_password {
-	position: absolute;
-	background: rgb(218, 218, 218);
-	left: 200px;
-	bottom: 0px;
-	width: 80px;
-	border-radius: 5px;
-	border: 1px solid gray;
-	margin-left: 3%;
-	font-size: 13px;
-	height: 98%;
-	padding-bottom: 1px;
-}
 
 a#logout::before {
 	background-color: white;
@@ -344,5 +299,19 @@ a#logout {
 a#logout > span {
 	color: white;
 	font-weight: 800;
+}
+
+div.btn_change_div > button{
+	margin: 10px 0 2px 0;
+	border: 1px solid gray;
+	border-radius: 15px;
+	padding: 3px 12px;
+}
+
+select#gender {
+	margin: 10px 0 2px 0;
+	border: 1px solid gray;
+	border-radius: 15px;
+	padding: 4px 8px;
 }
 

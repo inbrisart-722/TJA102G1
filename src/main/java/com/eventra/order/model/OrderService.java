@@ -268,7 +268,7 @@ public class OrderService {
 			return "0|FAILED";
 		
 		/* ********* *rd part : 以防 ECPay 多次送出同樣的 ReturnURL ********* */
-		if(!PaymentAttemptStatus.PENDING.equals(paVO.getPaymentAttemptStatus())) return "1|OK";
+		if(PaymentAttemptStatus.PENDING != paVO.getPaymentAttemptStatus()) return "1|OK";
 		
 		/* ********* 4th part: 先更新共用欄位 ********* */
 		paVO.setStoreId(req.getStoreID());

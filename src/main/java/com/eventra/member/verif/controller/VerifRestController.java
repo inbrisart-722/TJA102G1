@@ -1,4 +1,4 @@
-package com.eventra.member.controller;
+package com.eventra.member.verif.controller;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -8,9 +8,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.eventra.member.model.CheckIfSendableResDTO;
-import com.eventra.member.model.SendVerifCodeReqDTO;
-import com.eventra.member.model.VerifService;
+import com.eventra.member.verif.model.CheckIfSendableResDTO;
+import com.eventra.member.verif.model.SendVerifCodeReqDTO;
+import com.eventra.member.verif.model.VerifService;
 
 import jakarta.mail.MessagingException;
 
@@ -37,7 +37,7 @@ public class VerifRestController {
 	@PostMapping("/verif/send-verif-code/registration")
 	public ResponseEntity<String> registration(@RequestBody SendVerifCodeReqDTO req) throws MessagingException{
 		
-		String res = VERIF_SERVICE.sendVerifRegistration(req);
+		String res = VERIF_SERVICE.sendVerif(req);
 		System.out.println("VERIF-REGISTRATION SENDING: " + res);
 		// 回傳給前端 "SUCCESS" or "FAILURE" -> 前端依此判斷 驗證信是否發送成功
 		return ResponseEntity.status(200).body(res);
@@ -45,13 +45,16 @@ public class VerifRestController {
 	
 	// Mail (2)
 	@PostMapping("/verif/send-verif-code/forgot-password")
-	public ResponseEntity<String> forgotPassword(@RequestBody SendVerifCodeReqDTO req) {
-		return null;
+	public ResponseEntity<String> forgotPassword(@RequestBody SendVerifCodeReqDTO req) throws MessagingException {
+		String res = VERIF_SERVICE.sendVerif(req);
+		System.out.println("VERIF-FORGOT-PASSWORD SENDING: " + res);
+		// 回傳給前端 "SUCCESS" or "FAILURE" -> 前端依此判斷 驗證信是否發送成功
+		return ResponseEntity.status(200).body(res);
 	}
 	
 	// Mail (3)
 	@PostMapping("/protected/verif/send-verif-code/change-mail")
-	public ResponseEntity<String> changeMail(@RequestBody SendVerifCodeReqDTO req) {
+	public ResponseEntity<String> changeMail(@RequestBody SendVerifCodeReqDTO req) throws MessagingException {
 		return null;
 	}
 }

@@ -32,17 +32,15 @@ document.addEventListener("DOMContentLoaded", () => {
 
 	// 1. 先給他一個彈窗
 	if (isVerificationSuccess) {
-		showToast("信箱驗證成功！請繼續完成註冊！");
+		showToast("信箱驗證成功！請繼續重設密碼流程！");
 	}
 
 	// 2. 聆聽輸入是否有錯誤
 	const password1Input = document.getElementById("password1");
 	const password2Input = document.getElementById("password2");
-	const nicknameInput = document.getElementById("nickname");
 
 	const password1Error = document.getElementById("password1Error");
 	const password2Error = document.getElementById("password2Error");
-	const nicknameError = document.getElementById("nicknameError");
 
 	const submitBtn = document.getElementById("submitBtn");
 
@@ -70,16 +68,6 @@ document.addEventListener("DOMContentLoaded", () => {
 		}
 	}
 
-	function validateNickname() {
-		const name = nicknameInput.value.trim();
-		if (name.length < 2 || name.length > 50) {
-			displayError(nicknameInput, nicknameError, "暱稱長度需介於2到50個字元");
-			return false;
-		} else {
-			displaySuccess(nicknameInput, nicknameError, "暱稱格式正確");
-			return true;
-		}
-	}
 
 	function displayError(input, messageEl, message) {
 		messageEl.textContent = message;
@@ -98,7 +86,6 @@ document.addEventListener("DOMContentLoaded", () => {
 	// 即時驗證
 	password1Input.addEventListener("input", validatePassword);
 	password2Input.addEventListener("input", validatePasswordMatch);
-	nicknameInput.addEventListener("input", validateNickname);
 
 	// 送出時最終驗證
 	submitBtn.addEventListener("click", (e) => {
@@ -106,17 +93,15 @@ document.addEventListener("DOMContentLoaded", () => {
 
 		const isPasswordValid = validatePassword();
 		const isPasswordMatchValid = validatePasswordMatch();
-		const isNicknameValid = validateNickname();
 
-		if (isPasswordValid && isPasswordMatchValid && isNicknameValid) {
+		if (isPasswordValid && isPasswordMatchValid) {
 			const params = new URLSearchParams(window.location.search);
 			const token = params.get("token");
 
 			const password = password1Input.value;
-			const nickname = nicknameInput.value;
-			const send_data = { token, password, nickname };
+			const send_data = { token, password };
 
-			csrfFetch("/api/front-end/member/register", {
+			csrfFetch("/api/front-end/member/reset-password", {
 				method: "POST",
 				headers: {
 					"CONTENT-TYPE": "application/json",
@@ -124,53 +109,20 @@ document.addEventListener("DOMContentLoaded", () => {
 				body: JSON.stringify(send_data),
 			})
 				.then((res) => {
-					if (!res.ok) throw new Error("register: NOT OK");
+					if (!res.ok) throw new Error("reset password: NOT 2XX");
 					return res.text();
 				})
 				.then((result) => {
 					console.log("email: " + result);
 					// result -> email 
 					if (result === "") {
-						alert("由於您的 token 錯誤或逾時，請重新進行註冊");
-						window.location.href = "/front-end/register1";
+						alert("由於您的 token 錯誤或逾時，請重新嘗試重設密碼");
+						window.location.href = "/front-end/forgot-password1";
+						return;
 					}
 
-					const email = result;
-					const send_data = {
-						username: email,
-						password: password,
-					};
-
-					// ver1. 註冊成功，導登入頁面
-//					alert("恭喜註冊成功！將為您於3秒後導至登入頁！");
-//					
-//					setTimeout(() => {
-//						location.href = "/front-end/login";
-//					}, 3000);
-
-					// ver2. 註冊成功，協助打 login api 取得 member token 登入身份
-					alert("恭喜註冊成功！將為您於3秒後導至首頁！");
-					
-					fetch("/api/auth/login/member", {
-						method: "POST",
-						headers: {
-							"Content-Type": "application/json"
-						},
-						body: JSON.stringify(send_data),
-					})
-						.then((res) => {
-							if (!res.ok) throw new Error("Login failed");
-							return res.json();
-						})
-						.then((result) => {
-							console.log(result);
-							setTimeout(() => {
-								location.href = "/front-end/index";
-							}, 3000);
-						})
-						.catch(error => console.log(error));
-
-
+					alert("成功更換密碼！將為您於3秒後導至登入頁！");
+					setTimeout(() => window.location.href = "/front-end/login", 3000);
 				})
 				.catch((error) => {
 					console.log("error");

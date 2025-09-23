@@ -1,7 +1,5 @@
 document.addEventListener("DOMContentLoaded", function() {
 
-	document.querySelector("a.icon-profile").click();
-	
 	// 登出 這個特別用把事件冒泡改 capturing 套用同架構但避免 tabs.js 先取並且丟錯誤（沒section-5 等等）
 
 	document.querySelector("#logout").addEventListener("click", function(e) {
@@ -317,21 +315,19 @@ document.addEventListener("DOMContentLoaded", function() {
 		const user_photo = e.target.files[0];
 		if (user_photo === null) return;
 
-		const form_data = new FormData();
+		const form_data = new Formdata();
 		form_data.append("user_photo", user_photo);
 
-		csrfFetch("/api/front-end/protected/member/update-photo", {
+		fetch("/api/front-end/protected/member/update-photo", {
 			method: "POST",
 			body: form_data,
 		})
 			.then((res) => {
 				if (!res.ok) throw new Error("Not 2XX or 401");
-				else return res.json();
+				else return res.text();
 			})
 			.then((result) => {
 				console.log(result[0]);
-				console.log(result[1]);
-				
 				user_img.src = `${result[1]}`;
 			})
 			.catch(error => console.log(error));
@@ -455,7 +451,73 @@ document.addEventListener("DOMContentLoaded", function() {
 	});
 });
 
-
 document.addEventListener("DOMContentLoaded", function() {
 
+	document.addEventListener("click", function(e) {
+		const btn_reset_password = e.target.closest("button#reset_password");
+		if (!btn_reset_password) return;
+		e.preventDefault();
+
+		const span_password = document.querySelector("#saved_password");
+
+			// 清掉舊內容（把更改密碼按鈕移除）
+			span_password.innerHTML = "";
+
+			// 建立容器
+			const wrapper = document.createElement("span");
+			wrapper.classList.add("password-wrapper");
+
+			// 建立輸入框
+			const input_new_password = document.createElement("input");
+			input_new_password.type = "password";
+			input_new_password.placeholder = "請輸入新密碼";
+			input_new_password.classList.add("password-input");
+
+			// 建立眼睛 icon
+			const toggle_icon = document.createElement("span");
+			toggle_icon.innerHTML = `<i class="icon-eye-7"></i>`;
+			toggle_icon.classList.add("password-toggle");
+
+			// 切換顯示/隱藏密碼
+			toggle_icon.addEventListener("click", function() {
+				if (input_new_password.type === "password") {
+					input_new_password.type = "text";
+					toggle_icon.innerHTML = `<i class="icon-eye-off-1"></i>`;
+				} else {
+					input_new_password.type = "password";
+					toggle_icon.innerHTML = `<i class="icon-eye-7"></i>`;
+				}
+			});
+
+			// 建立送出按鈕
+			const btn_save_new_password = document.createElement("button");
+			btn_save_new_password.innerText = "儲存變更";
+			btn_save_new_password.classList.add("btn_save_new_password");
+
+			btn_save_new_password.addEventListener("click", function(e) {
+				e.preventDefault();
+
+				const newPassword = input_new_password.value;
+				if (!newPassword) {
+					alert("請輸入新密碼");
+					return;
+				}
+
+				// TODO: fetch API 呼叫後端更新密碼
+				console.log("送出新密碼:", newPassword);
+
+				// 清除 input 與確認按鈕，恢復原狀
+				span_password.innerHTML = `
+	    <button id="reset_password">更改密碼</button>
+	  `;
+			});
+
+			// 放進 wrapper
+			wrapper.appendChild(input_new_password);
+			wrapper.appendChild(toggle_icon);
+			wrapper.appendChild(btn_save_new_password);
+
+			// 放入頁面
+			span_password.appendChild(wrapper);
+		});
 });

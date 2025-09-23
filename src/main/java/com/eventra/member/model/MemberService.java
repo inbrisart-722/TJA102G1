@@ -13,6 +13,9 @@ import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.eventra.member.verif.model.RegisterReqDTO;
+import com.eventra.member.verif.model.ResetPasswordReqDTO;
+import com.eventra.member.verif.model.UpdateInfoReqDTO;
 import com.util.RandomRawPasswordGenerator;
 
 @Service
@@ -32,10 +35,26 @@ public class MemberService {
 		this.PASSWORD_ENCODER = passwordEncoder;
 	}
 	
+	public String resetPassword(ResetPasswordReqDTO req) {
+		String token = req.getToken();
+		String password = req.getPassword();
+		String password_hash = PASSWORD_ENCODER.encode(password);
+		
+		String email = MEMBER_REDIS_REPO.findEmailByToken(token);
+		if(email == null) return null;
+		
+		MemberVO memberVO = MEMBER_REPO.findByEmail(email).orElse(null);
+		if(memberVO == null) return null;
+		
+		memberVO.setPasswordHash(password_hash);
+		
+		return email;
+	}
+	
 	public boolean checkIfMember(String email) {
 		MemberVO memberVO = MEMBER_REPO.findByEmail(email).orElse(null);
-		if(memberVO == null) return false; // 是會員（已經在會員 DB 中）
-		else return true; // 不是會員
+		if(memberVO == null) return false; // 不是會員
+		else return true; // 是會員（已經在會員 DB 中）
 	}
 	
 	public String register(RegisterReqDTO req) {
@@ -52,7 +71,11 @@ public class MemberService {
 		MemberVO member = new MemberVO.Builder(email, password_hash, nickname).build();
 		MEMBER_REPO.save(member);
 		
+		// 這顆 token 已無用途
 		MEMBER_REDIS_REPO.deleteToken(token);
+		// 這個 email 的冷卻時間也可以刪除 -> 避免有人註冊完後馬上改密碼等等，不該擋他！
+		MEMBER_REDIS_REPO.deleteResendLimit(email);
+		
 		return email;
 	}
 	

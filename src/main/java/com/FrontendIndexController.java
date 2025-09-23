@@ -3,6 +3,7 @@ package com;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -18,10 +19,9 @@ import org.springframework.web.bind.annotation.RequestParam;
 import com.eventra.cart_item.model.CartItemService;
 import com.eventra.cart_item.model.GetCartItemResDTO;
 import com.eventra.favorite.model.FavoriteService;
-import com.eventra.member.model.VerifService;
+import com.eventra.member.verif.model.VerifService;
 
 import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpSession;
 
 @Controller
 @RequestMapping("/front-end")
@@ -39,7 +39,7 @@ public class FrontendIndexController {
 	private static final Integer TEST_MEMBER = 3;
 
 	// 從 application.properties 讀取 google.api.key
-//	@Value("${google.api.key}") 
+	@Value("${google.api.key}") 
     private String googleApiKey;
 	
 	@GetMapping("/admin")
@@ -126,12 +126,24 @@ public class FrontendIndexController {
 		return "front-end/register1";
 	}
 	
-	@GetMapping("/register2")
-	public String register2Page(@RequestParam("token") String token, Model model) {
-		String email = verifSvc.findEmailByToken(token);
-		model.addAttribute("email", email);
-		return "front-end/register2";
+//	@GetMapping("/register2")
+//	public String register2Page(@RequestParam("token") String token, Model model) {
+//		String email = verifSvc.findEmailByToken(token);
+//		model.addAttribute("email", email);
+//		return "front-end/register2";
+//	}
+	
+	@GetMapping("/forgot-password1")
+	public String forgotPassword1Page() {
+		return "front-end/forgot_password1";
 	}
+	
+//	@GetMapping("/forgot-password2")
+//	public String forgotPassword2Page(@RequestParam("token") String token, Model model) {
+//		String email = verifSvc.findEmailByToken(token);
+//		model.addAttribute("email", email);
+//		return "front-end/forgot_password2";
+//	}
 	
 	@GetMapping("/verif-failure")
 	public String temp() {

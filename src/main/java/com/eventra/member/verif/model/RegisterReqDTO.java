@@ -1,4 +1,4 @@
-package com.eventra.member.model;
+package com.eventra.member.verif.model;
 
 public class RegisterReqDTO {
 	private String token;
