@@ -14,7 +14,7 @@ import com.eventra.exhibition.model.ExhibitionRepository;
 import com.eventra.exhibitiontickettype.model.ExhibitionTicketTypeRepository;
 import com.eventra.exhibitiontickettype.model.ExhibitionTicketTypeVO;
 import com.eventra.member.model.MemberRepository;
-import com.sse.exhibitionticket.TicketSseEmitterService;
+import com.sse.ticket.TicketSseEmitterService;
 import com.util.MillisToMinutesSecondsUtil;
 
 @Service

@@ -3,7 +3,6 @@ package com;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -20,6 +19,9 @@ import com.eventra.cart_item.model.CartItemService;
 import com.eventra.cart_item.model.GetCartItemResDTO;
 import com.eventra.favorite.model.FavoriteService;
 import com.eventra.member.model.VerifService;
+
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpSession;
 
 @Controller
 @RequestMapping("/front-end")
@@ -103,13 +105,18 @@ public class FrontendIndexController {
 	}
 	
 	@GetMapping("/login")
-	public String loginPage(@AuthenticationPrincipal UserDetails user) {
+	public String loginPage(@AuthenticationPrincipal UserDetails user, HttpServletRequest req, Model model) {
 		// 1. 使用者有帶 token，且有 MEMBER 身份，就不給進來登入頁面了，因為不然放他進來再次登入，要清 Token 再換發，不如就設計得先登出才放進來
 		if(user != null && user.getAuthorities().stream()
 				.map(GrantedAuthority::getAuthority)
 				.toList()
 				.contains("ROLE_MEMBER")) return "redirect:/front-end/index";
 		
+//		String OAuth2Redirect = req.getRequestURI();
+//		model.addAttribute("OAuth2Redirect", OAuth2Redirect);
+//		HttpSession session = req.getSession(true);
+//		session.setAttribute("OAuth2Redirect", OAuth2Redirect);
+				
 		// 2. 否則，歡迎！！！
 		return "front-end/login";
 	}
