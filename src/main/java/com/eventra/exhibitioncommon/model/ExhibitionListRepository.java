@@ -47,7 +47,7 @@ public interface ExhibitionListRepository extends JpaRepository<ExhibitionVO, In
 					"COALESCE(e.photo_landscape, '/img/0_exhibition/ChatGPT_exhibition_1.png'), " +  		// photoLandscape[2]
 					"SUM(s.exhibition_page_view_count) AS totalViews " +									// totalViews[3], 排序用
 					"FROM exhibition_page_popularity_stats s " +
-					"JOIN exhibition e ON s.exhibition_id = e.exhibition_id " + 							// JOIN exhibition
+//					"JOIN exhibition e ON s.exhibition_id = e.exhibition_id " + 							// JOIN exhibition
 					"WHERE s.view_date >= DATE_SUB(CURRENT_DATE, INTERVAL :days DAY) " +					// 自今日起算往前推n天
 					"AND e.exhibition_status_id IN (3, 4) " +  												// 展覽狀態: 3尚未開賣,4售票中
 					"GROUP BY e.exhibition_id, e.exhibition_name, e.photo_landscape " +
@@ -60,7 +60,7 @@ public interface ExhibitionListRepository extends JpaRepository<ExhibitionVO, In
 	@Query(value = "SELECT e.exhibition_id, e.exhibition_name, " +											// exhibitionId[0]、exhibitionName[1]
 					"COALESCE(e.photo_landscape, '/img/0_exhibition/ChatGPT_exhibition_1.png') " +			// photoLandscape[2]
 					"FROM exhibition e " +
-					"JOIN exhibition_ticket_type ett ON e.exhibition_id = ett.exhibition_id " +				// JOIN exhibition_ticket_type
+//					"JOIN exhibition_ticket_type ett ON e.exhibition_id = ett.exhibition_id " +				// JOIN exhibition_ticket_type
 					"WHERE e.exhibition_status_id IN (3, 4) " +  											// 展覽狀態: 3尚未開賣,4售票中
 					"GROUP BY e.exhibition_id, e.exhibition_name, e.photo_landscape, " +
 					"e.start_time, e.end_time, e.location, e.total_rating_count " +
