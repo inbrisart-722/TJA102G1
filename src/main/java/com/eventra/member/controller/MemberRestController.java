@@ -1,8 +1,11 @@
 package com.eventra.member.controller;
 
+import java.security.Principal;
 import java.util.List;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -13,8 +16,8 @@ import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.eventra.member.model.RegisterReqDTO;
 import com.eventra.member.model.MemberService;
+import com.eventra.member.model.RegisterReqDTO;
 import com.eventra.member.model.UpdateInfoReqDTO;
 
 @RestController
@@ -25,6 +28,16 @@ public class MemberRestController {
 	
 	public MemberRestController(MemberService memberService) {
 		this.MEMBER_SERVICE = memberService;
+	}
+	
+	@GetMapping("/protected/member/getMyMemberId")
+	public ResponseEntity<Integer> getMyMemberId(@AuthenticationPrincipal Principal principal, Authentication auth){
+		Integer memberId = auth != null ? Integer.valueOf(auth.getName()) : null;
+//		System.out.println("=========");
+//		System.out.println(principal != null ? principal.getName() : null);
+//		System.out.println(auth != null ? auth.getName() : null);
+//		System.out.println("=========");
+		return ResponseEntity.ok(memberId);
 	}
 	
 	@GetMapping("/protected/member/load-photo")
@@ -66,6 +79,8 @@ public class MemberRestController {
 		System.out.println(res + ": 成功註冊");
 		return ResponseEntity.status(200).body(res);
 	}
+	
+	
 	
 //	@PostMapping("member/login")
 //	public ResponseEntity<String> login

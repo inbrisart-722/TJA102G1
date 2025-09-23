@@ -1,4 +1,4 @@
-package com.sse.exhibitionticket;
+package com.sse.ticket;
 
 import java.io.IOException;
 import java.util.Map;
@@ -12,6 +12,7 @@ import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 public class TicketSseEmitterService {
 
 	// ConcurrentHashMap -> thread-safe version of HashMap
+		// 多個 thread（請求）同時存取的時候，不會像 HashMap 那樣出現 race condition 或 ConcurrentModificationException
 	// 儲存目前所有已連線的 Client
 	// Key: client id（我們用當下時間戳當 Key）
 	// Value: 對應的 SseEmitter（代表這個 Client 的連線管道）
@@ -26,6 +27,8 @@ public class TicketSseEmitterService {
 		clients.put(id, emitter);
 		
 		// 三種 callback，確保「連線中斷時」可以移除該 client，避免 memory leak
+		// 不是必須，但是是最佳實踐，否則會累積很多失效連線，效能下滑
+			// 例如使用者關掉瀏覽器 tab → server 端 SseEmitter 物件可能還留在 Map 裡，時間久了會有一堆無效 emitter → 記憶體增加、推播失敗時丟一堆 exception
 		
 		// 正常結束 
 		emitter.onCompletion(() -> clients.remove(id));
