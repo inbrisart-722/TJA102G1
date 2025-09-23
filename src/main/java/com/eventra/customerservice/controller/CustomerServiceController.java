@@ -1,6 +1,7 @@
 package com.eventra.customerservice.controller;
 
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -15,9 +16,11 @@ import com.eventra.customerservice.model.CustomerServiceService;
 @RequestMapping("/api/front-end/chat")
 public class CustomerServiceController {
 
+	private final AtomicInteger onlineCount;
 	private final CustomerServiceService CS_SVC;
 	
-	public CustomerServiceController(CustomerServiceService customerServiceService) {
+	public CustomerServiceController(AtomicInteger onlineCount, CustomerServiceService customerServiceService) {
+		this.onlineCount = onlineCount;
 		this.CS_SVC = customerServiceService;
 	}
 	
@@ -27,5 +30,10 @@ public class CustomerServiceController {
 		List<ChatMessageResDTO> list = CS_SVC.getMessages(timestamp);
 		
 		return ResponseEntity.ok(list);
+	}
+	
+	@GetMapping("/initCount")
+	public ResponseEntity<Integer> initCount(){
+		return ResponseEntity.ok(onlineCount.get());
 	}
 }

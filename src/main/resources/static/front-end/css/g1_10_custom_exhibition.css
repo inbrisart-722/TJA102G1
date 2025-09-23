@@ -201,6 +201,13 @@ div#price_single_main>span {
 	font-weight: 800;
 }
 
+.chat-header>span:nth-child(2) {
+	flex-grow: 10;
+	margin-left: 10px;
+	margin-bottom: 7.5px;
+	font-size: 15px;
+}
+
 .chat-header>button {
 	margin-right: 3px;
 	color: white;
@@ -216,6 +223,7 @@ div#price_single_main>span {
 	display: flex;
 	flex-direction: column;
 	gap: 10px;
+/* 	scroll-behavior: smooth; */
 }
 
 .message {
@@ -225,6 +233,15 @@ div#price_single_main>span {
 	max-width: 80%;
 	margin: 3px 0;
 	word-break: break-all;
+	
+	opacity: 0;
+ 	transform: translateY(5px);
+ 	transition: opacity 1s ease, transform 1s ease;
+}
+
+.message.show {
+  opacity: 1;
+  transform: translateY(0);
 }
 
 .message.others {
@@ -317,7 +334,7 @@ div#price_single_main>span {
 	flex-direction: column;
 	justify-content: center;
 	align-items: center;
-	background: linear-gradient(to top, rgba(249, 249, 249, 1) 70%,
+	background: linear-gradient(to top, rgba(249, 249, 249, 1) 40%,
 		rgba(249, 249, 249, 0));
 	/* 往上漸層消失 */
 	z-index: 5;

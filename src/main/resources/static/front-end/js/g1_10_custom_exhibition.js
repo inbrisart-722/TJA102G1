@@ -816,13 +816,15 @@ document.addEventListener("DOMContentLoaded", function() {
 			});
 	}
 
-	const redirect_send_data = sessionStorage.getItem("send_data");
-	if (redirect_send_data) {
-		if (!sessionStorage.getItem("redirect")) {
-			addCartItem(JSON.parse(redirect_send_data));
-			sessionStorage.removeItem("send_data");
-		}
-	}
+//	const redirect_send_data = sessionStorage.getItem("send_data");
+//	if (redirect_send_data) {
+//		if (!sessionStorage.getItem("redirect")) {
+//			setTimeout(() => {
+//				addCartItem(JSON.parse(redirect_send_data))
+//				sessionStorage.removeItem("send_data");
+//				}, 1000)
+//		}
+//	}
 
 	const btn_add_cart = document.querySelector("a#add_cart");
 
@@ -1246,6 +1248,7 @@ document.addEventListener("DOMContentLoaded", function() {
 	const chatInput = document.getElementById("chat-input");
 	const chatBody = document.getElementById("chat-body");
 	const chatOverlay = document.getElementById("chat-overlay");
+	const chatOnlineCount = document.getElementById("chat-online-count");
 	chatWindow.style.display = "none";
 
 	let myMemberId;
@@ -1290,8 +1293,9 @@ document.addEventListener("DOMContentLoaded", function() {
 
 	/* ================= 處理滑動 -> 繼續載入舊訊息 ================= */
 	chatBody.addEventListener("scroll", async () => {
-		//		 console.log(chatBody.scrollTop); // 上方還能滑動之高度
-		//		 console.log(chatBody.scrollHeight) // 總共可滑動之高度
+		// console.log(chatBody.scrollTop); // 上方還能滑動之高度
+		// console.log(chatBody.scrollHeight) // 總共可滑動之高度
+		
 		// 滑到頂部就繼續載入
 		if (chatBody.scrollTop === 0 && !isLoading && !oldestReached) {
 			isLoading = true;
@@ -1314,7 +1318,9 @@ document.addEventListener("DOMContentLoaded", function() {
 					// 後端送回來這則，是別人發的
 					else appendMessage("others", msgs[i], true);
 
-					if (i === 0) timestampCursor = msgs[i].sentTime;
+					if (i === 0) {
+						timestampCursor = msgs[i].sentTime;
+					}
 				}
 			}
 			else {
@@ -1322,6 +1328,7 @@ document.addEventListener("DOMContentLoaded", function() {
 				isLoading = false;
 				return;
 			}
+			recordable = true;
 			isLoading = false;
 		}
 		
@@ -1334,13 +1341,16 @@ document.addEventListener("DOMContentLoaded", function() {
 		// 第一次點擊 打開聊天室 按鈕
 		// 打開以後就持續同步聊天室直到斷線了，所以第二次不用再取
 		if (!hasGottenMyMemberId) {
-			// 取自己的 memberId -> 拿來後續判斷顯示左還右！
+			// 1. 馬上先建立連線
+			connect();
+			// 2. 先取在線人數 -> 改在連線中取，否則會取不到自己的連線數字
+			// 3. 取自己的 memberId -> 拿來後續判斷顯示左還右！
 			getMyMemberId().then(memberId => {
 				myMemberId = memberId;
 				toggleChatWindow(myMemberId);
 				hasGottenMyMemberId = true;
 			})
-			// 取過去的聊天記錄
+			// 4. 取過去的聊天記錄
 			const timestamp = Date.now(); // 拿到一個 long 類型的數值
 			getMessages(timestamp).then(list => {
 				list.forEach((msg, index) => {
@@ -1372,6 +1382,19 @@ document.addEventListener("DOMContentLoaded", function() {
 		if (e.key === "Enter") sendMessage();
 	});
 
+	/* ================= api: 取得初始在線人數 ================= */
+	function getInitOnlineCount(){
+		return fetch("/api/front-end/chat/initCount", {method: "GET"})
+		.then(res => {
+			if(!res.ok) throw new Error("Not 2XX");
+			return res.text();
+		})
+		.catch(error => {
+			console.log("initCount: " + error);
+			return null;			
+		})
+	}
+	
 	/* ================= api: 確認自己是誰 ================= */
 	function getMyMemberId() {
 		return fetch("/api/front-end/protected/member/getMyMemberId", { method: "GET" })
@@ -1430,6 +1453,10 @@ document.addEventListener("DOMContentLoaded", function() {
 		stompClient.connect({}, function(frame) {
 			console.log('Connected: ' + frame);
 
+			getInitOnlineCount().then(onlineCount => {
+				chatOnlineCount.innerText = onlineCount;				
+			})
+			
 			// 核心 part2 -> .subscribe()
 			// 參數1: 訂閱位址
 			// 訂閱後端廣播頻道（配合後端 @SendTo("...") 或 convertAndSend(...))
@@ -1445,6 +1472,10 @@ document.addEventListener("DOMContentLoaded", function() {
 					appendMessage("self", msg);
 				// 後端送回來這則，是別人發的
 				else appendMessage("others", msg);
+			})
+			
+			stompClient.subscribe('/topic/onlineCount', function(message){
+				chatOnlineCount.innerText = message.body;
 			})
 		})
 	}
@@ -1486,16 +1517,24 @@ document.addEventListener("DOMContentLoaded", function() {
 		msgDiv.appendChild(time);
 
 		if (prepend) {
-			const prevHeight = chatBody.scrollHeight;
-			chatBody.prepend(msgDiv);
-			const newHeight = chatBody.scrollHeight;
-			chatBody.scrollTop += (newHeight - prevHeight);
+			// 1. 找到目前最上面那個訊息 (載入前第一個元素)
+			 const firstMsg = chatBody.firstElementChild;
+			 const prevTop = firstMsg ? firstMsg.getBoundingClientRect().top : 0;
+
+			 // 2. 插入新訊息
+			 chatBody.prepend(msgDiv);
+			 requestAnimationFrame(() => msgDiv.classList.add("show"));
+
+			 // 3. 計算插入後這個元素的新位置
+			 const newTop = firstMsg ? firstMsg.getBoundingClientRect().top : 0;
+
+			 // 4. 調整 scrollTop → 補回位移
+			 chatBody.scrollTop += (newTop - prevTop);
 		} else {
 			chatBody.appendChild(msgDiv);
 			// 自動捲到最底
 			chatBody.scrollTop = chatBody.scrollHeight;
+			requestAnimationFrame(() => msgDiv.classList.add("show"));
 		}
 	}
-	// 呼叫
-	connect();
 })

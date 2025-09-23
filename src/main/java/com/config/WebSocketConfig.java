@@ -1,5 +1,8 @@
 package com.config;
 
+import java.util.concurrent.atomic.AtomicInteger;
+
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.messaging.simp.config.MessageBrokerRegistry;
 import org.springframework.web.socket.config.annotation.EnableWebSocketMessageBroker;
@@ -12,17 +15,29 @@ import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerCo
 	// 意思是：後端會當作一個「中繼站」，幫前端處理「訂閱」「廣播」這種聊天室需求。
 	// implements -> 客製化 WebSocket + STOMP 的行為
 public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
-
+	// @EnableWebSocketMessageBroker + WebSocketMessageBrokerConfigurer → 啟用 STOMP over WebSocket 支援。
+	// Spring 會自動建立一個 MessageChannel，裡面有「入站 (client → server)」跟「出站 (server → client)」兩個 channel。
+	// 以下在 configureMessageBroker 設定的 /app、/topic 就是這個 channel 的路由規則。
+	// 這些設定會被放進一個 SimpAnnotationMethodMessageHandler，它知道「收到 /app/** 要呼叫哪個 @MessageMapping 方法」。
+		// @MessageMapping 的 Controller 會被 Spring 在啟動時掃描 → 註冊成一個 MessageHandler。
+		// 當訊息經過 inbound channel 時，Spring 會檢查目的地 /app/chat，然後丟給對應的 Controller 方法執行。
+		// 就像 HTTP 請求會被 DispatcherServlet 分派到 @RestController。
+	
 	// 大綱
 	// 1. 連線建立
 		// 前端呼叫 SockJS("/ws-chat") -> 進入 registerStompEndpoints 定義的 endpoint
 	// 2. 前端發送
 		// 前端呼叫 stompClient.send("/app/chat", ...) -> 進入後端 @MessageMapping("/chat") 方法
 	// 3. 後端廣播
-		// 後端用 convertAndSend("/topic/messages", msg) -> 廣播給所有訂閱 /topic/messages 的前端
+		// 後端用 @SendTo 或 convertAndSend("/topic/messages", msg) -> 廣播給所有訂閱 /topic/messages 的前端
 	// 4. 前端接收
 		// 前端 stompClient.subscribe("/topic/messages", callback) -> 收到廣播訊息
 		
+	@Bean
+	public AtomicInteger onlineCount() {
+		return new AtomicInteger(0);
+	}
+	
 	@Override
 	// 這裡是「前端如何接進來」的設定
 	public void registerStompEndpoints(StompEndpointRegistry registry) {
