@@ -18,15 +18,11 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import com.eventra.cart_item.model.CartItemService;
 import com.eventra.cart_item.model.GetCartItemResDTO;
-import com.eventra.favorite.model.FavoriteService;
 import com.eventra.member.model.VerifService;
 
 @Controller
 @RequestMapping("/front-end")
 public class FrontendIndexController {
-
-	@Autowired
-	private FavoriteService favSvc;
 	
 	@Autowired
 	private CartItemService cartItemSvc;
@@ -41,9 +37,7 @@ public class FrontendIndexController {
     private String googleApiKey;
 	
 	@GetMapping("/admin")
-	public String adminPage(Model model) {
-		// 載入收藏
-		model.addAttribute("favList", favSvc.findFavoritesByMember(1));
+	public String adminPage() {
 		return "front-end/admin";
 	}
 

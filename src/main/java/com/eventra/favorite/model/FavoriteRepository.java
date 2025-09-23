@@ -16,7 +16,7 @@ public interface FavoriteRepository extends JpaRepository<FavoriteVO, Integer> {
 	@Query(value = "SELECT * FROM favorite " +
 			"WHERE member_id = :memId " +
 			"AND favorite_status = 1 " +
-			"ORDER BY favorite_id DESC",
+			"ORDER BY updated_at DESC",
 			nativeQuery = true)
 	List<FavoriteVO> findFavoritesByMember(@Param("memId") Integer memId);
 	

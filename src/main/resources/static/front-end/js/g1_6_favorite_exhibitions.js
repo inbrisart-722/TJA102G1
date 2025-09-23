@@ -1,83 +1,100 @@
-// 頁面載入檢查是否已收藏
-$(function () {
-    var $btn = $("#favorite");
-    var memId = $btn.data("mem-id"); // 會員 ID
-    var exhId = $btn.data("exh-id"); // 展覽 ID
+// g1_6_favorite_exhibitions.js
+// 專門處理 展覽頁 - 收藏按鈕的初始化與切換收藏
+document.addEventListener("DOMContentLoaded", () => {
+	// 從 URL 取 exhibitionId
+	const params = new URLSearchParams(window.location.search);
+	const exhId = params.get("exhibitionId");
 
-    // 呼叫後端檢查
-    $.getJSON("/favorite/check", { memId: memId, exhId: exhId }, function (res) {
-		 console.log("memId= " + memId + ", exhId= " + exhId);
-        if (res.success && res.favoriteStatus) {
-            $btn.addClass("active");
-			console.log("載入頁面的初始收藏狀態 = 1");
-        } else {
-            $btn.removeClass("active");
-			console.log("載入頁面的初始收藏狀態 = 0");
-        }
-    });
-});
+	if (!exhId) {
+		console.error("URL 少 exhibitionId");
+		return;
+	}
 
-// 切換收藏用
-(function() {
-	// 抓取id = favorite
-	var section = document.getElementById('favorite');
-	if (!section) return;
+	// 寫入 body 的 data-exh-id
+	document.body.setAttribute("data-exh-id", exhId);
 
-	// 讀取data-toggle-url的值(即/favorite/toggle), 存到TOGGLE_URL, 供後續請求使用
-	var TOGGLE_URL = section.getAttribute('data-toggle-url');
+	// 找收藏按鈕
+	const btn = document.getElementById("favorite");
+	if (!btn) return;
 
-	// 綁定click事件
-	$(document).on('click', '.btn_fav', function(e) {
-		e.preventDefault(); // 去除標籤本身的預設行為
-		var $btn = $(this);
-		var memId = $btn.data('mem-id');
-		var exhId = $btn.data('exh-id');
-		 console.log(memId, exhId);
+	// 確保按鈕有展覽ID
+	btn.dataset.exhId = exhId;
 
-		$.ajax({
-			url: TOGGLE_URL, // 即/favorite/toggle
-			type: 'POST',
-			data: { memId: memId, exhId: exhId },
-			dataType: 'json',
-			success: function(res) {
-				// 確保回傳格式為json
-				if (typeof res === "string") {
-					try {
-						res = JSON.parse(res);
-					} catch (e) {
-						console.log("回傳格式錯誤: ", res);
-						return;
-					}
-				}
-				
-				if (res && res.success) {
-					// 會員中心 - 收藏清單
-					if ($btn.closest('.col-lg-4.col-md-6').length) {
-						if (!res.favoriteStatus) {
-							$btn.closest('.col-lg-4.col-md-6').fadeOut(200, function() {
-								$(this).remove();
-							});
-						}
-					}
-					// 展覽頁 - 單一按鈕
-					else {
-						if (res.favoriteStatus) {
-							$btn.addClass('active');
-							$btn.find('i').addClass('icon-heart-filled');
-							console.log("點即按鈕後, 切換 或 新增完成, 收藏狀態 = 1");
-						} else {
-							$btn.removeClass('active');
-							$btn.find('i').removeClass('icon-heart-filled');
-							console.log("點即按鈕後, 切換完成, 收藏狀態 = 0");
-						}
-					}
-				} else {
-					console.log((res && res.message) ? res.message : '更新失敗');
-				}
-			},
-			error: function() {
-				console.log('更新失敗');
+	// 頁面初始化, 呼叫 API 檢查收藏狀態
+	csrfFetch(`/api/favorite/check?exhId=${exhId}`)
+		.then(res => res.json())
+		.then(data => {
+			if (data.favoriteStatus) {
+				btn.classList.add("active");
+				btn.querySelector("i").classList.add("icon-heart-filled");
+				console.log("載入頁面的初始收藏狀態 = 1");
+			} else {
+				btn.classList.remove("active");
+				btn.querySelector("i").classList.remove("icon-heart-filled");
+				console.log("載入頁面的初始收藏狀態 = 0");
 			}
-		});
+		})
+		.catch(err =>
+			console.error("初始化收藏狀態失敗: ", err)
+		);
+
+	// 綁定收藏切換 (取消後移除)
+	btn.addEventListener("click", (e) => {
+		e.preventDefault();
+
+		csrfFetch("/api/front-end/protected/favorite/toggle", {
+			method: "POST",
+			headers: { "Content-Type": "application/x-www-form-urlencoded" },
+			body: `exhId=${exhId}`
+		})
+			.then(res => {
+				if (res.status === 401) {
+					// 存path + query
+					const redirectPath = window.location.pathname + window.location.search;
+					sessionStorage.setItem("redirect", redirectPath);
+					
+					console.log("結果: ", sessionStorage.getItem("redirect"));
+					
+					Swal.fire({
+						title: "請先登入會員",
+						text: "登入後才能收藏展覽",
+						icon: "warning",
+						showCancelButton: true,
+						confirmButtonText: "前往",
+						cancelButtonText: "返回"
+
+					}).then(result => {
+						if (result.isConfirmed) {
+							location.href = "/front-end/login?redirect=" + encodeURIComponent(redirectPath);
+						}
+					});
+					return Promise.reject("未登入");
+				}
+				return res.json();
+			})
+			.then(data => {
+				if (data.favoriteStatus) {
+					btn.classList.add("active");
+					btn.querySelector("i").classList.add("icon-heart-filled");
+					Swal.fire({
+						title: "已收藏展覽！", 
+						icon: "success", 
+						timer: 1500, 
+						showConfirmButton: false 
+					});
+				} else {
+					btn.classList.remove("active");
+					btn.querySelector("i").classList.remove("icon-heart-filled");
+					Swal.fire({
+						title: "已取消收藏", 
+						icon: "success", 
+						timer: 1500, 
+						showConfirmButton: false 
+					});
+				}
+			})
+			.catch(err => {
+				if (err !== "未登入") console.error("切換收藏失敗:", err);
+			});
 	});
-})();
+});
