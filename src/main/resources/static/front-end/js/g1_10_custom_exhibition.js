@@ -1250,7 +1250,8 @@ document.addEventListener("DOMContentLoaded", function() {
 	const chatOnlineCount = document.getElementById("chat-online-count");
 	chatWindow.style.display = "none";
 
-	let myMemberId;
+	let myMemberId; // 核心! 定義我的 memberId !!
+	
 	let hasGottenMyMemberId = false;
 	let timestampCursor; // 每次拿這個時間去 fetch 更舊的 10 筆！
 	let isLoading = false; // 避免重複請求用！
@@ -1467,6 +1468,8 @@ document.addEventListener("DOMContentLoaded", function() {
 				// JSON.parse() 是一個 "JSON parser"：它直接將一個已知的 JSON 字串解析成物件。
 				const msg = JSON.parse(message.body);
 				// 後端送回來這則，是我本人發的
+				console.log("msg.memberId: " + msg.memberId);
+				console.log("myMemberId: " + myMemberId);
 				if (Number(msg.memberId) === Number(myMemberId)) // 都轉數字比
 					appendMessage("self", msg);
 				// 後端送回來這則，是別人發的

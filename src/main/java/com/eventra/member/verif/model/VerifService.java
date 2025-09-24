@@ -1,11 +1,11 @@
 package com.eventra.member.verif.model;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
-import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.thymeleaf.TemplateEngine;
@@ -13,6 +13,7 @@ import org.thymeleaf.context.Context;
 
 import com.eventra.member.model.MemberRedisRepository;
 import com.eventra.member.model.MemberRepository;
+import com.eventra.member.model.MemberVO;
 import com.util.SpringMailService;
 
 import jakarta.mail.MessagingException;
@@ -31,14 +32,17 @@ public class VerifService {
 	// 載入 HTML 模板檔案 -> 把變數替換入 ${} -> 輸出成一個純 HTML 字串
 	// Spring web 會透過 Spring MVC 自動呼叫 TemplateEngine
 	// 寄信、非 Web 場景，則需要自己 @Autowired TemplateEngine，且手動把模板渲染成 HTML 字串。
+	private final PasswordEncoder PASSWORD_ENCODER;
 
 	public VerifService(@Value("${spring.mail.test.host}") String domain, MemberRepository memberRepository,
-			MemberRedisRepository memberRedisRepository, SpringMailService mailService, TemplateEngine templateEngine) {
+			MemberRedisRepository memberRedisRepository, SpringMailService mailService, TemplateEngine templateEngine,
+			PasswordEncoder passwordEncoder) {
 		this.DOMAIN = domain;
 		this.MEMBER_REPO = memberRepository;
 		this.MEMBER_REDIS_REPO = memberRedisRepository;
 		this.MAIL_SERVICE = mailService;
 		this.TEMPLATE_ENGINE = templateEngine;
+		this.PASSWORD_ENCODER = passwordEncoder;
 	}
 
 	public CheckIfSendableResDTO checkIfSendable(String email) {
@@ -57,16 +61,25 @@ public class VerifService {
 		String email = req.getEmail();
 		AuthType authType = req.getAuthType();
 
+		// 0. 額外確認 change-mail 與 reset-password 需帶入 memberId 給 map
+		String memberIdStr = null;
+		if(authType == AuthType.CHANGE_MAIL) memberIdStr = SecurityContextHolder.getContext().getAuthentication().getName();
+		
+//		Integer memberId = null;
+//		try {memberId = Integer.valueOf(SecurityContextHolder.getContext().getAuthentication().getName());}
+//		catch (NullPointerException e) {System.out.println(e.toString());}
+
 		// 1. 組裝 redis token 所需資訊
 		Map<String, String> map = new HashMap<>();
 		map.put("email", email);
 		map.put("authType", authType.toString());
+		if (authType == AuthType.CHANGE_MAIL && memberIdStr != null) map.put("memberId", memberIdStr);
 
 		// uuid 直接呼叫 toString
 		String token = MEMBER_REDIS_REPO.createAuthToken(map).toString();
 
 		/* =========== 以下就要開始判斷這次是要送哪種 authType -> 發哪種信 =========== */
-		
+
 		// 2. 送信(簡單版）
 		// sendSimpleMail(String to, String subject, String text)
 //		MAIL_SERVICE.sendSimpleMail(req.getEmail(), "哈囉", "小測試！！" + uuid);
@@ -82,20 +95,32 @@ public class VerifService {
 			// (3) sendHtmlMail(String to, String subject, String htmlContent) throws
 			// MessagingException
 			MAIL_SERVICE.sendHtmlMail(email, "【Eventra】請驗證您的 Email 📩", html);
-		}
-		else if (AuthType.FORGOT_PASSWORD == authType) {
+		} else if (AuthType.FORGOT_PASSWORD == authType) {
 			String html = TEMPLATE_ENGINE.process("front-end/verif_forgot_password_mail", context);
 			MAIL_SERVICE.sendHtmlMail(email, "【Eventra】重設您的密碼 🔐", html);
-		}
-		else if (AuthType.CHANGE_MAIL == authType) {
+		} else if (AuthType.CHANGE_MAIL == authType) {
 			String html = TEMPLATE_ENGINE.process("front-end/verif_change_mail_mail", context);
-			MAIL_SERVICE.sendHtmlMail(email, "【Eventra】會員帳號綁定 Email 📩", html);
+			MAIL_SERVICE.sendHtmlMail(email, "【Eventra】會員重新綁定 Email 📩", html);
 		}
 		return "SUCCESS";
 	}
 
 	public VerificationResult verifyToken(String token, AuthType verifAuthType) {
 
+		if(verifAuthType == AuthType.CHANGE_MAIL) {
+			String memberIdStr = MEMBER_REDIS_REPO.findMemberIdByToken(token);
+			Integer memberId = memberIdStr != null ? Integer.valueOf(memberIdStr) : null;
+			
+			if( memberId != null) {
+				MemberVO member = MEMBER_REPO.findById(memberId).orElseThrow();
+				String email = MEMBER_REDIS_REPO.findEmailByToken(token);
+			
+				member.setEmail(email);
+			}
+			else return VerificationResult.TOKEN_NOT_FOUND;
+		}
+		
+		// 此步驟若為 change-mail 會把 token 給刪了，不然就是續命並且增加嘗試次數
 		String tokenAuthTypeStr = MEMBER_REDIS_REPO.verifyToken(token);
 		
 		// 1 -> 根本沒找到 token 

@@ -78,9 +78,8 @@ public class VerifController {
 
 		System.out.println(res.getMessage());
 
-		// 1. 成功（需要 token 不需要 message）
 		if (VerificationResult.SUCCESS == res) {
-			return "redirect:/front-end/register2?token=" + token;
+			return "redirect:/front-end/admin";
 		}
 
 		// 2. 失敗（需要 message 不需要 email)

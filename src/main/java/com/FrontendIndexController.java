@@ -145,6 +145,16 @@ public class FrontendIndexController {
 //		return "front-end/forgot_password2";
 //	}
 	
+	@GetMapping("/change-mail1")
+	public String changeMail1Page() {
+		return "front-end/change_mail1";
+	}
+	
+	@GetMapping("/reset-password1")
+	public String resetPassword1Page() {
+		return "front-end/reset_password1";
+	}
+	
 	@GetMapping("/verif-failure")
 	public String temp() {
 		return "front-end/verif_failure";

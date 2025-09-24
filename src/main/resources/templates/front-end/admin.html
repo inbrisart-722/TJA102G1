@@ -616,36 +616,22 @@
 								<br />
 
 								<ul id="profile_summary">
-									<li>信箱 <span id="saved_email">info@clara.com</span>
+									<li>姓名 <span id="saved_full_name"></span></li>
+									<li>平台暱稱 <span id="saved_nickname"></span></li>
+									<li>性別 <span id="saved_gender"></span></li>
+									<li>手機號碼 <span id="saved_phone_number"></span>
 									</li>
-									<li>密碼 <span id="saved_password">(隱藏)</span>
-									</li>
-									<li>姓名 <span id="saved_name">Tomson</span></li>
-									<li>平台暱稱 <span id="saved_nickname">Tomson127</span></li>
-									<li>性別 <span id="saved_gender">男</span></li>
-									<li>手機號碼 <span id="saved_phone_number">0926427329</span>
-									</li>
-									<li>生日 <span id="saved_birth_date">2022/02/22</span></li>
-									<li>地址 <span id="saved_address">臺北市中山區南京東路三段219號5樓(緯育TibaMe台北職訓中心)</span>
+									<li>生日 <span id="saved_birth_date"></span></li>
+									<li>地址 <span id="saved_address"></span>
 									</li>
 
-									<h4 id="related_account">已綁定帳號</h4>
+									<h4 id="related_account"></h4>
 									<br />
-
-									<li class="third_party">Facebook <span id="saved_facebook"><i
-											class="icon-check"></i></span>
-									</li>
-									<li class="third_party">Google <span id="saved_google"><i
-											class="icon-check"></i></span>
-									</li>
-									<li class="third_party">Github <span id="saved_facebook"><i
-											class="icon-check-empty"></i></span>
-									</li>
 								</ul>
 							</div>
 							<div class="col-md-3" id="img_block">
 								<p>
-									<img src="img/tourist_guide_pic.jpg" alt="Image"
+									<img src="" alt="Image"
 										class="img-fluid styled profile_pic" id="user_img" />
 								</p>
 								<button type="submit" class="btn_1 gray" id="js-upload-submit">
@@ -663,26 +649,10 @@
 
 						<!-- End row -->
 
-						<div class="row">
+						<div class="row" id="if_not_oauth2">
 							<div class="col-md-12">
 								<h4>更新資料</h4>
 								<small>註：僅列出部分可更新之項目</small> <br /> <br /> <br />
-							</div>
-							<div class="col-md-6">
-								<div class="form-group">
-									<label>信箱</label>
-									<div class="btn_change_div">
-										<button id="change_mail">變更信箱</button>
-									</div>
-								</div>
-							</div>
-							<div class="col-md-6">
-								<div class="form-group">
-									<label>密碼</label>
-									<div class="btn_change_div">
-										<button id="change_password">變更密碼</button>
-									</div>
-								</div>
 							</div>
 						</div>
 						<!-- End row -->
@@ -690,13 +660,13 @@
 						<div class="row">
 							<div class="col-md-6">
 								<div class="form-group">
-									<label>姓名</label> <input class="form-control" name="full_name"
+									<label>姓名</label> <input class="form-control update" name="full_name"
 										id="full_name" type="text" value="陳珮瑋" />
 								</div>
 							</div>
 							<div class="col-md-6">
 								<div class="form-group">
-									<label>平台暱稱</label> <input class="form-control" name="nickname"
+									<label>平台暱稱</label> <input class="form-control update" name="nickname"
 										id="nickname" type="text" value="Tomcat11" />
 								</div>
 							</div>
@@ -708,7 +678,7 @@
 								<div class="form-group">
 									<label>性別</label>
 									<div id="gender_div">
-										<select name="gender" id="gender">
+										<select name="gender" id="gender" class="update">
 											<option value="">--請選擇--</option>
 											<option value="male">男性</option>
 											<option value="female">女性</option>
@@ -720,7 +690,7 @@
 							</div>
 							<div class="col-md-6">
 								<div class="form-group">
-									<label>手機號碼</label> <input class="form-control"
+									<label>手機號碼</label> <input class="form-control update"
 										name="phone_number" id="phone_number" type="text"
 										value="0926427329" />
 								</div>
@@ -732,13 +702,13 @@
 							<div class="col-md-6">
 								<div class="form-group">
 									<label>生日<small>&nbsp;(YYYY/MM/DD)</small></label> <input
-										class="form-control" name="birth_date" id="birth_date"
+										class="form-control update" name="birth_date" id="birth_date"
 										type="date" value="2000-07-22" />
 								</div>
 							</div>
 							<div class="col-md-6">
 								<div class="form-group">
-									<label>地址</label> <input class="form-control" name="address"
+									<label>地址</label> <input class="form-control update" name="address"
 										id="address" type="text"
 										value="臺北市中山區南京東路三段219號5樓(緯育TibaMe台北職訓中心)
                       " />

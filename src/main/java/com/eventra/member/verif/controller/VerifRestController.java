@@ -1,5 +1,7 @@
 package com.eventra.member.verif.controller;
 
+import java.security.Principal;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -55,6 +57,9 @@ public class VerifRestController {
 	// Mail (3)
 	@PostMapping("/protected/verif/send-verif-code/change-mail")
 	public ResponseEntity<String> changeMail(@RequestBody SendVerifCodeReqDTO req) throws MessagingException {
-		return null;
+		String res = VERIF_SERVICE.sendVerif(req);
+		System.out.println("VERIF-CHANGE_MAIL SENDING: " + res);
+		// 回傳給前端 "SUCCESS" or "FAILURE" -> 前端依此判斷 驗證信是否發送成功
+		return ResponseEntity.status(200).body(res);
 	}
 }

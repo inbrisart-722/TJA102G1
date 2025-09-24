@@ -1,26 +1,26 @@
-package com.eventra.customerservice.controller;
+package com.eventra.chat.controller;
 
 import java.security.Principal;
 
-import org.springframework.boot.autoconfigure.neo4j.Neo4jProperties.Authentication;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.messaging.handler.annotation.SendTo;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 
-import com.eventra.customerservice.model.ChatMessageReqDTO;
-import com.eventra.customerservice.model.ChatMessageResDTO;
-import com.eventra.customerservice.model.CustomerServiceService;
+import com.eventra.chat.model.ChatMessageReqDTO;
+import com.eventra.chat.model.ChatMessageResDTO;
+import com.eventra.chat.model.ChatService;
 
 @Controller
 // 專門處理 WebSocket STOMP 訊息的 Spring Controller
 // 不是回傳 HTML，而是回傳訊息給 WebSocket broker
 
-public class CustomerServiceWSController {
+public class ChatWSController {
 
-	private final CustomerServiceService CS_SVC;
+	private final ChatService CS_SVC;
 	
-	public CustomerServiceWSController(CustomerServiceService csService) { 
+	public ChatWSController(ChatService csService) { 
 		this.CS_SVC = csService;
 	}
 	
@@ -50,17 +50,17 @@ public class CustomerServiceWSController {
 		// 在 Spring WebSocket + STOMP + Spring Security
 		// 握手時會自動把目前登入、送出訊息的使用者（Authentication）包裝成一個 Principal，傳給 @MessageMapping 方法
 		
-//		System.out.println(auth != null ? auth.getUsername() : "????");
-//		System.out.println(principal != null ? "=========" + principal.getName() : "?????"); // 有效
-		
 		Integer memberId = null; 
 		if(principal != null && principal.getName() != null) memberId = Integer.valueOf(principal.getName());
+		System.out.println("這次送訊息來的人的 memberId:" + memberId);
+		System.out.println(auth != null ? auth.getName() : null);
 			
 		ChatMessageResDTO res = CS_SVC.addMessage(req, memberId);
 		
 		return res;
 	}
 	
+
 //	public void? delete
 	
 }

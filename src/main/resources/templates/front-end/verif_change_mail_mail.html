@@ -2,7 +2,7 @@
 <html lang="zh-Hant">
 <head>
   <meta charset="UTF-8">
-  <title>重設密碼</title>
+  <title>會員綁定信箱</title>
 </head>
 <body style="margin:0; padding:0; background-color:#f6f8fa; font-family:Arial, Helvetica, sans-serif;">
 
@@ -18,22 +18,22 @@
           <!-- Header -->
           <tr>
             <td align="center" style="background:#007BFF; padding:20px;">
-              <h1 style="margin:0; color:#ffffff; font-size:22px;">【Eventra】重設您的密碼 📩</h1>
+              <h1 style="margin:0; color:#ffffff; font-size:22px;">【Eventra】會員重新綁定 Email 📩</h1>
             </td>
           </tr>
           
           <!-- 內容 -->
           <tr>
             <td style="padding:30px; color:#333; font-size:15px; line-height:1.6;">
-              <p style="margin:0 0 15px;">親愛的用戶，您好：</p>
+              <p style="margin:0 0 15px;">親愛的會員，您好：</p>
               <p style="margin:0 0 15px;">
-                在您重設 <strong>Eventra</strong> 帳戶密碼之前<br/>
+                在您重新綁定 <strong>Eventra</strong> 會員帳戶信箱之前<br/>
                 我們需要先確認這是您的有效電子信箱。
               </p>
 
               <!-- 驗證按鈕 -->
               <p style="text-align:center; margin:30px 0;">
-                <a th:href="${domain+'/front-end/verif-forgot-password?token='+token}"
+                <a th:href="${domain+'/front-end/verif-change-mail?token='+token}"
                    style="background:#007BFF; color:#ffffff; text-decoration:none;
                           padding:14px 28px; border-radius:5px; font-size:16px; display:inline-block;">
                    立即驗證信箱
@@ -42,14 +42,14 @@
 
               <!-- 輔助說明 -->
               <p style="margin:0 0 15px; font-size:13px; color:#555;">
-                按下上方按鈕後，系統會帶您完成重設密碼流程。
+                按下上方按鈕後，系統會帶您完成信箱綁定流程。
               </p>
               <p style="margin:0 0 15px; font-size:13px; color:#555;">
                 如果按鈕無法點擊，請將以下連結貼到瀏覽器開啟：<br/>
-                <a th:href="${domain+'/front-end/verif-forgot-password?token='+token}"
-                th:text="${domain+'/front-end/verif-forgot-password?token='+token}"
+                <a th:href="${domain+'/front-end/verif-change-mail?token='+token}"
+                th:text="${domain+'/front-end/verif-change-mail?token='+token}"
                    style="color:#007BFF; word-break:break-all;">
-                   http://localhost:8088/front-end/verif-forgot-password?token=YOUR_VERIFY_TOKEN
+                   http://localhost:8088/front-end/verif-change-mail?token=YOUR_VERIFY_TOKEN
                 </a>
               </p>
 

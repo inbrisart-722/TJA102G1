@@ -1,6 +1,6 @@
 package com.eventra.member.verif.model;
 
-public class ResetPasswordReqDTO {
+public class ForgotPasswordReqDTO {
 	private String token;
 	private String password;
 	

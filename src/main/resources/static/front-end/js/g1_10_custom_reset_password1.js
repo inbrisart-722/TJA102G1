@@ -1,43 +1,12 @@
-// 顯示 Toast 訊息的函式
-function showToast(message) {
-	const toastContainer = document.getElementById("toast-container");
 
-	// 建立 Toast 元素
-	const toast = document.createElement("div");
-	toast.className = "toast-message";
-
-	// 加入成功圖示 (可以使用 emoji 或 SVG)
-	toast.innerHTML = `
-    <span class="icon">&#10004;</span>
-    <span>${message}</span>
-  `;
-
-	// 將 Toast 加入到容器中
-	toastContainer.appendChild(toast);
-
-	// 設置定時器，在幾秒後移除 Toast
-	setTimeout(() => {
-		toast.style.animation = "fadeOut 0.5s forwards";
-		setTimeout(() => {
-			toast.remove();
-		}, 500); // 移除元素的時間要與動畫時間一致
-	}, 3000); // 顯示 3 秒
-}
-
-// 範例：在頁面載入後立即顯示 Toast
-// 實際應用時，你可以在後台驗證成功後呼叫這個函式
 document.addEventListener("DOMContentLoaded", () => {
-	// 假設這是從後台或 URL 參數判斷的成功狀態
-	const isVerificationSuccess = true;
 
-	// 1. 先給他一個彈窗
-	if (isVerificationSuccess) {
-		showToast("信箱驗證成功！請繼續重設密碼流程！");
-	}
-
+	let password_try = 0;
+	
 	// 2. 聆聽輸入是否有錯誤
 	const password1Input = document.getElementById("password1");
 	const password2Input = document.getElementById("password2");
+	const passwordOldInput = document.getElementById("passwordOld");
 
 	const password1Error = document.getElementById("password1Error");
 	const password2Error = document.getElementById("password2Error");
@@ -83,6 +52,25 @@ document.addEventListener("DOMContentLoaded", () => {
 		input.classList.add("is-valid");
 	}
 
+	function checkIfPasswordCorrect(password) {
+		return csrfFetch("/api/front-end/protected/member/check-if-password-correct", {
+			method: "POST",
+			headers: {
+				"Content-Type": "application/json"
+			},
+			body: JSON.stringify({password})
+		})
+			.then(res => {
+				if (!res.ok) throw new Error("check-if-password-correct: Not 2XX");
+				else return res.text();
+			})
+			.catch(error => {
+				console.log(error);
+				return false;
+			})
+
+	}
+
 	// 即時驗證
 	password1Input.addEventListener("input", validatePassword);
 	password2Input.addEventListener("input", validatePasswordMatch);
@@ -95,39 +83,49 @@ document.addEventListener("DOMContentLoaded", () => {
 		const isPasswordMatchValid = validatePasswordMatch();
 
 		if (isPasswordValid && isPasswordMatchValid) {
-			const params = new URLSearchParams(window.location.search);
-			const token = params.get("token");
 
-			const password = password1Input.value;
-			const send_data = { token, password };
+			const passwordOld = passwordOldInput.value;
+			const passwordNew = password1Input.value;
 
-			csrfFetch("/api/front-end/member/forgot-password", {
-				method: "POST",
-				headers: {
-					"CONTENT-TYPE": "application/json",
-				},
-				body: JSON.stringify(send_data),
-			})
-				.then((res) => {
-					if (!res.ok) throw new Error("reset password: NOT 2XX");
-					return res.text();
-				})
-				.then((result) => {
-					console.log("email: " + result);
-					// result -> email 
-					if (result === "") {
-						alert("由於您的 token 錯誤或逾時，請重新嘗試重設密碼");
-						window.location.href = "/front-end/forgot-password1";
-						return;
+			checkIfPasswordCorrect(passwordOld).then(res => {
+				console.log(res);
+				
+				if (res === "false") {
+					if(password_try < 2){
+						password_try++;
+						alert("密碼輸入錯誤: " + password_try + "次！(最多嘗試3次）");
 					}
-
-					alert("成功更換密碼！將為您於3秒後導至登入頁！");
-					setTimeout(() => window.location.href = "/front-end/login", 3000);
-				})
-				.catch((error) => {
-					console.log("error");
-					console.log(error);
-				});
+					else{
+						alert("密碼錯誤已達 3 次，請稍後再試！")
+						window.location.href = "/front-end/admin";
+					}
+				}
+				
+				else if (res === "true") {
+					console.log(passwordNew);
+					csrfFetch("/api/front-end/protected/member/reset-password", {
+						method: "POST",
+						headers: {
+							"Content-Type": "application/json",
+						},
+						body: JSON.stringify({password : passwordNew}),
+					})
+						.then((res) => {
+							if (!res.ok) throw new Error("reset password: NOT 2XX");
+							return res.text();
+						})
+						.then((result) => {
+							if (result === "SUCCESS") {
+								alert("成功更換密碼！將為您於3秒後導回會員中心頁面！");
+								window.location.href = "/front-end/admin";
+							}
+						})
+						.catch((error) => {
+							console.log("error");
+							console.log(error);
+						});
+				}
+			});
 		}
 	});
 });

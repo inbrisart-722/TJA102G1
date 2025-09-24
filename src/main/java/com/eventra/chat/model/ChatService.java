@@ -1,4 +1,4 @@
-package com.eventra.customerservice.model;
+package com.eventra.chat.model;
 
 import java.util.List;
 
@@ -10,12 +10,12 @@ import com.eventra.member.model.MemberVO;
 
 @Service
 @Transactional
-public class CustomerServiceService {
+public class ChatService {
 
-	private final CustomerServiceRedisRepository CS_REPO;
+	private final ChatRedisRepository CS_REPO;
 	private final MemberRepository MEMBER_REPO;
 	
-	public CustomerServiceService(CustomerServiceRedisRepository customerServiceRedisRepository, MemberRepository memberRepository) {
+	public ChatService(ChatRedisRepository customerServiceRedisRepository, MemberRepository memberRepository) {
 		this.CS_REPO = customerServiceRedisRepository;
 		this.MEMBER_REPO = memberRepository;
 	}
@@ -23,12 +23,13 @@ public class CustomerServiceService {
 	public ChatMessageResDTO addMessage(ChatMessageReqDTO req, Integer memberId) {
 		// 1. req to res
 		MemberVO member = MEMBER_REPO.findById(memberId).orElse(null);
-		String profilePic = member != null ? member.getProfilePic() : "img/group1_img/aa志嘉.png";
+		String profilePic = member != null ? member.getProfilePic() : null;
+		if(profilePic == null) profilePic = "img/tourist_guide_pic.jpg";
 				
 		ChatMessageResDTO res = new ChatMessageResDTO();
 		res.setContent(req.getContent())
 			.setSentTime(System.currentTimeMillis())
-			.setAvatarSrc(profilePic) // testing
+			.setAvatarSrc(profilePic)
 			.setMemberId(memberId);
 		
 		// 2. 呼叫 repo

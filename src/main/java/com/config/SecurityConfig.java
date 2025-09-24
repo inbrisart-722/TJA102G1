@@ -370,7 +370,7 @@ public class SecurityConfig {
 				// 1. 必須要用 / 開頭 去指定路徑
 				// 2.「愈前面的規則優先度愈高」。
 				.requestMatchers("/front-end/order_success", "/front-end/order_failure").hasRole("MEMBER")
-				.requestMatchers("/front-end/admin", "/front-end/cart", "/front-end/payment",
+				.requestMatchers("/front-end/admin", "/front-end/cart", "/front-end/payment", "/front-end/change-mail1", "/front-end/reset-password1",
 						"/api/front-end/protected/**")
 				.hasRole("MEMBER")
 				.requestMatchers("/back-end/exhibitor/exhibitor_login", "/front-end/exhibitor_register").permitAll()
@@ -390,7 +390,11 @@ public class SecurityConfig {
 				// 就算你改成 DSL 寫法 (Spring Security 6.2 的新方式)，只要你想要對 STOMP 訊息 (@MessageMapping →
 				// /app/**，@SendTo → /topic/**) 做授權，就還是要引入 spring-security-messaging。
 				.requestMatchers("/app/chat") // 顯式放行 websocket
-				.hasRole("MEMBER").requestMatchers("/topic/messages").permitAll().anyRequest().permitAll()
+				.hasRole("MEMBER")
+				.requestMatchers("/topic/messages")
+				.permitAll()
+				.anyRequest()
+				.permitAll()
 
 		// .permitAll() 完全不攔截
 		// .denyAll() 完全拒絕
@@ -506,10 +510,10 @@ public class SecurityConfig {
 			String refresh = JWT_UTIL.generateRefresh(member.getMemberId().toString(), MEM_REFRESH_TTL);
 
 			response.addHeader(HttpHeaders.SET_COOKIE, ResponseCookie.from(MEM_ACCESS_COOKIE, access).httpOnly(true)
-					.secure(false).sameSite("Lax").path("/").maxAge(MEM_ACCESS_TTL).build().toString());
+					.secure(true).sameSite("None").path("/").maxAge(MEM_ACCESS_TTL).build().toString());
 
 			response.addHeader(HttpHeaders.SET_COOKIE, ResponseCookie.from(MEM_REFRESH_COOKIE, refresh).httpOnly(true)
-					.secure(false).sameSite("Strict").path("/").maxAge(MEM_REFRESH_TTL).build().toString());
+					.secure(true).sameSite("None").path("/").maxAge(MEM_REFRESH_TTL).build().toString());
 
 			// 先把 member 包成 UserDetails
 			UserDetails memberToken = User.withUsername(String.valueOf(member.getMemberId()))
@@ -521,17 +525,17 @@ public class SecurityConfig {
 					new UsernamePasswordAuthenticationToken(memberToken, null, memberToken.getAuthorities()));
 
 			String targetUrl = null; 
-			// 1. 從 session 拿看看（配合 login 頁面塞入）
+			// 1-1. 從 session 拿看看（配合 login 頁面塞入）
 //			HttpSession session = request.getSession(false);
 //			if(session != null) targetUrl = String.valueOf(session.getAttribute("OAuth2Redirect"));
 //			if (targetUrl != null) response.sendRedirect(targetUrl);
 
-			// 2. 從 SavedRequest 拿看看
+			// 1-2. 從 SavedRequest 拿看看
 			SavedRequest savedRequest = new HttpSessionRequestCache().getRequest(request, response);
 			URI uri = (savedRequest != null) ? URI.create(savedRequest.getRedirectUrl()) : null;
 			String path = uri != null ? uri.getPath() : null;
 			
-			// 其實我 request Cache 已經擋掉，怕之後會改先放著
+			// 2. 嘗試轉導，並排除 api 開頭的路徑，避免回 JSON .. -> 其實我 request Cache 已經擋掉，怕之後會改先放著
 			if (path != null && !path.startsWith("/api")) {
 				targetUrl = savedRequest.getRedirectUrl();
 				response.sendRedirect(targetUrl);
@@ -547,15 +551,17 @@ public class SecurityConfig {
 
 					// 清除 Cookie，避免殘留舊的 access_token/refresh_token
 					response.addHeader(HttpHeaders.SET_COOKIE, ResponseCookie.from(MEM_ACCESS_COOKIE, "").httpOnly(true)
-							.secure(false).sameSite("Lax").path("/").maxAge(0).build().toString());
+							.secure(true).sameSite("None").path("/").maxAge(0).build().toString());
 					response.addHeader(HttpHeaders.SET_COOKIE, ResponseCookie.from(MEM_REFRESH_COOKIE, "")
-							.httpOnly(true).secure(false).sameSite("Strict").path("/").maxAge(0).build().toString());
+							.httpOnly(true).secure(true).sameSite("None").path("/").maxAge(0).build().toString());
 
 					// 導回登入頁，附帶錯誤訊息
 					response.sendRedirect("/front-end/login?error=oauth2_failed");
 				}));
 
-		// 不要
+		// RequestCache -> 設定只讓頁面請求進 cache, 忽略 api 請求，否則會導回到 api 位址，不合理！
+		// Spring Security 預設會用 HttpSessionRequestCache 紀錄「使用者被攔下來時，原本想要存取的 URL」
+		// 登入成功後，Security 就會把使用者導回這個 URL
 		http
 		  .requestCache(cache -> cache
 		      .requestCache(new HttpSessionRequestCache() {
