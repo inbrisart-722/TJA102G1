@@ -1,5 +1,7 @@
 package com.eventra.comment.controller;
 
+import java.security.Principal;
+
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -7,7 +9,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.eventra.comment.model.AddCommentReqDTO;
 import com.eventra.comment.model.AddCommentResDTO;
-import com.eventra.comment.model.CommentRepository;
 import com.eventra.comment.model.CommentService;
 import com.eventra.comment.model.LoadCommentReqDTO;
 import com.eventra.comment.model.LoadCommentResDTO;
@@ -26,15 +27,17 @@ public class CommentRestController {
 	// encoding ... listener
 	
 	@PostMapping("/protected/comment/addComment")
-	public AddCommentResDTO addComment(@RequestBody AddCommentReqDTO req) {
-		return COMMENT_SERVICE.addComment(req, TEST_MEMBER);
+	public AddCommentResDTO addComment(@RequestBody AddCommentReqDTO req, Principal principal) {
+		Integer memberId = principal != null ? Integer.valueOf(principal.getName()) : null;
+		return COMMENT_SERVICE.addComment(req, memberId);
 	}
 	// 前端給：exhibitionId, parentCommentId(nullable), content => addCommentReqDTO
 	// 後端回：status, commentVO, commentCount, replyCount => addCommentResDTO
 	
 	@PostMapping("/comment/loadComment")
-	public LoadCommentResDTO loadComment(@RequestBody LoadCommentReqDTO req) {
-		return COMMENT_SERVICE.loadComment(req, TEST_MEMBER);
+	public LoadCommentResDTO loadComment(@RequestBody LoadCommentReqDTO req, Principal principal) {
+		Integer memberId = principal != null ? Integer.valueOf(principal.getName()) : null;
+		return COMMENT_SERVICE.loadComment(req, memberId);
 	}
 	// 前端給：exhibitionId, created_at, comment_id, parentCommentId(nullable) => loadCommentReqDTO
 	// 後端回：status, message, list, mapReaction, hasNextPage => loadCommentResDTO

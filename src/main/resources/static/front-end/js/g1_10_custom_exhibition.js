@@ -15,9 +15,11 @@ document.addEventListener("DOMContentLoaded", function() {
 
 			// 收集數據
 			// 收集數據 -> 1. exhibition_id;
-			const path_name = window.location.pathname;
-			const last_slash_index = path_name.lastIndexOf("/");
-			const exhibition_id = path_name.substring(last_slash_index);
+//			const path_name = window.location.pathname;
+//			const last_slash_index = path_name.lastIndexOf("/");
+//			const exhibition_id = path_name.substring(last_slash_index);
+			const params = new URLSearchParams(window.location.search);
+			const exhibitionId = params.get("exhibitionId");
 			// 收集數據 -> 2. parent_comment_id
 			const parent_comment = btn_send.closest("div.review_strip_single");
 			let parent_comment_id;
@@ -26,7 +28,7 @@ document.addEventListener("DOMContentLoaded", function() {
 
 			// exhibition_id, parent_comment_id, content
 			send_data = {
-				exhibitionId: 2, // test
+				exhibitionId: Number(exhibitionId), // test
 				parentCommentId: parent_comment_id,
 				content: comment_value,
 			};
@@ -144,6 +146,11 @@ document.addEventListener("DOMContentLoaded", function() {
                       </button>
                     </form>
                     <article class="reply_block">
+					<!-- 單個回覆 插入 start -->
+					                          <button class="btn_full btn_more_comments_child">
+					                          查看更多回覆
+					                          </button>
+					                          <!-- 單個回覆 插入 end -->
                     </article>
                     </section>`;
 						const report_block =
@@ -328,9 +335,11 @@ document.addEventListener("DOMContentLoaded", function() {
 			btn_more_parent.innerText = "載入中...";
 			// 收集數據
 			// 收集數據 -> 1. exhibition_id;
-			const path_name = window.location.pathname;
-			const last_slash_index = path_name.lastIndexOf("/");
-			const exhibition_id = path_name.substring(last_slash_index);
+//			const path_name = window.location.pathname;
+//			const last_slash_index = path_name.lastIndexOf("/");
+//			const exhibition_id = path_name.substring(last_slash_index);
+			const params = new URLSearchParams(window.location.search);
+			const exhibitionId = params.get("exhibitionId");
 			// 收集數據 -> 2. created_at;
 			// const created_at = btn_more_parent.dataset.createdAt;
 			// 收集數據 -> 3. comment_id;
@@ -338,7 +347,7 @@ document.addEventListener("DOMContentLoaded", function() {
 			// 收集數據 -> 4. is_parent;
 
 			const send_data = {
-				exhibitionId: 2, // test
+				exhibitionId: Number(exhibitionId), // test
 				// createdAt: created_at,
 				commentId: comment_id,
 			};
@@ -432,11 +441,13 @@ document.addEventListener("DOMContentLoaded", function() {
 						const icon_like = div.querySelector("i.icon-thumbs-up");
 						const icon_dislike = div.querySelector("i.icon-thumbs-down");
 
-						// undefined / LIKE / DISLIKE
-						const member_reaction = result.mapReaction[c.commentId];
-						if (member_reaction === "LIKE") icon_like.classList.add("-on");
-						else if (member_reaction === "DISLIKE")
-							icon_dislike.classList.add("-on");
+						if(result.status === "member"){
+							// undefined / LIKE / DISLIKE
+							const member_reaction = result.mapReaction[c.commentId];
+							if (member_reaction === "LIKE") icon_like.classList.add("-on");
+							else if (member_reaction === "DISLIKE")
+								icon_dislike.classList.add("-on");
+						}
 					});
 
 					btn_more_parent.innerText = "查看更多留言";
@@ -461,9 +472,11 @@ document.addEventListener("DOMContentLoaded", function() {
 
 			// 收集數據
 			// 收集數據 -> 1. exhibition_id;
-			const path_name = window.location.pathname;
-			const last_slash_index = path_name.lastIndexOf("/");
-			const exhibition_id = path_name.substring(last_slash_index);
+//			const path_name = window.location.pathname;
+//			const last_slash_index = path_name.lastIndexOf("/");
+//			const exhibition_id = path_name.substring(last_slash_index);
+			const params = new URLSearchParams(window.location.search);
+			const exhibitionId = params.get("exhibitionId");
 			// 收集數據 -> 2. created_at;
 			// const created_at = btn_more_child.dataset.createdAt;
 			// 收集數據 -> 3. comment_id;
@@ -474,7 +487,7 @@ document.addEventListener("DOMContentLoaded", function() {
 			).dataset.commentId;
 
 			const send_data = {
-				exhibitionId: 2, // test
+				exhibitionId: Number(exhibitionId), // test
 				// createdAt: created_at, // cursor 用
 				commentId: comment_id, // cursor 用
 				parentCommentId: parent_comment_id, // 抓 div.reivew_strip_single 的值
@@ -540,12 +553,13 @@ document.addEventListener("DOMContentLoaded", function() {
 						const icon_like = div.querySelector("i.icon-thumbs-up");
 						const icon_dislike = div.querySelector("i.icon-thumbs-down");
 
+						if(result.status === "member"){
 						// undefined / LIKE / DISLIKE
-						const member_reaction = result.mapReaction[r.commentId];
-						if (member_reaction === "LIKE") icon_like.classList.add("-on");
-						else if (member_reaction === "DISLIKE")
-							icon_dislike.classList.add("-on");
-
+							const member_reaction = result.mapReaction[r.commentId];
+							if (member_reaction === "LIKE") icon_like.classList.add("-on");
+							else if (member_reaction === "DISLIKE")
+								icon_dislike.classList.add("-on");
+						}
 						// 小心 max-height 問題...
 					});
 
@@ -832,9 +846,11 @@ document.addEventListener("DOMContentLoaded", function() {
 
 		// 收集數據
 		// 收集數據 -> 1. exhibition_id;
-		const path_name = window.location.pathname;
-		const last_slash_index = path_name.lastIndexOf("/");
-		const exhibition_id = path_name.substring(last_slash_index + 1);
+//		const path_name = window.location.pathname;
+//		const last_slash_index = path_name.lastIndexOf("/");
+//		const exhibition_id = path_name.substring(last_slash_index + 1);
+		const params = new URLSearchParams(window.location.search);
+		const exhibitionId = params.get("exhibitionId");
 		// 收集數據 -> 2. ticket_datas;
 		const adults_el = document.querySelector("input#adults");
 		const students_el = document.querySelector("input#students");
@@ -872,7 +888,7 @@ document.addEventListener("DOMContentLoaded", function() {
 		// 1全票，2學生票，3敬老票，4身心障礙者票，5軍警票
 
 		const send_data = {
-			exhibitionId: 2, // test
+			exhibitionId: Number(exhibitionId), // test
 			ticketDatas: ticket_datas,
 		};
 
@@ -1089,15 +1105,15 @@ document.addEventListener("DOMContentLoaded", function() {
 		// 評價按鈕
 		const btn_open_rate_modal = e.target.closest("button#btn_open_rate_modal");
 		if (!btn_open_rate_modal) return;
-		openRate();
 		// 收集數據
 		// 收集數據 -> 1. exhibition_id;
-		const path_name = window.location.pathname;
-		const last_slash_index = path_name.lastIndexOf("/");
-		const exhibition_id = path_name.substring(last_slash_index);
+//		const path_name = window.location.pathname;
+//		const last_slash_index = path_name.lastIndexOf("/");
+//		const exhibition_id = path_name.substring(last_slash_index);
+		const params = new URLSearchParams(window.location.search);
+		const exhibitionId = params.get("exhibitionId");
 
-		// 測試先放 2
-		csrfFetch("/api/front-end/rating/getMyRating?exhibitionId=" + "2", {
+		csrfFetchToRedirect("/api/front-end/protected/rating/getMyRating?exhibitionId=" + exhibitionId, {
 			method: "GET",
 		})
 			.then((res) => {
@@ -1105,6 +1121,7 @@ document.addEventListener("DOMContentLoaded", function() {
 				return res.json();
 			})
 			.then((result) => {
+				openRate();
 				console.log(result);
 				// status, canRate, originalRating
 				// Main logic

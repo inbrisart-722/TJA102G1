@@ -92,6 +92,10 @@ public class CommentService {
 		boolean hasNextPage = slice.hasNext();
 		// resDTO 參數3 (voList -> idList -> reactionList -> mapReaction(idList + reactionList) )
 		List<Integer> idList = voList.stream().map(CommentVO :: getCommentId).collect(Collectors.toList());
+		
+		// 截斷
+		if(memberId == null) return new LoadCommentResDTO().setStatus("guest").setList(voList).setHasNextPage(hasNextPage);
+		
 		List<Object[]> idReactionList = COMMENT_REACTION_REPO.findReactionsByMember(memberId, idList); 
 				// 自訂@Query 只能帶 Pageable 不能直接帶 Sort => 乾脆用 order by 寫死本來的 Sort.by("comment.commentId").descending()
 		Map<Integer, String> mapReaction = new HashMap<>();
@@ -101,7 +105,7 @@ public class CommentService {
 			mapReaction.put(id, reaction);
 		}
 		
-		LoadCommentResDTO res = new LoadCommentResDTO().setStatus("success").setList(voList).setHasNextPage(hasNextPage).setMapReaction(mapReaction);
+		LoadCommentResDTO res = new LoadCommentResDTO().setStatus("member").setList(voList).setHasNextPage(hasNextPage).setMapReaction(mapReaction);
 		return res;
 	}
 }

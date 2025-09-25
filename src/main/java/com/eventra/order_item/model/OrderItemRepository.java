@@ -1,8 +1,8 @@
 package com.eventra.order_item.model;
 
-import java.util.Collection;
-
 import org.springframework.data.jpa.repository.JpaRepository;
+
+import com.eventra.order.model.OrderStatus;
 
 public interface OrderItemRepository extends JpaRepository<OrderItemVO, Integer>{
 	
@@ -10,5 +10,5 @@ public interface OrderItemRepository extends JpaRepository<OrderItemVO, Integer>
 //	(Integer memberId, Integer exhibitionId, Collection<String> orderStatuses);
 	// 建立 Enum of orderStatus => 
 	boolean existsByOrder_Member_MemberIdAndExhibitionTicketType_ExhibitionIdAndOrder_OrderStatus
-	(Integer memberId, Integer exhibitionId, String orderStatus);
+	(Integer memberId, Integer exhibitionId, OrderStatus orderStatus);
 }

@@ -6,6 +6,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.eventra.exhibition.model.ExhibitionRepository;
 import com.eventra.exhibition.model.ExhibitionVO;
 import com.eventra.member.model.MemberVO;
+import com.eventra.order.model.OrderStatus;
 import com.eventra.order_item.model.OrderItemRepository;
 
 import jakarta.persistence.EntityManager;
@@ -30,7 +31,7 @@ public class RatingService {
 
 	public GetMyRatingResDTO getRating(Integer exhibitionId, Integer memberId) {
 		// resDTO 參數 1
-		boolean canRate = ORDER_ITEM_REPO.existsByOrder_Member_MemberIdAndExhibitionTicketType_ExhibitionIdAndOrder_OrderStatus(memberId, exhibitionId, "已付款");
+		boolean canRate = ORDER_ITEM_REPO.existsByOrder_Member_MemberIdAndExhibitionTicketType_ExhibitionIdAndOrder_OrderStatus(memberId, exhibitionId, OrderStatus.已付款);
 		System.out.println(canRate);
 		// resDTO 參數 2
 		Byte originalRating = null;
@@ -46,7 +47,7 @@ public class RatingService {
 	public UpsertRatingResDTO upsertRating(Integer exhibitionId, Integer memberId, Byte ratingScore) {
 		UpsertRatingResDTO res = new UpsertRatingResDTO();
 		// status, canRate, originalRating;
-		boolean canRate = ORDER_ITEM_REPO.existsByOrder_Member_MemberIdAndExhibitionTicketType_ExhibitionIdAndOrder_OrderStatus(memberId, exhibitionId, "已付款");
+		boolean canRate = ORDER_ITEM_REPO.existsByOrder_Member_MemberIdAndExhibitionTicketType_ExhibitionIdAndOrder_OrderStatus(memberId, exhibitionId, OrderStatus.已付款);
 		// 再次確認可評分
 		if(canRate == true) {
 			RatingVO ratingVOOriginal = RATING_REPO.getRating(exhibitionId, memberId);

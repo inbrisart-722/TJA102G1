@@ -1,5 +1,6 @@
 package com;
 
+import java.security.Principal;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,7 +39,7 @@ public class FrontendIndexController {
 	@Autowired
 	private ExhibitionServiceImpl exhibitionSvc;
 	
-	private static final Integer TEST_MEMBER = 3;
+//	private static final Integer TEST_MEMBER = 3;
 
 	// 從 application.properties 讀取 google.api.key
 	@Value("${google.api.key}") 
@@ -86,10 +87,10 @@ public class FrontendIndexController {
 	}
 
 	@PostMapping("/payment")
-	public String paymentPage(@RequestParam List<Integer> cartItemIds, Model model) {
+	public String paymentPage(@RequestParam List<Integer> cartItemIds, Model model, Principal principal) {
 		// 找到指定 cartItemDTOs
-		System.out.println(cartItemIds);
-		List<GetCartItemResDTO> listOfDTOs = cartItemSvc.getCartItem(TEST_MEMBER, cartItemIds);
+		Integer memberId = principal != null ? Integer.valueOf(principal.getName()) : null;
+		List<GetCartItemResDTO> listOfDTOs = cartItemSvc.getCartItem(memberId, cartItemIds);
 		model.addAttribute("listOfDTOs", listOfDTOs);
 		return "front-end/payment";
 	}
