@@ -14,7 +14,7 @@ import com.eventra.order.model.OrderVO;
 @RequestMapping("/front-end")
 public class OrderController {
 
-	private static final Integer TEST_MEMBER = 3;
+//	private static final Integer TEST_MEMBER = 3;
 	
 	private final OrderService ORDER_SERVICE;
 	

@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -398,13 +398,13 @@
 							</div>
 							<hr />
 							<form>
-								<a href="/oauth2/authorization/facebook" id="btn_facebook_login" class="social_bt facebook">透過
+								<a th:href=@{/oauth2/authorization/facebook(redirect=${OAuth2Redirect})} href="/oauth2/authorization/facebook" id="btn_facebook_login" class="social_bt facebook">透過
 									Facebook 登入</a> 
 									<a
-									href="/oauth2/authorization/google"
+									th:href=@{/oauth2/authorization/google(redirect=${OAuth2Redirect})} href="/oauth2/authorization/google"
 									id="btn_google_login" class="social_bt google">透過 Google 登入</a>
 									
-									<a href="/oauth2/authorization/github" id="btn_github_login" class="social_bt github"><i class="icon-github-circled
+									<a th:href=@{/oauth2/authorization/github(redirect=${OAuth2Redirect})} href="/oauth2/authorization/github" id="btn_github_login" class="social_bt github"><i class="icon-github-circled
 									"></i>透過
 									Github 登入</a> 
 								<div class="divider">
@@ -419,7 +419,7 @@
 										class="form-control" placeholder="password" />
 								</div>
 								<p class="small">
-									<a href="#" style="color: rgb(1, 1, 9)">忘記密碼?</a>
+									<a href="/front-end/forgot-password1" style="color: rgb(1, 1, 9)">忘記密碼?</a>
 								</p>
 								<a href="#" id="btn_login" class="btn_full">登入</a> <a
 									href="/front-end/register1" class="btn_full_outline">註冊</a>

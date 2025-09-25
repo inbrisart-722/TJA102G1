@@ -24,8 +24,12 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.eventra.exhibitiontickettype.model.ExhibitionTicketTypeRepository;
+import com.eventra.comment.controller.CommentStatus;
+import com.eventra.comment.model.CommentRepository;
+import com.eventra.exhibitionstatus.model.ExhibitionStatusVO;
 import com.eventra.exhibitiontickettype.model.ExhibitionTicketTypeVO;
 import com.eventra.exhibitor.backend.controller.dto.ExhibitionCreateDTO;
+import com.eventra.exhibitor.model.ExhibitorDTO;
 import com.eventra.exhibitor.model.ExhibitorVO;
 import com.eventra.tickettype.model.TicketTypeRepository;
 import com.eventra.tickettype.model.TicketTypeVO;
@@ -44,6 +48,7 @@ public class ExhibitionServiceImpl implements ExhibitionService {
 	private record TicketJsonItem(String name, Integer price) {
 	}
 	
+	private final CommentRepository commentRepository;
 
 	@PersistenceContext
 	private EntityManager entityManager;
@@ -51,10 +56,12 @@ public class ExhibitionServiceImpl implements ExhibitionService {
 	private static final int DEFAULT_STATUS_ID = 1;
 
 	@Autowired
-	public ExhibitionServiceImpl(ExhibitionRepository repository, ExhibitionTicketTypeRepository exhibitionTicketTypeRepository, TicketTypeRepository ticketTypeRepository) {
+	public ExhibitionServiceImpl(ExhibitionRepository repository, CommentRepository commentRepository, ExhibitionTicketTypeRepository exhibitionTicketTypeRepository, TicketTypeRepository ticketTypeRepository) {
 		this.repository = repository;
 		this.exhibitionTicketTypeRepository = exhibitionTicketTypeRepository;
 		this.ticketTypeRepository = ticketTypeRepository;
+    this.commentRepository = commentRepository;
+		
 	}
 
 	@Transactional
@@ -179,6 +186,11 @@ public class ExhibitionServiceImpl implements ExhibitionService {
 		Pageable pageable = PageRequest.of(page, size, Sort.by("startTime").descending());
 		return repository.findAll(pageable);
 	}
+	
+	
+//	/* 更新展覽時觸發通知用, 編輯展覽會呼叫此方法 */
+//	@Transactional
+	
 
 	// 查詢單筆
 	public ExhibitionVO findById(Integer id) {
@@ -299,6 +311,70 @@ public class ExhibitionServiceImpl implements ExhibitionService {
 	    		}
 	    	}
 	    }
+    
+	// inbrisart 20250925 給展覽頁 SSR 帶入
+	/**
+	 * @param exhibitionId
+	 * @return
+	 */
+	public ExhibitionDTO getExhibitionInfoForPage(Integer exhibitionId) {
+		ExhibitionVO exhibition = repository.findById(exhibitionId).orElse(null);
+		Set<ExhibitionTicketTypeVO> etts = exhibition.getExhibitionTicketTypes();
+		if(exhibition == null) return null;
+		ExhibitionDTO dto = new ExhibitionDTO();
+		dto.setExhibitionId(exhibitionId);
+		dto.setPhotoLandscape(exhibition.getPhotoLandscape());
+		dto.setExhibitionName(exhibition.getExhibitionName());
+		dto.setAverageRatingScore(exhibition.getAverageRatingScore());
+		dto.setTotalRatingCount(exhibition.getTotalRatingCount());
+		dto.setLeftTicketQuantity(exhibition.getTotalTicketQuantity() - exhibition.getSoldTicketQuantity());
+		
+		Map<Integer, Integer> tickets = new HashMap<>();
+		Set<ExhibitionTicketTypeVO> ettVOs = exhibition.getExhibitionTicketTypes();
+		for(ExhibitionTicketTypeVO ettVO : ettVOs)
+			tickets.put(ettVO.getTicketTypeId(), ettVO.getPrice());
+		
+		// ??
+//		List<String> ticketOrder = List.of("全票", "學生票", "敬老票", "身心障礙者票", "軍警票");
+//		tickets.put("");
+//		Map<String, Integer> tickets = exhibition.getExhibitionTicketTypes()
+//				.stream()
+//				.sorted(Comparator.comparingInt(
+//						ett -> ticketOrder.indexOf(ett.getTicketType().getTicketTypeName())))
+//				.collect(Collectors.toMap(
+//						ett -> ett.getTicketType().getTicketTypeName(),
+//						ExhibitionTicketTypeVO::getPrice,
+//						(v1, v2) -> v1,
+//						LinkedHashMap::new
+//				));
+		
+		dto.setTickets(tickets);
+				
+		Integer cheapestTicketPrice = Integer.MAX_VALUE;
+		for(ExhibitionTicketTypeVO vo : etts)
+			if(vo.getPrice() < cheapestTicketPrice) cheapestTicketPrice = vo.getPrice();
+		
+		dto.setCheapestTicketPrice(cheapestTicketPrice);
+		dto.setStartTime(exhibition.getStartTime());
+		dto.setEndTime(exhibition.getEndTime());
+		dto.setLocation(exhibition.getLocation());
+		dto.setDescription(exhibition.getDescription());
+		ExhibitorVO exhibitorVO = exhibition.getExhibitorVO();
+		String exhibitorDisplayName = 
+				exhibitorVO.getExhibitorRegistrationName() != null
+				? exhibitorVO.getExhibitorRegistrationName()
+				: exhibitorVO.getCompanyName();
+		
+		ExhibitorDTO exhibitorDTO = new ExhibitorDTO();
+		exhibitorDTO
+			.setExhibitorId(exhibitorVO.getExhibitorId())
+			.setExhibitorDisplayName(exhibitorDisplayName);
+		
+		dto.setExhibitor(exhibitorDTO); 
+		Long totalCommentCount = commentRepository.countByExhibitionId(CommentStatus.正常, exhibitionId);
+		dto.setTotalCommentCount(totalCommentCount);
+		
+		return dto;
 	}
 	
 }

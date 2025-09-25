@@ -280,8 +280,8 @@ public class JwtCookieAuthenticationFilter extends OncePerRequestFilter {
 
 					// 2. 更新 Access Token Cookie
 					ResponseCookie newCookie = ResponseCookie.from(accessCookieName, newAccess).httpOnly(true)
-							.secure(false) // ⚠️ 測試環境 false，正式要 true
-							.sameSite("Lax").path("/").maxAge(accessTtl).build();
+							.secure(true) // ⚠️ 測試環境 false，正式要 true
+							.sameSite("None").path("/").maxAge(accessTtl).build();
 					res.addHeader("Set-Cookie", newCookie.toString());
 
 					// 3. 直接用新的 Access Token 完成身份驗證
@@ -306,12 +306,19 @@ public class JwtCookieAuthenticationFilter extends OncePerRequestFilter {
 	private void authenticateUser(String token, HttpServletRequest req) {
 		try {
 			String username = jwt.getUsername(token);
+//			System.out.println("JWT username= " + username);
+			
+			// @AuthenticationPrincipal Principal principal → 
+			// 這個會嘗試把 principal cast 成 java.security.Principal，結果不一定匹配（因為你塞的是 UserDetails）。
 			UserDetails user = uds.loadUserByUsername(username);
+//			System.out.println("UserDetails loaded: " + user);
 
 			var auth = new UsernamePasswordAuthenticationToken(user, null, user.getAuthorities());
+			// 它是 附加請求的細節資訊，例如：remoteAddress（發出請求的 IP）, sessionId（如果有 session）
 			auth.setDetails(new WebAuthenticationDetailsSource().buildDetails(req));
 
 			SecurityContextHolder.getContext().setAuthentication(auth);
+//			System.out.println("SecurityContext 已設定: " + SecurityContextHolder.getContext().getAuthentication());
 		} catch (Exception e) {
 			System.out.println("JwtCookieAuthenticationFilter: " + e.toString());
 			SecurityContextHolder.clearContext();

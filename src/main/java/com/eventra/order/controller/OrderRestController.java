@@ -1,5 +1,6 @@
 package com.eventra.order.controller;
 
+import java.security.Principal;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -25,7 +26,7 @@ import com.eventra.order.model.OrderStatus;
 @RequestMapping("/api/front-end")
 public class OrderRestController {
 
-	private static final Integer TEST_MEMBER = 3;
+//	private static final Integer TEST_MEMBER = 3;
 	
 	private final OrderService ORDER_SERVICE;
 	private final CartItemService CART_ITEM_SERVICE;
@@ -36,22 +37,26 @@ public class OrderRestController {
 	}
 	
 	@GetMapping("/protected/order/getAllOrder")
-	public List<GetAllOrderResDTO> getAllOrder(){
-		return ORDER_SERVICE.getAllOrderByMemberId(TEST_MEMBER);
+	public List<GetAllOrderResDTO> getAllOrder(Principal principal){
+		Integer memberId = principal != null ? Integer.valueOf(principal.getName()) : null;
+		return ORDER_SERVICE.getAllOrderByMemberId(memberId);
 	}
 	
 /* ************************* 以下皆與綠界相關 ************************* */
 	@PostMapping("/protected/order/ECPay/resending")
-	public ECPaySendingResDTO ECPayResending(@RequestBody String orderUlid) {
-		System.out.println("re-sending");
+	public ECPaySendingResDTO ECPayResending(@RequestBody String orderUlid, Principal principal) {
+		Integer memberId = principal != null ? Integer.valueOf(principal.getName()) : null;
+		System.out.println("ECPay Resending: " + memberId + "!!!!!!!!!!");
+		// 有需要判斷 memberId 不吻合不給送？
 		ECPaySendingResDTO res = ORDER_SERVICE.ECPayResending(orderUlid);
 		return res;
 	}
 	
 	@PostMapping("/protected/order/ECPay/sending")
-	public ECPaySendingResDTO ECPaySending(@RequestBody ECPaySendingReqDTO req) {
-		System.out.println("sending");
-		ECPaySendingResDTO res = ORDER_SERVICE.ECPaySending(req, TEST_MEMBER);
+	public ECPaySendingResDTO ECPaySending(@RequestBody ECPaySendingReqDTO req, Principal principal) {
+		Integer memberId = principal != null ? Integer.valueOf(principal.getName()) : null;
+		System.out.println("ECPay sending: " + memberId + "!!!!!!!!!!");
+		ECPaySendingResDTO res = ORDER_SERVICE.ECPaySending(req, memberId);
 		return res;
 	}
 	// 前端 送 CartItemIds -> List<Integer> 
@@ -83,7 +88,7 @@ public class OrderRestController {
 		// 阻塞式 Long Polling（非 WebFlux）-> 高併發 效率不佳 -> SSE / WebSocket
 		for(int i = 0; i < 30; i++) {
 			orderStatus = ORDER_SERVICE.checkOrderStatus(merchantTradeNo);
-			if(!"待付款".equals(orderStatus)) {
+			if(orderStatus != OrderStatus.付款中) {
 				res.put("orderStatus", orderStatus);
 				return ResponseEntity.ok(res); 
 			}

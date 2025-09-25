@@ -21,6 +21,18 @@
 	<dependencies>
 		<!-- 柏燁 start -->
 
+		<!-- Spring WebSocket -->
+		<!-- 原生 WebSocket endpoint -->
+		<!-- spring-websocket | spring-messaging | Stomp（協議）支援 -->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-websocket</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.security</groupId>
+			<artifactId>spring-security-messaging</artifactId>
+		</dependency>
+
 		<!-- Spring Security - OAuth2User -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
@@ -82,18 +94,18 @@
 		</dependency>
 
 		<!-- 如果之後要用 Spring Data Redis 再打開 -->
-		<!--		<dependency>-->
-		<!--			<groupId>org.springframework.boot</groupId>-->
-		<!--			<artifactId>spring-boot-starter-data-redis</artifactId>-->
-		<!--		</dependency>-->
-		<!--		<dependency>-->
-		<!--			<groupId>com.fasterxml.jackson.core</groupId>-->
-		<!--			<artifactId>jackson-databind</artifactId>-->
-		<!--		</dependency>-->
-		<!--		<dependency>-->
-		<!--			<groupId>com.fasterxml.jackson.datatype</groupId>-->
-		<!--			<artifactId>jackson-datatype-jsr310</artifactId>-->
-		<!--		</dependency>-->
+				<dependency>
+					<groupId>org.springframework.boot</groupId>
+					<artifactId>spring-boot-starter-data-redis</artifactId>
+				</dependency>
+				<dependency>
+					<groupId>com.fasterxml.jackson.core</groupId>
+					<artifactId>jackson-databind</artifactId>
+				</dependency>
+				<dependency>
+					<groupId>com.fasterxml.jackson.datatype</groupId>
+					<artifactId>jackson-datatype-jsr310</artifactId>
+				</dependency>
 
 		<!-- 柏燁 end -->
 

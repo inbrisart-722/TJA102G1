@@ -1,5 +1,6 @@
 package com.eventra.cart_item.controller;
 
+import java.security.Principal;
 import java.util.List;
 
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -21,37 +22,47 @@ public class CartItemRestController {
 
 	private final CartItemService CART_ITEM_SERVICE;
 	
-	private static final Integer TEST_MEMBER = 3;
+//	private static final Integer TEST_MEMBER = 3;
 	
 	public CartItemRestController (CartItemService cartItemService){
 		this.CART_ITEM_SERVICE = cartItemService;
 	}
 	
 	@PostMapping("/addCartItem")
-	public String addCartItem(@RequestBody AddCartItemReqDTO req) {
-		CART_ITEM_SERVICE.addCartItem(req, TEST_MEMBER);
+	public String addCartItem(@RequestBody AddCartItemReqDTO req, Principal principal) {
+		Integer memberId = principal != null ? Integer.valueOf(principal.getName()) : null;
+		
+		try {CART_ITEM_SERVICE.addCartItem(req, memberId);}
+		catch (IllegalStateException e) {
+			System.out.println(e.toString());
+			return "failure";
+		}
 		return "success";
 	}
 	// 前端給：exhibitionId, ticketDatas
 	// 後端回：status ? 
 	
 	@DeleteMapping("/removeOneCartItem")
-	public String removeOneCartItem(@RequestParam("cartItemId") Integer cartItemId) {
-		return CART_ITEM_SERVICE.removeOneCartItem(cartItemId, TEST_MEMBER);
+	public String removeOneCartItem(@RequestParam("cartItemId") Integer cartItemId, Principal principal) {
+		Integer memberId = principal != null ? Integer.valueOf(principal.getName()) : null;
+		return CART_ITEM_SERVICE.removeOneCartItem(cartItemId, memberId);
 	}
 	
 	@DeleteMapping("/removeAllCartItem")
-	public String removeCartItem() {
-		return CART_ITEM_SERVICE.removeAllCartItem(TEST_MEMBER);
+	public String removeCartItem(Principal principal) {
+		Integer memberId = principal != null ? Integer.valueOf(principal.getName()) : null;
+		return CART_ITEM_SERVICE.removeAllCartItem(memberId);
 	}
 	
 	@GetMapping("/getAllCartItem")
-	public List<GetCartItemResDTO> getAllCartItem() {
-		return CART_ITEM_SERVICE.getAllCartItem(TEST_MEMBER);
+	public List<GetCartItemResDTO> getAllCartItem(Principal principal) {
+		Integer memberId = principal != null ? Integer.valueOf(principal.getName()) : null;
+		return CART_ITEM_SERVICE.getAllCartItem(memberId);
 	}
 	
 	@GetMapping("/getMyExpiration")
-	public GetMyExpirationResDTO getMyExpiration() {
-		return CART_ITEM_SERVICE.getEarliestExpiration(TEST_MEMBER);
+	public GetMyExpirationResDTO getMyExpiration(Principal principal) {
+		Integer memberId = principal != null ? Integer.valueOf(principal.getName()) : null;
+		return CART_ITEM_SERVICE.getEarliestExpiration(memberId);
 	}
 }

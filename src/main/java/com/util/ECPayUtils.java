@@ -49,6 +49,7 @@ public class ECPayUtils {
 //	}
 
 	public Map<String, String> genCheckMap(ECPayCallbackReqDTO req){
+		// 其實要用 treemap ..
 		Map<String, String> fields = new HashMap<>();
 		// Populate the map with non-null values from the DTO
         if (req.getMerchantID() != null) fields.put("MerchantID", req.getMerchantID());

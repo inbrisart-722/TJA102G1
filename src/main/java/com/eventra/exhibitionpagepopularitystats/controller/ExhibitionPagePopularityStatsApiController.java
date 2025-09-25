@@ -22,5 +22,4 @@ public class ExhibitionPagePopularityStatsApiController {
 	    popularSvc.recordTodayView(exhId);
 	    return "exhibitionId= " + exhId; // 回傳字串給前端
 	}
-        
 }

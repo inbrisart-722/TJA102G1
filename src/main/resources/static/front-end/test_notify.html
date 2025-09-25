@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <title>Admin 發送展覽通知</title>
+  <script src="/front-end/js/g1_10_custom_common_csrf.js"></script>
+</head>
+<body>
+  <h2>Admin 發送展覽通知</h2>
+
+  <label>展覽 ID：</label>
+  <input id="exhId" type="number" placeholder="輸入展覽ID"><br><br>
+
+  <label>通知類型：</label>
+  <select id="notifyType">
+    <option value="">請選擇</option>
+    <option value="ticketStart">開賣提醒</option>
+    <option value="ticketLow">售票緊急</option>
+    <option value="locationChange">地點異動</option>
+    <option value="timeChange">檔期異動</option>
+  </select><br><br>
+
+  <button onclick="sendNotify()">發送通知</button>
+
+  <script>
+    function sendNotify() {
+      const exhId = document.getElementById("exhId").value;
+      const type = document.getElementById("notifyType").value;
+
+      if (!exhId || !type) {
+        alert("請輸入展覽ID並選擇通知類型");
+        return;
+      }
+
+      // 只要傳 exhId + type，後端會自己生成 title/content
+      csrfFetch(`/api/exhibitions/${exhId}/notify?type=${type}`, {
+        method: "POST"
+      })
+      .then(res => res.text())
+      .then(data => {
+        alert("後端回應: " + data);
+        console.log("後端回應:", data);
+      })
+      .catch(err => console.error("錯誤:", err));
+    }
+  </script>
+</body>
+</html>

@@ -130,7 +130,7 @@ document.addEventListener("DOMContentLoaded", () => {
 				.then((result) => {
 					console.log("email: " + result);
 					// result -> email 
-					if (result === null) {
+					if (result === "") {
 						alert("由於您的 token 錯誤或逾時，請重新進行註冊");
 						window.location.href = "/front-end/register1";
 					}

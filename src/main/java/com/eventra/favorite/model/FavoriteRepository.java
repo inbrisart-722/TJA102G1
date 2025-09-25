@@ -16,7 +16,7 @@ public interface FavoriteRepository extends JpaRepository<FavoriteVO, Integer> {
 	@Query(value = "SELECT * FROM favorite " +
 			"WHERE member_id = :memId " +
 			"AND favorite_status = 1 " +
-			"ORDER BY favorite_id DESC",
+			"ORDER BY updated_at DESC",
 			nativeQuery = true)
 	List<FavoriteVO> findFavoritesByMember(@Param("memId") Integer memId);
 	
@@ -32,4 +32,8 @@ public interface FavoriteRepository extends JpaRepository<FavoriteVO, Integer> {
 	// 查詢會員是否已有收藏展覽 (UK: memberId + exhibitionId)
 	Optional<FavoriteVO> findByMemberIdAndExhibitionId(Integer memId, Integer exhId);
 	
+	
+	// event_notification 功能需要用, 找展覽ID
+	    List<FavoriteVO> findByExhibitionId(Integer exhibitionId);
+
 }

@@ -1,8 +1,10 @@
 package com;
 
+import java.security.Principal;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -10,41 +12,71 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import com.eventra.cart_item.model.CartItemService;
 import com.eventra.cart_item.model.GetCartItemResDTO;
+import com.eventra.exhibition.model.ExhibitionDTO;
+import com.eventra.exhibition.model.ExhibitionServiceImpl;
 import com.eventra.favorite.model.FavoriteService;
-import com.eventra.member.model.VerifService;
+import com.eventra.member.verif.model.VerifService;
+
+import jakarta.servlet.http.HttpServletRequest;
 
 @Controller
 @RequestMapping("/front-end")
 public class FrontendIndexController {
-
+  
 	@Autowired
 	private FavoriteService favSvc;
-	
 	@Autowired
 	private CartItemService cartItemSvc;
-	
 	@Autowired
 	private VerifService verifSvc;
+	@Autowired
+	private ExhibitionServiceImpl exhibitionSvc;
 	
-	private static final Integer TEST_MEMBER = 3;
+//	private static final Integer TEST_MEMBER = 3;
 
+	// 從 application.properties 讀取 google.api.key
+	@Value("${google.api.key}") 
+    private String googleApiKey;
+	
 	@GetMapping("/admin")
-	public String adminPage(Model model) {
-		// 載入收藏
-		model.addAttribute("favList", favSvc.findFavoritesByMember(1));
+	public String adminPage() {
 		return "front-end/admin";
 	}
 
+	// 1. 接住列表頁面 href: /front-end/exhibitions/
+	@GetMapping("/exhibitions/{exhibitionId}")
+	public String exhibitionsPageRedirect(@PathVariable("exhibitionId") Integer exhibitionId) {
+		return "redirect:/front-end/exhibitions?exhibitionId=" + exhibitionId;
+	}
+	
+	// 2. 為了同時確保 css, js 可取到，"目前"必要的轉導
 	@GetMapping("/exhibitions")
-	public String exhibitionsPage(Model model) {
+	public String exhibitionsPage(@RequestParam("exhibitionId") Integer exhibitionId, Model model) {
+		ExhibitionDTO dto = exhibitionSvc.getExhibitionInfoForPage(exhibitionId);
+		// fallback -> exhibitionId 查不到對應展覽
+		if(dto == null) return "redirect:/front-end/404";
+		// success -> 塞 dto 並轉交 template-resolver
+		model.addAttribute("exhibition", dto);
 		return "front-end/exhibitions";
 	}
+	@GetMapping("/404")
+	public String Page404() {
+		return "front-end/404";
+	}
+	
+	// 0. 靜態測試（之後得刪）
+	@GetMapping("/exhibitions2")
+	public String exhibitionsPageStatic(Model model) {
+		return "front-end/exhibitions";
+	}
+	
 
 	@GetMapping("/cart")
 	public String cartPage(Model model, Authentication auth) {
@@ -55,10 +87,10 @@ public class FrontendIndexController {
 	}
 
 	@PostMapping("/payment")
-	public String paymentPage(@RequestParam List<Integer> cartItemIds, Model model) {
+	public String paymentPage(@RequestParam List<Integer> cartItemIds, Model model, Principal principal) {
 		// 找到指定 cartItemDTOs
-		System.out.println(cartItemIds);
-		List<GetCartItemResDTO> listOfDTOs = cartItemSvc.getCartItem(TEST_MEMBER, cartItemIds);
+		Integer memberId = principal != null ? Integer.valueOf(principal.getName()) : null;
+		List<GetCartItemResDTO> listOfDTOs = cartItemSvc.getCartItem(memberId, cartItemIds);
 		model.addAttribute("listOfDTOs", listOfDTOs);
 		return "front-end/payment";
 	}
@@ -82,13 +114,18 @@ public class FrontendIndexController {
 	}
 	
 	@GetMapping("/login")
-	public String loginPage(@AuthenticationPrincipal UserDetails user) {
+	public String loginPage(@AuthenticationPrincipal UserDetails user, HttpServletRequest req, Model model) {
 		// 1. 使用者有帶 token，且有 MEMBER 身份，就不給進來登入頁面了，因為不然放他進來再次登入，要清 Token 再換發，不如就設計得先登出才放進來
 		if(user != null && user.getAuthorities().stream()
 				.map(GrantedAuthority::getAuthority)
 				.toList()
 				.contains("ROLE_MEMBER")) return "redirect:/front-end/index";
 		
+//		String OAuth2Redirect = req.getRequestURI();
+//		model.addAttribute("OAuth2Redirect", OAuth2Redirect);
+//		HttpSession session = req.getSession(true);
+//		session.setAttribute("OAuth2Redirect", OAuth2Redirect);
+				
 		// 2. 否則，歡迎！！！
 		return "front-end/login";
 	}
@@ -98,11 +135,33 @@ public class FrontendIndexController {
 		return "front-end/register1";
 	}
 	
-	@GetMapping("/register2")
-	public String register2Page(@RequestParam("token") String token, Model model) {
-		String email = verifSvc.findEmailByToken(token);
-		model.addAttribute("email", email);
-		return "front-end/register2";
+//	@GetMapping("/register2")
+//	public String register2Page(@RequestParam("token") String token, Model model) {
+//		String email = verifSvc.findEmailByToken(token);
+//		model.addAttribute("email", email);
+//		return "front-end/register2";
+//	}
+	
+	@GetMapping("/forgot-password1")
+	public String forgotPassword1Page() {
+		return "front-end/forgot_password1";
+	}
+	
+//	@GetMapping("/forgot-password2")
+//	public String forgotPassword2Page(@RequestParam("token") String token, Model model) {
+//		String email = verifSvc.findEmailByToken(token);
+//		model.addAttribute("email", email);
+//		return "front-end/forgot_password2";
+//	}
+	
+	@GetMapping("/change-mail1")
+	public String changeMail1Page() {
+		return "front-end/change_mail1";
+	}
+	
+	@GetMapping("/reset-password1")
+	public String resetPassword1Page() {
+		return "front-end/reset_password1";
 	}
 	
 	@GetMapping("/verif-failure")
@@ -121,9 +180,10 @@ public class FrontendIndexController {
 	}
 	
 	@GetMapping("/map_explore")
-	public String mapExplorePage() {
-		return "front-end/map_explore";
-	}
+    public String mapExplore(Model model) {
+        model.addAttribute("googleApiKey", googleApiKey);
+        return "front-end/map_explore";
+    }
 	
 	@GetMapping("/search_results")
 	public String searchResultsPage() {

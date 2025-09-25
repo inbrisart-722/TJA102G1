@@ -83,7 +83,6 @@ public class ExhibitionVO {
 	private Integer totalTicketQuantity;
 
     
-    
     @Column(name = "sold_ticket_quantity")
 	private Integer soldTicketQuantity;
 

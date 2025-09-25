@@ -268,7 +268,7 @@ public class OrderService {
 			return "0|FAILED";
 		
 		/* ********* *rd part : 以防 ECPay 多次送出同樣的 ReturnURL ********* */
-		if(!PaymentAttemptStatus.PENDING.equals(paVO.getPaymentAttemptStatus())) return "1|OK";
+		if(PaymentAttemptStatus.PENDING != paVO.getPaymentAttemptStatus()) return "1|OK";
 		
 		/* ********* 4th part: 先更新共用欄位 ********* */
 		paVO.setStoreId(req.getStoreID());
@@ -360,7 +360,9 @@ public class OrderService {
 	public ECPaySendingResDTO ECPaySending(ECPaySendingReqDTO req, Integer memberId) {
 		/* ********* 1st part : 從 ids 拉掉指定購物車明細 ********* */
 		// NoSQL 先動其實有點風險，phase II 可看是否有辦法修正
+//		System.out.println("hi!!!!!!!!!!");
 		List<Integer> cartItemIds = req.getCartItemIds();
+//		for(Integer id : cartItemIds)System.out.println(id);
 		List<CartItemRedisVO> vos = CART_ITEM_REDIS_REPO.removeCartItem(cartItemIds, memberId);
 		if (vos == null || vos.isEmpty())
 			return null; // 選定的購物車明細已經被清掉！

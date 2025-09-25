@@ -1,796 +1,637 @@
 <!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta
-      name="description"
-      content="Citytours - Premium site template for city tours agencies, transfers and tickets."
-    />
-    <meta name="author" content="Ansonika" />
-    <title>Eventra</title>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta name="description"
+	content="Citytours - Premium site template for city tours agencies, transfers and tickets." />
+<meta name="author" content="Ansonika" />
+<title>Eventra</title>
 
-    <!-- Favicons-->
-    <link rel="shortcut icon" href="img/favicon.ico" type="image/x-icon" />
-    <link
-      rel="apple-touch-icon"
-      type="image/x-icon"
-      href="img/apple-touch-icon-57x57-precomposed.png"
-    />
-    <link
-      rel="apple-touch-icon"
-      type="image/x-icon"
-      sizes="72x72"
-      href="img/apple-touch-icon-72x72-precomposed.png"
-    />
-    <link
-      rel="apple-touch-icon"
-      type="image/x-icon"
-      sizes="114x114"
-      href="img/apple-touch-icon-114x114-precomposed.png"
-    />
-    <link
-      rel="apple-touch-icon"
-      type="image/x-icon"
-      sizes="144x144"
-      href="img/apple-touch-icon-144x144-precomposed.png"
-    />
+<!-- Favicons-->
+<link rel="shortcut icon" href="img/favicon.ico" type="image/x-icon" />
+<link rel="apple-touch-icon" type="image/x-icon"
+	href="img/apple-touch-icon-57x57-precomposed.png" />
+<link rel="apple-touch-icon" type="image/x-icon" sizes="72x72"
+	href="img/apple-touch-icon-72x72-precomposed.png" />
+<link rel="apple-touch-icon" type="image/x-icon" sizes="114x114"
+	href="img/apple-touch-icon-114x114-precomposed.png" />
+<link rel="apple-touch-icon" type="image/x-icon" sizes="144x144"
+	href="img/apple-touch-icon-144x144-precomposed.png" />
 
-    <!-- GOOGLE WEB FONT -->
-    <link
-      href="https://fonts.googleapis.com/css2?family=Gochi+Hand&family=Montserrat:wght@300;400;500;600;700&display=swap"
-      rel="stylesheet"
-    />
+<!-- GOOGLE WEB FONT -->
+<link
+	href="https://fonts.googleapis.com/css2?family=Gochi+Hand&family=Montserrat:wght@300;400;500;600;700&display=swap"
+	rel="stylesheet" />
 
-    <!-- COMMON CSS -->
-    <link href="css/bootstrap.min.css" rel="stylesheet" />
-    <link href="css/style.css" rel="stylesheet" />
-    <link href="css/vendors.css" rel="stylesheet" />
+<!-- COMMON CSS -->
+<link href="css/bootstrap.min.css" rel="stylesheet" />
+<link href="css/style.css" rel="stylesheet" />
+<link href="css/vendors.css" rel="stylesheet" />
 
-    <!-- CUSTOM CSS -->
+<!-- CUSTOM CSS -->
 
-    <link href="css/g1_6_custom.css" rel="stylesheet" />
-    <link href="css/g1_10_custom.css" rel="stylesheet" />
-    <!-- 8/27 才新增改用展覽 css -->
-    <link href="css/g1_10_custom_common.css" rel="stylesheet" />
-    <link href="css/g1_10_custom_exhibition.css" rel="stylesheet" />
-  </head>
+<link href="css/g1_6_custom.css" rel="stylesheet" />
+<link href="css/g1_10_custom.css" rel="stylesheet" />
+<!-- 8/27 才新增改用展覽 css -->
+<link href="css/g1_10_custom_common.css" rel="stylesheet" />
+<link href="css/g1_10_custom_exhibition.css" rel="stylesheet" />
+</head>
 
-<!-- 先預設會在body抓展覽ID, -->
-  <body class="datepicker_mobile_full" data-exh-id="1">
-    <!-- Remove this class to disable datepicker full on mobile -->
+<body class="datepicker_mobile_full">
+	<!-- Remove this class to disable datepicker full on mobile -->
 
-    <div id="preloader">
-      <div class="sk-spinner sk-spinner-wave">
-        <div class="sk-rect1"></div>
-        <div class="sk-rect2"></div>
-        <div class="sk-rect3"></div>
-        <div class="sk-rect4"></div>
-        <div class="sk-rect5"></div>
-      </div>
-    </div>
-    <!-- End Preload -->
+	<div id="preloader">
+		<div class="sk-spinner sk-spinner-wave">
+			<div class="sk-rect1"></div>
+			<div class="sk-rect2"></div>
+			<div class="sk-rect3"></div>
+			<div class="sk-rect4"></div>
+			<div class="sk-rect5"></div>
+		</div>
+	</div>
+	<!-- End Preload -->
 
-    <div class="layer"></div>
-    <!-- Mobile menu overlay mask -->
+	<div class="layer"></div>
+	<!-- Mobile menu overlay mask -->
 
-    <!-- Header================================================== -->
-    <header>
-      <div class="container">
-        <div class="row" id="header-row">
-          <div class="col-md-2">
-            <div id="logo">
-              <a href="index.html"
-                ><img
-                  src="img/logo.png"
-                  width="160"
-                  height="34"
-                  alt="City tours"
-                  class="logo_normal"
-              /></a>
-              <a href="index.html"
-                ><img
-                  src="img/logo_sticky.png"
-                  width="160"
-                  height="34"
-                  alt="City tours"
-                  class="logo_sticky"
-              /></a>
-            </div>
-          </div>
-          <nav class="col-md-9">
-            <a
-              class="cmn-toggle-switch cmn-toggle-switch__htx open_close"
-              href="javascript:void(0);"
-              ><span>Menu mobile</span></a
-            >
-            <div class="main-menu">
-              <div id="header_menu">
-                <img
-                  src="img/logo_sticky.png"
-                  width="160"
-                  height="34"
-                  alt="City tours"
-                />
-              </div>
-              <a href="#" class="open_close" id="close_in"
-                ><i class="icon_set_1_icon-77"></i
-              ></a>
-              <ul>
-                <li class="submenu">
-                  <a href="/html/index.html" class="show-submenu">首頁</a>
-                </li>
-                <li class="submenu">
-                  <a
-                    href="/html/all_tours_map_listing.html"
-                    class="show-submenu"
-                    >地圖探索</a
-                  >
-                </li>
-                <li class="submenu">
-                  <a href="/html/all_tours_list.html" class="show-submenu"
-                    >推薦展覽</a
-                  >
-                </li>
-              </ul>
-            </div>
-            <!-- End main-menu -->
-            <!-- 搜尋專用 -->
-            <div id="nav_icon_1">
-              <a href="#" class="search-overlay-menu-btn"
-                ><i class="icon_search active"></i
-              ></a>
-              <input
-                class="searchbar"
-                type="text"
-                id="nav_search"
-                placeholder=" 搜尋展覽或主辦名稱"
-              />
-            </div>
-            <!-- 搜尋專用 end -->
-            <ul id="top_tools">
-              <li id="nav_icon_2">
-                <a href="/html/cart.html" class="cart_bt"
-                  ><i class="icon-cart"></i><strong>29:52</strong></a
-                >
-              </li>
-              <li id="nav_icon_3">
-                <a href="#"><i class="icon-ticket-2"></i></a>
-              </li>
-              <li id="nav_icon_4">
-                <!-- 不知怎麼引入那個登入彈窗 -->
-                <a href="#"><i class="icon-user"></i></a>
-              </li>
-            </ul>
-          </nav>
-        </div>
-      </div>
-      <!-- container -->
-    </header>
-    <!-- End Header -->
+	<!-- Header================================================== -->
+	<header>
+		<div class="container">
+			<div class="row" id="header-row">
+				<div class="col-md-2">
+					<div id="logo">
+						<a href="index.html"><img src="img/logo.png" width="160"
+							height="34" alt="City tours" class="logo_normal" /></a> <a
+							href="index.html"><img src="img/logo_sticky.png" width="160"
+							height="34" alt="City tours" class="logo_sticky" /></a>
+					</div>
+				</div>
+				<nav class="col-md-9">
+					<a class="cmn-toggle-switch cmn-toggle-switch__htx open_close"
+						href="javascript:void(0);"><span>Menu mobile</span></a>
+					<div class="main-menu">
+						<div id="header_menu">
+							<img src="img/logo_sticky.png" width="160" height="34"
+								alt="City tours" />
+						</div>
+						<a href="#" class="open_close" id="close_in"><i
+							class="icon_set_1_icon-77"></i></a>
+						<ul>
+							<li class="submenu"><a href="/html/index.html"
+								class="show-submenu">首頁</a></li>
+							<li class="submenu"><a
+								href="/html/all_tours_map_listing.html" class="show-submenu">地圖探索</a>
+							</li>
+							<li class="submenu"><a href="/html/all_tours_list.html"
+								class="show-submenu">推薦展覽</a></li>
+						</ul>
+					</div>
+					<!-- End main-menu -->
+					<!-- 搜尋專用 -->
+					<div id="nav_icon_1">
+						<a href="#" class="search-overlay-menu-btn"><i
+							class="icon_search active"></i></a> <input class="searchbar"
+							type="text" id="nav_search" placeholder=" 搜尋展覽或主辦名稱" />
+					</div>
+					<!-- 搜尋專用 end -->
+					<ul id="top_tools">
+						<li id="nav_icon_2"><a href="/html/cart.html" class="cart_bt"><i
+								class="icon-cart"></i><strong>29:52</strong></a></li>
+						<li id="nav_icon_3"><a href="#"><i class="icon-ticket-2"></i></a>
+						</li>
+						<li id="nav_icon_4">
+							<!-- 不知怎麼引入那個登入彈窗 --> <a href="#"><i class="icon-user"></i></a>
+						</li>
+					</ul>
+				</nav>
+			</div>
+		</div>
+		<!-- container -->
+	</header>
+	<!-- End Header -->
 
-    <section
-      class="parallax-window"
-      data-parallax="scroll"
-      data-image-src="img/group1_img/富士山.jpg"
-      data-natural-width="1400"
-      data-natural-height="470"
-    >
-      <div class="parallax-content-2">
-        <div class="container">
-          <div class="row">
-            <div class="col-md-8">
-              <h1 style="margin-bottom: 16px">當代藝術畫展 - TibaMe</h1>
-              <span class="rating" id="span_rating"
-                ><i class="icon-star"></i><i class="icon-star"></i
-                ><i class="icon-star"></i><i class="icon-star"></i
-                ><i class="icon-star"></i>&nbsp;&nbsp;<strong
-                  ><small>4.5&nbsp;&nbsp;(75)</small></strong
-                >
-                <div class="banner_actions">
-                  <button id="btn_open_rate_modal" class="btn_rate">
-                    評價展覽
-                  </button>
-                  <!-- 個人功能測試階段, 會員ID暫預設為3, 展覽ID暫預設為1 -->
-                  <button id="favorite" th:attr="data-toggle-url=@{/api/favorite/toggle}"
-                  class="btn_fav"
-                  		th:data-mem-id="3" 
-                        th:data-exh-id="1">
-                    <i class="icon-heart "></i> 收藏展覽
-                  </button>
-                </div>
-              </span>
-            </div>
-
-            <div class="col-md-4">
-              <div id="price_single_main">
-                票價 <span><sup>NT$</sup>300+</span>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
-    <!-- End section -->
-
-    <main>
-      <!-- End Map -->
-
-      <div class="container margin_60">
-        <div class="row">
-          <div class="col-lg-8" id="single_tour_desc">
-            <nav class="section_nav" aria-label="內頁導覽">
-              <a href="#sec-info">展覽資料</a>
-              <a href="#sec-content">展覽介紹</a>
-              <a href="#sec-exhibitor">主辦專頁</a>
-              <a href="#sec-comments">留言區</a>
-            </nav>
-
-            <p class="d-block d-lg-none">
-              <a
-                class="btn_map"
-                data-bs-toggle="collapse"
-                href="#collapseMap"
-                aria-expanded="false"
-                aria-controls="collapseMap"
-                data-text-swap="Hide map"
-                data-text-original="View on map"
-                >View on map</a
-              >
-            </p>
-            <!-- Map button for tablets/mobiles -->
-
-            <div class="row">
-              <h3 id="sec-info">展覽資訊</h3>
-              <hr class="main_hr" />
-              <div class="col-lg-12">
-                <h4>展覽時間</h4>
-                <span class="sec_info">2025/08/25~2025/08/31</span>
-
-                <h4>展覽地點</h4>
-                <span class="sec_info"
-                  >臺北市中山區南京東路三段219號5樓(緯育TibaMe台北職訓中心)</span
-                >
-              </div>
-            </div>
-            <br />
-
-            <div class="row">
-              <h3 id="sec-content">展覽介紹</h3>
-              <hr class="main_hr" />
-              <div class="col-lg-12">
-                <h4>巴黎之美</h4>
-                <p>
-                  本展覽將帶您感受巴黎浪漫氛圍與藝術魅力，從經典名畫到當代創作，讓您彷彿置身塞納河畔。本展覽將帶您感受巴黎浪漫氛圍與藝術魅力，從經典名畫到當代創作，讓您彷彿置身塞納河畔。
-                </p>
-                <h4>展覽包含</h4>
-                <p>以下內容皆包含於票價中，讓您一次飽覽精彩：</p>
-                <div class="row">
-                  <div class="col-md-6">
-                    <ul class="list_ok">
-                      <li>導覽手冊與展區地圖</li>
-                      <li>免費語音導覽服務</li>
-                      <li>精選藝術品近距離觀賞</li>
-                      <li>特展區專屬入場券</li>
-                      <li>館內咖啡廳折扣券</li>
-                      <li>紀念品商店優惠券</li>
-                    </ul>
-                  </div>
-                  <div class="col-md-6">
-                    <ul class="list_ok">
-                      <li>導覽手冊與展區地圖</li>
-                      <li>免費語音導覽服務</li>
-                      <li>精選藝術品近距離觀賞</li>
-                      <li>特展區專屬入場券</li>
-                    </ul>
-                  </div>
-                </div>
-                <img
-                  src="./img/group1_img/富士山.jpg"
-                  alt=""
-                  class="exhib_content_img"
-                />
-                <!-- End row  -->
-              </div>
-            </div>
-
-            <br />
-            <br />
-            <br />
-
-            <div class="row">
-              <h3 id="sec-exhibitor">主辦專頁</h3>
-              <hr class="main_hr" />
-              <div class="col-lg-12" id="exhibitor-info">
-                <a href="#" title="前往主辦專頁" class="exhibitor-link">
-                  緯育 TibaMe 台北職訓中心
-                </a>
-              </div>
-            </div>
-
-            <br />
-            <br />
-            <br />
-
-            <div class="row">
-              <h3 id="sec-comments">留言區</h3>
-              <hr class="main_hr" />
-              <div class="col-lg-12">
-                <div id="general_rating">總計 <span>75</span> 則留言</div>
-                <!-- End general_rating (其實是評價） -->
-                <!-- 本人回覆輸入 -->
-                <section class="top-reply">
-                  <form action="" class="form_reply">
-                    <img
-                      src="./img/avatar1.jpg"
-                      alt="Image"
-                      class="rounded-circle replier_self"
-                    />
-                    <input type="text" placeholder="輸入回覆" />
-                    <button type="submit">
-                      <i class="icon-direction-1"></i>
-                    </button>
-                  </form>
-                </section>
-
-                <button class="btn_full btn_more_comments_parent">
-                  查看更多留言
+	<section class="parallax-window" data-parallax="scroll" th:data-image-src="${exhibition.photoLandscape}"
+		data-image-src="img/group1_img/富士山.jpg" data-natural-width="1400"
+		data-natural-height="470">
+		<div class="parallax-content-2">
+			<div class="container">
+				<div class="row">
+					<div class="col-md-8">
+						<h1 style="margin-bottom: 16px" th:text="${exhibition.exhibitionName}">當代藝術畫展 - TibaMe</h1>
+						<span class="rating" id="span_rating">
+						<i th:each="i : ${#numbers.sequence(1, 5)}" th:class="${exhibition.averageRatingScore >= i ? 'icon-star voted' 
+																				: (exhibition.averageRatingScore > i - 1 and exhibition.averageRatingScore < i ? 'icon-star-half-alt voted' : 'icon-star')}"></i>
+						&nbsp;&nbsp;<strong><small th:utext="${exhibition.averageRatingScore + '&nbsp;&nbsp;(' + exhibition.totalRatingCount + ')'}">4.5&nbsp;&nbsp;(75)</small></strong>
+							<div class="banner_actions">
+								<button id="btn_open_rate_modal" class="btn_rate">評價展覽
+								</button>
+								<!-- 收藏展覽按鈕 -->
+                <button id="favorite" class="btn_fav" data-exh-id="">
+                  <i class="icon-heart"></i> 收藏展覽
                 </button>
-              </div>
-            </div>
-          </div>
-          <!--End  single_tour_desc-->
+							</div> </span>
+					</div>
 
-          <aside class="col-lg-4" id="sidebar">
-            <div class="box_style_1 expose">
-              <h3 class="inner">購票</h3>
-              <div class="row">
-                <div class="ticket_type">
-                  <div class="numbers-row-parent">
-                    <label>全票</label>
-                    <div class="numbers-row">
-                      <input
-                        type="text"
-                        value="0"
-                        id="adults"
-                        class="qty2 form-control"
-                        name="quantity"
-                        data-ticket-type-id="1"
-                      />
-                    </div>
-                    <span>$ 350</span>
-                  </div>
-                  <div class="numbers-row-parent">
-                    <label>學生票</label>
-                    <div class="numbers-row">
-                      <input
-                        type="text"
-                        value="0"
-                        id="students"
-                        class="qty2 form-control"
-                        name="quantity"
-                        data-ticket-type-id="2"
-                      />
-                    </div>
-                    <span>$ 300</span>
-                  </div>
-                  <div class="numbers-row-parent">
-                    <label>敬老票</label>
-                    <div class="numbers-row">
-                      <input
-                        type="text"
-                        value="0"
-                        id="elderly"
-                        class="qty2 form-control"
-                        name="quantity"
-                        data-ticket-type-id="3"
-                      />
-                    </div>
-                    <span>$ 250</span>
-                  </div>
-                  <div class="numbers-row-parent">
-                    <label>身心障礙者票</label>
-                    <div class="numbers-row">
-                      <input
-                        type="text"
-                        value="0"
-                        id="disabled"
-                        class="qty2 form-control"
-                        name="quantity"
-                        data-ticket-type-id="4"
-                      />
-                    </div>
-                    <span>$ 200</span>
-                  </div>
-                  <div class="numbers-row-parent">
-                    <label>軍警票</label>
-                    <div class="numbers-row">
-                      <input
-                        type="text"
-                        value="0"
-                        id="mili_and_police"
-                        class="qty2 form-control"
-                        name="quantity"
-                        data-ticket-type-id="5"
-                      />
-                    </div>
-                    <span>$ 200</span>
-                  </div>
-                </div>
-              </div>
-              <table class="table table_summary">
-                <tbody id="table_body">
-                  <tr>
-                    <td class="label">全票</td>
-                    <td class="text-end">0</td>
-                  </tr>
-                  <tr>
-                    <td class="label">學生票</td>
-                    <td class="text-end">0</td>
-                  </tr>
-                  <tr>
-                    <td class="label">敬老票</td>
-                    <td class="text-end">0</td>
-                  </tr>
-                  <tr>
-                    <td class="label">身心障礙者票</td>
-                    <td class="text-end">0</td>
-                  </tr>
-                  <tr>
-                    <td class="label">軍警票</td>
-                    <td class="text-end">0</td>
-                  </tr>
-                  <tr class="total">
-                    <td>總計</td>
-                    <td class="text-end">$0</td>
-                  </tr>
-                </tbody>
-              </table>
-              <a class="btn_full" href="cart.html" id="add_cart_and_go">立即訂票</a>
-              <a class="btn_full_outline" href="#" id="add_cart"
-                ><i class="icon-heart"></i> 加入購物車</a
-              >
-            </div>
-            <!--/box_style_1 -->
+					<div class="col-md-4">
+						<div id="price_single_main">
+							票價 <span th:inline="text"><sup>NT$</sup>[[${exhibition.cheapestTicketPrice + '+'}]]</span> 剩餘票數 <span
+								id="sse_ticket_left" th:text="${exhibition.leftTicketQuantity}">73</span>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</section>
+	<!-- End section -->
 
-            <div id="related_exhib">
-              <h3 class="inner">推薦展覽</h3>
-              <div>
-                <div class="sidebar_exhib_block">
-                  <a href="">
-                    <div class="sidebar_exhib_img">
-                      <img
-                        src="img/0_exhibition/ChatGPT_exhibition_1.png"
-                        alt="推薦圖片"
-                      />
-                    </div>
-                    <span class="sidebar_exhib_title"
-                      >當代藝術畫展 - TibaMe</span
-                    >
-                    <span class="sidebar_exhib_loc"
-                      ><i class="icon-location"></i>&nbsp;台北市立美術館</span
-                    >
-                    <span class="sidebar_exhib_time"
-                      ><i class="icon-clock"></i>&nbsp;08/12~08/25</span
-                    >
-                    <div class="rating">
-                      <i class="icon-star voted"></i
-                      ><i class="icon-star voted"></i
-                      ><i class="icon-star voted"></i
-                      ><i class="icon-star voted"></i
-                      ><i class="icon-star-half-alt voted"></i>
-                      <span><small>(75)</small></span>
-                    </div>
-                  </a>
-                </div>
-              </div>
-              <hr />
-              <div>
-                <div class="sidebar_exhib_block">
-                  <a href="">
-                    <div class="sidebar_exhib_img">
-                      <img
-                        src="img/0_exhibition/ChatGPT_exhibition_1.png"
-                        alt="推薦圖片"
-                      />
-                    </div>
-                    <span class="sidebar_exhib_title"
-                      >當代藝術畫展 - TibaMe</span
-                    >
-                    <span class="sidebar_exhib_loc"
-                      ><i class="icon-location"></i>&nbsp;台北市立美術館</span
-                    >
-                    <span class="sidebar_exhib_time"
-                      ><i class="icon-clock"></i>&nbsp;08/12~08/25</span
-                    >
-                    <div class="rating">
-                      <i class="icon-star voted"></i
-                      ><i class="icon-star voted"></i
-                      ><i class="icon-star voted"></i
-                      ><i class="icon-star voted"></i
-                      ><i class="icon-star-half-alt voted"></i>
-                      <span><small>(75)</small></span>
-                    </div>
-                  </a>
-                </div>
-              </div>
-              <hr />
-              <div>
-                <div class="sidebar_exhib_block">
-                  <a href="">
-                    <div class="sidebar_exhib_img">
-                      <img
-                        src="img/0_exhibition/ChatGPT_exhibition_1.png"
-                        alt="推薦圖片"
-                      />
-                    </div>
-                    <span class="sidebar_exhib_title"
-                      >當代藝術畫展 - TibaMe</span
-                    >
-                    <span class="sidebar_exhib_loc"
-                      ><i class="icon-location"></i>&nbsp;台北市立美術館</span
-                    >
-                    <span class="sidebar_exhib_time"
-                      ><i class="icon-clock"></i>&nbsp;08/12~08/25</span
-                    >
-                    <div class="rating">
-                      <i class="icon-star voted"></i
-                      ><i class="icon-star voted"></i
-                      ><i class="icon-star voted"></i
-                      ><i class="icon-star voted"></i
-                      ><i class="icon-star-half-alt voted"></i>
-                      <span><small>(75)</small></span>
-                    </div>
-                  </a>
-                </div>
-              </div>
+	<main>
+		<!-- End Map -->
 
-              <div id="more_related_exhib">
-                <button class="btn_full btn_full_exhib">查看更多</button>
-              </div>
-            </div>
-          </aside>
-        </div>
-        <!--End row -->
-      </div>
-      <!--End container -->
+		<div class="container margin_60">
+			<div class="row">
+				<div class="col-lg-8" id="single_tour_desc">
+					<nav class="section_nav" aria-label="內頁導覽">
+						<a href="#sec-info">展覽資訊</a> <a href="#sec-content">展覽介紹</a> <a
+							href="#sec-exhibitor">主辦專頁</a> <a href="#sec-comments">留言區</a>
+					</nav>
 
-      <div id="overlay"></div>
-      <!-- Mask on input focus -->
-    </main>
-    <!-- End main -->
+					<p class="d-block d-lg-none">
+						<a class="btn_map" data-bs-toggle="collapse" href="#collapseMap"
+							aria-expanded="false" aria-controls="collapseMap"
+							data-text-swap="Hide map" data-text-original="View on map">View
+							on map</a>
+					</p>
+					<!-- Map button for tablets/mobiles -->
 
-    <footer class="revealed">
-      <div class="container">
-        <div class="row" id="footer_row1">
-          <div class="col-md-3">
-            <h3>【資源】</h3>
-            <br />
-            <ul>
-              <li><a href="#">常見問題 FAQ</a></li>
-              <li><a href="#">平台公告</a></li>
-              <li><a href="#">主辦方專區</a></li>
-            </ul>
-          </div>
-          <div class="col-md-4">
-            <h3>【聯繫我們】</h3>
-            <a href="tel://004542344599" id="phone">(02) 813-3782</a>
-            <a href="mailto:help@citytours.com" id="email_footer"
-              >helper@eventra.com</a
-            >
-          </div>
-        </div>
-        <!-- End row -->
-        <div class="row" id="footer_row2">
-          <div class="col-md-12">
-            <div id="social_footer">
-              <ul>
-                <li>
-                  <a href="#0"><i class="bi bi-instagram"></i></a>
-                </li>
-                <li>
-                  <a href="#0"><i class="bi bi-whatsapp"></i></a>
-                </li>
-                <li>
-                  <a href="#0"><i class="bi bi-facebook"></i></a>
-                </li>
-                <li>
-                  <a href="#0"><i class="bi bi-twitter-x"></i></a>
-                </li>
-                <li>
-                  <a href="#0"><i class="bi bi-youtube"></i></a>
-                </li>
-              </ul>
-              <p>© Eventra 2025</p>
-            </div>
-          </div>
-        </div>
-        <!-- End row -->
-      </div>
-      <!-- End container -->
-    </footer>
-    <!-- End footer -->
+					<div class="row">
+						<h3 id="sec-info">展覽資訊</h3>
+						<hr class="main_hr" />
+						<div class="col-lg-12">
+							<h4>展覽時間</h4>
+							<span class="sec_info" th:text="${exhibition.startTime + ' ~ ' + exhibition.endTime}">2025/08/25~2025/08/31</span>
 
-    <div id="toTop"></div>
-    <!-- Back to top button -->
+							<h4>展覽地點</h4>
+							<span class="sec_info" th:text="${exhibition.location}">臺北市中山區南京東路三段219號5樓(緯育TibaMe台北職訓中心)</span>
+						</div>
+					</div>
+					<br />
 
-    <!-- Search Menu -->
-    <div class="search-overlay-menu">
-      <span class="search-overlay-close"
-        ><i class="icon_set_1_icon-77"></i
-      ></span>
-      <form role="search" id="searchform" method="get">
-        <input
-          value=""
-          name="q"
-          type="text"
-          placeholder="搜尋展覽或主辦名稱 "
-        />
-        <button type="submit"><i class="icon_set_1_icon-78"></i></button>
-      </form>
+					<div class="row">
+						<h3 id="sec-content">展覽介紹</h3>
+						<hr class="main_hr" />
+						<div class="col-lg-12" th:utext="${exhibition.description}">
+							<h4>巴黎之美</h4>
+							<p>
+								本展覽將帶您感受巴黎浪漫氛圍與藝術魅力，從經典名畫到當代創作，讓您彷彿置身塞納河畔。本展覽將帶您感受巴黎浪漫氛圍與藝術魅力，從經典名畫到當代創作，讓您彷彿置身塞納河畔。
+							</p>
+							<h4>展覽包含</h4>
+							<p>以下內容皆包含於票價中，讓您一次飽覽精彩：</p>
+							<div class="row">
+								<div class="col-md-6">
+									<ul class="list_ok">
+										<li>導覽手冊與展區地圖</li>
+										<li>免費語音導覽服務</li>
+										<li>精選藝術品近距離觀賞</li>
+										<li>特展區專屬入場券</li>
+										<li>館內咖啡廳折扣券</li>
+										<li>紀念品商店優惠券</li>
+									</ul>
+								</div>
+								<div class="col-md-6">
+									<ul class="list_ok">
+										<li>導覽手冊與展區地圖</li>
+										<li>免費語音導覽服務</li>
+										<li>精選藝術品近距離觀賞</li>
+										<li>特展區專屬入場券</li>
+									</ul>
+								</div>
+							</div>
+							<img src="./img/group1_img/富士山.jpg" alt=""
+								class="exhib_content_img" />
+							<!-- End row  -->
+						</div>
+					</div>
 
-      <div id="search_block_parent">
-        <div id="search_filter_block">
-          <button><i class="icon-filter"></i>區域篩選</button>
-          <button><i class="icon-filter"></i>日期篩選</button>
-        </div>
-        <h3>熱門搜尋</h3>
-        <div id="search_hot_block" class="search_block">
-          <a href="/html/all_tours_list.html" class="history-btn">熱門搜尋</a>
-          <a href="/html/all_tours_list.html" class="history-btn">熱門搜尋</a>
-          <a href="/html/all_tours_list.html" class="history-btn">熱門搜尋</a>
-          <a href="/html/all_tours_list.html" class="history-btn">熱門搜尋</a>
-          <a href="/html/all_tours_list.html" class="history-btn">熱門搜尋</a>
-          <a href="/html/all_tours_list.html" class="history-btn">熱門搜尋</a>
-        </div>
-        <hr />
-        <h3>您最近搜尋過</h3>
-        <div id="search_history_block" class="search_block">
-          <a href="/html/all_tours_list.html" class="history-btn">歷史搜尋</a>
-          <a href="/html/all_tours_list.html" class="history-btn">歷史搜尋</a>
-          <a href="/html/all_tours_list.html" class="history-btn">歷史搜尋</a>
-          <a href="/html/all_tours_list.html" class="history-btn">歷史搜尋</a>
-          <a href="/html/all_tours_list.html" class="history-btn">歷史搜尋</a>
-          <a href="/html/all_tours_list.html" class="history-btn">歷史搜尋</a>
-          <a href="/html/all_tours_list.html" class="history-btn">歷史搜尋</a>
-          <a href="/html/all_tours_list.html" class="history-btn">歷史搜尋</a>
-          <a href="/html/all_tours_list.html" class="history-btn">歷史搜尋</a>
-          <a href="/html/all_tours_list.html" class="history-btn">歷史搜尋</a>
-          <a href="/html/all_tours_list.html" class="history-btn">歷史搜尋</a>
-          <a href="/html/all_tours_list.html" class="history-btn">歷史搜尋</a>
-        </div>
-      </div>
-    </div>
-    <!-- End Search Menu -->
+					<br /> <br /> <br />
 
-    <!-- Sign In Popup -->
-    <div id="sign-in-dialog" class="zoom-anim-dialog mfp-hide">
-      <div class="small-dialog-header">
-        <h3>Sign In</h3>
-      </div>
-      <form>
-        <div class="sign-in-wrapper">
-          <a href="#0" class="social_bt facebook">Login with Facebook</a>
-          <a href="#0" class="social_bt google">Login with Google</a>
-          <div class="divider"><span>Or</span></div>
-          <div class="form-group">
-            <label>Email</label>
-            <input type="email" class="form-control" name="email" id="email" />
-            <i class="icon_mail_alt"></i>
-          </div>
-          <div class="form-group">
-            <label>Password</label>
-            <input
-              type="password"
-              class="form-control"
-              name="password"
-              id="password"
-              value=""
-            />
-            <i class="icon_lock_alt"></i>
-          </div>
-          <div class="clearfix add_bottom_15">
-            <div class="checkboxes float-start">
-              <label class="container_check"
-                >Remember me
-                <input type="checkbox" />
-                <span class="checkmark"></span>
-              </label>
-            </div>
-            <div class="float-end">
-              <a id="forgot" href="javascript:void(0);">Forgot Password?</a>
-            </div>
-          </div>
-          <div class="text-center">
-            <input type="submit" value="Log In" class="btn_login" />
-          </div>
-          <div class="text-center">
-            Don’t have an account? <a href="javascript:void(0);">Sign up</a>
-          </div>
-          <div id="forgot_pw">
-            <div class="form-group">
-              <label>Please confirm login email below</label>
-              <input
-                type="email"
-                class="form-control"
-                name="email_forgot"
-                id="email_forgot"
-              />
-              <i class="icon_mail_alt"></i>
-            </div>
-            <p>
-              You will receive an email containing a link allowing you to reset
-              your password to a new preferred one.
-            </p>
-            <div class="text-center">
-              <input type="submit" value="Reset Password" class="btn_1" />
-            </div>
-          </div>
-        </div>
-      </form>
-      <!--form -->
-    </div>
-    <!-- 評價彈窗 -->
-    <div id="modal_backdrop" class="modal_backdrop hidden"></div>
-    <div
-      id="rate_modal"
-      class="modal hidden"
-      role="dialog"
-      aria-modal="true"
-      aria-labelledby="rate_title"
-    >
-      <div class="modal__panel">
-        <h4 id="rate_title">評價展覽</h4>
-        <form id="rate_form">
-          <div class="stars" aria-label="選擇星等">
-            <input type="radio" id="star5" name="rating" value="5" /><label
-              for="star5"
-              title="5 星"
-              >★</label
-            >
-            <input type="radio" id="star4" name="rating" value="4" /><label
-              for="star4"
-              title="4 星"
-              >★</label
-            >
-            <input type="radio" id="star3" name="rating" value="3" /><label
-              for="star3"
-              title="3 星"
-              >★</label
-            >
-            <input type="radio" id="star2" name="rating" value="2" /><label
-              for="star2"
-              title="2 星"
-              >★</label
-            >
-            <input type="radio" id="star1" name="rating" value="1" /><label
-              for="star1"
-              title="1 星"
-              >★</label
-            >
-          </div>
-          <div id="cannot_rate" class="-on">
-            由於您未參與過此展覽，因此無法進行評價
-          </div>
-          <div id="original_rating"></div>
-          <div class="modal__actions">
-            <button type="button" class="btn_cancel">取消</button>
-            <button type="submit" class="btn_submit" disabled>送出評價</button>
-          </div>
-        </form>
-      </div>
-    </div>
+					<div class="row">
+						<h3 id="sec-exhibitor">主辦專頁</h3>
+						<hr class="main_hr" />
+						<div class="col-lg-12" id="exhibitor-info">
+							<a href="#" th:href="@{/front-end/exhibitor_home/{exhibitorId}(exhibitorId = ${exhibition.exhibitor.exhibitorId})}" title="前往主辦專頁" class="exhibitor-link" th:text="${exhibition.exhibitor.exhibitorDisplayName}"> 緯育 TibaMe
+								台北職訓中心 </a>
+						</div>
+					</div>
 
-    <!-- Toast 容器：固定在右上角 -->
-    <div id="toast-container" aria-live="polite" aria-atomic="true"></div>
+					<br /> <br /> <br />
 
-    <!-- Common scripts -->
-    <script src="js/jquery-3.7.1.min.js"></script>
-    <script src="js/common_scripts_min.js"></script>
-    <script src="js/functions.js"></script>
+					<div class="row">
+						<h3 id="sec-comments">留言區</h3>
+						<hr class="main_hr" />
+						<div class="col-lg-12">
+							<div id="general_rating">
+								總計 <span th:text="${exhibition.totalCommentCount}">75</span> 則留言
+							</div>
+							<!-- End general_rating (其實是評價） -->
+							<!-- 本人回覆輸入 -->
+							<section class="top-reply">
+								<form action="" class="form_reply">
+									<img src="./img/avatar1.jpg" alt="Image"
+										class="rounded-circle replier_self" /> <input type="text"
+										placeholder="輸入回覆" />
+									<button type="submit">
+										<i class="icon-direction-1"></i>
+									</button>
+								</form>
+							</section>
 
-    <!-- Date and time pickers -->
-    <script>
+							<button class="btn_full btn_more_comments_parent">
+								查看更多留言</button>
+						</div>
+					</div>
+				</div>
+				<!--End  single_tour_desc-->
+
+				<aside class="col-lg-4" id="sidebar">
+					<div class="box_style_1 expose">
+						<h3 class="inner">購票</h3>
+						<div class="row">
+							<div class="ticket_type">
+								<div class="numbers-row-parent">
+									<label>全票</label>
+									<div class="numbers-row">
+										<input type="text" value="0" id="adults"
+											class="qty2 form-control" name="quantity"
+											data-ticket-type-id="1" />
+									</div>
+									<span th:text="'$ ' + ${exhibition.tickets.get(1)}">$ 350</span>
+								</div>
+								<div class="numbers-row-parent">
+									<label>學生票</label>
+									<div class="numbers-row">
+										<input type="text" value="0" id="students"
+											class="qty2 form-control" name="quantity"
+											data-ticket-type-id="2" />
+									</div>
+									<span th:text="'$ ' + ${exhibition.tickets.get(2)}">$ 350</span>
+								</div>
+								<div class="numbers-row-parent">
+									<label>敬老票</label>
+									<div class="numbers-row">
+										<input type="text" value="0" id="elderly"
+											class="qty2 form-control" name="quantity"
+											data-ticket-type-id="3" />
+									</div>
+									<span th:text="'$ ' + ${exhibition.tickets.get(3)}">$ 350</span>
+								</div>
+								<div class="numbers-row-parent">
+									<label>身心障礙者票</label>
+									<div class="numbers-row">
+										<input type="text" value="0" id="disabled"
+											class="qty2 form-control" name="quantity"
+											data-ticket-type-id="4" />
+									</div>
+									<span th:text="'$ ' + ${exhibition.tickets.get(4)}">$ 350</span>
+								</div>
+								<div class="numbers-row-parent">
+									<label>軍警票</label>
+									<div class="numbers-row">
+										<input type="text" value="0" id="mili_and_police"
+											class="qty2 form-control" name="quantity"
+											data-ticket-type-id="5" />
+									</div>
+									<span th:text="'$ ' + ${exhibition.tickets.get(5)}">$ 350</span>
+								</div>
+							</div>
+						</div>
+						<table class="table table_summary">
+							<tbody id="table_body">
+								<tr>
+									<td class="label">全票</td>
+									<td class="text-end">0</td>
+								</tr>
+								<tr>
+									<td class="label">學生票</td>
+									<td class="text-end">0</td>
+								</tr>
+								<tr>
+									<td class="label">敬老票</td>
+									<td class="text-end">0</td>
+								</tr>
+								<tr>
+									<td class="label">身心障礙者票</td>
+									<td class="text-end">0</td>
+								</tr>
+								<tr>
+									<td class="label">軍警票</td>
+									<td class="text-end">0</td>
+								</tr>
+								<tr class="total">
+									<td>總計</td>
+									<td class="text-end">$0</td>
+								</tr>
+							</tbody>
+						</table>
+						<a class="btn_full" href="cart.html" id="add_cart_and_go">立即訂票</a>
+						<a class="btn_full_outline" href="#" id="add_cart"><i
+							class="icon-heart"></i> 加入購物車</a>
+					</div>
+					<!--/box_style_1 -->
+
+					<div id="related_exhib">
+						<h3 class="inner">推薦展覽</h3>
+						<div>
+							<div class="sidebar_exhib_block">
+								<a href="">
+									<div class="sidebar_exhib_img">
+										<img src="img/0_exhibition/ChatGPT_exhibition_1.png"
+											alt="推薦圖片" />
+									</div> <span class="sidebar_exhib_title">當代藝術畫展 - TibaMe</span> <span
+									class="sidebar_exhib_loc"><i class="icon-location"></i>&nbsp;台北市立美術館</span>
+									<span class="sidebar_exhib_time"><i class="icon-clock"></i>&nbsp;08/12~08/25</span>
+									<div class="rating">
+										<i class="icon-star voted"></i><i class="icon-star voted"></i><i
+											class="icon-star voted"></i><i class="icon-star voted"></i><i
+											class="icon-star-half-alt voted"></i> <span><small>(75)</small></span>
+									</div>
+								</a>
+							</div>
+						</div>
+						<hr />
+						<div>
+							<div class="sidebar_exhib_block">
+								<a href="">
+									<div class="sidebar_exhib_img">
+										<img src="img/0_exhibition/ChatGPT_exhibition_1.png"
+											alt="推薦圖片" />
+									</div> <span class="sidebar_exhib_title">當代藝術畫展 - TibaMe</span> <span
+									class="sidebar_exhib_loc"><i class="icon-location"></i>&nbsp;台北市立美術館</span>
+									<span class="sidebar_exhib_time"><i class="icon-clock"></i>&nbsp;08/12~08/25</span>
+									<div class="rating">
+										<i class="icon-star voted"></i><i class="icon-star voted"></i><i
+											class="icon-star voted"></i><i class="icon-star voted"></i><i
+											class="icon-star-half-alt voted"></i> <span><small>(75)</small></span>
+									</div>
+								</a>
+							</div>
+						</div>
+						<hr />
+						<div>
+							<div class="sidebar_exhib_block">
+								<a href="">
+									<div class="sidebar_exhib_img">
+										<img src="img/0_exhibition/ChatGPT_exhibition_1.png"
+											alt="推薦圖片" />
+									</div> <span class="sidebar_exhib_title">當代藝術畫展 - TibaMe</span> <span
+									class="sidebar_exhib_loc"><i class="icon-location"></i>&nbsp;台北市立美術館</span>
+									<span class="sidebar_exhib_time"><i class="icon-clock"></i>&nbsp;08/12~08/25</span>
+									<div class="rating">
+										<i class="icon-star voted"></i><i class="icon-star voted"></i><i
+											class="icon-star voted"></i><i class="icon-star voted"></i><i
+											class="icon-star-half-alt voted"></i> <span><small>(75)</small></span>
+									</div>
+								</a>
+							</div>
+						</div>
+
+						<div id="more_related_exhib">
+							<button class="btn_full btn_full_exhib">查看更多</button>
+						</div>
+					</div>
+				</aside>
+			</div>
+			<!--End row -->
+		</div>
+		<!--End container -->
+
+		<div id="overlay"></div>
+		<!-- Mask on input focus -->
+	</main>
+	<!-- End main -->
+
+	<footer class="revealed">
+		<div class="container">
+			<div class="row" id="footer_row1">
+				<div class="col-md-3">
+					<h3>【資源】</h3>
+					<br />
+					<ul>
+						<li><a href="#">常見問題 FAQ</a></li>
+						<li><a href="#">平台公告</a></li>
+						<li><a href="#">主辦方專區</a></li>
+					</ul>
+				</div>
+				<div class="col-md-4">
+					<h3>【聯繫我們】</h3>
+					<a href="tel://004542344599" id="phone">(02) 813-3782</a> <a
+						href="mailto:help@citytours.com" id="email_footer">helper@eventra.com</a>
+				</div>
+			</div>
+			<!-- End row -->
+			<div class="row" id="footer_row2">
+				<div class="col-md-12">
+					<div id="social_footer">
+						<ul>
+							<li><a href="#0"><i class="bi bi-instagram"></i></a></li>
+							<li><a href="#0"><i class="bi bi-whatsapp"></i></a></li>
+							<li><a href="#0"><i class="bi bi-facebook"></i></a></li>
+							<li><a href="#0"><i class="bi bi-twitter-x"></i></a></li>
+							<li><a href="#0"><i class="bi bi-youtube"></i></a></li>
+						</ul>
+						<p>© Eventra 2025</p>
+					</div>
+				</div>
+			</div>
+			<!-- End row -->
+		</div>
+		<!-- End container -->
+	</footer>
+	<!-- End footer -->
+
+	<div id="toTop"></div>
+	<!-- Back to top button -->
+
+	<div id="chat-widget">
+		<!-- Sticky Button -->
+		<button id="chat-toggle">
+			<i class=" icon-chat-5"></i>
+		</button>
+
+		<!-- Chat Window -->
+		<div id="chat-window">
+			<div class="chat-header">
+				<span>Eventra - 聊天大廳</span>
+				<span><sub>(目前在線人數: <span id="chat-online-count">1</span>人)</sub></span>
+				<button id="chat-close">✕</button>
+			</div>
+			<div class="chat-body" id="chat-body">
+<!-- 				<div class="message others"> -->
+<!-- 					<img src="img/group1_img/aa志嘉.png" class="avatar"> -->
+<!-- 					<div class="bubble">Hi 👋 有什麼可以幫忙的嗎？</div> -->
+<!-- 					<time class="others">上午8:12</time> -->
+<!-- 				</div> -->
+<!-- 				<div class="message self"> -->
+<!-- 					<img src="img/group1_img/aa志嘉.png" class="avatar" /> -->
+<!-- 					<div class="bubble">Hi 👋 我是志嘉</div> -->
+<!-- 					<time class="self">下午12:37</time> -->
+<!-- 				</div> -->
+				<div id="chat-overlay">
+					<button onclick="location.href='/front-end/login'">登入</button>
+					<span>登入後才能留言哦！</span>
+				</div>
+
+			</div>
+
+			<div class="chat-footer">
+				<input type="text" id="chat-input" placeholder="輸入訊息..." />
+				<button id="chat-send">➤</button>
+			</div>
+		</div>
+	</div>
+
+
+	<!-- Search Menu -->
+	<div class="search-overlay-menu">
+		<span class="search-overlay-close"><i
+			class="icon_set_1_icon-77"></i></span>
+		<form role="search" id="searchform" method="get">
+			<input value="" name="q" type="text" placeholder="搜尋展覽或主辦名稱 " />
+			<button type="submit">
+				<i class="icon_set_1_icon-78"></i>
+			</button>
+		</form>
+
+		<div id="search_block_parent">
+			<div id="search_filter_block">
+				<button>
+					<i class="icon-filter"></i>區域篩選
+				</button>
+				<button>
+					<i class="icon-filter"></i>日期篩選
+				</button>
+			</div>
+			<h3>熱門搜尋</h3>
+			<div id="search_hot_block" class="search_block">
+				<a href="/html/all_tours_list.html" class="history-btn">熱門搜尋</a> <a
+					href="/html/all_tours_list.html" class="history-btn">熱門搜尋</a> <a
+					href="/html/all_tours_list.html" class="history-btn">熱門搜尋</a> <a
+					href="/html/all_tours_list.html" class="history-btn">熱門搜尋</a> <a
+					href="/html/all_tours_list.html" class="history-btn">熱門搜尋</a> <a
+					href="/html/all_tours_list.html" class="history-btn">熱門搜尋</a>
+			</div>
+			<hr />
+			<h3>您最近搜尋過</h3>
+			<div id="search_history_block" class="search_block">
+				<a href="/html/all_tours_list.html" class="history-btn">歷史搜尋</a> <a
+					href="/html/all_tours_list.html" class="history-btn">歷史搜尋</a> <a
+					href="/html/all_tours_list.html" class="history-btn">歷史搜尋</a> <a
+					href="/html/all_tours_list.html" class="history-btn">歷史搜尋</a> <a
+					href="/html/all_tours_list.html" class="history-btn">歷史搜尋</a> <a
+					href="/html/all_tours_list.html" class="history-btn">歷史搜尋</a> <a
+					href="/html/all_tours_list.html" class="history-btn">歷史搜尋</a> <a
+					href="/html/all_tours_list.html" class="history-btn">歷史搜尋</a> <a
+					href="/html/all_tours_list.html" class="history-btn">歷史搜尋</a> <a
+					href="/html/all_tours_list.html" class="history-btn">歷史搜尋</a> <a
+					href="/html/all_tours_list.html" class="history-btn">歷史搜尋</a> <a
+					href="/html/all_tours_list.html" class="history-btn">歷史搜尋</a>
+			</div>
+		</div>
+	</div>
+	<!-- End Search Menu -->
+
+	<!-- Sign In Popup -->
+	<div id="sign-in-dialog" class="zoom-anim-dialog mfp-hide">
+		<div class="small-dialog-header">
+			<h3>Sign In</h3>
+		</div>
+		<form>
+			<div class="sign-in-wrapper">
+				<a href="#0" class="social_bt facebook">Login with Facebook</a> <a
+					href="#0" class="social_bt google">Login with Google</a>
+				<div class="divider">
+					<span>Or</span>
+				</div>
+				<div class="form-group">
+					<label>Email</label> <input type="email" class="form-control"
+						name="email" id="email" /> <i class="icon_mail_alt"></i>
+				</div>
+				<div class="form-group">
+					<label>Password</label> <input type="password" class="form-control"
+						name="password" id="password" value="" /> <i
+						class="icon_lock_alt"></i>
+				</div>
+				<div class="clearfix add_bottom_15">
+					<div class="checkboxes float-start">
+						<label class="container_check">Remember me <input
+							type="checkbox" /> <span class="checkmark"></span>
+						</label>
+					</div>
+					<div class="float-end">
+						<a id="forgot" href="javascript:void(0);">Forgot Password?</a>
+					</div>
+				</div>
+				<div class="text-center">
+					<input type="submit" value="Log In" class="btn_login" />
+				</div>
+				<div class="text-center">
+					Don’t have an account? <a href="javascript:void(0);">Sign up</a>
+				</div>
+				<div id="forgot_pw">
+					<div class="form-group">
+						<label>Please confirm login email below</label> <input
+							type="email" class="form-control" name="email_forgot"
+							id="email_forgot" /> <i class="icon_mail_alt"></i>
+					</div>
+					<p>You will receive an email containing a link allowing you to
+						reset your password to a new preferred one.</p>
+					<div class="text-center">
+						<input type="submit" value="Reset Password" class="btn_1" />
+					</div>
+				</div>
+			</div>
+		</form>
+		<!--form -->
+	</div>
+	<!-- 評價彈窗 -->
+	<div id="modal_backdrop" class="modal_backdrop hidden"></div>
+	<div id="rate_modal" class="modal hidden" role="dialog"
+		aria-modal="true" aria-labelledby="rate_title">
+		<div class="modal__panel">
+			<h4 id="rate_title">評價展覽</h4>
+			<form id="rate_form">
+				<div class="stars" aria-label="選擇星等">
+					<input type="radio" id="star5" name="rating" value="5" /><label
+						for="star5" title="5 星">★</label> <input type="radio" id="star4"
+						name="rating" value="4" /><label for="star4" title="4 星">★</label>
+					<input type="radio" id="star3" name="rating" value="3" /><label
+						for="star3" title="3 星">★</label> <input type="radio" id="star2"
+						name="rating" value="2" /><label for="star2" title="2 星">★</label>
+					<input type="radio" id="star1" name="rating" value="1" /><label
+						for="star1" title="1 星">★</label>
+				</div>
+				<div id="cannot_rate" class="-on">由於您未參與過此展覽，因此無法進行評價</div>
+				<div id="original_rating"></div>
+				<div class="modal__actions">
+					<button type="button" class="btn_cancel">取消</button>
+					<button type="submit" class="btn_submit" disabled>送出評價</button>
+				</div>
+			</form>
+		</div>
+	</div>
+
+	<!-- Toast 容器：固定在右上角 -->
+	<div id="toast-container" aria-live="polite" aria-atomic="true"></div>
+
+	<!-- Common scripts -->
+	<script src="js/jquery-3.7.1.min.js"></script>
+	<script src="js/common_scripts_min.js"></script>
+	<script src="js/functions.js"></script>
+	<script src="js/sockjs.min.js"></script>
+	<script src="js/stomp.min.js"></script>
+
+	<!-- Date and time pickers -->
+	<script>
       $(function () {
         $("input.date-pick").daterangepicker(
           {
@@ -823,18 +664,58 @@
       <!--Review modal validation -->
     </script>
 
-    <!-- <script src="assets/validate.js"></script> -->
+	<!-- <script src="assets/validate.js"></script> -->
 
-    <!-- Map -->
-    <script src="http://maps.googleapis.com/maps/api/js"></script>
-    <script src="js/map.js"></script>
-    <script src="js/infobox.js"></script>
-    <script src="js/g1_10_custom_common_csrf.js"></script>
-    <script src="js/g1_10_custom_common.js"></script>
-    <script src="js/g1_10_custom_exhibition.js"></script>
-    <script src="js/g1_6_favorite_exhibitions.js"></script>
-    <script src="js/g1_6_exhibitions_viewcount.js"></script>
-    <script src="js/g1_6_search_history.js"></script>  <!-- 存搜尋紀錄用 -->
-    <script src="js/g1_6_search_modal.js"></script>	 <!-- 導頁至搜尋結果頁用 -->
-  </body>
+	<script src="js/g1_10_custom_common_csrf.js"></script>
+	<script src="js/g1_10_custom_common.js"></script>
+	<script src="js/g1_10_custom_exhibition.js"></script>
+	<script src="js/g1_6_favorite_exhibitions.js"></script>
+	<script src="js/g1_6_exhibitions_viewcount.js"></script>
+	<script src="js/g1_6_search_history.js"></script> <!-- 存搜尋紀錄用 -->
+	<script src="js/g1_6_search_modal.js"></script>	<!-- 導頁至搜尋結果頁用 -->
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script> <!-- 引入 SweetAlert2 -->
+
+	<!-- dify.ai ai chatbot -->
+	<script>
+		window.difyChatbotConfig = {
+			token : '6dNmiwvbRPuqvJW7',
+			inputs : {
+				welcome_message : "您好，歡迎來到 Eventra，請詢問任何問題！"
+			// You can define the inputs from the Start node here
+			// key is the variable name
+			// e.g.
+			// name: "NAME"
+			},
+			systemVariables : {
+			// user_id: 'YOU CAN DEFINE USER ID HERE',
+			// conversation_id: 'YOU CAN DEFINE CONVERSATION ID HERE, IT MUST BE A VALID UUID',
+			},
+			userVariables : {
+			// avatar_url: 'YOU CAN DEFINE USER AVATAR URL HERE',
+			// name: 'YOU CAN DEFINE USER NAME HERE',
+			},
+		}
+	</script>
+	<script src="https://udify.app/embed.min.js" id="6dNmiwvbRPuqvJW7"
+		defer>
+		
+	</script>
+	<style>
+#dify-chatbot-bubble-button {
+	background-color: rgba(37, 29, 28, 0.65) !important;
+	position: fixed;
+	left: 24px;
+	bottom: 24px;
+}
+
+#dify-chatbot-bubble-window {
+	width: 24rem !important;
+	height: 32rem !important;
+	position: fixed !important;
+	left: 92px !important;
+	bottom: 28px !important;
+}
+</style>
+
+</body>
 </html>

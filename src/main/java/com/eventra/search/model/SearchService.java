@@ -18,7 +18,7 @@ public class SearchService {
 		if (search.getRegions() == null) {
 			search.setRegions("");
 		}
-		System.out.println("📩 收到 keyword=" + search.getKeyword() + ", regions=" + search.getRegions());
+		System.out.println("收到 keyword=" + search.getKeyword() + ", regions=" + search.getRegions());
 		return repository.save(search);
 	}
 

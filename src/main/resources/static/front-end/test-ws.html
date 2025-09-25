@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <title>展覽通知測試 - 接收端</title>
+  <script src="https://cdn.jsdelivr.net/npm/sockjs-client@1/dist/sockjs.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/stompjs@2.3.3/lib/stomp.min.js"></script>
+</head>
+<body>
+  <h2>展覽通知測試 - 接收端</h2>
+  <input id="memberId" type="number" placeholder="輸入會員ID (例: 1)">
+  <button onclick="connect()">連線並訂閱</button>
+  <button onclick="loadHistory()">載入歷史通知</button>
+  <hr>
+  <h3>收到的通知：</h3>
+  <div id="messages"></div>
+
+  <script>
+    let stompClient = null;
+    let currentMemberId = null;
+
+    function connect() {
+      currentMemberId = document.getElementById("memberId").value;
+      if (!currentMemberId) {
+        alert("請輸入會員ID");
+        return;
+      }
+
+      const socket = new SockJS("http://localhost:8088/ws");
+      stompClient = Stomp.over(socket);
+
+      stompClient.connect({}, () => {
+        console.log("已連線，訂閱 memberId=" + currentMemberId);
+        stompClient.subscribe("/topic/member/" + currentMemberId + "/notifications", (message) => {
+          const body = JSON.parse(message.body);
+          document.getElementById("messages").innerHTML += 
+            `<p><b>即時通知</b> [${body.type}] ${body.title}: ${body.content}</p>`;
+        });
+      });
+    }
+
+    function loadHistory() {
+      if (!currentMemberId) {
+        currentMemberId = document.getElementById("memberId").value;
+      }
+      if (!currentMemberId) {
+        alert("請先輸入會員ID");
+        return;
+      }
+
+      fetch("http://localhost:8088/api/notifications/member/" + currentMemberId)
+        .then(res => res.json())
+        .then(list => {
+          const msgDiv = document.getElementById("messages");
+          msgDiv.innerHTML += `<h4>歷史通知 (${list.length} 筆)</h4>`;
+          list.forEach(item => {
+            msgDiv.innerHTML += 
+              `<p><b>歷史通知</b> [已讀:${item.readStatus}] ${item.title}: ${item.content}</p>`;
+          });
+        })
+        .catch(err => console.error("載入歷史通知錯誤:", err));
+    }
+  </script>
+</body>
+</html>

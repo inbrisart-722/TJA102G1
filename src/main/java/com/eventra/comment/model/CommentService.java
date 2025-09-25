@@ -10,6 +10,7 @@ import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.eventra.comment.controller.CommentStatus;
 import com.eventra.comment_reaction.model.CommentReactionRepository;
 import com.eventra.exhibition.model.ExhibitionVO;
 import com.eventra.member.model.MemberVO;
@@ -60,9 +61,9 @@ public class CommentService {
         CommentVO commentVOOut = COMMENT_REPO.saveAndFlush(commentVOIn); // 送去DB先執行（交易尚未提交） => 1. 與交易本身提交是兩回事 
         entityManager.refresh(commentVOOut); // 去DB查詢後更新快取 => 1. 拿到其他自增值 2. 也可用 @CreationTimestamp, @UpdateTimestamp 就不用 refresh
         // resDTO 參數 2
-        Integer commentCount = COMMENT_REPO.findCountByExhibition("正常", req.getExhibitionId());
+        Integer commentCount = COMMENT_REPO.findCountByExhibition(CommentStatus.正常, req.getExhibitionId());
         // resDTO 參數 3
-        Integer replyCount = (parentCommentRef != null) ? COMMENT_REPO.findCountByParent("正常", req.getExhibitionId(), req.getParentCommentId()) : null;
+        Integer replyCount = (parentCommentRef != null) ? COMMENT_REPO.findCountByParent(CommentStatus.正常, req.getExhibitionId(), req.getParentCommentId()) : null;
         
         System.out.println(commentCount);
         System.out.println(replyCount);
@@ -81,8 +82,8 @@ public class CommentService {
 		
 		// 2. reqDTO => Slice<VO>
 		Slice<CommentVO> slice = (parentCommentId == null)
-				? COMMENT_REPO.findComments("正常", exhibitionId, commentId, PAGE_LOAD)
-				: COMMENT_REPO.findCommentsByParent("正常", exhibitionId, parentCommentId, commentId, PAGE_LOAD);
+				? COMMENT_REPO.findComments(CommentStatus.正常, exhibitionId, commentId, PAGE_LOAD)
+				: COMMENT_REPO.findCommentsByParent(CommentStatus.正常, exhibitionId, parentCommentId, commentId, PAGE_LOAD);
 		
 		// 3. Slice<VO> => List<resDTO>
 		// resDTO 參數1
@@ -92,6 +93,10 @@ public class CommentService {
 		boolean hasNextPage = slice.hasNext();
 		// resDTO 參數3 (voList -> idList -> reactionList -> mapReaction(idList + reactionList) )
 		List<Integer> idList = voList.stream().map(CommentVO :: getCommentId).collect(Collectors.toList());
+		
+		// 截斷
+		if(memberId == null) return new LoadCommentResDTO().setStatus("guest").setList(voList).setHasNextPage(hasNextPage);
+		
 		List<Object[]> idReactionList = COMMENT_REACTION_REPO.findReactionsByMember(memberId, idList); 
 				// 自訂@Query 只能帶 Pageable 不能直接帶 Sort => 乾脆用 order by 寫死本來的 Sort.by("comment.commentId").descending()
 		Map<Integer, String> mapReaction = new HashMap<>();
@@ -101,7 +106,7 @@ public class CommentService {
 			mapReaction.put(id, reaction);
 		}
 		
-		LoadCommentResDTO res = new LoadCommentResDTO().setStatus("success").setList(voList).setHasNextPage(hasNextPage).setMapReaction(mapReaction);
+		LoadCommentResDTO res = new LoadCommentResDTO().setStatus("member").setList(voList).setHasNextPage(hasNextPage).setMapReaction(mapReaction);
 		return res;
 	}
 }
