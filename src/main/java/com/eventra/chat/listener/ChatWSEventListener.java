@@ -1,4 +1,4 @@
-package com.eventra.customerservice.listener;
+package com.eventra.chat.listener;
 
 import java.util.concurrent.atomic.AtomicInteger;
 

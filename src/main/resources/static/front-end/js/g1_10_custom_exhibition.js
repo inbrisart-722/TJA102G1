@@ -794,12 +794,11 @@ document.addEventListener("DOMContentLoaded", function() {
 				return res.text();
 			})
 			.then((result) => {
-				// if (result.status === "success") {
-				showToast("已加入購物車", "success");
-				console.log(result);
-				// } else if (result.status === "failed") {
-				// showToast("加入購物車失敗", "error");
-				// }
+				if (result === "success") {
+					showToast("已加入購物車", "success");
+				} else if (result === "failure") {
+					showToast("剩餘票數不足，加入購物車失敗", "error");
+				}
 				adults_el.value =
 					students_el.value =
 					elderly_el.value =
@@ -816,15 +815,15 @@ document.addEventListener("DOMContentLoaded", function() {
 			});
 	}
 
-//	const redirect_send_data = sessionStorage.getItem("send_data");
-//	if (redirect_send_data) {
-//		if (!sessionStorage.getItem("redirect")) {
-//			setTimeout(() => {
-//				addCartItem(JSON.parse(redirect_send_data))
-//				sessionStorage.removeItem("send_data");
-//				}, 1000)
-//		}
-//	}
+	//	const redirect_send_data = sessionStorage.getItem("send_data");
+	//	if (redirect_send_data) {
+	//		if (!sessionStorage.getItem("redirect")) {
+	//			setTimeout(() => {
+	//				addCartItem(JSON.parse(redirect_send_data))
+	//				sessionStorage.removeItem("send_data");
+	//				}, 1000)
+	//		}
+	//	}
 
 	const btn_add_cart = document.querySelector("a#add_cart");
 
@@ -1251,7 +1250,8 @@ document.addEventListener("DOMContentLoaded", function() {
 	const chatOnlineCount = document.getElementById("chat-online-count");
 	chatWindow.style.display = "none";
 
-	let myMemberId;
+	let myMemberId; // 核心! 定義我的 memberId !!
+	
 	let hasGottenMyMemberId = false;
 	let timestampCursor; // 每次拿這個時間去 fetch 更舊的 10 筆！
 	let isLoading = false; // 避免重複請求用！
@@ -1295,7 +1295,7 @@ document.addEventListener("DOMContentLoaded", function() {
 	chatBody.addEventListener("scroll", async () => {
 		// console.log(chatBody.scrollTop); // 上方還能滑動之高度
 		// console.log(chatBody.scrollHeight) // 總共可滑動之高度
-		
+
 		// 滑到頂部就繼續載入
 		if (chatBody.scrollTop === 0 && !isLoading && !oldestReached) {
 			isLoading = true;
@@ -1311,7 +1311,7 @@ document.addEventListener("DOMContentLoaded", function() {
 				//					
 				//					// 更新 timestamp cursor
 				//				})
-				
+
 				for (let i = msgs.length - 1; i >= 0; i--) {
 					if (Number(msgs[i].memberId) === Number(myMemberId)) // 都轉數字比
 						appendMessage("self", msgs[i], true);
@@ -1331,7 +1331,7 @@ document.addEventListener("DOMContentLoaded", function() {
 			recordable = true;
 			isLoading = false;
 		}
-		
+
 	})
 
 	/* ================= 處理第一次點擊 toggle btn 開啟對話窗 ================= */
@@ -1383,18 +1383,18 @@ document.addEventListener("DOMContentLoaded", function() {
 	});
 
 	/* ================= api: 取得初始在線人數 ================= */
-	function getInitOnlineCount(){
-		return fetch("/api/front-end/chat/initCount", {method: "GET"})
-		.then(res => {
-			if(!res.ok) throw new Error("Not 2XX");
-			return res.text();
-		})
-		.catch(error => {
-			console.log("initCount: " + error);
-			return null;			
-		})
+	function getInitOnlineCount() {
+		return fetch("/api/front-end/chat/initCount", { method: "GET" })
+			.then(res => {
+				if (!res.ok) throw new Error("Not 2XX");
+				return res.text();
+			})
+			.catch(error => {
+				console.log("initCount: " + error);
+				return null;
+			})
 	}
-	
+
 	/* ================= api: 確認自己是誰 ================= */
 	function getMyMemberId() {
 		return fetch("/api/front-end/protected/member/getMyMemberId", { method: "GET" })
@@ -1454,9 +1454,9 @@ document.addEventListener("DOMContentLoaded", function() {
 			console.log('Connected: ' + frame);
 
 			getInitOnlineCount().then(onlineCount => {
-				chatOnlineCount.innerText = onlineCount;				
+				chatOnlineCount.innerText = onlineCount;
 			})
-			
+
 			// 核心 part2 -> .subscribe()
 			// 參數1: 訂閱位址
 			// 訂閱後端廣播頻道（配合後端 @SendTo("...") 或 convertAndSend(...))
@@ -1468,13 +1468,15 @@ document.addEventListener("DOMContentLoaded", function() {
 				// JSON.parse() 是一個 "JSON parser"：它直接將一個已知的 JSON 字串解析成物件。
 				const msg = JSON.parse(message.body);
 				// 後端送回來這則，是我本人發的
+				console.log("msg.memberId: " + msg.memberId);
+				console.log("myMemberId: " + myMemberId);
 				if (Number(msg.memberId) === Number(myMemberId)) // 都轉數字比
 					appendMessage("self", msg);
 				// 後端送回來這則，是別人發的
 				else appendMessage("others", msg);
 			})
-			
-			stompClient.subscribe('/topic/onlineCount', function(message){
+
+			stompClient.subscribe('/topic/onlineCount', function(message) {
 				chatOnlineCount.innerText = message.body;
 			})
 		})
@@ -1518,18 +1520,18 @@ document.addEventListener("DOMContentLoaded", function() {
 
 		if (prepend) {
 			// 1. 找到目前最上面那個訊息 (載入前第一個元素)
-			 const firstMsg = chatBody.firstElementChild;
-			 const prevTop = firstMsg ? firstMsg.getBoundingClientRect().top : 0;
+			const firstMsg = chatBody.firstElementChild;
+			const prevTop = firstMsg ? firstMsg.getBoundingClientRect().top : 0;
 
-			 // 2. 插入新訊息
-			 chatBody.prepend(msgDiv);
-			 requestAnimationFrame(() => msgDiv.classList.add("show"));
+			// 2. 插入新訊息
+			chatBody.prepend(msgDiv);
+			requestAnimationFrame(() => msgDiv.classList.add("show"));
 
-			 // 3. 計算插入後這個元素的新位置
-			 const newTop = firstMsg ? firstMsg.getBoundingClientRect().top : 0;
+			// 3. 計算插入後這個元素的新位置
+			const newTop = firstMsg ? firstMsg.getBoundingClientRect().top : 0;
 
-			 // 4. 調整 scrollTop → 補回位移
-			 chatBody.scrollTop += (newTop - prevTop);
+			// 4. 調整 scrollTop → 補回位移
+			chatBody.scrollTop += (newTop - prevTop);
 		} else {
 			chatBody.appendChild(msgDiv);
 			// 自動捲到最底

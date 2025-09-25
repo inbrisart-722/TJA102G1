@@ -29,7 +29,11 @@ public class CartItemRestController {
 	
 	@PostMapping("/addCartItem")
 	public String addCartItem(@RequestBody AddCartItemReqDTO req) {
-		CART_ITEM_SERVICE.addCartItem(req, TEST_MEMBER);
+		try {CART_ITEM_SERVICE.addCartItem(req, TEST_MEMBER);}
+		catch (IllegalStateException e) {
+			System.out.println(e.toString());
+			return "failure";
+		}
 		return "success";
 	}
 	// 前端給：exhibitionId, ticketDatas

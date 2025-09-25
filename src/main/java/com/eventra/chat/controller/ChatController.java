@@ -1,4 +1,4 @@
-package com.eventra.customerservice.controller;
+package com.eventra.chat.controller;
 
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -9,17 +9,17 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.eventra.customerservice.model.ChatMessageResDTO;
-import com.eventra.customerservice.model.CustomerServiceService;
+import com.eventra.chat.model.ChatMessageResDTO;
+import com.eventra.chat.model.ChatService;
 
 @RestController
 @RequestMapping("/api/front-end/chat")
-public class CustomerServiceController {
+public class ChatController {
 
 	private final AtomicInteger onlineCount;
-	private final CustomerServiceService CS_SVC;
+	private final ChatService CS_SVC;
 	
-	public CustomerServiceController(AtomicInteger onlineCount, CustomerServiceService customerServiceService) {
+	public ChatController(AtomicInteger onlineCount, ChatService customerServiceService) {
 		this.onlineCount = onlineCount;
 		this.CS_SVC = customerServiceService;
 	}

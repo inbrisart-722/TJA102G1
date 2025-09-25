@@ -80,9 +80,15 @@ public class MemberRedisRepository {
 				return null;
 			}
 			else {
-				jedis.hset("verif:token:" + token, "attempts", String.valueOf(attempts + 1));
-				jedis.expire("verif:token:" + token, TOKEN_VALIDATED_TO_REGISTER);
 				String authType= jedis.hget("verif:token:" + token, "authType");
+				System.out.println(authType);
+				if(jedis.hget("verif:token:" + token, "memberId") == null) {
+					jedis.hset("verif:token:" + token, "attempts", String.valueOf(attempts + 1));
+					jedis.expire("verif:token:" + token, TOKEN_VALIDATED_TO_REGISTER);
+					return authType;
+				}
+				System.out.println("are you here?");
+				jedis.del("verif:token:" + token);
 				return authType;
 			}
 		});
@@ -96,8 +102,17 @@ public class MemberRedisRepository {
 		});
 	}
 	
+	public String findMemberIdByToken(String token) {
+		return JEDIS.execute(jedis -> {
+			return jedis.hget("verif:token:" + token, "memberId");
+		});
+	}
 	public void deleteToken(String token) {
 		JEDIS.execute(jedis -> jedis.del("verif:token:" + token));
+	}
+	
+	public void deleteResendLimit(String email) {
+		JEDIS.execute(jedis -> jedis.del(resendLimitKey(email)));
 	}
 
 }
