@@ -92,14 +92,14 @@
 						<li class="nav-item"><a class="nav-link"><p>展商後台</p></a></li>
 						<li class="nav-item menu-open"><a href="#" class="nav-link"><i
 								class="nav-icon bi bi-circle-fill"></i>
-							<p>展覽管理</p></a>
+								<p>展覽管理</p></a>
 							<ul class="nav nav-treeview">
 								<li class="nav-item"><a
 									href="/back-end/exhibitor/exhibition_list" class="nav-link"><p>展覽列表</p></a></li>
 							</ul></li>
 						<li class="nav-item menu-open"><a href="#" class="nav-link"><i
 								class="nav-icon bi bi-circle-fill"></i>
-							<p>銷售管理</p></a>
+								<p>銷售管理</p></a>
 							<ul class="nav nav-treeview">
 								<li class="nav-item"><a
 									href="/back-end/exhibitor/order_list" class="nav-link"><p>訂單列表</p></a></li>
@@ -107,7 +107,7 @@
 							</ul></li>
 						<li class="nav-item menu-open"><a href="#" class="nav-link"><i
 								class="nav-icon bi bi-circle-fill"></i>
-							<p>會員中心</p></a>
+								<p>會員中心</p></a>
 							<ul class="nav nav-treeview">
 								<li class="nav-item"><a
 									href="/back-end/exhibitor/exhibitor_info" class="nav-link"><p>展商資訊</p></a></li>
@@ -202,9 +202,19 @@
 										<td><span class="status-pill"
 											th:text="${ex.exhibitionStatus.exhibitionStatus}">1</span></td>
 										<td th:text="${ex.totalTicketQuantity}">0</td>
-										<!-- <td>
-                   	  <span class="status-pill" th:text="${ex.reviewStatusId}"></span>
-                   </td> -->
+										<td class="text-end">
+											<!-- 編輯模式 --> 
+											<a th:href="@{/back-end/exhibitor/edit/{id}(id=${ex.exhibitionId})}"
+											class="btn btn-outline-secondary btn-sm me-1"> <i
+											class="bi bi-gear"></i> 編輯
+											</a>
+											<!-- 預覽 --> 
+											<a
+											th:href="@{/back-end/preview/{id}(id=${ex.exhibitionId})}"
+											class="btn btn-outline-primary btn-sm"> <i
+											class="bi bi-eye"></i> 預覽
+											</a>
+										</td>
 									</tr>
 								</tbody>
 							</table>

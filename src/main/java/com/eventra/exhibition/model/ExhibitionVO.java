@@ -15,6 +15,7 @@ import com.eventra.exhibitor.model.ExhibitorVO;
 import com.eventra.rating.model.RatingVO;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -38,7 +39,7 @@ public class ExhibitionVO {
     @Column(name = "exhibition_id")
 	private Integer exhibitionId;
     
-    @OneToMany(mappedBy = "exhibition")
+    @OneToMany(mappedBy = "exhibition", cascade = CascadeType.ALL, orphanRemoval = true) 
     private Set<ExhibitionTicketTypeVO> exhibitionTicketTypes;
     
     @OneToMany(mappedBy = "exhibition")
@@ -47,8 +48,8 @@ public class ExhibitionVO {
     @OneToMany(mappedBy = "exhibition")
     private Set<RatingVO> ratings;
 
-//    @Column(name = "exhibition_status_id")
-//	private Integer exhibitionStatusId;
+    @Column(name = "exhibition_status_id")
+	private Integer exhibitionStatusId;
     
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "exhibition_status_id", insertable = false, updatable = false)
@@ -124,8 +125,16 @@ public class ExhibitionVO {
     public void setExhibitionId(Integer exhibitionId) {
         this.exhibitionId = exhibitionId;
     }
+    
+    public Integer getExhibitionStatusId() {
+		return exhibitionStatusId;
+	}
 
-    public ExhibitionStatusVO getExhibitionStatus() {
+	public void setExhibitionStatusId(Integer exhibitionStatusId) {
+		this.exhibitionStatusId = exhibitionStatusId;
+	}
+
+	public ExhibitionStatusVO getExhibitionStatus() {
         return exhibitionStatus;
     }
 

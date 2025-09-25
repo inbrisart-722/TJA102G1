@@ -14,7 +14,11 @@ import com.eventra.exhibitiontickettype.model.ExhibitionTicketTypeVO;
  * 接收使用者新增展覽輸入資料
  */
 public class ExhibitionCreateDTO {
-
+	
+	private Integer exhibitionId;
+	
+	private String ticketJson;
+	
 	/**
 	 * 接收使用者上傳的檔案（此時尚未處理成路徑）
 	 */
@@ -22,21 +26,31 @@ public class ExhibitionCreateDTO {
 
 	private MultipartFile photoLandscape;
 	
+	/**
+	 * 進入編輯頁面時給舊有圖片預覽用
+	 */
+	private String photoPortraitPath;
+	
+	private String photoLandscapePath;
+	
 //	@JsonIgnore
     private Set<ExhibitionTicketTypeVO> exhibitionTicketTypes;
 
 //	@NotBlank(message = "展覽名稱必填")
 	private String exhibitionName;
 	
+	@DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm")
 //	@NotNull(message = "請勿空白")
 	private LocalDateTime startTime;
 	
+	@DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm")
 //	@NotNull(message = "請勿空白")
 	private LocalDateTime endTime;
 
 //	@NotBlank(message = "展覽地點必填")
 	private String location;
 	
+	@DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm")
 //	@NotNull(message = "請勿空白")
 	private LocalDateTime ticketStartTime;
 
@@ -46,9 +60,39 @@ public class ExhibitionCreateDTO {
 
 //	@NotBlank(message = "展覽資訊必填")
 	private String description;
+	
+	public Integer getExhibitionId() {
+		return exhibitionId;
+	}
 
-	
-	
+	public void setExhibitionId(Integer exhibitionId) {
+		this.exhibitionId = exhibitionId;
+	}
+
+	public String getTicketJson() {
+		return ticketJson;
+	}
+
+	public void setTicketJson(String ticketJson) {
+		this.ticketJson = ticketJson;
+	}
+
+	public String getPhotoPortraitPath() {
+		return photoPortraitPath;
+	}
+
+	public void setPhotoPortraitPath(String photoPortraitPath) {
+		this.photoPortraitPath = photoPortraitPath;
+	}
+
+	public String getPhotoLandscapePath() {
+		return photoLandscapePath;
+	}
+
+	public void setPhotoLandscapePath(String photoLandscapePath) {
+		this.photoLandscapePath = photoLandscapePath;
+	}
+
 	public Set<ExhibitionTicketTypeVO> getExhibitionTicketTypes() {
 		return exhibitionTicketTypes;
 	}
