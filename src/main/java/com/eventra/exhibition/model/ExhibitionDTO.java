@@ -23,6 +23,7 @@ public class ExhibitionDTO {
 	private String location;
 	private String description;
 	private ExhibitorDTO exhibitor; // 帶入 id 後拼接展商主頁網址
+	private Long totalCommentCount;
 	
 	public String getPhotoLandscape() {
 		return photoLandscape;
@@ -102,5 +103,10 @@ public class ExhibitionDTO {
 	public void setCheapestTicketPrice(Integer cheapestTicketPrice) {
 		this.cheapestTicketPrice = cheapestTicketPrice;
 	}
-	
+	public Long getTotalCommentCount() {
+		return totalCommentCount;
+	}
+	public void setTotalCommentCount(Long totalCommentCount) {
+		this.totalCommentCount = totalCommentCount;
+	}
 }

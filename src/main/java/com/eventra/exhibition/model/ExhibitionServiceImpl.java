@@ -4,14 +4,11 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Comparator;
 import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -22,6 +19,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.eventra.comment.controller.CommentStatus;
+import com.eventra.comment.model.CommentRepository;
 import com.eventra.exhibitionstatus.model.ExhibitionStatusVO;
 import com.eventra.exhibitiontickettype.model.ExhibitionTicketTypeVO;
 import com.eventra.exhibitor.backend.controller.dto.ExhibitionCreateDTO;
@@ -35,13 +34,15 @@ import jakarta.persistence.PersistenceContext;
 public class ExhibitionServiceImpl implements ExhibitionService {
 
 	private final ExhibitionRepository repository;
+	private final CommentRepository commentRepository;
 
 	@PersistenceContext
 	private EntityManager entityManager;
 
 	@Autowired
-	public ExhibitionServiceImpl(ExhibitionRepository repository) {
+	public ExhibitionServiceImpl(ExhibitionRepository repository, CommentRepository commentRepository) {
 		this.repository = repository;
+		this.commentRepository = commentRepository;
 	}
 
 	@Transactional
@@ -174,6 +175,8 @@ public class ExhibitionServiceImpl implements ExhibitionService {
 			.setExhibitorDisplayName(exhibitorDisplayName);
 		
 		dto.setExhibitor(exhibitorDTO); 
+		Long totalCommentCount = commentRepository.countByExhibitionId(CommentStatus.正常, exhibitionId);
+		dto.setTotalCommentCount(totalCommentCount);
 		
 		return dto;
 	}

@@ -18,7 +18,7 @@ import com.eventra.comment.model.LoadCommentResDTO;
 public class CommentRestController {
 
 	private final CommentService COMMENT_SERVICE;
-	private static final Integer TEST_MEMBER = 3;
+//	private static final Integer TEST_MEMBER = 3;
 	
 	public CommentRestController(CommentService commentService) {
 		this.COMMENT_SERVICE = commentService;
