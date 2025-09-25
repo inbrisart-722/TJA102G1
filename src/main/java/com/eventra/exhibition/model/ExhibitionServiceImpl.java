@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Comparator;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -27,6 +28,9 @@ import com.eventra.exhibitiontickettype.model.ExhibitionTicketTypeRepository;
 import com.eventra.comment.controller.CommentStatus;
 import com.eventra.comment.model.CommentRepository;
 import com.eventra.exhibitionstatus.model.ExhibitionStatusVO;
+
+import com.eventra.exhibitiontickettype.model.ExhibitionTicketTypeRepository;
+
 import com.eventra.exhibitiontickettype.model.ExhibitionTicketTypeVO;
 import com.eventra.exhibitor.backend.controller.dto.ExhibitionCreateDTO;
 import com.eventra.exhibitor.model.ExhibitorDTO;
@@ -45,10 +49,10 @@ public class ExhibitionServiceImpl implements ExhibitionService {
 	private final ExhibitionRepository repository;
 	private final ExhibitionTicketTypeRepository exhibitionTicketTypeRepository;
 	private final TicketTypeRepository ticketTypeRepository;
+	private final CommentRepository commentRepository;
 	private record TicketJsonItem(String name, Integer price) {
 	}
 	
-	private final CommentRepository commentRepository;
 
 	@PersistenceContext
 	private EntityManager entityManager;
@@ -60,7 +64,7 @@ public class ExhibitionServiceImpl implements ExhibitionService {
 		this.repository = repository;
 		this.exhibitionTicketTypeRepository = exhibitionTicketTypeRepository;
 		this.ticketTypeRepository = ticketTypeRepository;
-    this.commentRepository = commentRepository;
+		this.commentRepository = commentRepository;
 		
 	}
 
@@ -311,6 +315,7 @@ public class ExhibitionServiceImpl implements ExhibitionService {
 	    		}
 	    	}
 	    }
+	}
     
 	// inbrisart 20250925 給展覽頁 SSR 帶入
 	/**
@@ -376,5 +381,4 @@ public class ExhibitionServiceImpl implements ExhibitionService {
 		
 		return dto;
 	}
-	
 }
