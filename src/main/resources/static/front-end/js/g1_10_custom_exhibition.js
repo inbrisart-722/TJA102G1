@@ -34,7 +34,7 @@ document.addEventListener("DOMContentLoaded", function() {
 			};
 
 			// fetch 1 => 新增父子留言
-			csrfFetch("/api/front-end/protected/comment/addComment", {
+			csrfFetchToRedirect("/api/front-end/protected/comment/addComment", {
 				method: "POST",
 				headers: {
 					"Content-Type": "application/json",
@@ -42,10 +42,6 @@ document.addEventListener("DOMContentLoaded", function() {
 				body: JSON.stringify(send_data),
 			})
 				.then((res) => {
-					if (res.status === 401) {
-						sessionStorage.setItem("redirect", window.location.pathname);
-						location.href = "/front-end/login";
-					}
 					if (!res.ok) throw new error("addComment: Not 2XX or 401");
 					return res.json();
 				})
@@ -787,7 +783,7 @@ document.addEventListener("DOMContentLoaded", function() {
 		const disabled_el = document.querySelector("input#disabled");
 		const mili_and_police_el = document.querySelector("input#mili_and_police");
 
-		csrfFetch("/api/front-end/protected/cartItem/addCartItem", {
+		csrfFetchToRedirect("/api/front-end/protected/cartItem/addCartItem", {
 			method: "POST",
 			headers: {
 				"Content-Type": "application/json",
@@ -795,13 +791,13 @@ document.addEventListener("DOMContentLoaded", function() {
 			body: JSON.stringify(send_data),
 		})
 			.then((res) => {
-				if (res.status === 401) {
+//				if (res.status === 401) {
 					// 存入localStorage
-					sessionStorage.setItem("redirect", window.location.pathname);
-					sessionStorage.setItem("send_data", JSON.stringify(send_data));
+//					sessionStorage.setItem("redirect", window.location.pathname);
+//					sessionStorage.setItem("send_data", JSON.stringify(send_data));
 					// 再轉導
-					window.location.href = "/front-end/login";
-				}
+//					window.location.href = "/front-end/login";
+//				}
 				if (!res.ok) {
 					throw new Error("addCartItem: Not 2XX or 401");
 				}
@@ -975,7 +971,7 @@ document.addEventListener("DOMContentLoaded", function() {
 			commentId: comment_id,
 			reaction,
 		};
-		csrfFetch("/api/front-end/protected/commentReaction/updateReaction", {
+		csrfFetchToRedirect("/api/front-end/protected/commentReaction/updateReaction", {
 			method: "POST",
 			headers: {
 				"Content-Type": "application/json",
@@ -983,10 +979,6 @@ document.addEventListener("DOMContentLoaded", function() {
 			body: JSON.stringify(send_data),
 		})
 			.then((res) => {
-				if (res.status === 401) {
-					sessionStorage.setItem("redirect", window.location.pathname);
-					location.href = "/front-end/login";
-				}
 				if (!res.ok) throw new Error("updateReaction: Not 2XX or 401");
 				return res.json();
 			})
@@ -1190,7 +1182,7 @@ document.addEventListener("DOMContentLoaded", function() {
 
 		if (ratingScore === originalRatingScore) return;
 
-		csrfFetch(
+		csrfFetchToRedirect(
 			"/api/front-end/protected/rating/upsertRating?exhibitionId=" +
 			2 + // test
 			"&ratingScore=" +
@@ -1202,10 +1194,6 @@ document.addEventListener("DOMContentLoaded", function() {
 			.then((res) => {
 				if (!res.ok) throw new Error("upsertRating: Not 2XX or 401");
 				// 其實前端已經擋不該評價的（包含未登入），但還是寫一次邏輯怕有人路徑亂送，後端取不到 Authentication 可能出錯
-				if (res.status === 401) {
-					sessionStorage.setItem("redirect", window.location.pathname);
-					location.href = "/front-end/login";
-				}
 				return res.json();
 			})
 			.then((result) => {
