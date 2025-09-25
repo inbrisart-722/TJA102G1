@@ -1,9 +1,10 @@
-package com.eventra.eventnotifiation.model;
+package com.eventra.eventnotification.model;
 
 import java.io.Serializable;
 import java.sql.Timestamp;
 
 import com.eventra.favorite.model.FavoriteVO;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -16,7 +17,7 @@ import jakarta.persistence.Table;
 
 @Entity
 @Table (name ="event_notification")
-public class EventNotifiationVO implements Serializable {
+public class EventNotificationVO implements Serializable {
 	private static final long serialVersionUID = 1L;
 
 	@Id
@@ -26,13 +27,11 @@ public class EventNotifiationVO implements Serializable {
 	
 	@ManyToOne
 	@JoinColumn(name = "favorite_id", referencedColumnName = "favorite_id")
+	@JsonIgnore
 	private FavoriteVO favoriteVO;
 	
 	@Column(name ="member_id")
 	private Integer memberId;
-//	@ManyToOne
-//	@JoinColumn(name = "member_id", referencedColumnName = "member_id")
-//	private MemberVO memberVO;
 	
 	@Column(name ="read_status", nullable = false)
 	private Boolean readStatus = false; // default false
@@ -45,13 +44,13 @@ public class EventNotifiationVO implements Serializable {
 	private Timestamp createdAt;
 	
 	// 無參數建構子
-	public EventNotifiationVO() {
+	public EventNotificationVO() {
 		super();
 	}
-	
+
 	// 有參數建構子
-	public EventNotifiationVO(Integer favoriteAnnouncementId, FavoriteVO favoriteVO, Integer memberId, Boolean readStatus,
-			String title, String content, Timestamp createdAt) {
+	public EventNotificationVO(Integer favoriteAnnouncementId, FavoriteVO favoriteVO, Integer memberId,
+			Boolean readStatus, String title, String content, Timestamp createdAt) {
 		super();
 		this.favoriteAnnouncementId = favoriteAnnouncementId;
 		this.favoriteVO = favoriteVO;
@@ -75,7 +74,7 @@ public class EventNotifiationVO implements Serializable {
 		return favoriteVO;
 	}
 
-	public void setFavorite(FavoriteVO favoriteVO) {
+	public void setFavoriteVO(FavoriteVO favoriteVO) {
 		this.favoriteVO = favoriteVO;
 	}
 
@@ -118,5 +117,5 @@ public class EventNotifiationVO implements Serializable {
 	public void setCreatedAt(Timestamp createdAt) {
 		this.createdAt = createdAt;
 	}
-	
+
 }

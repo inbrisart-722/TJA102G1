@@ -39,7 +39,7 @@ public class ExhibitionUtilCompositeQuery {
 	        java.sql.Timestamp.valueOf(dateFrom + " 00:00:00")
 	    );
 
-	    // startTime <= dateTo 23:59:59, 手工把時分秒加上, 避免 SQ L出錯
+	    // startTime <= dateTo 23:59:59, 手工把時分秒加上, 避免 SQL 出錯
 	    Predicate less = cb.lessThanOrEqualTo(
 	        root.get("startTime"),
 	        java.sql.Timestamp.valueOf(dateTo + " 23:59:59")

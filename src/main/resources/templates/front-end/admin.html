@@ -523,32 +523,7 @@
 								<!-- 面板2：收藏展覽通知（預設隱藏）展示3個 -->
 								<div id="favorite-notifications"
 									class="notification-section d-none">
-									<!-- 1 -->
-									<div class="card mb-3 shadow-sm border-0 notification-unread">
-										<div class="card-body border-0">
-											<h5 class="card-title mb-1 fw-bold">收藏展覽開賣通知</h5>
-											<p class="card-text mb-2 text-muted" style="font-size: 16px">
-												你收藏的「感官解放：藝術的另一種語言」已開放購票，數量有限請盡速選購。</p>
-										</div>
-									</div>
-
-									<!-- 2 -->
-									<div class="card mb-3 shadow-sm border-0 notification-read">
-										<div class="card-body border-0">
-											<h5 class="card-title mb-1 fw-bold">收藏展覽有新檔期</h5>
-											<p class="card-text mb-2 text-muted" style="font-size: 16px">
-												「當代光影展」新增 10/01–10/15 檔期，歡迎查看詳情。</p>
-										</div>
-									</div>
-
-									<!-- 3 -->
-									<div class="card mb-3 shadow-sm border-0 notification-read">
-										<div class="card-body border-0">
-											<h5 class="card-title mb-1 fw-bold">收藏展覽有新檔期</h5>
-											<p class="card-text mb-2 text-muted" style="font-size: 16px">
-												「當代光影展」新增 10/01–10/15 檔期，歡迎查看詳情。</p>
-										</div>
-									</div>
+									<!-- 由 g1_6_event_notification.js 帶入 -->
 								</div>
 
 								<!-- 面板3：平台公告（預設隱藏） -->
@@ -875,8 +850,12 @@
 	<script src="js/g1_10_custom_common.js"></script>
 	<script src="js/g1_10_custom_member_center.js"></script>
 	<script src="js/g1_6_favorite_announcement.js"></script>
-	<script src="js/g1_6_favorite_admin.js"></script>	<!-- 收藏功能載入與切換用 -->
-	<script src="js/g1_6_search_history.js"></script>  <!-- 存搜尋紀錄用 -->
-    <script src="js/g1_6_search_modal.js"></script>	 <!-- 導頁至搜尋結果頁用 -->
+	<script src="js/g1_6_favorite_admin.js"></script>
+	<script src="js/g1_6_search_history.js"></script>
+	<!-- 存搜尋紀錄用 -->
+	<script src="js/g1_6_search_modal.js"></script>
+	<!-- 導頁至搜尋結果頁用 -->
+	<script src="js/g1_6_event_notification.js"></script>
+	<!-- 收藏展覽通知用 -->
 </body>
 </html>

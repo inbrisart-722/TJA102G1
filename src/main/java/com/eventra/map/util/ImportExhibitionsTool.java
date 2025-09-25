@@ -2,6 +2,7 @@ package com.eventra.map.util;
 
 import com.eventra.exhibition.model.ExhibitionRepository;
 import com.eventra.exhibition.model.ExhibitionVO;
+import com.eventra.exhibitionstatus.model.ExhibitionStatusVO;
 import com.eventra.exhibitor.model.ExhibitorVO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -31,9 +32,7 @@ public class ImportExhibitionsTool {
 				ExhibitionVO vo = new ExhibitionVO();
 
 //				// 建立展覽狀態 VO（假設 4 ）
-//				ExhibitionStatusVO statusVO = new ExhibitionStatusVO();
-//				statusVO.setExhibitionStatusId(4);
-//				vo.setExhibitionStatus(statusVO);
+				vo.setExhibitionStatusId(4);
 
 				// 建立展商VO (先用隨機 1–6)
 				ExhibitorVO exhibitorVO = new ExhibitorVO();

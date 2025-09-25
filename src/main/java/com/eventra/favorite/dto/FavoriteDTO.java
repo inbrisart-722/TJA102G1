@@ -1,7 +1,7 @@
 package com.eventra.favorite.dto;
 
 public class FavoriteDTO {
-    private Integer exhibitionId;		// 收藏id
+    private Integer exhibitionId;		// 展覽id
     private String exhibitionName;  	// 展覽名稱
     private boolean favoriteStatus;		// 收藏狀態
     

@@ -25,4 +25,9 @@ public interface ExhibitionService {
 	
 	Page<ExhibitionVO> getExhibitionsPage(int page, int size);
 	
+	
+//	/* 更新展覽時觸發通知用, 編輯展覽會呼叫此方法 */
+//	ExhibitionVO updateExhibition(Integer exhibitionId, ExhibitionCreateDTO dto);
+
+	
 }

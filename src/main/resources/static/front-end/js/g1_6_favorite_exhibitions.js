@@ -21,7 +21,7 @@ document.addEventListener("DOMContentLoaded", () => {
 	btn.dataset.exhId = exhId;
 
 	// 頁面初始化, 呼叫 API 檢查收藏狀態
-	csrfFetch(`/api/favorite/check?exhId=${exhId}`)
+	csrfFetch(`/api/front-end/protected/favorite/check?exhId=${exhId}`)
 		.then(res => res.json())
 		.then(data => {
 			if (data.favoriteStatus) {
