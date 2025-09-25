@@ -38,8 +38,7 @@
 <link href="css/g1_10_custom_exhibition.css" rel="stylesheet" />
 </head>
 
-<!-- 先預設會在body抓展覽ID, -->
-<body class="datepicker_mobile_full" data-exh-id="1" th:data-exh-id=${exhibition.exhibitionId}>
+<body class="datepicker_mobile_full">
 	<!-- Remove this class to disable datepicker full on mobile -->
 
 	<div id="preloader">
@@ -126,12 +125,10 @@
 							<div class="banner_actions">
 								<button id="btn_open_rate_modal" class="btn_rate">評價展覽
 								</button>
-								<!-- 個人功能測試階段, 會員ID暫預設為3, 展覽ID暫預設為1 -->
-								<button id="favorite"
-									th:attr="data-toggle-url=@{/api/favorite/toggle}"
-									class="btn_fav" th:data-mem-id="3" th:data-exh-id="1">
-									<i class="icon-heart "></i> 收藏展覽
-								</button>
+								<!-- 收藏展覽按鈕 -->
+                <button id="favorite" class="btn_fav" data-exh-id="">
+                  <i class="icon-heart"></i> 收藏展覽
+                </button>
 							</div> </span>
 					</div>
 
@@ -668,19 +665,14 @@
 
 	<!-- <script src="assets/validate.js"></script> -->
 
-	<!-- Map -->
-	<script src="http://maps.googleapis.com/maps/api/js"></script>
-	<script src="js/map.js"></script>
-	<script src="js/infobox.js"></script>
 	<script src="js/g1_10_custom_common_csrf.js"></script>
 	<script src="js/g1_10_custom_common.js"></script>
 	<script src="js/g1_10_custom_exhibition.js"></script>
 	<script src="js/g1_6_favorite_exhibitions.js"></script>
 	<script src="js/g1_6_exhibitions_viewcount.js"></script>
-	<script src="js/g1_6_search_history.js"></script>
-	<!-- 存搜尋紀錄用 -->
-	<script src="js/g1_6_search_modal.js"></script>
-	<!-- 導頁至搜尋結果頁用 -->
+	<script src="js/g1_6_search_history.js"></script> <!-- 存搜尋紀錄用 -->
+	<script src="js/g1_6_search_modal.js"></script>	<!-- 導頁至搜尋結果頁用 -->
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script> <!-- 引入 SweetAlert2 -->
 
 	<!-- dify.ai ai chatbot -->
 	<script>

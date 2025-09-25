@@ -28,7 +28,7 @@ import jakarta.servlet.http.HttpServletRequest;
 @Controller
 @RequestMapping("/front-end")
 public class FrontendIndexController {
-
+  
 	@Autowired
 	private FavoriteService favSvc;
 	@Autowired
@@ -45,9 +45,7 @@ public class FrontendIndexController {
     private String googleApiKey;
 	
 	@GetMapping("/admin")
-	public String adminPage(Model model) {
-		// 載入收藏
-		model.addAttribute("favList", favSvc.findFavoritesByMember(1));
+	public String adminPage() {
 		return "front-end/admin";
 	}
 
