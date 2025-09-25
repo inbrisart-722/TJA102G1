@@ -114,6 +114,11 @@ public class ExhibitionServiceImpl implements ExhibitionService {
 		Pageable pageable = PageRequest.of(page, size, Sort.by("startTime").descending());
 		return repository.findAll(pageable);
 	}
+	
+	
+//	/* 更新展覽時觸發通知用, 編輯展覽會呼叫此方法 */
+//	@Transactional
+	
 
 	// inbrisart 20250925 給展覽頁 SSR 帶入
 	/**

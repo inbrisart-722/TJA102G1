@@ -32,4 +32,8 @@ public interface FavoriteRepository extends JpaRepository<FavoriteVO, Integer> {
 	// 查詢會員是否已有收藏展覽 (UK: memberId + exhibitionId)
 	Optional<FavoriteVO> findByMemberIdAndExhibitionId(Integer memId, Integer exhId);
 	
+	
+	// event_notification 功能需要用, 找展覽ID
+	    List<FavoriteVO> findByExhibitionId(Integer exhibitionId);
+
 }

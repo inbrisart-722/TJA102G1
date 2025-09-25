@@ -79,4 +79,4 @@ Thumbs.db
 ##############################
 # 保密
 ##############################
-application.properties
+application.properties/src/main/resources/application.properties

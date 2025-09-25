@@ -1,3 +1,4 @@
+// g1_6_favorite_announcement.js
 // <!-- 收藏、通知頁用 -->
 document.addEventListener("DOMContentLoaded", function () {
   /* ===============================
