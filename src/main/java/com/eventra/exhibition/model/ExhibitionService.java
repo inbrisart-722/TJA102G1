@@ -21,13 +21,27 @@ public interface ExhibitionService {
 	 */
 	void addExhibition(ExhibitionCreateDTO dto, Integer exhibitorId) ;
 	
+	/**
+	 * 查詢所有展覽
+	 * @return
+	 */
 	List<ExhibitionVO> getAllExhibitions();
 	
+	/**
+	 * 分頁(參數使用int是因為JPA的page方法預設是int所以可以直接丟進去，Integer要額外處理null的判斷)
+	 * @param int
+	 * 			page
+	 * @param int
+	 * 			size
+	 * @return
+	 */
 	Page<ExhibitionVO> getExhibitionsPage(int page, int size);
 	
+	ExhibitionVO findById(Integer id);
 	
+	void updateExhibition(ExhibitionCreateDTO dto, Integer id);
+  
 //	/* 更新展覽時觸發通知用, 編輯展覽會呼叫此方法 */
 //	ExhibitionVO updateExhibition(Integer exhibitionId, ExhibitionCreateDTO dto);
-
 	
 }

@@ -1,19 +1,23 @@
 package com;
 
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import com.eventra.exhibition.model.ExhibitionMapper;
 import com.eventra.exhibition.model.ExhibitionService;
-import com.eventra.exhibition.model.ExhibitionServiceImpl;
 import com.eventra.exhibition.model.ExhibitionVO;
 import com.eventra.exhibitor.backend.controller.dto.ExhibitionCreateDTO;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import jakarta.servlet.http.HttpSession;
 
@@ -42,7 +46,9 @@ public class BackendIndexController {
     	ExhibitionCreateDTO exhibitionCreateDTO = new ExhibitionCreateDTO();
     	model.addAttribute("exhibitionCreateDTO", exhibitionCreateDTO);
     	
-    	return "/back-end/create_exhibition";
+    	// 新增這行：讓模板有可用的 JSON 字串（空陣列）
+        model.addAttribute("ticketListJson", "[]");
+    	return "back-end/create_exhibition";
     }
     
     /**
@@ -60,6 +66,43 @@ public class BackendIndexController {
     	return "redirect:/back-end/exhibitor/exhibition_list";
     }
     
+    /**
+     * 進入編輯模式
+     */
+    @GetMapping("exhibitor/edit/{id}")
+    public String editExhibition(@PathVariable Integer id, Model model) {
+    	ExhibitionVO exhibition = exhibitionService.findById(id);
+    	ExhibitionCreateDTO dto = ExhibitionMapper.toDTO(exhibition);
+    	
+    	// 轉換票種 VO -> JS-friendly 結構
+    	List<Map<String, Object>> ticketList = (dto.getExhibitionTicketTypes() == null) ? List.of()
+    	        : dto.getExhibitionTicketTypes().stream()
+                .map(t -> Map.<String, Object>of(
+                    "name",  t.getTicketType().getTicketTypeName(),
+                    "price", t.getPrice()
+                ))
+                .toList();
+    	
+    	// 這裡用 Jackson 轉字串
+        String ticketListJson = "[]";
+        try {
+            ticketListJson = new ObjectMapper().writeValueAsString(ticketList);
+        } catch (Exception e) {
+            // 可視需要記錄 log
+            // log.warn("Serialize ticketList failed", e);
+        }
+        
+        model.addAttribute("ticketListJson", ticketListJson);
+    	model.addAttribute("ticketList", ticketList);
+    	model.addAttribute("exhibitionCreateDTO", dto);
+    	return "back-end/create_exhibition";
+    }
+    
+    @PostMapping("exhibitor/update_exhibition")
+    public String updateExhibition(ExhibitionCreateDTO dto, HttpSession session) {
+    	exhibitionService.updateExhibition(dto, TEST_EXHIBITOR);
+    	return "redirect:/back-end/exhibitor/exhibition_list";
+    }
     
     @GetMapping("exhibitor/exhibition_list")
     public String goExhibitionListPage(Model model,@RequestParam(defaultValue = "0") int page,@RequestParam(defaultValue = "10") int size) {

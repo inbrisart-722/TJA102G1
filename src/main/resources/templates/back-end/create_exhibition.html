@@ -203,24 +203,34 @@
 			</div>
 
 			<form id="eventForm"
-				th:action="@{/back-end/exhibitor/insert_exhibition}"
-				th:object="${exhibitionCreateDTO}" method="post"
-				enctype="multipart/form-data">
+			      th:action="${exhibitionCreateDTO.exhibitionId} == null ? @{/back-end/exhibitor/insert_exhibition} : @{/back-end/exhibitor/update_exhibition}"
+			      th:object="${exhibitionCreateDTO}" method="post"
+			      enctype="multipart/form-data">
+			  <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+			  <!-- 帶回原本的展覽 id（編輯時） -->
+			  <input type="hidden" th:field="*{exhibitionId}" />
 				<div class="app-content">
 					<div class="container-fluid">
 
 						<!-- 基本資訊 -->
 						<div class="col-lg-4 d-flex flex-column align-items-center gap-2">
 							<!-- 800×533 封面 -->
-							<div class="ratio-uploader" id="coverBox" style="--ar: 800/533;">
-								<div class="preview">
-									<span class="text-secondary">上傳圖片</span>
-								</div>
+							<div class="ratio-uploader" id="coverBox" style="--ar: 800/533;"
+							     th:attr="data-initial=${exhibitionCreateDTO.photoPortraitPath}">
+							  <!-- 舊圖預覽（僅在編輯模式有值時顯示） -->
+							  <div class="preview">
+							    <span class="text-secondary"
+							          th:if="${exhibitionCreateDTO.photoPortraitPath == null}">上傳圖片</span>
+							    <img th:if="${exhibitionCreateDTO.photoPortraitPath != null}"
+							         th:src="@{/{p}(p=${exhibitionCreateDTO.photoPortraitPath})}"
+							         alt="封面圖">
+							  </div>
 							</div>
+							
 							<div class="d-flex gap-2">
-								<input class="form-control form-control-sm" id="coverInput"
-									name="coverImage" type="file" th:field="*{photoPortrait}"
-									accept="image/*">
+							  <input class="form-control form-control-sm" id="coverInput"
+							         name="coverImage" type="file" th:field="*{photoPortrait}" accept="image/*">
+								
 								<button type="button" class="btn btn-outline-secondary btn-sm"
 									id="btnClearCover">清除</button>
 							</div>
@@ -292,12 +302,19 @@
 					</div>
 
 					<div class="card-body">
+					<!-- 後端票種資料（使用 data- 屬性承載 JSON） -->
+						<div id="ticketData"
+						     th:attr="data-json=${ticketListJson}"
+						     hidden></div>
 						<div class="row fw-semibold text-secondary d-none d-lg-flex px-2">
 							<div class="col-lg-6">票種名稱</div>
 							<div class="col-lg-4">金額</div>
 							<div class="col-lg-2 text-end">操作</div>
 						</div>
 						<div id="ticketList" class="mt-2"></div>
+						<!-- 隱藏欄位 -->
+    					<input type="hidden" id="ticketJson" name="ticketJson">
+    					<input type="hidden" name="draft" id="isDraft" value="false">
 					</div>
 				</div>
 
@@ -308,16 +325,21 @@
 					</div>
 					<div class="card-body">
 						<div class="d-flex flex-column align-items-start gap-2">
-							<div class="ratio-uploader" id="bannerBox"
-								style="--ar: 1400/470;">
-								<div class="preview">
-									<span class="text-secondary">上傳橫幅</span>
+							<div class="ratio-uploader" id="bannerBox" style="--ar: 1400/470;"
+								     th:attr="data-initial=${exhibitionCreateDTO.photoLandscapePath}">
+								  <div class="preview">
+								    <span class="text-secondary"
+								          th:if="${exhibitionCreateDTO.photoLandscapePath == null}">上傳橫幅</span>
+								    <img th:if="${exhibitionCreateDTO.photoLandscapePath != null}"
+								         th:src="@{/{p}(p=${exhibitionCreateDTO.photoLandscapePath})}"
+								         alt="橫幅圖">
+								  </div>
 								</div>
-							</div>
-							<div class="d-flex gap-2">
-								<input class="form-control form-control-sm"
-									th:field="*{photoLandscape}" id="bannerInput"
-									name="bannerImage" type="file" accept="image/*">
+								
+								<div class="d-flex gap-2">
+								  <input class="form-control form-control-sm"
+								         th:field="*{photoLandscape}" id="bannerInput"
+								         name="bannerImage" type="file" accept="image/*">
 								<button type="button" class="btn btn-outline-secondary btn-sm"
 									id="btnClearBanner">清除</button>
 							</div>
@@ -333,8 +355,8 @@
 						<h5 class="card-title mb-0">展覽資訊</h5>
 					</div>
 					<div class="card-body">
-						<div id="editor"></div>
-						<textarea id="editor" name="description"></textarea>
+						
+						<textarea id="editor" th:field="*{description}"></textarea>
 					</div>
 				</div>
 
@@ -344,7 +366,7 @@
 					<button class="btn btn-outline-secondary" id="btnPreview">
 						<i class="bi bi-eye me-1"></i>預覽
 					</button>
-					<button class="btn btn-primary" id="btnSaveDraft">
+					<button type="button" class="btn btn-primary" id="btnSaveDraft">
 						<i class="bi bi-save me-1"></i>儲存為草稿
 					</button>
 					<button type="submit" class="btn btn-success">
@@ -417,6 +439,7 @@
           ['view',     ['codeview', 'help']]
         ]
       });
+      
 
       // 修正老版本 data-toggle，確保下拉能用
       const editor = document.querySelector('.note-editor');
@@ -435,6 +458,9 @@
 
       console.log('jQuery', $.fn.jquery, 'Bootstrap.Dropdown?', !!window.bootstrap?.Dropdown, 'Summernote?', !!$.fn.summernote);
     });
+   
+
+	
 
     // ---- 封面上傳 ----
    /*  const coverInput = document.getElementById('coverInput');
@@ -454,57 +480,9 @@
     function getDescriptionHtml(){ return $('#editor').summernote('code'); }
     function setDescriptionHtml(html){ $('#editor').summernote('code', html || ''); }
 
-    // ---- 從 sessionStorage 帶入編輯資料 ----
-    document.addEventListener('DOMContentLoaded', () => {
-    const params = new URLSearchParams(location.search);
-    const editId = params.get('edit');
+    
 
-    if (!editId) {
-      // 沒有 edit 參數 => 新增模式，確保不殘留舊資料
-      sessionStorage.removeItem('editingEvent');
-      return;
-    }
-
-    const raw = sessionStorage.getItem('editingEvent');
-    if (!raw) return;
-
-    try {
-      const ev = JSON.parse(raw);
-      document.getElementById('evName').value   = ev.name || '';
-      document.getElementById('startAt').value  = ev.startAt || ev.date || '';
-      document.getElementById('endAt').value    = ev.endAt || '';
-      document.getElementById('location').value = ev.location || '';
-      document.getElementById('organizer').value= ev.organizer || '';
-
-      const totalInput = document.getElementById('totalTickets');
-      const saleOpen   = document.getElementById('saleOpenAt');
-      if (totalInput && ev.total != null) totalInput.value = ev.total;
-      if (saleOpen   && ev.saleOpenAt)   saleOpen.value   = ev.saleOpenAt;
-
-
-
-      if ($('#editor').length) {
-        const html = ev.descriptionHtml || ev.descriptionText || '';
-        $('#editor').summernote('code', html);
-      }
-
-          // 若活動物件保存了圖片（DataURL），帶回預覽
-      if (ev.coverImage) { coverDataUrl = ev.coverImage;
-        document.querySelector('#coverBox .preview').innerHTML = `<img src="${coverDataUrl}" />`; }
-
-      if (ev.bannerImage) { bannerDataUrl = ev.bannerImage;
-        document.querySelector('#bannerBox .preview').innerHTML = `<img src="${bannerDataUrl}" />`; }
-
-    } catch(e) {
-      console.warn('editingEvent parse error', e);
-    }
-  });
-
-  // 點「返回列表」時順便清掉殘留
-  document.addEventListener('click', (e) => {
-    const a = e.target.closest('a[href="./event_list.html"]');
-    if (a) sessionStorage.removeItem('editingEvent');
-  });
+  
 
     // ---- 預覽 ----
     document.getElementById('btnPreview').addEventListener('click', ()=>{
@@ -598,15 +576,19 @@
       }
     }
 
-    document.getElementById('btnSaveDraft').addEventListener('click', () => saveEventAndBack(true));
-</script>
+	    document.getElementById('btnSaveDraft').addEventListener('click', (e) => {
+	    	  e.preventDefault();
+	    	  document.getElementById('isDraft').value = 'true';
+	    	  document.getElementById('eventForm').submit();
+	    	});
+	</script>
 	<script>
-document.getElementById("myLogout")?.addEventListener("click", (e) => {
-	  e.preventDefault();
-	  sessionStorage.clear();
-	  window.location.href = "/back-end/exhibitor/exhibitor_login";
-	});
-</script>
+	document.getElementById("myLogout")?.addEventListener("click", (e) => {
+		  e.preventDefault();
+		  sessionStorage.clear();
+		  window.location.href = "/back-end/exhibitor/exhibitor_login";
+		});
+	</script>
 	<script>
     (async () => {
       // 讓放了 data-include 的容器先隱藏，避免 FOUC
@@ -653,169 +635,188 @@ document.getElementById("myLogout")?.addEventListener("click", (e) => {
         });
       }
     })();
-    // ===== 票種：固定 5 種、可啟用/停用 =====
-const DEFAULT_TICKETS = [
-  { name:'全票',       price:'' , active:true },
-  { name:'學生票',     price:'' , active:true },
-  { name:'敬老票',     price:'' , active:true },
-  { name:'身心障礙者票', price:'' , active:true },
-  { name:'軍警票',     price:'' , active:true },
-];
+    </script>
+    <!-- // ===== 票種：固定 5 種、可啟用/停用 ===== -->
+	
 
-const ticketList = document.getElementById('ticketList');
-let ticketState = JSON.parse(JSON.stringify(DEFAULT_TICKETS)); // 深拷貝
+	<script>
+	
 
-function renderTickets(){
-  ticketList.innerHTML = '';
-  ticketState.forEach((t, idx) => {
-    const row = document.createElement('div');
-    row.className = 'ticket-row row g-2 align-items-center mb-2' + (t.active ? '' : ' inactive');
-    row.dataset.index = idx;
 
-    row.innerHTML = `
-      <div class="col-lg-6">
-        <input class="form-control name-input" placeholder="票種" value="${t.name}" ${t.active?'':'disabled'}>
-      </div>
-      <div class="col-lg-4">
-        <input type="number" th:field="*{exhibitionTicketTypes}" min="0" class="form-control price-input" placeholder="金額" value="${t.price}" ${t.active?'':'disabled'}>
-      </div>
-      <div class="col-lg-2 text-end">
-        <button type="button" class="btn ${t.active ? 'btn-success' : 'btn-outline-secondary'} btn-sm toggle-active" title="${t.active?'已選用，點擊停用':'未選用，點擊啟用'}">
-          <i class="bi bi-check-lg"></i>
-        </button>
-      </div>
-    `;
-
-    // 綁定輸入更新 state
-    row.querySelector('.name-input').addEventListener('input', (e)=>{
-      ticketState[idx].name = e.target.value;
-    });
-    row.querySelector('.price-input').addEventListener('input', (e)=>{
-      ticketState[idx].price = e.target.value;
-    });
-
-    // 切換啟用/停用
-    row.querySelector('.toggle-active').addEventListener('click', ()=>{
-      ticketState[idx].active = !ticketState[idx].active;
-      renderTickets();
-    });
-
-    ticketList.appendChild(row);
-  });
-}
-
-// 初次渲染
-renderTickets();
-
-// ===== collectTickets：僅帶啟用的票種 =====
-function collectTickets(){
-  return ticketState
-    .filter(t => t.active)
-    .map(t => ({
-      name: t.name.trim() || '未命名',
-      price: t.price ? Number(t.price) : null
-    }));
-}
-
-// ===== 若從 sessionStorage 載入編輯資料，票種同步進來（沒有的就關閉） =====
-document.addEventListener('DOMContentLoaded', () => {
-  const raw = sessionStorage.getItem('editingEvent');
-  if (!raw) return;
-
-  try{
-    const ev = JSON.parse(raw);
-
-    // 先把基本欄位帶回（你原本已有，保留即可）
-    // ...
-
-    // 票種處理：ev.tickets 只存「被啟用」的票種
-    if (Array.isArray(ev.tickets)) {
-      // 以「名稱（去空白、轉小寫）」做對應，較不怕大小寫/前後空白
-      const key = s => (s ?? '').trim().toLowerCase();
-      const tMap = new Map(ev.tickets.map(t => [key(t.name), t]));
-
-      // 預設 5 種：有出現在 ev.tickets → active:true，否則 active:false
-      ticketState = DEFAULT_TICKETS.map(d => {
-        const found = tMap.get(key(d.name));
-        if (found) {
-          return { name: d.name, price: found.price ?? '', active: true };
-        }
-        // ⭐ 關鍵：沒找到就預設為「未啟用」
-        return { ...d, active: false, price: '' };
-      });
-
-      renderTickets();
-    }
-  }catch(e){
-    console.warn(e);
-  }
-});
 
     // ===== 圖片上傳與預覽（封面 800×533、橫幅 1400×470） =====
-let coverDataUrl = null;
-let bannerDataUrl = null;
+	let coverDataUrl = null;
+	let bannerDataUrl = null;
 
-function bindImageUploader(inputEl, boxEl, clearBtn, onDataUrl, expectRatio){
-  const preview = boxEl.querySelector('.preview');
+	function bindImageUploader(inputEl, boxEl, clearBtn, onDataUrl, expectRatio){
+		  const preview = boxEl.querySelector('.preview');
+	
+		  function setPreview(src){
+		    preview.innerHTML = '';
+		    if (!src){
+		      preview.innerHTML = '<span class="text-secondary">上傳圖片</span>';
+		      return;
+		    }
+		    const img = new Image();
+		    img.onload = () => {
+		      if (expectRatio){
+		        const ratio = img.naturalWidth / img.naturalHeight;
+		        if (Math.abs(ratio - expectRatio) > expectRatio * 0.03) {
+		          alert(`建議上傳 ${expectRatio===800/533?'800×533':'1400×470'} 的圖片，否則可能被裁切或變形`);
+		        }
+		      }
+		    };
+		    img.src = src;
+		    preview.appendChild(img);
+		  }
+	
+		  // 變更：讀取初始圖（由後端塞到 data-initial）
+		  const initial = boxEl.getAttribute('data-initial');
+		  if (initial && initial.trim() !== '') {
+		    // 注意：initial 是像 "uploads/exhibitions/1/p_xxx.jpg" 的相對路徑
+		    setPreview('/' + initial.replace(/^\/+/, ''));
+		  } else {
+		    setPreview(null);
+		  }
+	
+		  inputEl.addEventListener('change', ()=>{
+		    const f = inputEl.files?.[0]; if (!f) return;
+		    const reader = new FileReader();
+		    reader.onload = (ev)=>{
+		      const dataUrl = String(ev.target.result || '');
+		      onDataUrl(dataUrl);
+		      setPreview(dataUrl);
+		    };
+		    reader.readAsDataURL(f);
+		  });
+	
+		  clearBtn.addEventListener('click', ()=>{
+		    inputEl.value = '';
+		    onDataUrl(null);
+		    setPreview(null);
+		  });
+		}
+	
+		// 綁定封面（800×533）
+		bindImageUploader(
+		  document.getElementById('coverInput'),
+		  document.getElementById('coverBox'),
+		  document.getElementById('btnClearCover'),
+		  (d)=>{ coverDataUrl = d; },
+		  800/533
+		);
+	
+		// 綁定橫幅（1400×470）
+		bindImageUploader(
+		  document.getElementById('bannerInput'),
+		  document.getElementById('bannerBox'),
+		  document.getElementById('btnClearBanner'),
+		  (d)=>{ bannerDataUrl = d; },
+		  1400/470
+		);
 
-  function setPreview(src){
-    if (!src){
-      preview.innerHTML = '<span class="text-secondary">上傳圖片</span>';
-      return;
-    }
-    preview.innerHTML = '';
-    const img = new Image();
-    img.onload = () => {
-      if (expectRatio){
-        const ratio = img.naturalWidth / img.naturalHeight;
-        if (Math.abs(ratio - expectRatio) > expectRatio * 0.03) {
-          alert(`建議上傳 ${expectRatio===800/533?'800×533':'1400×470'} 的圖片，否則可能被裁切或變形`);
-        }
-      }
-    };
-    img.src = src;
-    preview.appendChild(img);
-  }
+	</script>
+	
 
-  inputEl.addEventListener('change', ()=>{
-    const f = inputEl.files?.[0]; if (!f) return;
-    const reader = new FileReader();
-    reader.onload = (ev)=>{
-      const dataUrl = String(ev.target.result || '');
-      onDataUrl(dataUrl);
-      setPreview(dataUrl);
-    };
-    reader.readAsDataURL(f);
-  });
+	<script>
+	  // 1) 從 data- 屬性還原後端 JSON
+	  const ticketListEl = document.getElementById('ticketData');
+	  let loadedTickets = [];
+	  try {
+	    const raw = ticketListEl ? ticketListEl.getAttribute('data-json') : '';
+	    if (raw && raw.trim().length > 0) {
+	      loadedTickets = JSON.parse(raw);
+	    }
+	  } catch (e) {
+	    console.warn('parse ticketData failed:', e);
+	  }
+	
+	  // 2) 預設 5 種（編輯時若有資料就不會用到）
+	  const DEFAULT_TICKETS = [
+	    { name:'全票',        price:'', active:true },
+	    { name:'學生票',      price:'', active:true },
+	    { name:'敬老票',      price:'', active:true },
+	    { name:'身心障礙者票', price:'', active:true },
+	    { name:'軍警票',      price:'', active:true },
+	  ];
+	
+	  
+	  const ticketList = document.getElementById('ticketList');
+	  let ticketState = (Array.isArray(loadedTickets) && loadedTickets.length > 0)
+	    ? loadedTickets.map(t => ({
+	        name: t.name ?? '',
+	        price: (t.price === null || t.price === undefined) ? '' : String(t.price),
+	        active: true
+	      }))
+	    : DEFAULT_TICKETS;
+	
+	  // 3) 渲染
+	  function renderTickets(){
+	    if (!ticketList) return;
+	    ticketList.innerHTML = '';
+	    ticketState.forEach((t, idx) => {
+	      const row = document.createElement('div');
+	      row.className = 'ticket-row row g-2 align-items-center mb-2' + (t.active ? '' : ' inactive');
+	      row.dataset.index = idx;
+	      row.innerHTML = `
+	        <div class="col-lg-6">
+	          <input class="form-control name-input" name="ticketName${idx}"
+	                 placeholder="票種" value="${t.name}" ${t.active?'':'disabled'}>
+	        </div>
+	        <div class="col-lg-4">
+	          <input type="number" name="ticketPrice${idx}" min="0"
+	                 class="form-control price-input" placeholder="金額"
+	                 value="${t.price ?? ''}" ${t.active?'':'disabled'}>
+	        </div>
+	        <div class="col-lg-2 text-end">
+	          <button type="button" class="btn ${t.active ? 'btn-success' : 'btn-outline-secondary'} btn-sm toggle-active"
+	                  title="${t.active?'已選用，點擊停用':'未選用，點擊啟用'}">
+	            <i class="bi bi-check-lg"></i>
+	          </button>
+	        </div>`;
+	      row.querySelector('.name-input').addEventListener('input', e => ticketState[idx].name = e.target.value);
+	      row.querySelector('.price-input').addEventListener('input', e => ticketState[idx].price = e.target.value);
+	      row.querySelector('.toggle-active').addEventListener('click', () => { ticketState[idx].active = !ticketState[idx].active; renderTickets(); });
+	      ticketList.appendChild(row);
+	    });
+	  }
+	
+	  // 4) 送出時把啟用票種塞到 hidden input
+	  function collectTickets() {
+		  // 這個 ticketState 你已有（含 active / name / price）
+		  return ticketState
+		    .filter(t => t.active && t.price !== '' && t.price !== null && !Number.isNaN(Number(t.price)))
+		    .map(t => ({
+		      name: (t.name || '').trim() || '未命名',
+		      price: Number(t.price)
+		    }));
+		}
+		
+		// 送出前寫入 hidden input
+		document.getElementById('eventForm')?.addEventListener('submit', () => {
+		  const payload = collectTickets();
+		  document.getElementById('ticketJson').value = JSON.stringify(payload);
+		});
+		
+		// 如果你有「儲存為草稿」按鈕是用 JS 觸發 submit，也要在那之前塞值
+		document.getElementById('btnSaveDraft')?.addEventListener('click', (e) => {
+		  e.preventDefault();
+		  document.getElementById('ticketJson').value = JSON.stringify(collectTickets());
+		  document.getElementById('isDraft').value = 'true';
+		  document.getElementById('eventForm').submit();
+		});
 
-  clearBtn.addEventListener('click', ()=>{
-    inputEl.value = '';
-    onDataUrl(null);
-    setPreview(null);
-  });
+	
+	  // 重點：兩種方式都綁，並且**立刻叫一次**，避免時序踩雷
+// 	  document.addEventListener('DOMContentLoaded', renderTickets);
+// 	  window.addEventListener('load', renderTickets);
+	  renderTickets(); // 立即呼叫一次
+	
+	  document.getElementById('eventForm')?.addEventListener('submit', () => {
+	    document.getElementById('ticketJson').value = JSON.stringify(collectTickets());
+	  });
+	</script>
 
-  setPreview(null);
-}
-
-// 綁定封面（800×533）
-bindImageUploader(
-  document.getElementById('coverInput'),
-  document.getElementById('coverBox'),
-  document.getElementById('btnClearCover'),
-  (d)=>{ coverDataUrl = d; },
-  800/533
-);
-
-// 綁定橫幅（1400×470）
-bindImageUploader(
-  document.getElementById('bannerInput'),
-  document.getElementById('bannerBox'),
-  document.getElementById('btnClearBanner'),
-  (d)=>{ bannerDataUrl = d; },
-  1400/470
-);
-
-
-</script>
+	
 </body>
 </html>
