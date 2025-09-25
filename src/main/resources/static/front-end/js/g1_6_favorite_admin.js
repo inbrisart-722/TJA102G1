@@ -7,7 +7,7 @@ document.addEventListener("DOMContentLoaded", () => {
     if (!container) return;
 
     // 呼叫 API 載入收藏清單
-    csrfFetch(`/api/favorite/list`)
+    csrfFetch(`/api/front-end/protected/favorite/list`)
         .then(res => res.json())
         .then(data => {
             container.innerHTML = ""; // 清空舊內容
@@ -67,7 +67,7 @@ document.addEventListener("click", (e) => {
     const $btn = e.target.closest(".btn_fav");
 	const exhId = $btn.dataset.exhId;   // ← 修正這裡
 
-    csrfFetch("/api/favorite/toggle", {
+    csrfFetch("/api/front-end/protected/favorite/toggle", {
         method: "POST",
         headers: { "Content-Type": "application/x-www-form-urlencoded" },
         body: `exhId=${exhId}`
