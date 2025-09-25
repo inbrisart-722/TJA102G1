@@ -72,7 +72,7 @@ public class MemberRestController {
 		}
 		
 		try {MEMBER_SERVICE.updateMemberPhoto(src, memberId);}
-		catch(NoSuchElementException e) {
+		catch(NoSuchElementException e) { // 測試，repo findBy 可用此例外去接
 			System.out.println(e.toString());
 			return ResponseEntity.status(200).body(List.of(e.toString(), ""));
 		}
