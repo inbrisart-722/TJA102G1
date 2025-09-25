@@ -58,6 +58,7 @@ public class ExhibitionServiceImpl implements ExhibitionService {
 	private EntityManager entityManager;
 	
 	private static final int DEFAULT_STATUS_ID = 1;
+	private static final int DRAFT_STATUS_ID = 6;
 
 	@Autowired
 	public ExhibitionServiceImpl(ExhibitionRepository repository, CommentRepository commentRepository, ExhibitionTicketTypeRepository exhibitionTicketTypeRepository, TicketTypeRepository ticketTypeRepository) {
@@ -81,12 +82,17 @@ public class ExhibitionServiceImpl implements ExhibitionService {
 		// 1) 將 DTO 資料轉換成 Entity(VO)
 		ExhibitionVO exhibitionVO = ExhibitionMapper.toVO(dto);
 
-		
+		// 若是草稿 -> 草稿id，否則預設
+		if(Boolean.TRUE.equals(dto.getDraft())) {
+			exhibitionVO.setExhibitionStatusId(DRAFT_STATUS_ID);
+		}else if(exhibitionVO.getExhibitionStatusId() == null) {
+			exhibitionVO.setExhibitionStatusId(DEFAULT_STATUS_ID);
+		}
 		
 //	    exhibitionVO.setExhibitionStatus(entityManager.getReference(ExhibitionStatusVO.class, 1));
 		
 		if (exhibitionVO.getExhibitionStatusId() == null) {
-	        exhibitionVO.setExhibitionStatusId(DEFAULT_STATUS_ID); // <— 加在這裡
+	        exhibitionVO.setExhibitionStatusId(DEFAULT_STATUS_ID); 
 	    }
 
 		exhibitionVO.setExhibitorVO(entityManager.getReference(ExhibitorVO.class, exhibitorId));
@@ -257,6 +263,11 @@ public class ExhibitionServiceImpl implements ExhibitionService {
 	    		throw new RuntimeException("存portrait失敗", e);
 	    	}
 	    }
+	    
+	    // 變更為草稿
+	    if (Boolean.TRUE.equals(dto.getDraft())) {
+            vo.setExhibitionStatusId(DRAFT_STATUS_ID);
+        }
 	    // 4)
 	    repository.save(vo); // 儲存展覽本體，把剛剛更新的圖片路徑寫回資料庫
 	    
