@@ -18,6 +18,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import com.eventra.cart_item.model.CartItemService;
 import com.eventra.cart_item.model.GetCartItemResDTO;
+import com.eventra.exhibition.model.ExhibitionDTO;
+import com.eventra.exhibition.model.ExhibitionServiceImpl;
 import com.eventra.favorite.model.FavoriteService;
 import com.eventra.member.verif.model.VerifService;
 
@@ -29,12 +31,12 @@ public class FrontendIndexController {
 
 	@Autowired
 	private FavoriteService favSvc;
-	
 	@Autowired
 	private CartItemService cartItemSvc;
-	
 	@Autowired
 	private VerifService verifSvc;
+	@Autowired
+	private ExhibitionServiceImpl exhibitionSvc;
 	
 	private static final Integer TEST_MEMBER = 3;
 
@@ -51,19 +53,27 @@ public class FrontendIndexController {
 
 	// 1. 接住列表頁面 href: /front-end/exhibitions/
 	@GetMapping("/exhibitions/{exhibitionId}")
-	public String exhibitionsPageRedirect(@PathVariable("exhibitionId") Integer exhibitionId, Model model) {
+	public String exhibitionsPageRedirect(@PathVariable("exhibitionId") Integer exhibitionId) {
 		return "redirect:/front-end/exhibitions?exhibitionId=" + exhibitionId;
 	}
 	
-	// 2. 為了同時確保 css, js 可取到，目前必要的轉導
-//	@GetMapping("/exhibitions")
-//	public String exhibitionsPage(@RequestParam("exhibitionId") Integer exhibitionId, Model model) {
-//		System.out.println(exhibitionId);
-//		return "front-end/exhibitions";
-//	}
+	// 2. 為了同時確保 css, js 可取到，"目前"必要的轉導
+	@GetMapping("/exhibitions")
+	public String exhibitionsPage(@RequestParam("exhibitionId") Integer exhibitionId, Model model) {
+		ExhibitionDTO dto = exhibitionSvc.getExhibitionInfoForPage(exhibitionId);
+		// fallback -> exhibitionId 查不到對應展覽
+		if(dto == null) return "redirect:/front-end/404";
+		// success -> 塞 dto 並轉交 template-resolver
+		model.addAttribute("exhibition", dto);
+		return "front-end/exhibitions";
+	}
+	@GetMapping("/404")
+	public String Page404() {
+		return "front-end/404";
+	}
 	
 	// 0. 靜態測試（之後得刪）
-	@GetMapping("/exhibitions")
+	@GetMapping("/exhibitions2")
 	public String exhibitionsPageStatic(Model model) {
 		return "front-end/exhibitions";
 	}
