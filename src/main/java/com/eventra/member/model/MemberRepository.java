@@ -13,4 +13,5 @@ public interface MemberRepository extends JpaRepository<MemberVO, Integer>{
 	Optional<MemberVO> findByGithubId(String githubId);
 	
 	Optional<MemberVO> findByFacebookId(String facebookId);
+	
 }

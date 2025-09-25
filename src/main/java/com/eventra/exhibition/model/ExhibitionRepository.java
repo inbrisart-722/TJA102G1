@@ -18,6 +18,7 @@ public interface ExhibitionRepository extends JpaRepository<ExhibitionVO, Intege
 	 Integer updateTotalRatingScore(@Param("eid") Integer exhibitionid, @Param("delta") Byte delta);
 	 
 	 @Modifying
-	 @Query(value = "update ExhibitionVO e set e.soldTicketQuantity = e.soldTicketQuantity + :delta where e.exhibitionId = :eid")
+	 @Query(value = "update ExhibitionVO e set e.soldTicketQuantity = e.soldTicketQuantity + :delta where e.exhibitionId = :eid "
+	 		+ "and e.soldTicketQuantity + :delta <= e.totalTicketQuantity")
 	 Integer updateSoldTicketQuantity(@Param("eid") Integer exhibitionId, @Param("delta") Integer delta);
 }

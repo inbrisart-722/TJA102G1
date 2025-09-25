@@ -1,4 +1,4 @@
-package com.eventra.customerservice.model;
+package com.eventra.chat.model;
 
 public class ChatMessageResDTO {
 

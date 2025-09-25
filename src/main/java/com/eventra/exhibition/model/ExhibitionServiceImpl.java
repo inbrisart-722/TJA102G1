@@ -4,8 +4,14 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -17,7 +23,9 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.eventra.exhibitionstatus.model.ExhibitionStatusVO;
+import com.eventra.exhibitiontickettype.model.ExhibitionTicketTypeVO;
 import com.eventra.exhibitor.backend.controller.dto.ExhibitionCreateDTO;
+import com.eventra.exhibitor.model.ExhibitorDTO;
 import com.eventra.exhibitor.model.ExhibitorVO;
 
 import jakarta.persistence.EntityManager;
@@ -107,5 +115,67 @@ public class ExhibitionServiceImpl implements ExhibitionService {
 		return repository.findAll(pageable);
 	}
 
+	// inbrisart 20250925 給展覽頁 SSR 帶入
+	/**
+	 * @param exhibitionId
+	 * @return
+	 */
+	public ExhibitionDTO getExhibitionInfoForPage(Integer exhibitionId) {
+		ExhibitionVO exhibition = repository.findById(exhibitionId).orElse(null);
+		Set<ExhibitionTicketTypeVO> etts = exhibition.getExhibitionTicketTypes();
+		if(exhibition == null) return null;
+		ExhibitionDTO dto = new ExhibitionDTO();
+		dto.setExhibitionId(exhibitionId);
+		dto.setPhotoLandscape(exhibition.getPhotoLandscape());
+		dto.setExhibitionName(exhibition.getExhibitionName());
+		dto.setAverageRatingScore(exhibition.getAverageRatingScore());
+		dto.setTotalRatingCount(exhibition.getTotalRatingCount());
+		dto.setLeftTicketQuantity(exhibition.getTotalTicketQuantity() - exhibition.getSoldTicketQuantity());
+		
+		Map<Integer, Integer> tickets = new HashMap<>();
+		Set<ExhibitionTicketTypeVO> ettVOs = exhibition.getExhibitionTicketTypes();
+		for(ExhibitionTicketTypeVO ettVO : ettVOs)
+			tickets.put(ettVO.getTicketTypeId(), ettVO.getPrice());
+		
+		// ??
+//		List<String> ticketOrder = List.of("全票", "學生票", "敬老票", "身心障礙者票", "軍警票");
+//		tickets.put("");
+//		Map<String, Integer> tickets = exhibition.getExhibitionTicketTypes()
+//				.stream()
+//				.sorted(Comparator.comparingInt(
+//						ett -> ticketOrder.indexOf(ett.getTicketType().getTicketTypeName())))
+//				.collect(Collectors.toMap(
+//						ett -> ett.getTicketType().getTicketTypeName(),
+//						ExhibitionTicketTypeVO::getPrice,
+//						(v1, v2) -> v1,
+//						LinkedHashMap::new
+//				));
+		
+		dto.setTickets(tickets);
+				
+		Integer cheapestTicketPrice = Integer.MAX_VALUE;
+		for(ExhibitionTicketTypeVO vo : etts)
+			if(vo.getPrice() < cheapestTicketPrice) cheapestTicketPrice = vo.getPrice();
+		
+		dto.setCheapestTicketPrice(cheapestTicketPrice);
+		dto.setStartTime(exhibition.getStartTime());
+		dto.setEndTime(exhibition.getEndTime());
+		dto.setLocation(exhibition.getLocation());
+		dto.setDescription(exhibition.getDescription());
+		ExhibitorVO exhibitorVO = exhibition.getExhibitorVO();
+		String exhibitorDisplayName = 
+				exhibitorVO.getExhibitorRegistrationName() != null
+				? exhibitorVO.getExhibitorRegistrationName()
+				: exhibitorVO.getCompanyName();
+		
+		ExhibitorDTO exhibitorDTO = new ExhibitorDTO();
+		exhibitorDTO
+			.setExhibitorId(exhibitorVO.getExhibitorId())
+			.setExhibitorDisplayName(exhibitorDisplayName);
+		
+		dto.setExhibitor(exhibitorDTO); 
+		
+		return dto;
+	}
 	
 }

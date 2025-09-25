@@ -3,6 +3,7 @@ package com;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -17,11 +18,12 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import com.eventra.cart_item.model.CartItemService;
 import com.eventra.cart_item.model.GetCartItemResDTO;
+import com.eventra.exhibition.model.ExhibitionDTO;
+import com.eventra.exhibition.model.ExhibitionServiceImpl;
 import com.eventra.favorite.model.FavoriteService;
-import com.eventra.member.model.VerifService;
+import com.eventra.member.verif.model.VerifService;
 
 import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpSession;
 
 @Controller
 @RequestMapping("/front-end")
@@ -29,17 +31,17 @@ public class FrontendIndexController {
 
 	@Autowired
 	private FavoriteService favSvc;
-	
 	@Autowired
 	private CartItemService cartItemSvc;
-	
 	@Autowired
 	private VerifService verifSvc;
+	@Autowired
+	private ExhibitionServiceImpl exhibitionSvc;
 	
 	private static final Integer TEST_MEMBER = 3;
 
 	// 從 application.properties 讀取 google.api.key
-//	@Value("${google.api.key}") 
+	@Value("${google.api.key}") 
     private String googleApiKey;
 	
 	@GetMapping("/admin")
@@ -51,19 +53,27 @@ public class FrontendIndexController {
 
 	// 1. 接住列表頁面 href: /front-end/exhibitions/
 	@GetMapping("/exhibitions/{exhibitionId}")
-	public String exhibitionsPageRedirect(@PathVariable("exhibitionId") Integer exhibitionId, Model model) {
+	public String exhibitionsPageRedirect(@PathVariable("exhibitionId") Integer exhibitionId) {
 		return "redirect:/front-end/exhibitions?exhibitionId=" + exhibitionId;
 	}
 	
-	// 2. 為了同時確保 css, js 可取到，目前必要的轉導
-//	@GetMapping("/exhibitions")
-//	public String exhibitionsPage(@RequestParam("exhibitionId") Integer exhibitionId, Model model) {
-//		System.out.println(exhibitionId);
-//		return "front-end/exhibitions";
-//	}
+	// 2. 為了同時確保 css, js 可取到，"目前"必要的轉導
+	@GetMapping("/exhibitions")
+	public String exhibitionsPage(@RequestParam("exhibitionId") Integer exhibitionId, Model model) {
+		ExhibitionDTO dto = exhibitionSvc.getExhibitionInfoForPage(exhibitionId);
+		// fallback -> exhibitionId 查不到對應展覽
+		if(dto == null) return "redirect:/front-end/404";
+		// success -> 塞 dto 並轉交 template-resolver
+		model.addAttribute("exhibition", dto);
+		return "front-end/exhibitions";
+	}
+	@GetMapping("/404")
+	public String Page404() {
+		return "front-end/404";
+	}
 	
 	// 0. 靜態測試（之後得刪）
-	@GetMapping("/exhibitions")
+	@GetMapping("/exhibitions2")
 	public String exhibitionsPageStatic(Model model) {
 		return "front-end/exhibitions";
 	}
@@ -126,11 +136,33 @@ public class FrontendIndexController {
 		return "front-end/register1";
 	}
 	
-	@GetMapping("/register2")
-	public String register2Page(@RequestParam("token") String token, Model model) {
-		String email = verifSvc.findEmailByToken(token);
-		model.addAttribute("email", email);
-		return "front-end/register2";
+//	@GetMapping("/register2")
+//	public String register2Page(@RequestParam("token") String token, Model model) {
+//		String email = verifSvc.findEmailByToken(token);
+//		model.addAttribute("email", email);
+//		return "front-end/register2";
+//	}
+	
+	@GetMapping("/forgot-password1")
+	public String forgotPassword1Page() {
+		return "front-end/forgot_password1";
+	}
+	
+//	@GetMapping("/forgot-password2")
+//	public String forgotPassword2Page(@RequestParam("token") String token, Model model) {
+//		String email = verifSvc.findEmailByToken(token);
+//		model.addAttribute("email", email);
+//		return "front-end/forgot_password2";
+//	}
+	
+	@GetMapping("/change-mail1")
+	public String changeMail1Page() {
+		return "front-end/change_mail1";
+	}
+	
+	@GetMapping("/reset-password1")
+	public String resetPassword1Page() {
+		return "front-end/reset_password1";
 	}
 	
 	@GetMapping("/verif-failure")

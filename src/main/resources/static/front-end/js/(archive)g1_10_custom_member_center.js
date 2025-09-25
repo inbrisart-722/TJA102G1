@@ -1,7 +1,5 @@
 document.addEventListener("DOMContentLoaded", function() {
 
-	document.querySelector("a.icon-profile").click();
-	
 	// 登出 這個特別用把事件冒泡改 capturing 套用同架構但避免 tabs.js 先取並且丟錯誤（沒section-5 等等）
 
 	document.querySelector("#logout").addEventListener("click", function(e) {
@@ -317,21 +315,19 @@ document.addEventListener("DOMContentLoaded", function() {
 		const user_photo = e.target.files[0];
 		if (user_photo === null) return;
 
-		const form_data = new FormData();
+		const form_data = new Formdata();
 		form_data.append("user_photo", user_photo);
 
-		csrfFetch("/api/front-end/protected/member/update-photo", {
+		fetch("/api/front-end/protected/member/update-photo", {
 			method: "POST",
 			body: form_data,
 		})
 			.then((res) => {
 				if (!res.ok) throw new Error("Not 2XX or 401");
-				else return res.json();
+				else return res.text();
 			})
 			.then((result) => {
 				console.log(result[0]);
-				console.log(result[1]);
-				
 				user_img.src = `${result[1]}`;
 			})
 			.catch(error => console.log(error));
@@ -346,26 +342,19 @@ document.addEventListener("DOMContentLoaded", function() {
 	///////////////////////////////////////////////////////////
 	///////////////////////////////////////////////////////////
 
-	// 只驗證其中四項
 	function validateForm() {
-		const full_name = document.querySelector("#full_name").value.trim();
 		const nickname = document.querySelector("#nickname").value.trim();
 		const phone_number = document.querySelector("#phone_number").value.trim();
+		const birth_date = document.querySelector("#birth_date").value.trim();
 		const address = document.querySelector("#address").value.trim();
 
 		let errors = {};
 
-		
-		// 0. full_name: 長度 <= 50
-		if (full_name.length > 50) {
-			errors.full_name = "姓名不能超過 50 個字元";
-		}
-		
 		// 1. nickname：必填 + 長度 <= 50
 		if (!nickname) {
-			errors.nickname = "平台暱稱必填";
+			errors.nickname = "暱稱必填";
 		} else if (nickname.length > 50) {
-			errors.nickname = "平台暱稱不能超過 50 個字元";
+			errors.nickname = "暱稱不能超過 50 個字元";
 		}
 
 		// 2. phone_number：可選填，但若填必須符合台灣電話格式
@@ -403,10 +392,7 @@ document.addEventListener("DOMContentLoaded", function() {
 		}
 	}
 
-	// 選取所有可以 update 項目
-	const full_name = document.querySelector("#full_name");
 	const nickname = document.querySelector("#nickname");
-	const gender = document.querySelector("#gender");
 	const phone_number = document.querySelector("#phone_number");
 	const birth_date = document.querySelector("#birth_date");
 	const address = document.querySelector("#address");
@@ -415,21 +401,16 @@ document.addEventListener("DOMContentLoaded", function() {
 	const btn_recover = document.querySelector("#btn_recover");
 
 	btn_recover.addEventListener("click", function() {
-		full_name.value = nickname.value = gender.value = phone_number.value = birth_date.value = address.value = "";
+		nickname.value = phone_number.value = birth_date.value = address.value = "";
 		document.querySelectorAll(".error-msg").forEach(el => el.remove());
 	});
 
 	// 綁定儲存變更按鈕
 	const btn_save = document.querySelector("#btn_save");
-	
-	const saved_full_name = document.querySelector("#saved_full_name");
 	const saved_nickname = document.querySelector("#saved_nickname");
-	const saved_gender = document.querySelector("#saved_gender");
 	const saved_phone_number = document.querySelector("#saved_phone_number");
 	const saved_birth_date = document.querySelector("#saved_birth_date");
 	const saved_address = document.querySelector("#saved_address");
-	
-	let saveable = true;
 	btn_save.addEventListener("click", function(e) {
 		e.preventDefault();
 
@@ -444,14 +425,11 @@ document.addEventListener("DOMContentLoaded", function() {
 		}
 
 		const form_data = new FormData();
-		form_data.append("fullName", full_name.value);
 		form_data.append("nickname", nickname.value);
-		form_data.append("gender", gender.value);
 		form_data.append("phoneNumber", phone_number.value);
 		form_data.append("birthDate", birth_date.value);
 		form_data.append("address", address.value);
 
-		saveable = false;
 		csrfFetchToRedirect("/api/front-end/protected/member/update-info", {
 			method: "POST",
 			// FormData 不能搭配自己手動設定 Content-Type
@@ -463,139 +441,83 @@ document.addEventListener("DOMContentLoaded", function() {
 				else return res.text();
 			})
 			.then((result) => {
-				setTimeout(() => {
-					console.log(result);
-					saved_full_name.innerText = full_name.value;
-					saved_nickname.innerText = nickname.value;
-					saved_gender.innerText = gender.value;
-					saved_phone_number.innerText = phone_number.value;
-					saved_birth_date.innerText = birth_date.value;
-					saved_address.innerText = address.value;
-					sendable = true;
-				}, 500);
+				console.log(result);
+				saved_nickname.innerText = nickname.value;
+				saved_phone_number.innerText = phone_number.value;
+				saved_birth_date.innerText = birth_date.value;
+				saved_address.innerText = address.value;
 			})
-			.catch(error => {
-				console.log(error)
-				sendable = true;
-			});
+			.catch(error => console.log(error));
 	});
 });
 
-// 取得基本資料區塊
 document.addEventListener("DOMContentLoaded", function() {
-	
-	const profile_summary = document.getElementById("profile_summary");
-	const related_account = document.getElementById("related_account");
-	// saved 區塊
-	let saved_email_el;
-	let saved_password_el;
-	const saved_full_name_el = document.getElementById("saved_full_name");
-	const saved_nickname_el = document.getElementById("saved_nickname");
-	const saved_gender_el = document.getElementById("saved_gender");
-	const saved_phone_number_el = document.getElementById("saved_phone_number");
-	const saved_birth_date_el = document.getElementById("saved_birth_date");
-	const saved_address_el = document.getElementById("saved_address");
-	// 圖片（user_img)
-	const user_img = document.querySelector("#user_img");
-	// update 區塊
-	const full_name_el = document.querySelector("#full_name");
-	const nickname_el = document.querySelector("#nickname");
-	const gender_el = document.querySelector("#gender");
-	const phone_number_el = document.querySelector("#phone_number");
-	const birth_date_el = document.querySelector("#birth_date");
-	const address_el = document.querySelector("#address");
-	
-	const insert_if_oauth2 = function(oauth2provider){
-		related_account.insertAdjacentHTML("afterbegin", `此帳號透過 <span>${oauth2provider}</span> 綁定`);
-	}
-//	<h4 id="related_account">此帳號透過 <span>${oauth2provider}</span> 綁定</h4>
-//			<br />
-	// 如果判斷不是 OAuth2 才需要加入的部分
-	const insert_if_not_oauth2 = function(){
-		// 1. saved 部分要加入信箱密碼
-		
-		profile_summary.insertAdjacentHTML("afterbegin", `		<li>信箱 <span id="saved_email"></span>
-		</li>
-		<li>密碼 <span id="saved_password"></span>
-		</li>`);
-		// 2. update 部分要加入信箱密碼
-		const div_if_not_oauth2 = document.querySelector("div#if_not_oauth2");
-		div_if_not_oauth2.insertAdjacentHTML("beforeend", `<div class="col-md-6">
-									<div class="form-group">
-										<label>信箱</label>
-										<div class="btn_change_div">
-											<button id="change_mail">更改會員信箱</button>
-										</div>
-									</div>
-								</div>
-								<div class="col-md-6">
-									<div class="form-group">
-										<label>密碼</label>
-										<div class="btn_change_div">
-											<button id="change_password">重設密碼</button>
-										</div>
-									</div>
-								</div>`)
-								
-		saved_email_el = document.getElementById("saved_email");
-		saved_password_el = document.getElementById("saved_password");
-		
-		const btn_change_mail_el = document.getElementById("change_mail");
-		const btn_change_password_el = document.getElementById("change_password");
-		
-		btn_change_mail_el.addEventListener("click", () => window.location.href = "/front-end/change-mail1")
-		btn_change_password_el.addEventListener("click", () => window.location.href = "/front-end/reset-password1")
-	};
-								
-	fetch("/api/front-end/protected/member/getMemberInfo", {
-		method: "GET"
-	})
-	.then(res => {
-		if(!res.ok) throw new Error("getMemberInfo: NOT 2XX");
-		else return res.json();
-	})
-	.then(result => {
-		console.log(result);
-		
-		// 如果非使用 OAuth2 登入 -> 才渲染更新框的 (1)信箱 (2)密碼 部分
-		if(!result.githubId && !result.facebookId && !result.googleId){
-			insert_if_not_oauth2();
-			saved_email_el.innerText = result.email ? result.email : "-";
-			saved_password_el.innerText = "(已隱藏)";
-		}
-		else {
-			console.log("i used oauth2 to log in !!");
-			// 先渲染非 OAuth2 會員才有的值
-			let oauth2provider;
-			
-			if(result.githubId) oauth2provider = "GitHub";
-			if(result.googleId) oauth2provider = "Google";
-			if(result.facebookId) oauth2provider = "Facebook";
-			
-			insert_if_oauth2(oauth2provider);
-		}
-		
-		// saved部分 -> 把 innerText 放上 -> 所有會員（不論是否 OAuth2）都有的值
-		saved_full_name_el.innerText = result.fullName ? result.fullName : "-";
-		saved_nickname_el.innerText = result.nickname ? result.nickname : "-";
-		saved_gender_el.innerText = result.gender ? result.gender : "-";
-		saved_phone_number_el.innerText = result.phoneNumber ? result.phoneNumber : "-";
-		saved_birth_date_el.innerText = result.birthDate ? result.birthDate : "-";
-		saved_address_el.innerText = result.address ? result.address : "-";
-		
-		// update部分 -> 把 value 放上 -> 所有會員（不論是否 OAuth2）都有的值
-		full_name_el.value = result.fullName ? result.fullName : "";
-		nickname_el.value = result.nickname ? result.nickname : ""; // 其實一定有 (not null constraint)
-		gender_el.value = result.gender ? result.gender : ""; 
-		phone_number_el.value = result.phoneNumber ? result.phoneNumber : "";
-		birth_date_el.value = result.birthDate ? result.birthDate : "";
-		address_el.value = result.address ? result.address : "";
-		
-		// 圖片部分
-		user_img.src = result.profilePic ? result.profilePic : "img/tourist_guide_pic.jpg";
- 	})
-	.catch(error => {
-		console.log(error);
-	})
-		
+
+	document.addEventListener("click", function(e) {
+		const btn_reset_password = e.target.closest("button#reset_password");
+		if (!btn_reset_password) return;
+		e.preventDefault();
+
+		const span_password = document.querySelector("#saved_password");
+
+			// 清掉舊內容（把更改密碼按鈕移除）
+			span_password.innerHTML = "";
+
+			// 建立容器
+			const wrapper = document.createElement("span");
+			wrapper.classList.add("password-wrapper");
+
+			// 建立輸入框
+			const input_new_password = document.createElement("input");
+			input_new_password.type = "password";
+			input_new_password.placeholder = "請輸入新密碼";
+			input_new_password.classList.add("password-input");
+
+			// 建立眼睛 icon
+			const toggle_icon = document.createElement("span");
+			toggle_icon.innerHTML = `<i class="icon-eye-7"></i>`;
+			toggle_icon.classList.add("password-toggle");
+
+			// 切換顯示/隱藏密碼
+			toggle_icon.addEventListener("click", function() {
+				if (input_new_password.type === "password") {
+					input_new_password.type = "text";
+					toggle_icon.innerHTML = `<i class="icon-eye-off-1"></i>`;
+				} else {
+					input_new_password.type = "password";
+					toggle_icon.innerHTML = `<i class="icon-eye-7"></i>`;
+				}
+			});
+
+			// 建立送出按鈕
+			const btn_save_new_password = document.createElement("button");
+			btn_save_new_password.innerText = "儲存變更";
+			btn_save_new_password.classList.add("btn_save_new_password");
+
+			btn_save_new_password.addEventListener("click", function(e) {
+				e.preventDefault();
+
+				const newPassword = input_new_password.value;
+				if (!newPassword) {
+					alert("請輸入新密碼");
+					return;
+				}
+
+				// TODO: fetch API 呼叫後端更新密碼
+				console.log("送出新密碼:", newPassword);
+
+				// 清除 input 與確認按鈕，恢復原狀
+				span_password.innerHTML = `
+	    <button id="reset_password">更改密碼</button>
+	  `;
+			});
+
+			// 放進 wrapper
+			wrapper.appendChild(input_new_password);
+			wrapper.appendChild(toggle_icon);
+			wrapper.appendChild(btn_save_new_password);
+
+			// 放入頁面
+			span_password.appendChild(wrapper);
+		});
 });

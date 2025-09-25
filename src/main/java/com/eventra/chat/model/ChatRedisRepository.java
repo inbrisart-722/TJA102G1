@@ -1,4 +1,4 @@
-package com.eventra.customerservice.model;
+package com.eventra.chat.model;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -10,7 +10,7 @@ import com.util.JsonCodec;
 import com.util.RedisPoolExecutor;
 
 @Repository
-public class CustomerServiceRedisRepository {
+public class ChatRedisRepository {
 
 	private final JsonCodec JSON_CODEC;
 	private final RedisPoolExecutor JEDIS;
@@ -20,7 +20,7 @@ public class CustomerServiceRedisRepository {
 	
 	private static final Long TTL_MILLISECS_MSG_EXPIRE = 3 * 24 * 60 * 60 * 1000L; // 3 days
 	
-	public CustomerServiceRedisRepository(JsonCodec jsonCodec, RedisPoolExecutor jedis) {
+	public ChatRedisRepository(JsonCodec jsonCodec, RedisPoolExecutor jedis) {
 		this.JSON_CODEC = jsonCodec;
 		this.JEDIS = jedis;
 	}

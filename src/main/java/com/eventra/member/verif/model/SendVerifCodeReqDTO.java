@@ -1,8 +1,8 @@
-package com.eventra.member.model;
+package com.eventra.member.verif.model;
 
 public class SendVerifCodeReqDTO {
 	private String email; 
-	private String authType;
+	private AuthType authType;
 	
 	public String getEmail() {
 		return email;
@@ -10,10 +10,10 @@ public class SendVerifCodeReqDTO {
 	public void setEmail(String email) {
 		this.email = email;
 	}
-	public String getAuthType() {
+	public AuthType getAuthType() {
 		return authType;
 	}
-	public void setAuthType(String authType) {
+	public void setAuthType(AuthType authType) {
 		this.authType = authType;
 	}
 }

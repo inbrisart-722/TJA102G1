@@ -4,15 +4,17 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.NoSuchElementException;
 import java.util.Objects;
 
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.eventra.member.verif.model.ForgotPasswordReqDTO;
+import com.eventra.member.verif.model.RegisterReqDTO;
+import com.eventra.member.verif.model.UpdateInfoReqDTO;
 import com.util.RandomRawPasswordGenerator;
 
 @Service
@@ -32,10 +34,35 @@ public class MemberService {
 		this.PASSWORD_ENCODER = passwordEncoder;
 	}
 	
+	public String forgotPassword(ForgotPasswordReqDTO req) {
+		String token = req.getToken();
+		String password = req.getPassword();
+		String password_hash = PASSWORD_ENCODER.encode(password);
+		
+		String email = MEMBER_REDIS_REPO.findEmailByToken(token);
+		if(email == null) return null;
+		
+		MemberVO memberVO = MEMBER_REPO.findByEmail(email).orElse(null);
+		if(memberVO == null) return null;
+		
+		memberVO.setPasswordHash(password_hash);
+		
+		return email;
+	}
+	
+	public Boolean checkIfPasswordCorrect(String password, Integer memberId) {
+		// 資料庫密碼
+		MemberVO member = MEMBER_REPO.findById(memberId).orElseThrow(() -> new RuntimeException("User not found!"));
+		String DBPasswordHash = member.getPasswordHash();
+		// 使用者此次輸入的密碼
+		if(!PASSWORD_ENCODER.matches(password, DBPasswordHash)) return false;
+		else return true;
+	}
+	
 	public boolean checkIfMember(String email) {
 		MemberVO memberVO = MEMBER_REPO.findByEmail(email).orElse(null);
-		if(memberVO == null) return false; // 是會員（已經在會員 DB 中）
-		else return true; // 不是會員
+		if(memberVO == null) return false; // 不是會員
+		else return true; // 是會員（已經在會員 DB 中）
 	}
 	
 	public String register(RegisterReqDTO req) {
@@ -52,26 +79,37 @@ public class MemberService {
 		MemberVO member = new MemberVO.Builder(email, password_hash, nickname).build();
 		MEMBER_REPO.save(member);
 		
+		// 這顆 token 已無用途
 		MEMBER_REDIS_REPO.deleteToken(token);
+		// 這個 email 的冷卻時間也可以刪除 -> 避免有人註冊完後馬上改密碼等等，不該擋他！
+		MEMBER_REDIS_REPO.deleteResendLimit(email);
+		
 		return email;
 	}
 	
-	public void updateMemberPhoto() {
-		
+	public void resetPassword(String password, Integer memberId) {
+		MemberVO member = MEMBER_REPO.findById(memberId).orElseThrow();
+		// IllegalArgumentException
+		String password_hash = PASSWORD_ENCODER.encode(password);
+		member.setPasswordHash(password_hash);
 	}
-	public void updateMemberInfo(UpdateInfoReqDTO req) {
-		// 1. 從 SecurityContext 拿 Authentication
-		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-		// 2. 從 Authenticaiton 拿 name (member的情況下是email)
-		String email = auth.getName();
-		// 3. 從 email 拿 member 物件
-		MemberVO member = MEMBER_REPO.findByEmail(email).orElseThrow();
-		// 4. 把更新資料塞入 managed object (因為 @Transactional）
+	
+	public void updateMemberPhoto(String src, Integer memberId) throws NoSuchElementException {
+		MemberVO member = MEMBER_REPO.findById(memberId).orElseThrow();
+		member.setProfilePic(src);
+	}
+	
+	public void updateMemberInfo(UpdateInfoReqDTO req, Integer memberId) {
+		// 1. 從 id 拿 member 物件
+		MemberVO member = MEMBER_REPO.findById(memberId).orElseThrow();
+		// 2. 把更新資料塞入 managed object (因為 @Transactional）
+		if(!Objects.equals(member.getFullName(), req.getFullName())) member.setFullName(req.getFullName());
 		if(!Objects.equals(member.getNickname(), req.getNickname())) member.setNickname(req.getNickname());
+		if(!Objects.equals(member.getGender(), req.getGender())) member.setGender(req.getGender());
 		if(!Objects.equals(member.getPhoneNumber(), req.getPhoneNumber())) member.setPhoneNumber(req.getPhoneNumber());
 		if(!Objects.equals(member.getBirthDate(), req.getBirthDate())) member.setBirthDate(req.getBirthDate());
 		if(!Objects.equals(member.getAddress(), req.getAddress())) member.setAddress(req.getAddress());
-		// 5. 存回去
+		// 3. 存回去
 		MEMBER_REPO.save(member);
 	}
 	
@@ -100,25 +138,25 @@ public class MemberService {
 		
 		/* =========== 2. provider ID 找不到！試看看透過 email 去找，且 merge =========== */
 		
-		String email = null;
-		
-		switch(provider) {
-			case "google" -> {
-				if( Boolean.TRUE.equals(user.getAttribute("email_verified")) ) {
-					email = user.getAttribute("email");
-					memberVO = MEMBER_REPO.findByEmail(email).orElse(null);
-				}
-			}
-			// github 的 email 只放 scope = read:user 沒辦法驗證，不能亂 merge
-		}
-		
-		if(memberVO != null) {
-			if(memberVO.getGoogleId() == null) {
-				memberVO.setGoogleId(providerId);
-				MEMBER_REPO.save(memberVO);
-			}
-			return memberVO;
-		}
+//		String email = null;
+//		
+//		switch(provider) {
+//			case "google" -> {
+//				if( Boolean.TRUE.equals(user.getAttribute("email_verified")) ) {
+//					email = user.getAttribute("email");
+//					memberVO = MEMBER_REPO.findByEmail(email).orElse(null);
+//				}
+//			}
+//			// github 的 email 只放 scope = read:user 沒辦法驗證，不能亂 merge
+//		}
+//		
+//		if(memberVO != null) {
+//			if(memberVO.getGoogleId() == null) {
+//				memberVO.setGoogleId(providerId);
+//				MEMBER_REPO.save(memberVO);
+//			}
+//			return memberVO;
+//		}
 		
 		/* =========== 3. email 也找不到！所以以下開始建立新 member 並塞入資料 =========== */
 		memberVO = new MemberVO();
@@ -129,8 +167,8 @@ public class MemberService {
 		
 			case "google" -> {
 				memberVO.setGoogleId(providerId);
-				if( Boolean.TRUE.equals(user.getAttribute("email_verified")) ) 
-					memberVO.setEmail( (String) infoMap.get("email") );
+//				if( Boolean.TRUE.equals(user.getAttribute("email_verified")) ) 
+//					memberVO.setEmail( (String) infoMap.get("email") );
 				memberVO.setFullName( (String) infoMap.get("name") );
 				memberVO.setNickname( Objects.toString(infoMap.get("given_name"), "Google 匿名使用者" ));
 				memberVO.setProfilePic( (String) infoMap.get("picture") );
@@ -171,8 +209,24 @@ public class MemberService {
 		
 		return memberVO;
 	}
-	public MemberVO findByMemberId() {
-		return null;
+	public GetMemberInfoResDTO getMemberInfo(Integer memberId) {
+		MemberVO member = MEMBER_REPO.findById(memberId).orElseThrow();
+		
+		GetMemberInfoResDTO res = new GetMemberInfoResDTO.Builder()
+				.email(member.getEmail())
+				.fullName(member.getFullName())
+				.nickname(member.getNickname())
+				.gender(member.getGender())
+				.phoneNumber(member.getPhoneNumber())
+				.birthDate(member.getBirthDate())
+				.address(member.getAddress())
+				.profilePic(member.getProfilePic())
+				.githubId(member.getGithubId())
+				.googleId(member.getGoogleId())
+				.facebookId(member.getFacebookId())
+				.build();
+		
+		return res;
 	}
 	
 	public MemberVO findByEmail() {
