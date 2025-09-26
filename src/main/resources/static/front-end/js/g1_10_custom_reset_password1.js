@@ -53,7 +53,7 @@ document.addEventListener("DOMContentLoaded", () => {
 	}
 
 	function checkIfPasswordCorrect(password) {
-		return csrfFetchToRedirect("/api/front-end/protected/member/check-if-password-correct", {
+		return csrfFetch("/api/front-end/protected/member/check-if-password-correct", {
 			method: "POST",
 			headers: {
 				"Content-Type": "application/json"

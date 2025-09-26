@@ -88,7 +88,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
 				// 可以發驗證信了
 				const send_data = { email, authType: "CHANGE_MAIL" };
-				return csrfFetchToRedirect("/api/front-end/protected/verif/send-verif-code/change-mail", {
+				return csrfFetch("/api/front-end/protected/verif/send-verif-code/change-mail", {
 					method: "POST",
 					headers: { "Content-Type": "application/json" },
 					body: JSON.stringify(send_data),

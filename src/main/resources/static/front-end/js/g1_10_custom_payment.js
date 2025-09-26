@@ -1,6 +1,6 @@
 document.addEventListener("DOMContentLoaded", function() {
-	const btn_ecpay = document.querySelector("a#ecpay");
-	btn_ecpay.addEventListener("click", function(e) {
+	const btn_pay = document.querySelector("a#pay");
+	btn_pay.addEventListener("click", function(e) {
 		e.preventDefault();
 		const all_tr_el = document.querySelectorAll("tr[data-cart-item-id]");
 
@@ -11,7 +11,7 @@ document.addEventListener("DOMContentLoaded", function() {
 			send_data["cartItemIds"].push(tr.dataset.cartItemId);
 		})
 
-		csrfFetchToRedirect("/api/front-end/protected/order/ECPay/sending", {
+		csrfFetch("/api/front-end/protected/order/ECPay/sending", {
 			method: "POST",
 			headers: {
 				"CONTENT-TYPE": "application/json",
@@ -19,6 +19,10 @@ document.addEventListener("DOMContentLoaded", function() {
 			body: JSON.stringify(send_data),
 		})
 			.then((res) => {
+				if (res.status === 401) {
+				        sessionStorage.setItem("redirect", window.location.pathname);
+				        location.href = "/front-end/login";
+				}
 				if (!res.ok) throw new Error("ECPay/sending: Not 2XX or 401");
 				return res.json();
 			})
@@ -59,25 +63,3 @@ document.addEventListener("DOMContentLoaded", function() {
 			});
 	});
 });
-
-document.addEventListener("DOMContentLoaded", function() {
-	const btn_linepay = document.querySelector("a#linepay");
-	
-	btn_linepay.addEventListener("click", function(e){
-		console.log(3);
-		e.preventDefault();
-		console.log(4);
-		csrfFetchToRedirect("/api/front-end/protected/linepay/payment-request", {
-			method: "POST",
-		}).then( res => {
-			if(!res.ok) throw new Error("linepay/payment-request: NOT 2XX");
-			else return res.text();
-		}).then( data =>{
-			console.log(data);
-			setTimeout(() => window.location.href = data, 3000);
-		}).catch( error => {
-			console.log(error);
-		})
-	})
-});
-

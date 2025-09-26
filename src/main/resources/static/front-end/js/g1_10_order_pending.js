@@ -4,7 +4,7 @@ const fetch_order_result = function() {
 	const merchantTradeNo = params.get("merchantTradeNo");
 	console.log(merchantTradeNo);
 
-	csrfFetchToRedirect(
+	csrfFetch(
 		"/api/front-end/protected/order/checkOrderStatus?merchantTradeNo=" +
 		merchantTradeNo,
 		{

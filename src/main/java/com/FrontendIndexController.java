@@ -49,7 +49,6 @@ public class FrontendIndexController {
 	public String adminPage() {
 		return "front-end/admin";
 	}
-	
 
 	// 1. 接住列表頁面 href: /front-end/exhibitions/
 	@GetMapping("/exhibitions/{exhibitionId}")
@@ -87,19 +86,14 @@ public class FrontendIndexController {
 		return "front-end/cart";
 	}
 
-	@GetMapping("/payment")
-	public String paymentPage() {
+	@PostMapping("/payment")
+	public String paymentPage(@RequestParam List<Integer> cartItemIds, Model model, Principal principal) {
+		// 找到指定 cartItemDTOs
+		Integer memberId = principal != null ? Integer.valueOf(principal.getName()) : null;
+		List<GetCartItemResDTO> listOfDTOs = cartItemSvc.getCartItem(memberId, cartItemIds);
+		model.addAttribute("listOfDTOs", listOfDTOs);
 		return "front-end/payment";
 	}
-	
-//	@PostMapping("/payment")
-//	public String paymentPage(@RequestParam List<Integer> cartItemIds, Model model, Principal principal) {
-//		// 找到指定 cartItemDTOs
-//		Integer memberId = principal != null ? Integer.valueOf(principal.getName()) : null;
-//		List<GetCartItemResDTO> listOfDTOs = cartItemSvc.getCartItem(memberId, cartItemIds);
-//		model.addAttribute("listOfDTOs", listOfDTOs);
-//		return "front-end/payment";
-//	}
 
 	@GetMapping("/index")
 	public String index(@AuthenticationPrincipal UserDetails user) {

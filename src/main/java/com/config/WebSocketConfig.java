@@ -68,8 +68,6 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 			// 後端：simpMessaingTemplate.convertAndSend("/topic/messages", payload);
 			// 所有訂閱 "/topic/messages" 的人都會收到
 		registry.setApplicationDestinationPrefixes("/app");
-		// userdefinitionprefix 也可設定 特定用戶目標前綴
-		
 		// 定義「前端發送訊息」的路徑前綴
 		// 規則是：凡是前端 send("/app/xxx") 的訊息，都會被後端的 @MessageMapping("/xxx") 方法處理
 		// 範例：
