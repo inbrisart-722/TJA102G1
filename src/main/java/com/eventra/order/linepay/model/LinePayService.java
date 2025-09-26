@@ -7,6 +7,7 @@ import java.util.UUID;
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestClient;
@@ -17,9 +18,12 @@ import com.util.JsonCodec;
 @Transactional
 public class LinePayService {
 
-	private static final String CHANNEL_ID = "2008177410";
-	private static final String CHANNEL_SECRET = "4c19d224be97b441d8326bc2f57310e7";
-	private static final String BASE_URL = "https://sandbox-api-pay.line.me";
+	@Value("${linepay.channel-id}")
+	private static String CHANNEL_ID;
+	@Value("${linepay.channel-secret}")
+	private static String CHANNEL_SECRET;
+	@Value("${linepay.base-url}")
+	private static String BASE_URL;
 
 	private final RestClient REST_CLIENT;
 	private final JsonCodec JSON_CODEC;
