@@ -35,7 +35,7 @@ import com.eventra.payment_attempt.model.PaymentAttemptVO;
 import com.github.f4b6a3.ulid.UlidCreator;
 import com.properties.ECPayProperties;
 import com.util.ECPayUtils;
-import com.util.MerchantTradeNo36Generator;
+import com.util.ProviderOrderId36Generator;
 
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
@@ -73,8 +73,8 @@ public class OrderService {
 			.build();
 	}
 
-	public OrderVO getOneOrderByTradeNo(String merchantTradeNo) {
-		return PAYMENT_ATTEMPT_REPO.findByMerchantTradeNo(merchantTradeNo).orElseThrow().getOrder();
+	public OrderVO getOneOrderByProviderOrderId(String providerOrderId) {
+		return PAYMENT_ATTEMPT_REPO.findByProviderOrderId(providerOrderId).orElseThrow().getOrder();
 	}
 
 	public List<GetAllOrderResDTO> getAllOrderByMemberId(Integer memberId) {
@@ -138,7 +138,7 @@ public class OrderService {
 		for (PaymentAttemptVO vo : expiredPaymentAttempts) {
 
 			/* ********* 2nd part : 打綠界 QueryTradeInfo api 確認沒有更新的 payment attempt 狀態 ********* */
-			Map<String, String> params = fieldsBuilder(vo.getMerchantId(), vo.getMerchantTradeNo());
+			Map<String, String> params = fieldsBuilder(vo.getMerchantId(), vo.getProviderOrderId());
 			// MultiValueMap(Spring-specific) 才會選 HttpMessageConverter -> FormHttpMessageConverter 並且標頭 application/x-www-form-urlencoded
 			// 並且 同 key 不會合併，符合 x-www-form-urlencoded
 			// HashMap 的話會變成 MappingJackson2HttpMessageConverter 然後標頭 application/json
@@ -163,13 +163,13 @@ public class OrderService {
 			
 			/* ********* 4rd part : 驗其他內容 ********* */
 			if(!Objects.equals(vo.getMerchantId(), res.get("MerchantID")) ||
-			   !Objects.equals(vo.getMerchantTradeNo(), res.get("MerchantTradeNo")) ||
+			   !Objects.equals(vo.getProviderOrderId(), res.get("MerchantTradeNo")) ||
 			   !Objects.equals(vo.getTradeAmt(), Integer.valueOf(res.get("TradeAmt"))) ||
 			   !Objects.equals(vo.getItemName(), res.get("ItemName"))) return;
 			
 			/* ********* 5th part : 開始更新 payment attempt ********* */
 			vo.setStoreId(res.get("StoreID"));
-			vo.setTradeNo(res.get("TradeNo"));
+			vo.setProviderTransactionId(res.get("TradeNo"));
 			vo.setRtnCode(res.get("TradeStatus")); // 目前認知是相同意義
 //			vo.setRtnMsg(); // 主動 Query 沒有
 //			vo.setSimulatePaid(); // 主動 Query 沒有
@@ -235,8 +235,8 @@ public class OrderService {
 			EXHIBITION_REPO.updateSoldTicketQuantity(entry.getKey(), -entry.getValue());
 	}
 	
-	public OrderStatus checkOrderStatus(String merchantTradeNo) {
-		OrderStatus orderStatus = PAYMENT_ATTEMPT_REPO.findByMerchantTradeNo(merchantTradeNo).orElseThrow().getOrder()
+	public OrderStatus checkOrderStatus(String providerOrderId) {
+		OrderStatus orderStatus = PAYMENT_ATTEMPT_REPO.findByProviderOrderId(providerOrderId).orElseThrow().getOrder()
 				.getOrderStatus();
 		return orderStatus;
 	}
@@ -244,7 +244,7 @@ public class OrderService {
 	public String ECPayReturnURL(ECPayCallbackReqDTO req) {
 		/* ********* 1st part : 從 merchantTradeNo 找到指定 PaymentAttempt ********* */
 		String merchantTradeNo = req.getMerchantTradeNo();
-		PaymentAttemptVO paVO = PAYMENT_ATTEMPT_REPO.findByMerchantTradeNo(merchantTradeNo).orElseThrow();
+		PaymentAttemptVO paVO = PAYMENT_ATTEMPT_REPO.findByProviderOrderId(merchantTradeNo).orElseThrow();
 		/* ********* 2rd part : 核對 CheckMacValue 失敗就在此截斷 0|FAIL ********* */
 		// 自己拿 map 用我們手上的 HashKey 去算過
 		String checkMacValue = null;
@@ -272,7 +272,7 @@ public class OrderService {
 		
 		/* ********* 4th part: 先更新共用欄位 ********* */
 		paVO.setStoreId(req.getStoreID());
-		paVO.setTradeNo(req.getTradeNo());
+		paVO.setProviderTransactionId(req.getTradeNo());
 		paVO.setRtnCode(req.getRtnCode());
 		paVO.setRtnMsg(req.getRtnMsg());
 		paVO.setSimulatePaid(req.getSimulatePaid());
@@ -335,7 +335,7 @@ public class OrderService {
 		Integer totalAmount = paVO.getTradeAmt();
 		String itemName = paVO.getItemName();
 		// 以下 2樣 都要重設重給（尤其是 merchantTradeNo 綠界會擋）
-		String merchantTradeNo = MerchantTradeNo36Generator.generateMerchantTradeNo();
+		String merchantTradeNo = ProviderOrderId36Generator.generateMerchantTradeNo();
 		String merchantTradeDate = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss").format(new Date());
 		
 		// 以下兩步驟 copy 第一次送出時的拼湊方式
@@ -346,10 +346,10 @@ public class OrderService {
 				.fields(fieldsBuilder(merchantTradeNo, merchantTradeDate, totalAmount, itemName)).build();
 		/* ********* 2th part : 新增 payment attempt 並回傳 ********* */
 		// 需要 order, merchantTradeNo, merchantId, tradeAmt, paymentType, checkMacValue
-		PaymentAttemptVO paymentAttemptVO = new PaymentAttemptVO.Builder().paymentAttemptStatus(PaymentAttemptStatus.PENDING)
-				.order(orderVO).merchantTradeNo(merchantTradeNo).merchantId(ECPAY_PROPS.merchantId()).tradeAmt(totalAmount)
+		PaymentAttemptVO paymentAttemptVO = new PaymentAttemptVO.Builder().provider(OrderProvider.ECPay).paymentAttemptStatus(PaymentAttemptStatus.PENDING)
+				.order(orderVO).providerOrderId(merchantTradeNo).merchantId(ECPAY_PROPS.merchantId()).tradeAmt(totalAmount)
 //			.paymentType("Credit") // Callback 寫不一樣的...
-				.tradeDate(merchantTradeDate).build();
+				.tradeDate(merchantTradeDate).buildECPay();
 
 		PAYMENT_ATTEMPT_REPO.save(paymentAttemptVO);
 		
@@ -360,9 +360,8 @@ public class OrderService {
 	public ECPaySendingResDTO ECPaySending(ECPaySendingReqDTO req, Integer memberId) {
 		/* ********* 1st part : 從 ids 拉掉指定購物車明細 ********* */
 		// NoSQL 先動其實有點風險，phase II 可看是否有辦法修正
-//		System.out.println("hi!!!!!!!!!!");
+		
 		List<Integer> cartItemIds = req.getCartItemIds();
-//		for(Integer id : cartItemIds)System.out.println(id);
 		List<CartItemRedisVO> vos = CART_ITEM_REDIS_REPO.removeCartItem(cartItemIds, memberId);
 		if (vos == null || vos.isEmpty())
 			return null; // 選定的購物車明細已經被清掉！
@@ -373,7 +372,7 @@ public class OrderService {
 				.collect(Collectors.joining("#"));
 		Integer totalAmount = vos.stream().collect(Collectors.summingInt(vo -> vo.getPrice() * vo.getQuantity()));
 		Integer totalQuantity = vos.stream().collect(Collectors.summingInt(vo -> vo.getQuantity()));
-		String merchantTradeNo = MerchantTradeNo36Generator.generateMerchantTradeNo();
+		String merchantTradeNo = ProviderOrderId36Generator.generateMerchantTradeNo();
 		String merchantTradeDate = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss").format(new Date());
 		// 綠界：送出時叫 merchantTradeDate => 回傳時叫 tradeDate
 		String ulid = UlidCreator.getUlid().toString();
@@ -407,10 +406,10 @@ public class OrderService {
 				.fields(fieldsBuilder(merchantTradeNo, merchantTradeDate, totalAmount, itemName)).build();
 		/* ********* 5th part : 新增 payment attempt 並回傳 ********* */
 		// 需要 order, merchantTradeNo, merchantId, tradeAmt, paymentType, checkMacValue
-		PaymentAttemptVO paymentAttemptVO = new PaymentAttemptVO.Builder().paymentAttemptStatus(PaymentAttemptStatus.PENDING)
-				.order(orderVO).merchantTradeNo(merchantTradeNo).merchantId(ECPAY_PROPS.merchantId()).tradeAmt(totalAmount)
+		PaymentAttemptVO paymentAttemptVO = new PaymentAttemptVO.Builder().provider(OrderProvider.ECPay).paymentAttemptStatus(PaymentAttemptStatus.PENDING)
+				.order(orderVO).providerOrderId(merchantTradeNo).merchantId(ECPAY_PROPS.merchantId()).tradeAmt(totalAmount)
 //				.paymentType("Credit") // Callback 寫不一樣的...
-				.tradeDate(merchantTradeDate).itemName(itemName).build();
+				.tradeDate(merchantTradeDate).itemName(itemName).buildECPay();
 
 		PAYMENT_ATTEMPT_REPO.save(paymentAttemptVO);
 

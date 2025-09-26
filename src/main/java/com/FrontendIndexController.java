@@ -87,19 +87,20 @@ public class FrontendIndexController {
 		return "front-end/cart";
 	}
 
-	@GetMapping("/payment")
-	public String paymentPage() {
-		return "front-end/payment";
-	}
-	
-//	@PostMapping("/payment")
-//	public String paymentPage(@RequestParam List<Integer> cartItemIds, Model model, Principal principal) {
-//		// 找到指定 cartItemDTOs
-//		Integer memberId = principal != null ? Integer.valueOf(principal.getName()) : null;
-//		List<GetCartItemResDTO> listOfDTOs = cartItemSvc.getCartItem(memberId, cartItemIds);
-//		model.addAttribute("listOfDTOs", listOfDTOs);
+// 開發 line pay 改 get 測試時使用
+//	@GetMapping("/payment")
+//	public String paymentPage() {
 //		return "front-end/payment";
 //	}
+	
+	@PostMapping("/payment")
+	public String paymentPage(@RequestParam List<Integer> cartItemIds, Model model, Principal principal) {
+		// 找到指定 cartItemDTOs
+		Integer memberId = principal != null ? Integer.valueOf(principal.getName()) : null;
+		List<GetCartItemResDTO> listOfDTOs = cartItemSvc.getCartItem(memberId, cartItemIds);
+		model.addAttribute("listOfDTOs", listOfDTOs);
+		return "front-end/payment";
+	}
 
 	@GetMapping("/index")
 	public String index(@AuthenticationPrincipal UserDetails user) {

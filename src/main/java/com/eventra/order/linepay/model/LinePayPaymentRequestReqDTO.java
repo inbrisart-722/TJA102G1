@@ -7,6 +7,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import com.util.JsonCodec;
 
+// 3層巢狀直接走 json 層級去寫此 dto
+
 // https://developers-pay.line.me/zh/online-api-v3/request-payment
 public class LinePayPaymentRequestReqDTO {
 //	private Map<String, Object> options;
@@ -57,7 +59,6 @@ public class LinePayPaymentRequestReqDTO {
 		return this;
 	}
 	
-	
 	public static class Package {
     	 private String id;       // 套裝ID (自行定義，如 "pkg001")
          private Integer amount;  // 套裝總金額
@@ -84,33 +85,34 @@ public class LinePayPaymentRequestReqDTO {
 			this.products = products;
 			return this;
 		}
-    }
-    public static class Product {
-    	private String name;     // 商品名稱
-        private Integer quantity; // 數量
-        private Integer price;    // 單價
-        
-		public String getName() {
-			return name;
-		}
-		public Product setName(String name) {
-			this.name = name;
-			return this;
-		}
-		public Integer getQuantity() {
-			return quantity;
-		}
-		public Product setQuantity(Integer quantity) {
-			this.quantity = quantity;
-			return this;
-		}
-		public Integer getPrice() {
-			return price;
-		}
-		public Product setPrice(Integer price) {
-			this.price = price;
-			return this;
-		}
+		
+		 public static class Product {
+		    	private String name;     // 商品名稱
+		        private Integer quantity; // 數量
+		        private Integer price;    // 單價
+		        
+				public String getName() {
+					return name;
+				}
+				public Product setName(String name) {
+					this.name = name;
+					return this;
+				}
+				public Integer getQuantity() {
+					return quantity;
+				}
+				public Product setQuantity(Integer quantity) {
+					this.quantity = quantity;
+					return this;
+				}
+				public Integer getPrice() {
+					return price;
+				}
+				public Product setPrice(Integer price) {
+					this.price = price;
+					return this;
+				}
+		    }
     }
 }
 

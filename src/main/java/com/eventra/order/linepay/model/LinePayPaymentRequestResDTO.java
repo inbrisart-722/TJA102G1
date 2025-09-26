@@ -7,20 +7,20 @@ public class LinePayPaymentRequestResDTO {
     private Info info;        
 
     public static class Info { // 結果訊息
-        private Long transactionId;  
+        private String  transactionId; // Long/ Integer 或 String ... 因配合 ECPay 統一用 String
         // LINE Pay 產生的交易 ID -> 可用於請求付款授權、取消授權和請款、退款。
         private PaymentUrl paymentUrl; // 前端導向的網址
-        private String paymentAccessToken; // （可選）付款存取 token
+//        private String paymentAccessToken; // （可選）付款存取 token
 
         // getters/setters
-        public Long getTransactionId() { return transactionId; }
-        public void setTransactionId(Long transactionId) { this.transactionId = transactionId; }
+        public String getTransactionId() { return transactionId; }
+        public void setTransactionId(String transactionId) { this.transactionId = transactionId; }
 
         public PaymentUrl getPaymentUrl() { return paymentUrl; }
         public void setPaymentUrl(PaymentUrl paymentUrl) { this.paymentUrl = paymentUrl; }
 
-        public String getPaymentAccessToken() { return paymentAccessToken; }
-        public void setPaymentAccessToken(String paymentAccessToken) { this.paymentAccessToken = paymentAccessToken; }
+//        public String getPaymentAccessToken() { return paymentAccessToken; }
+//        public void setPaymentAccessToken(String paymentAccessToken) { this.paymentAccessToken = paymentAccessToken; }
     }
 
     public static class PaymentUrl { // 付款畫面confirmURL訊息

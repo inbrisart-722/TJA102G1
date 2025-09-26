@@ -311,7 +311,7 @@ document.addEventListener("DOMContentLoaded", function() {
 				console.log(error);
 				toggleCheckoutButton(false);
 			});
-	}, 300);
+	}, 250);
 
 	// 量測高度 → 設置 CSS 變數 → 加 class 觸發動畫 → 動畫結束後移除
 	function collapseRow(rowEl, { delay = 0 } = {}) {

@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -15,8 +16,14 @@ import com.eventra.order.linepay.model.LinePayService;
 @SpringBootApplication
 public class Test_Application_CommandLineRunner implements CommandLineRunner {
 
-	@Autowired
-	private LinePayService LINE_PAY_SVC; 
+//	@Autowired
+//	private LinePayService LINE_PAY_SVC; 
+	
+//	@Value("${linepay.channel-id}") String channelId;
+//	@Value("${linepay.channel-secret}") String channelSecret;
+//	@Value("${linepay.base-url}") String baseUrl;
+//	@Value("${linepay.confirm-url}") String confirmUrl;
+//	@Value("${linepay.cancel-url}") String cancelUrl;
 	
 	public static void main(String[] args) {
         SpringApplication.run(Test_Application_CommandLineRunner.class);
@@ -25,7 +32,12 @@ public class Test_Application_CommandLineRunner implements CommandLineRunner {
     @Override
     public void run(String...args) throws Exception {
     	
-//    	LinePayPaymentRequestReqDTO.Product product = new LinePayPaymentRequestReqDTO.Product();
+//    	System.out.println(channelId);
+//    	System.out.println(channelSecret);
+//    	System.out.println(baseUrl);
+//    	System.out.println(confirmUrl);
+//    	System.out.println(cancelUrl);
+    	
 //    	product.setName("product1")
 //    			.setQuantity(1)
 //    			.setPrice(1000);

@@ -7,6 +7,7 @@ import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Objects;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Service;
@@ -27,13 +28,21 @@ public class MemberService {
 	private final MemberRepository MEMBER_REPO;
 	private final MemberRedisRepository MEMBER_REDIS_REPO;
 	private final PasswordEncoder PASSWORD_ENCODER; 
+	private final String DEFAULT_PROFILE_PIC;
 	
-	public MemberService(MemberRepository memberRepository, MemberRedisRepository memberRedisRepository, PasswordEncoder passwordEncoder) {
+	public MemberService(MemberRepository memberRepository, MemberRedisRepository memberRedisRepository, PasswordEncoder passwordEncoder, @Value("${default.profile-pic}") String defaultProfilePic) {
 		this.MEMBER_REPO = memberRepository;
 		this.MEMBER_REDIS_REPO = memberRedisRepository;
 		this.PASSWORD_ENCODER = passwordEncoder;
+		this.DEFAULT_PROFILE_PIC = defaultProfilePic;
 	}
 	
+	public String getMyProfilePic(Integer memberId) {
+		MemberVO member = MEMBER_REPO.findById(memberId).orElse(null);
+		if(member == null) return DEFAULT_PROFILE_PIC;
+		else if(member.getProfilePic() != null) return member.getProfilePic();
+		else return DEFAULT_PROFILE_PIC;
+	}
 	public String forgotPassword(ForgotPasswordReqDTO req) {
 		String token = req.getToken();
 		String password = req.getPassword();
