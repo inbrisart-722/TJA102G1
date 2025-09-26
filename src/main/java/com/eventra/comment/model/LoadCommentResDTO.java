@@ -5,7 +5,7 @@ import java.util.Map;
 
 public class LoadCommentResDTO {
 	private String status;
-	private List<CommentVO> list;
+	private List<CommentDTO> list;
 	private boolean hasNextPage;
 	private Map<Integer, String> mapReaction;
 	
@@ -16,10 +16,10 @@ public class LoadCommentResDTO {
 		this.status = status;
 		return this;
 	}
-	public List<CommentVO> getList() {
+	public List<CommentDTO> getList() {
 		return list;
 	}
-	public LoadCommentResDTO setList(List<CommentVO> list) {
+	public LoadCommentResDTO setList(List<CommentDTO> list) {
 		this.list = list;
 		return this;
 	}

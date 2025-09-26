@@ -1,7 +1,6 @@
 
 package com.eventra.exhibition.model;
 
-import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -16,6 +15,7 @@ import java.util.Set;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -24,10 +24,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.eventra.exhibitiontickettype.model.ExhibitionTicketTypeRepository;
 import com.eventra.comment.controller.CommentStatus;
 import com.eventra.comment.model.CommentRepository;
-import com.eventra.exhibitionstatus.model.ExhibitionStatusVO;
+import com.eventra.exhibitiontickettype.model.ExhibitionTicketTypeRepository;
 import com.eventra.exhibitiontickettype.model.ExhibitionTicketTypeVO;
 import com.eventra.exhibitor.backend.controller.dto.ExhibitionCreateDTO;
 import com.eventra.exhibitor.model.ExhibitorDTO;
@@ -55,14 +54,15 @@ public class ExhibitionServiceImpl implements ExhibitionService {
 	private EntityManager entityManager;
 	
 	private static final int DEFAULT_STATUS_ID = 1;
+	private final String DEFAULT_PHOTO_LANDSCAPE;
 
 	@Autowired
-	public ExhibitionServiceImpl(ExhibitionRepository repository, CommentRepository commentRepository, ExhibitionTicketTypeRepository exhibitionTicketTypeRepository, TicketTypeRepository ticketTypeRepository) {
+	public ExhibitionServiceImpl(ExhibitionRepository repository, CommentRepository commentRepository, ExhibitionTicketTypeRepository exhibitionTicketTypeRepository, TicketTypeRepository ticketTypeRepository, @Value("${default.exhibition-photo-landscape}") String defaultPhotoLandscape) {
 		this.repository = repository;
 		this.exhibitionTicketTypeRepository = exhibitionTicketTypeRepository;
 		this.ticketTypeRepository = ticketTypeRepository;
-    this.commentRepository = commentRepository;
-		
+		this.commentRepository = commentRepository;
+		this.DEFAULT_PHOTO_LANDSCAPE = defaultPhotoLandscape;
 	}
 
 	@Transactional
@@ -320,11 +320,12 @@ public class ExhibitionServiceImpl implements ExhibitionService {
 	 */
 	public ExhibitionDTO getExhibitionInfoForPage(Integer exhibitionId) {
 		ExhibitionVO exhibition = repository.findById(exhibitionId).orElse(null);
-		Set<ExhibitionTicketTypeVO> etts = exhibition.getExhibitionTicketTypes();
 		if(exhibition == null) return null;
+		Set<ExhibitionTicketTypeVO> etts = exhibition.getExhibitionTicketTypes();
 		ExhibitionDTO dto = new ExhibitionDTO();
+		String photoLandscape = exhibition.getPhotoLandscape() != null ? exhibition.getPhotoLandscape() : DEFAULT_PHOTO_LANDSCAPE;
 		dto.setExhibitionId(exhibitionId);
-		dto.setPhotoLandscape(exhibition.getPhotoLandscape());
+		dto.setPhotoLandscape(photoLandscape);
 		dto.setExhibitionName(exhibition.getExhibitionName());
 		dto.setAverageRatingScore(exhibition.getAverageRatingScore());
 		dto.setTotalRatingCount(exhibition.getTotalRatingCount());

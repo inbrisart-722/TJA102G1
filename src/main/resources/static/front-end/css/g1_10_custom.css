@@ -402,6 +402,7 @@ section.top-reply {
 section.top-reply img.replier_self {
   position: absolute;
   width: 42px;
+  height: 42px;
   top: 8px;
   left: 24px;
 }
@@ -468,11 +469,21 @@ section.replies > form > button {
 section.top-reply {
   margin-bottom: 48px;
 }
+section.top-reply > form.form_reply > img.replier_self {
+	border: 0.5px solid gray;
+}
+
 div.review_strip_single {
   position: relative;
   margin: 36px 0;
 }
-
+div.review_strip_single > img.rounded-circle.comment-avatar {
+	box-sizing: border-box;
+	height: 76px;
+	width: 76px;
+	border: 1px solid gray;
+}
+	
 div.review_strip_single > small {
   position: absolute;
   right: 0px;
@@ -564,10 +575,12 @@ section.replies > form {
 }
 section.replies img.replier_self {
   position: absolute;
-  width: 36px;
-  top: 2px;
-  left: 10px;
+  width: 30px;
+  height: 30px;
+  top: 4.5px;
+  left: 12.5px;
   overflow: hidden;
+  border: 1px solid gray;
 }
 section.replies > form > input {
   border: 1px solid gray;
@@ -606,8 +619,9 @@ section.replies > article.reply_block > div.reply_body {
 section.replies img.replier_others {
   position: absolute;
   top: 15px;
-  left: 5px;
+  left: 9px;
   width: 36px;
+  height: 36px;
 }
 section.replies div.report_block > button {
   font-size: 24px;
