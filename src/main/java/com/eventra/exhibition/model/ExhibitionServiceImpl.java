@@ -1,3 +1,4 @@
+
 package com.eventra.exhibition.model;
 
 import java.io.File;
@@ -311,7 +312,7 @@ public class ExhibitionServiceImpl implements ExhibitionService {
 	    		}
 	    	}
 	    }
-    
+	}
 	// inbrisart 20250925 給展覽頁 SSR 帶入
 	/**
 	 * @param exhibitionId

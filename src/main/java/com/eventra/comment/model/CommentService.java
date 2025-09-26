@@ -110,3 +110,16 @@ public class CommentService {
 		return res;
 	}
 }
+//front-end
+//一般登入
+	// ssr -> [SecurityConfig] defaultAuthenticationEntryPointfor 
+		// target = "/front-end/login?redirect=" + req.getRequestURI()
+		// if(req.getQueryString() != null) target += "&" + req.getQueryString();
+		// res.sendRedirect(target); -> "/front-end/login?redirect=exhibitions&exhibitionId=3"
+	// api -> [任一 .js 檔 ajax] 401 帶入 sessionStorage ("redirect" = pathname + search) -> [g1_10_custom_login.js] 導回
+//oauth2 登入
+	// ssr -> [SecurityConfig] oauth2Login successHandler
+		// SavedRequest savedRequest = new HttpSessionRequestCache().getRequest(request, response)
+		// String targetUrl = savedRequest.getRedirectUrl();
+		// response.sendRedirect(targetUrl);
+	// csr -> ????
