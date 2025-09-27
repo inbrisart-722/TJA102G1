@@ -25,6 +25,7 @@ import jakarta.servlet.http.HttpSession;
 @RequestMapping("/back-end")
 public class BackendIndexController {
 	
+	private static final Integer DRAFT_STATUS_ID = 6;
 	private final ExhibitionService exhibitionService;
 	private final Integer TEST_EXHIBITOR = 3;
 
@@ -105,16 +106,28 @@ public class BackendIndexController {
     }
     
     @GetMapping("exhibitor/exhibition_list")
-    public String goExhibitionListPage(Model model,@RequestParam(defaultValue = "0") int page,@RequestParam(defaultValue = "10") int size) {
-//    	List<ExhibitionVO> exhibitions = exhibitionService.getAllExhibitions();
-//    	model.addAttribute("exhibitions", exhibitions);
-    	
-    	Page<ExhibitionVO> exhibitionPage = exhibitionService.getExhibitionsPage(page, size);
-    	
-    	model.addAttribute("exhibitions", exhibitionPage.getContent());
+    public String goExhibitionListPage(Model model,
+    								  @RequestParam(defaultValue = "0") int page,
+    								  @RequestParam(defaultValue = "10") int size,	
+    								  @RequestParam(defaultValue = "all") String tab,
+    								  @RequestParam(required = false) String q) {
+
+    	Integer exhibitorId = TEST_EXHIBITOR; // 實務上改成登入者 id
+        Page<ExhibitionVO> p;
+
+        switch (tab) {
+            case "draft" -> p = exhibitionService.findDrafts(exhibitorId, DRAFT_STATUS_ID, page, size, q); // 6=草稿
+            case "not_on_sale" -> p = exhibitionService.findNotOnSale(exhibitorId, page, size, q);
+            case "on_sale" -> p = exhibitionService.findOnSale(exhibitorId, page, size, q);
+            case "ended" -> p = exhibitionService.findEnded(exhibitorId, page, size, q);
+            default -> p = exhibitionService.findAll(exhibitorId, page, size, q);
+        }
+        model.addAttribute("tab", tab);
+    	model.addAttribute("exhibitions", p.getContent());
     	model.addAttribute("currentPage", page);
-    	model.addAttribute("totalPages", exhibitionPage.getTotalPages());
-    	model.addAttribute("totalElements", exhibitionPage.getTotalElements());
+    	model.addAttribute("totalPages", p.getTotalPages());
+    	model.addAttribute("totalElements", p.getTotalElements());
+    	model.addAttribute("q", q == null ? "" : q);
     	return "back-end/exhibition_list";
     }
     

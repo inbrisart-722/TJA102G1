@@ -29,35 +29,53 @@ public interface ExhibitionRepository extends JpaRepository<ExhibitionVO, Intege
 			select e from ExhibitionVO e
 			where e.exhibitorVO.exhibitorId = :exhibitorId
 			and e.exhibitionStatusId = :draftId
+			and (:q is null or :q = '' or lower(e.exhibitionName) like lower(concat('%', :q, '%')))
 			""")
-	Page<ExhibitionVO> findDrafts(@Param("exhibitorId") Integer exhibitorId, @Param("draftId") Integer draftId,
-			Pageable pageable);
+	Page<ExhibitionVO> findDrafts(@Param("exhibitorId") Integer exhibitorId, 
+								  @Param("draftId") Integer draftId,
+								  @Param("q") String q,
+								  Pageable pageable);
 
 	// 尚未開賣查詢：尚未到 ticketStartTime 且尚未結束
 	@Query("""
 			select e from ExhibitionVO e
 			where e.exhibitorVO.exhibitorId = :exhibitorId
+			and e.exhibitionStatusId <> :draftId
 			and (e.endTime is null or e.endTime > CURRENT_TIMESTAMP)
 			and (e.ticketStartTime is not null and e.ticketStartTime > CURRENT_TIMESTAMP)
+			and (:q is null or :q = '' or lower(e.exhibitionName) like lower(concat('%', :q, '%')))
 			""")
-	Page<ExhibitionVO> findNotOnSale(@Param("exhibitorId") Integer exhibitorId, Pageable pageable);
+	Page<ExhibitionVO> findNotOnSale(@Param("exhibitorId") Integer exhibitorId, 
+									 @Param("draftId") Integer draftId,
+									 @Param("q") String q,
+									 Pageable pageable);
 
 	// 售票中：已到開賣時間，且未結束
 	@Query("""
 			select e from ExhibitionVO e
 			where e.exhibitorVO.exhibitorId = :exhibitorId
+			and e.exhibitionStatusId <> :draftId
 			and (e.ticketStartTime <= CURRENT_TIMESTAMP and CURRENT_TIMESTAMP < e.endTime)
+			and (:q is null or :q = '' or lower(e.exhibitionName) like lower(concat('%', :q, '%')))
 			""")
-	Page<ExhibitionVO> findOnSale(@Param("exhibitorId") Integer exhibitorId, Pageable pageable);
+	Page<ExhibitionVO> findOnSale(@Param("exhibitorId") Integer exhibitorId, 
+								  @Param("draftId") Integer draftId,
+								  @Param("q") String q,
+								  Pageable pageable);
 
 	// 已結束：已過 endTime
 	@Query("""
 			select e from ExhibitionVO e
 			where e.exhibitorVO.exhibitorId = :exhibitorId
+			and e.exhibitionStatusId <> :draftId
 			and e.endTime < CURRENT_TIMESTAMP
+			and (:q is null or :q = '' or lower(e.exhibitionName) like lower(concat('%', :q, '%')))
 			""")
-	Page<ExhibitionVO> findEnded(@Param("exhibitorId") Integer exhibitorId, Pageable pageable);
+	Page<ExhibitionVO> findEnded(@Param("exhibitorId") Integer exhibitorId, 
+								 @Param("draftId") Integer draftId,
+								 @Param("q") String q,
+								 Pageable pageable);
 
 	// 全部（分頁）
-	Page<ExhibitionVO> findByExhibitorVO_ExhibitorId(Integer exhibitorId, Pageable pageable);
+	Page<ExhibitionVO> findByExhibitorVO_ExhibitorIdAndExhibitionNameContainingIgnoreCase(Integer exhibitorId, String exhibitionName, Pageable pageable);
 }

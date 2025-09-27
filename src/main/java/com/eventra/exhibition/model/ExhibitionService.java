@@ -42,13 +42,13 @@ public interface ExhibitionService {
 //	ExhibitionVO updateExhibition(Integer exhibitionId, ExhibitionCreateDTO dto);
 	
 	// === 狀態分頁查詢（給列表頁用） ===
-    Page<ExhibitionVO> findAll(Integer exhibitorId, int page, int size);
+    Page<ExhibitionVO> findAll(Integer exhibitorId, int page, int size, String q);
 
-    Page<ExhibitionVO> findDrafts(Integer exhibitorId, Integer draftStatusId, int page, int size);
+    Page<ExhibitionVO> findDrafts(Integer exhibitorId, Integer draftStatusId, int page, int size, String q);
 
-    Page<ExhibitionVO> findNotOnSale(Integer exhibitorId, int page, int size);
+    Page<ExhibitionVO> findNotOnSale(Integer exhibitorId, int page, int size, String q);
 
-    Page<ExhibitionVO> findOnSale(Integer exhibitorId, int page, int size);
+    Page<ExhibitionVO> findOnSale(Integer exhibitorId, int page, int size, String q);
 
-    Page<ExhibitionVO> findEnded(Integer exhibitorId, int page, int size);
+    Page<ExhibitionVO> findEnded(Integer exhibitorId, int page, int size, String q);
 }

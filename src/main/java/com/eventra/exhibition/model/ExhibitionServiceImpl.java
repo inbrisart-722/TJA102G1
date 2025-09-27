@@ -257,7 +257,7 @@ public class ExhibitionServiceImpl implements ExhibitionService {
 	    // 同上，改成landscape
 	    MultipartFile landscape = dto.getPhotoLandscape(); 
 	    if(landscape != null && !landscape.isEmpty()) {  
-	    	String filename = "p_" + UUID.randomUUID() + "_" + landscape.getOriginalFilename();
+	    	String filename = "l_" + UUID.randomUUID() + "_" + landscape.getOriginalFilename();
 	    	try {
 	    		landscape.transferTo(baseDir.resolve(filename)); 
 	    		vo.setPhotoLandscape("uploads/exhibitions/" + id + "/" + filename); // 在資料庫欄位存相對路徑，供前端顯示用
@@ -282,7 +282,7 @@ public class ExhibitionServiceImpl implements ExhibitionService {
 	    Map<String, Integer> incomingByName = new LinkedHashMap<>(); // 用名稱作key，LinkedHashMap保留順序
 	    for(TicketJsonItem it : items) {
 	    	String name = (it.name() == null ? "" : it.name().trim()); // 取出名稱並去頭尾空白，null視為空字串
-	    	if(name.isEmpty() || it.price == null) { // 名稱空或價格為空的資料忽略
+	    	if(name.isEmpty() || it.price() == null) { // 名稱空或價格為空的資料忽略
 	    		continue;
 	    	}
 	    	incomingByName.put(name, it.price());
@@ -400,28 +400,28 @@ public class ExhibitionServiceImpl implements ExhibitionService {
 	}
 
 	@Override
-	public Page<ExhibitionVO> findAll(Integer exhibitorId, int page, int size) {
-		return repository.findByExhibitorVO_ExhibitorId(exhibitorId, defaultPageable(page, size));
+	public Page<ExhibitionVO> findAll(Integer exhibitorId, int page, int size, String q) {
+		return repository.findByExhibitorVO_ExhibitorIdAndExhibitionNameContainingIgnoreCase(exhibitorId, (q == null ? "" : q), defaultPageable(page, size));
 	}
 
 	@Override
-	public Page<ExhibitionVO> findDrafts(Integer exhibitorId, Integer draftStatusId, int page, int size) {
-		return repository.findDrafts(exhibitorId, (draftStatusId != null ? draftStatusId : DRAFT_STATUS_ID), defaultPageable(page, size));
+	public Page<ExhibitionVO> findDrafts(Integer exhibitorId, Integer draftStatusId, int page, int size, String q) {
+		return repository.findDrafts(exhibitorId, (draftStatusId != null ? draftStatusId : DRAFT_STATUS_ID), (q == null ? "" : q), defaultPageable(page, size));
 	}
 
 	@Override
-	public Page<ExhibitionVO> findNotOnSale(Integer exhibitorId, int page, int size) {
-		return repository.findNotOnSale(exhibitorId, defaultPageable(page, size));
+	public Page<ExhibitionVO> findNotOnSale(Integer exhibitorId, int page, int size, String q) {
+		return repository.findNotOnSale(exhibitorId, DRAFT_STATUS_ID, (q == null ? "" : q), defaultPageable(page, size));
 	}
 
 	@Override
-	public Page<ExhibitionVO> findOnSale(Integer exhibitorId, int page, int size) {
-		return repository.findOnSale(exhibitorId, defaultPageable(page, size));
+	public Page<ExhibitionVO> findOnSale(Integer exhibitorId, int page, int size, String q) {
+		return repository.findOnSale(exhibitorId, DRAFT_STATUS_ID, (q == null ? "" : q), defaultPageable(page, size));
 	}
 
 	@Override
-	public Page<ExhibitionVO> findEnded(Integer exhibitorId, int page, int size) {
-		return repository.findEnded(exhibitorId, defaultPageable(page, size));
+	public Page<ExhibitionVO> findEnded(Integer exhibitorId, int page, int size, String q) {
+		return repository.findEnded(exhibitorId, DRAFT_STATUS_ID, (q == null ? "" : q), defaultPageable(page, size));
 	}
 
 	
