@@ -17,6 +17,7 @@ import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
 
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestClient;
@@ -49,6 +50,8 @@ public class LinePayService {
 	@PersistenceContext
 	private EntityManager entityManager;
 	
+	private final Long ORDER_EXPIRATION_MILLIS;
+	
 	private String CHANNEL_ID;
 	private String CHANNEL_SECRET;
 	private String BASE_URL;
@@ -71,7 +74,7 @@ public class LinePayService {
 			@Value("${linepay.confirm-url-prefix}") String confirmUrlPrefix,
 			@Value("${linepay.cancel-url-prefix}") String cancelUrlPrefix,
 			RestClient.Builder restClientBuilder, JsonCodec jsonCodec, ExhibitionRepository exhibitionRepo, CartItemRedisRepository cartItemRedisRepo,
-			OrderRepository orderRepo, OrderItemRepository orderItemRepo, PaymentAttemptRepository paymentAttemptRepo) {
+			OrderRepository orderRepo, OrderItemRepository orderItemRepo, PaymentAttemptRepository paymentAttemptRepo, @Value("${order.expiration-millis}") Long orderExpirationMillis) {
 		
 		this.CHANNEL_ID = channelId;
 		this.CHANNEL_SECRET = channelSecret;
@@ -85,8 +88,154 @@ public class LinePayService {
 		this.ORDER_REPO = orderRepo;
 		this.ORDER_ITEM_REPO = orderItemRepo;
 		this.PAYMENT_ATTEMPT_REPO = paymentAttemptRepo;
+		this.ORDER_EXPIRATION_MILLIS = orderExpirationMillis;
 	}
 
+	public void cleanExpiredLinePayPaymentAttempt(PaymentAttemptVO paymentAttempt) {
+		// 1. 拿出 order 等後續要更新的物件
+		OrderVO order = paymentAttempt.getOrder();
+		
+		// 2. 拿出核心 transactionId
+		String transactionId = paymentAttempt.getProviderTransactionId();
+		// 3. 呼叫 check api 
+		LinePayPaymentRequestCheckResDTO res = paymentRequestCheck(transactionId);
+		
+		// 4. 從 api res 拆出 returnCode + returnMessage
+		String returnCode = res.getReturnCode();
+		String returnMessage = res.getReturnMessage();
+		paymentAttempt.setRtnMsg(returnMessage);
+		// 5. 開始針對不同 returnCode 做出相對應處理
+		
+	// 只限於 check api 的狀態碼（需要特別處理的）
+		// 0000: 顧客完成 LINE Pay 認證之前的狀態
+			// 顧客點了「付款」但還沒去 LINE Pay 畫面輸入資訊，或是正在輸入。例如：使用者停在 LINE Pay 頁面上，但還沒按「確認付款」。
+		// 0110: 顧客已完成 LINE Pay 認證，可以進行付款授權
+			// 顧客已經在 LINE Pay 輸入資料 & 認證成功了，LINE Pay 這邊確認「可以扣款」，但還需要你系統呼叫 /confirm 來「實際請款」。
+		// 0121: 顧客取消付款或超過 LINE Pay 認證等待時間
+			// 使用者自己在 LINE Pay 頁面按了「取消付款」，或者他卡在頁面沒動作，超時了。
+		// 0122: 付款失敗
+			// 意思：顧客有嘗試付款，但銀行端或 LINE Pay 驗證沒過。
+			// 常見原因：卡號無效、餘額不足、發卡銀行拒絕交易。
+		if("0121".equals(returnCode)) {
+			// 1. 過期，掃 expired
+			paymentAttempt.setPaymentAttemptStatus(PaymentAttemptStatus.EXPIRED);
+			order.setOrderStatus(OrderStatus.付款失敗);
+			// 2. 還可以嘗試付款，並且不釋出票，除非過期就要直接釋出且無法繼續嘗試
+			Long createdAt = order.getCreatedAt().getTime();
+			if(System.currentTimeMillis() - createdAt > ORDER_EXPIRATION_MILLIS) {
+				// 2-1. order -> 逾時
+				order.setOrderStatus(OrderStatus.付款逾時);
+				// 2-2. 釋票
+				releaseTickets(order);
+			}
+		}
+		if("0122".equals(returnCode)) {
+			// 1. 失敗，掃 failure
+			paymentAttempt.setPaymentAttemptStatus(PaymentAttemptStatus.FAILURE);
+			order.setOrderStatus(OrderStatus.付款失敗);
+			// 2. 還可以嘗試付款，並且不釋出票，除非過期就要直接釋出且無法繼續嘗試
+			Long createdAt = order.getCreatedAt().getTime();
+			if(System.currentTimeMillis() - createdAt > ORDER_EXPIRATION_MILLIS) {
+				// 2-1. order -> 逾時
+				order.setOrderStatus(OrderStatus.付款逾時);
+				// 2-2. 釋票
+				releaseTickets(order);
+			}
+		}
+		if("0000".equals(returnCode)) {
+			// 先當過期，掃 expired
+				// 但不過若後續成功，要檢查
+					// 是否重複付款
+					// 還有票 -> 重新保留，調整本來訂單狀態，並且打 confirm api
+					// 沒票 -> 取消授權, paymentAuthorizationsVoid api
+			
+			// 1. 過期，掃 expired
+			paymentAttempt.setPaymentAttemptStatus(PaymentAttemptStatus.EXPIRED);
+			order.setOrderStatus(OrderStatus.付款失敗);
+			// 2. 還可以嘗試付款，並且不釋出票，除非過期就要直接釋出且無法繼續嘗試
+			Long createdAt = order.getCreatedAt().getTime();
+			if(System.currentTimeMillis() - createdAt > ORDER_EXPIRATION_MILLIS) {
+				// 2-1. order -> 逾時
+				order.setOrderStatus(OrderStatus.付款逾時);
+				// 2-2. 釋票
+				releaseTickets(order);
+			}
+		}
+		if("0110".equals(returnCode)) {
+			// 成功，可呼叫confirm api
+			// 是要送 providerOrderId 而不是 providerTransactionId
+			String providerOrderId = paymentAttempt.getProviderOrderId();
+			paymentConfirm(providerOrderId);
+		}
+	}
+	
+	public LinePaySendingResDTO resendPaymentRequest(String orderUlid) {
+		LinePaySendingResDTO res = new LinePaySendingResDTO();
+		/* ================================================= */
+		OrderVO order = ORDER_REPO.findByOrderUlid(orderUlid);
+		Integer orderId = order != null ? order.getOrderId() : null;
+		if (orderId == null || !OrderStatus.付款失敗.equals(order.getOrderStatus()))
+			// 1. 送錯或亂送 ulid 會造成此狀況！不要亂送！
+			// 2. 狀態不是指定狀態！不要亂送！
+			return res.setStatus(LinePaySendingStatus.FAILURE_NOT_FOUND)
+						.setMessage(LinePaySendingStatus.FAILURE_NOT_FOUND.getMessage());
+		
+		PaymentAttemptVO paymentAttempt = PAYMENT_ATTEMPT_REPO.findTopByOrderIdOrderByCreatedAtDesc(orderId).orElseThrow();
+		// 狀態更動
+		order.setOrderStatus(OrderStatus.付款中);
+		// 先拿回舊的 prReq
+		LinePayPaymentRequestReqDTO prReq = JSON_CODEC.read(paymentAttempt.getPackagesJson(), LinePayPaymentRequestReqDTO.class);
+		// 調整成新的 prReq
+		String providerOrderId = ProviderOrderId36Generator.generateOrderId(); // 不是我們自己 db 的 orderId
+		prReq
+			.setOrderId(providerOrderId)
+			.setRedirectUrls(Map.of("confirmUrl", CONFIRM_URL_PREFIX + providerOrderId,
+									"cancelUrl", CANCEL_URL_PREFIX + providerOrderId));
+		String apiPath = "/v3/payments/request"; // endpoint
+		String nonce = UUID.randomUUID().toString(); // 避免重放攻擊，類似一次性密碼，使用過的 nonce 會被標示無效，攻擊者就無法多次請求隨意多次扣款等等
+		String message = CHANNEL_SECRET + apiPath + JSON_CODEC.write(prReq) + nonce;
+		String signature = signHmacSHA256(CHANNEL_SECRET, message);
+		LinePayPaymentRequestResDTO prRes =
+				REST_CLIENT.post()
+                .uri(apiPath)
+                .header("Content-Type", "application/json")
+                .header("X-LINE-ChannelId", CHANNEL_ID)
+                .header("X-LINE-Authorization-Nonce", nonce)
+                .header("X-LINE-Authorization", signature)
+                .body(prReq) // 給 Spring 轉 Json 即可
+                .retrieve()
+                .body(LinePayPaymentRequestResDTO.class);
+		/* ********* 4th part : 確認 payment request 狀況  ********* */
+		// 4-1 失敗就回傳
+		if(!"0000".equals(prRes.getReturnCode())) {// API呼叫成功時，傳回0000值。其他結果碼均為錯誤碼;
+			System.out.println(prRes.getReturnMessage());
+			
+			return res
+					.setStatus(LinePaySendingStatus.FAILURE_LINE_PAY)
+					.setMessage(LinePaySendingStatus.FAILURE_LINE_PAY.getMessage());
+		}
+		
+		// 4-2 成功才繼續！
+		
+		// 5. [db] payment_attempt 建立
+		PaymentAttemptVO paymentAttemptNew = new PaymentAttemptVO.Builder()
+						.paymentAttemptStatus(PaymentAttemptStatus.PENDING)
+						.order(order)
+						.provider(OrderProvider.LINEPay)
+						.providerOrderId(providerOrderId)
+						.tradeAmt(paymentAttempt.getTradeAmt())
+						.currency("TWD")
+						.packagesJson(JSON_CODEC.write(prReq)) // 寫入新版
+						.providerTransactionId(prRes.getInfo().getTransactionId())
+						.buildLinePay();
+		
+        PAYMENT_ATTEMPT_REPO.save(paymentAttemptNew);
+        
+		return res
+				.setStatus(LinePaySendingStatus.SUCCESS)
+				.setMessage(prRes.getInfo().getPaymentUrl().getWeb());
+	}
+	
 	// 1. payment request 送出 LINE PAY 訂單，拿到 redirectUrl.web 丟給前端 redirect
 	// POST /v3/payments/request
 	public LinePaySendingResDTO paymentRequest(LinePaySendingReqDTO req, Integer memberId) {
@@ -172,7 +321,7 @@ public class LinePayService {
 	    
 		/* ********* 4th part : 確認 payment request 狀況  ********* */
 		// 4-1 失敗就回傳，不建訂單
-		if(!prRes.getReturnCode().equals("0000")) {// API呼叫成功時，傳回0000值。其他結果碼均為錯誤碼;
+		if(!"0000".equals(prRes.getReturnCode())) {// API呼叫成功時，傳回0000值。其他結果碼均為錯誤碼;
 			System.out.println(prRes.getReturnMessage());
 			
 			return res
@@ -189,6 +338,7 @@ public class LinePayService {
 
 		OrderVO order = new OrderVO.Builder()
 				.orderUlid(orderUlid)
+				.orderProvider(OrderProvider.LINEPay)
 				.orderStatus(OrderStatus.付款中)
 				.member(member)
 				.totalAmount(totalAmount)
@@ -231,17 +381,55 @@ public class LinePayService {
 				.setStatus(LinePaySendingStatus.SUCCESS)
 				.setMessage(prRes.getInfo().getPaymentUrl().getWeb());
 	}
-
+	
 	// 2. check payment request 確認用戶授權狀況（用戶導入 line pay 可能直接跳開、關瀏覽器等）
 	// GET /v3/payments/requests/{transactionId}/check
-	public void paymentRequestCheck() {
+	// **目前** 只有透過 clean expired line pay payment attempt 來呼叫
+	public LinePayPaymentRequestCheckResDTO paymentRequestCheck(String transactionId) {
 		
+		String apiPath = "/v3/payments/requests/" + transactionId + "/check"; // endpoint
+		String nonce = UUID.randomUUID().toString(); // 避免重放攻擊，類似一次性密碼，使用過的 nonce 會被標示無效，攻擊者就無法多次請求隨意多次扣款等等
+		String message = CHANNEL_SECRET + apiPath + nonce;
+		String signature = signHmacSHA256(CHANNEL_SECRET, message);
+
+		LinePayPaymentRequestCheckResDTO prcRes =
+				REST_CLIENT.get()
+                .uri(apiPath)
+                .header("Content-Type", "application/json")
+                .header("X-LINE-ChannelId", CHANNEL_ID)
+                .header("X-LINE-Authorization-Nonce", nonce)
+                .header("X-LINE-Authorization", signature)
+                .retrieve()
+                .body(LinePayPaymentRequestCheckResDTO.class);
 		
+		return prcRes;
+	}
+	
+	@Async
+	// 預設會用 SimpleAsyncTaskExecutor，它不是標準的執行緒池，而是「每次呼叫就開新 thread」。
+	// 這在生產環境容易造成 thread 爆炸，所以通常會自訂一個 ThreadPoolExecutor。-> 之後再說
+	public void retryPaymentConfirm(String providerOrderId) {
+		
+		try { Thread.sleep(3000); }
+		catch(InterruptedException e) { Thread.currentThread().interrupt(); } // 保持中斷 
+		
+		PaymentAttemptVO paymentAttempt = PAYMENT_ATTEMPT_REPO.findByProviderOrderId(providerOrderId).orElse(null);
+		
+		if (paymentAttempt == null) return;
+		
+		Byte retryCount = paymentAttempt.getConfirmApiRetryCount();
+		if(retryCount <= 5) { // 1, 2, 3, 4, 5 共 5 次
+			paymentAttempt.setConfirmApiRetryCount((byte)(retryCount + 1));
+			PAYMENT_ATTEMPT_REPO.save(paymentAttempt);
+			paymentConfirm(providerOrderId);
+		}
 	}
 	
 	// 3-1. confirm request 用戶授權完成回到 confirmUrl 以後 
 	// POST /v3/payments/{transactionId}/confirm
 	public String paymentConfirm(String providerOrderId) {
+		// 要處理重送問題（重複付款）
+		
 		PaymentAttemptVO paymentAttempt = PAYMENT_ATTEMPT_REPO.findByProviderOrderId(providerOrderId).orElse(null);
 		
 		if(paymentAttempt == null) return null; // -> 付款成功 line pay 導用戶回來的頁面 有人亂輸入的話 要處理
@@ -266,14 +454,29 @@ public class LinePayService {
                 .retrieve()
                 .body(LinePayPaymentConfirmResDTO.class);
 		
-		// 失敗
-		if(!prRes.getReturnCode().equals("0000")) {
-			// do something 
-			System.out.println(prRes.getReturnMessage());
+		String returnCode = prRes.getReturnCode();
+		String returnMessage = prRes.getReturnMessage();
+		paymentAttempt.setRtnCode(returnCode);
+		paymentAttempt.setRtnMsg(returnMessage);
+		System.out.println(returnCode + ": " + returnMessage);
+		
+		// 失敗 -> confirm url 回來但 confirm api 失敗... 使用者帳戶已經保留款項，但我們沒有請款成功 !!
+		if(!"0000".equals(returnCode)) {
+			System.out.println("failed~~~~~~~~~~~~~~~~~~~~~~~~");
+			// 0. payment attempt 先設定為 checking 確保不會 order 被掃成逾時
+			Byte retryCount = paymentAttempt.getConfirmApiRetryCount();
+			paymentAttempt.setPaymentAttemptStatus(PaymentAttemptStatus.CHECKING);
+			paymentAttempt.setConfirmApiRetryCount((byte)(retryCount + 1));
+			PAYMENT_ATTEMPT_REPO.save(paymentAttempt);
+			// 1. 立即重打 api -> confirm API 是 冪等的，重複呼叫同一個 transactionId 不會重複扣款。
+			if(paymentAttempt.getConfirmApiRetryCount() <= 1)
+				retryPaymentConfirm(paymentAttempt.getProviderOrderId());
+			// 2. 後續 job 掃描... 
+			return null;
 		}
 		
 		// 成功
-		if(prRes.getReturnCode().equals("0000")) {
+		if("0000".equals(returnCode)) {
 		/* ********* 1st step: paymentAttempt, order, orderItems 更新狀態 ********* */
 			// 1-1: paymentAttempt
 			paymentAttempt.setPaymentAttemptStatus(PaymentAttemptStatus.SUCCESS);
@@ -296,17 +499,34 @@ public class LinePayService {
 		
 	}
 	
-	
-	// 4. 查詢已授權的付款 -> 不能拿這條來查未完成授權的認證階段資訊
-	// GET /v3/payments
-	public void paymentCheck() {
-		
+	// 4. 取消授權 -> payment attempt 過期回來沒票就要主動取消授權
+	// POST /v3/payments/authorizations/{transactionId}/void
+	// **目前** 只會被 confirm url 回來重複付款的方法呼叫
+	public void paymentAuthorizationsVoid() {
+		// 使用者體驗
+			// 1. 等過期：要等 LINE Pay 的授權到期（通常 7 天），這段期間顧客信用卡額度會被占用。
+				// 假設顧客額度 10,000，授權 5,000，雖然錢沒扣走，但額度只剩 5,000 可用。
+				// 顧客這時去刷別的東西可能會失敗，體驗不好。
+			// 2. 立即取消授權：商戶打 void API，授權立刻釋放，顧客額度馬上恢復。
+				// 👉 這就是為什麼支付平台（LINE Pay、ECPay、Stripe）都會建「取消授權 API」：是為了顧客體驗。
 	}
 	
-	// 5. capture(一般來說會跟confirm綁一起）後想退款（非單純是用戶授權後capture尚未完成 -> 那是另一條 api）
+	// 5. 查詢已授權的付款 -> 不能拿這條來查未完成授權的認證階段資訊
+	// GET /v3/payments
+	public void paymentCheck() {
+	}
+	
+	// 6. capture(一般來說會跟confirm綁一起）後想退款（非單純是用戶授權後capture尚未完成 -> 那是另一條 api）
 	// POST /v3/payments/{transactionId}/refund
 	public void paymentRefund() {
 		
+	}
+	
+	private void releaseTickets(OrderVO order) {
+		Map<Integer, Integer> releaseMap = order.getOrderItems().stream().collect(Collectors.groupingBy(
+				item -> item.getExhibitionTicketType().getExhibitionId(), Collectors.summingInt(item -> 1)));
+			for (Map.Entry<Integer, Integer> entry : releaseMap.entrySet())
+				EXHIBITION_REPO.updateSoldTicketQuantity(entry.getKey(), -entry.getValue());
 	}
 	
 	private String genTicketCode(String ulid) {
