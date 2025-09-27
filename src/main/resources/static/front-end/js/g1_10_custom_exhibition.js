@@ -1206,10 +1206,13 @@ document.addEventListener("DOMContentLoaded", function() {
 		console.log(originalRatingScore);
 
 		if (ratingScore === originalRatingScore) return;
+		
+		const params = new URLSearchParams(window.location.search);
+		const exhibitionId = params.get("exhibitionId");
 
 		csrfFetchToRedirect(
 			"/api/front-end/protected/rating/upsertRating?exhibitionId=" +
-			2 + // test
+			exhibitionId +
 			"&ratingScore=" +
 			ratingScore,
 			{

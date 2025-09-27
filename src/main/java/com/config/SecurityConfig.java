@@ -277,8 +277,8 @@ public class SecurityConfig {
 																					// 頂多只是讓使用者被迫登出
 						new AntPathRequestMatcher("/api/front-end/order/ECPay/ReturnURL"),
 						new AntPathRequestMatcher("/front-end/ECPay/*"), // ClientBackURL + OrderResultURL
-						new AntPathRequestMatcher("/front-end/google/*") // 雖然目前只有 get
-
+						new AntPathRequestMatcher("/front-end/google/*"), // 雖然目前只有 get
+						new AntPathRequestMatcher("/api/front-end/line/webhook")
 				));
 
 		// ========= Session：完全無狀態（靠 JWT，不用 HttpSession） =========

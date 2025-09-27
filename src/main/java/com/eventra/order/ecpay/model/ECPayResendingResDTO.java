@@ -1,4 +1,4 @@
-package com.eventra.order.model;
+package com.eventra.order.ecpay.model;
 
 public class ECPayResendingResDTO {
 

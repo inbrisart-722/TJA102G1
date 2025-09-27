@@ -1,4 +1,4 @@
-//package com.eventra.order.model;
+//package com.eventra.order.ecpay.model;
 //
 //public class ECPayQueryResDTO {
 //	private String MerchantID;
@@ -123,3 +123,6 @@
 //		CheckMacValue = checkMacValue;
 //	}
 //}
+
+
+

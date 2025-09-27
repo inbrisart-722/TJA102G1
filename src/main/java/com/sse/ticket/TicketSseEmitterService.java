@@ -64,6 +64,7 @@ public class TicketSseEmitterService {
 				// .complete -> 結束 SSE 連線
 				// 如果發送失敗（通常是 client 斷線），就關掉 emitter（SSE 連線）並且讓 callback 移除此清單
 				emitter.complete();
+				clients.values().remove(emitter); // 確保 map 中不會再有壞掉的 emitter
 			}
 		}
 	}

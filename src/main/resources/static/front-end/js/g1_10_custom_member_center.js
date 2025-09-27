@@ -1,7 +1,7 @@
 document.addEventListener("DOMContentLoaded", function() {
 
-	document.querySelector("a.icon-profile").click();
-	
+	//	document.querySelector("a.icon-profile").click();
+
 	// 登出 這個特別用把事件冒泡改 capturing 套用同架構但避免 tabs.js 先取並且丟錯誤（沒section-5 等等）
 
 	document.querySelector("#logout").addEventListener("click", function(e) {
@@ -9,9 +9,9 @@ document.addEventListener("DOMContentLoaded", function() {
 		e.stopPropagation(); // 阻止傳到 tabs.js
 
 		const wants_to_logout = confirm("確認登出嗎？");
-		
-		if(!wants_to_logout) return;
-			
+
+		if (!wants_to_logout) return;
+
 		// 免 csrf 有放行
 		fetch("/api/auth/logout/member", {
 			method: "POST",
@@ -61,7 +61,7 @@ document.addEventListener("DOMContentLoaded", function() {
 		const btn = e.target.closest("button.tab_order");
 		if (!btn) return;
 		e.preventDefault();
-    
+
 		console.log(btn.textContent + ": btn is clicked");
 		clear_section1();
 		// 所有 btn 取消 -on
@@ -235,53 +235,97 @@ document.addEventListener("DOMContentLoaded", function() {
 		if (canvas) canvas.remove();
 	});
 
-	// fetch 2 : 重送金流 /api/order/ECPay/resending
+	
 
 	document.addEventListener("click", function(e) {
 		const btn_repay = e.target.closest("button.order_repay")
 		if (!btn_repay) return;
 		const order_ulid = btn_repay.closest("div.order_row").querySelector("span.order_id > span").innerText;
 		console.log(order_ulid);
-		csrfFetchToRedirect("/api/front-end/protected/order/ECPay/resending", {
-			method: "POST",
-			headers: {
-				"CONTENT-TYPE": "text/plain" // 純字串
-			},
-			body: order_ulid
-		}).then((res) => {
-			if (!res.ok) throw new Error("ECPay/resending: Not 2XX or 401");
-			return res.json();
-		}).then((result) => {
-			if (result.status === "success") {
-				const form = document.createElement("form");
-				form.method = (result.method || "POST").toUpperCase();
-				form.action = result.action;
+		
+		// fetch1 : 先判斷此訂單本來是哪個金流服務提供商
+		csrfFetchToRedirect("/api/front-end/protected/order/getOrderProvider?orderUlid=" + order_ulid, {
+			method: "GET"
+		})
+			.then(res => {
+				if (!res.ok) throw new Error("getOrderProvider: NOT 2XX or 401")
+				else return res.json();
+			})
+			.then(data => {
+				// fetch2 : 重送金流 /api/order/ECPay/resending       ||       /api/front-end/protected/linepay/resending-payment-request
+				console.log(data);
+				if (data === "ECPay") ECPay_resending(order_ulid);
+				else if (data === "LINEPay") LINEPay_resending(order_ulid);
+		})
+			.catch(error => console.log(error));
 
-				// .entries returns an array of key-value pairs
-				// Each pair is itself a small array
-				Object.entries(result.fields).forEach(([k, v]) => {
-					const input = document.createElement("input");
-					input.type = "hidden";
-					input.name = k;
-					// null or undefined return ""
-					input.value = (v ?? "").toString();
-					form.appendChild(input);
-				});
+		// 以下 function 目的是為了副作用，就先不另外處理 promise 結果部分了
+			
+		////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		const LINEPay_resending = function(order_ulid) {
+			return csrfFetchToRedirect("/api/front-end/protected/linepay/resending-payment-request", {
+				method: "POST",
+				headers:  {
+					"Content-Type": "text/plain" // 純字串
+				},
+				body: order_ulid
+			}).then((res) => {
+					if (!res.ok) throw new Error("linepay/resending-payment-request: Not 2XX or 401");
+					return res.json();
+			}).then((data) => {
+				//	console.log(data.status);
+					if(data.status?.toUpperCase() !== "SUCCESS")
+						alert(data.message); // 失敗的 message 是拿來 alert 用戶
+					else window.location.href = data.message; // 只有成功的 message 才是拿來轉導
+			}).catch(error => {
+				console.log(error);
+			})
+		}
+		
+		////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		const ECPay_resending = function(order_ulid) {
+			return csrfFetchToRedirect("/api/front-end/protected/order/ECPay/resending", {
+				method: "POST",
+				headers: {
+					"CONTENT-TYPE": "text/plain" // 純字串
+				},
+				body: order_ulid
+			}).then((res) => {
+				if (!res.ok) throw new Error("ECPay/resending: Not 2XX or 401");
+				return res.json();
+			}).then((result) => {
+				if (result.status === "success") {
+					const form = document.createElement("form");
+					form.method = (result.method || "POST").toUpperCase();
+					form.action = result.action;
 
-				// noscript 保險（可選）
-				const btn = document.createElement("button");
-				btn.type = "submit";
-				btn.style.display = "none";
-				form.appendChild(btn);
+					// .entries returns an array of key-value pairs
+					// Each pair is itself a small array
+					Object.entries(result.fields).forEach(([k, v]) => {
+						const input = document.createElement("input");
+						input.type = "hidden";
+						input.name = k;
+						// null or undefined return ""
+						input.value = (v ?? "").toString();
+						form.appendChild(input);
+					});
 
-				document.body.appendChild(form);
-				form.submit();
-			} else {
-				console.log("ECPay Re-sending failed")
-			}
-		}).catch((error) => {
-			console.log(error);
-		});
+					// noscript 保險（可選）
+					const btn = document.createElement("button");
+					btn.type = "submit";
+					btn.style.display = "none";
+					form.appendChild(btn);
+
+					document.body.appendChild(form);
+					form.submit();
+				} else {
+					console.log("ECPay Re-sending failed")
+				}
+			}).catch((error) => {
+				console.log(error);
+			});
+		}
+
 
 	})
 
@@ -323,7 +367,7 @@ document.addEventListener("DOMContentLoaded", function() {
 			.then((result) => {
 				console.log(result[0]);
 				console.log(result[1]);
-				
+
 				user_img.src = `${result[1]}`;
 			})
 			.catch(error => console.log(error));
@@ -347,12 +391,12 @@ document.addEventListener("DOMContentLoaded", function() {
 
 		let errors = {};
 
-		
+
 		// 0. full_name: 長度 <= 50
 		if (full_name.length > 50) {
 			errors.full_name = "姓名不能超過 50 個字元";
 		}
-		
+
 		// 1. nickname：必填 + 長度 <= 50
 		if (!nickname) {
 			errors.nickname = "平台暱稱必填";
@@ -413,14 +457,14 @@ document.addEventListener("DOMContentLoaded", function() {
 
 	// 綁定儲存變更按鈕
 	const btn_save = document.querySelector("#btn_save");
-	
+
 	const saved_full_name = document.querySelector("#saved_full_name");
 	const saved_nickname = document.querySelector("#saved_nickname");
 	const saved_gender = document.querySelector("#saved_gender");
 	const saved_phone_number = document.querySelector("#saved_phone_number");
 	const saved_birth_date = document.querySelector("#saved_birth_date");
 	const saved_address = document.querySelector("#saved_address");
-	
+
 	let saveable = true;
 	btn_save.addEventListener("click", function(e) {
 		e.preventDefault();
@@ -475,7 +519,7 @@ document.addEventListener("DOMContentLoaded", function() {
 
 // 取得基本資料區塊
 document.addEventListener("DOMContentLoaded", function() {
-	
+
 	const profile_summary = document.getElementById("profile_summary");
 	const related_account = document.getElementById("related_account");
 	// saved 區塊
@@ -496,16 +540,16 @@ document.addEventListener("DOMContentLoaded", function() {
 	const phone_number_el = document.querySelector("#phone_number");
 	const birth_date_el = document.querySelector("#birth_date");
 	const address_el = document.querySelector("#address");
-	
-	const insert_if_oauth2 = function(oauth2provider){
+
+	const insert_if_oauth2 = function(oauth2provider) {
 		related_account.insertAdjacentHTML("afterbegin", `此帳號透過 <span>${oauth2provider}</span> 綁定`);
 	}
-//	<h4 id="related_account">此帳號透過 <span>${oauth2provider}</span> 綁定</h4>
-//			<br />
+	//	<h4 id="related_account">此帳號透過 <span>${oauth2provider}</span> 綁定</h4>
+	//			<br />
 	// 如果判斷不是 OAuth2 才需要加入的部分
-	const insert_if_not_oauth2 = function(){
+	const insert_if_not_oauth2 = function() {
 		// 1. saved 部分要加入信箱密碼
-		
+
 		profile_summary.insertAdjacentHTML("afterbegin", `		<li>信箱 <span id="saved_email"></span>
 		</li>
 		<li>密碼 <span id="saved_password"></span>
@@ -528,66 +572,66 @@ document.addEventListener("DOMContentLoaded", function() {
 										</div>
 									</div>
 								</div>`)
-								
+
 		saved_email_el = document.getElementById("saved_email");
 		saved_password_el = document.getElementById("saved_password");
-		
+
 		const btn_change_mail_el = document.getElementById("change_mail");
 		const btn_change_password_el = document.getElementById("change_password");
-		
+
 		btn_change_mail_el.addEventListener("click", () => window.location.href = "/front-end/change-mail1")
 		btn_change_password_el.addEventListener("click", () => window.location.href = "/front-end/reset-password1")
 	};
-								
+
 	csrfFetchToRedirect("/api/front-end/protected/member/getMemberInfo", {
 		method: "GET"
 	})
-	.then(res => {
-		if(!res.ok) throw new Error("getMemberInfo: NOT 2XX");
-		else return res.json();
-	})
-	.then(result => {
-		console.log(result);
-		
-		// 如果非使用 OAuth2 登入 -> 才渲染更新框的 (1)信箱 (2)密碼 部分
-		if(!result.githubId && !result.facebookId && !result.googleId){
-			insert_if_not_oauth2();
-			saved_email_el.innerText = result.email ? result.email : "-";
-			saved_password_el.innerText = "(已隱藏)";
-		}
-		else {
-			console.log("i used oauth2 to log in !!");
-			// 先渲染非 OAuth2 會員才有的值
-			let oauth2provider;
-			
-			if(result.githubId) oauth2provider = "GitHub";
-			if(result.googleId) oauth2provider = "Google";
-			if(result.facebookId) oauth2provider = "Facebook";
-			
-			insert_if_oauth2(oauth2provider);
-		}
-		
-		// saved部分 -> 把 innerText 放上 -> 所有會員（不論是否 OAuth2）都有的值
-		saved_full_name_el.innerText = result.fullName ? result.fullName : "-";
-		saved_nickname_el.innerText = result.nickname ? result.nickname : "-";
-		saved_gender_el.innerText = result.gender ? result.gender : "-";
-		saved_phone_number_el.innerText = result.phoneNumber ? result.phoneNumber : "-";
-		saved_birth_date_el.innerText = result.birthDate ? result.birthDate : "-";
-		saved_address_el.innerText = result.address ? result.address : "-";
-		
-		// update部分 -> 把 value 放上 -> 所有會員（不論是否 OAuth2）都有的值
-		full_name_el.value = result.fullName ? result.fullName : "";
-		nickname_el.value = result.nickname ? result.nickname : ""; // 其實一定有 (not null constraint)
-		gender_el.value = result.gender ? result.gender : ""; 
-		phone_number_el.value = result.phoneNumber ? result.phoneNumber : "";
-		birth_date_el.value = result.birthDate ? result.birthDate : "";
-		address_el.value = result.address ? result.address : "";
-		
-		// 圖片部分
-		user_img.src = result.profilePic ? result.profilePic : "img/tourist_guide_pic.jpg";
- 	})
-	.catch(error => {
-		console.log(error);
-	})
-		
+		.then(res => {
+			if (!res.ok) throw new Error("getMemberInfo: NOT 2XX");
+			else return res.json();
+		})
+		.then(result => {
+			console.log(result);
+
+			// 如果非使用 OAuth2 登入 -> 才渲染更新框的 (1)信箱 (2)密碼 部分
+			if (!result.githubId && !result.facebookId && !result.googleId) {
+				insert_if_not_oauth2();
+				saved_email_el.innerText = result.email ? result.email : "-";
+				saved_password_el.innerText = "(已隱藏)";
+			}
+			else {
+				console.log("i used oauth2 to log in !!");
+				// 先渲染非 OAuth2 會員才有的值
+				let oauth2provider;
+
+				if (result.githubId) oauth2provider = "GitHub";
+				if (result.googleId) oauth2provider = "Google";
+				if (result.facebookId) oauth2provider = "Facebook";
+
+				insert_if_oauth2(oauth2provider);
+			}
+
+			// saved部分 -> 把 innerText 放上 -> 所有會員（不論是否 OAuth2）都有的值
+			saved_full_name_el.innerText = result.fullName ? result.fullName : "-";
+			saved_nickname_el.innerText = result.nickname ? result.nickname : "-";
+			saved_gender_el.innerText = result.gender ? result.gender : "-";
+			saved_phone_number_el.innerText = result.phoneNumber ? result.phoneNumber : "-";
+			saved_birth_date_el.innerText = result.birthDate ? result.birthDate : "-";
+			saved_address_el.innerText = result.address ? result.address : "-";
+
+			// update部分 -> 把 value 放上 -> 所有會員（不論是否 OAuth2）都有的值
+			full_name_el.value = result.fullName ? result.fullName : "";
+			nickname_el.value = result.nickname ? result.nickname : ""; // 其實一定有 (not null constraint)
+			gender_el.value = result.gender ? result.gender : "";
+			phone_number_el.value = result.phoneNumber ? result.phoneNumber : "";
+			birth_date_el.value = result.birthDate ? result.birthDate : "";
+			address_el.value = result.address ? result.address : "";
+
+			// 圖片部分
+			user_img.src = result.profilePic ? result.profilePic : "img/tourist_guide_pic.jpg";
+		})
+		.catch(error => {
+			console.log(error);
+		})
+
 });

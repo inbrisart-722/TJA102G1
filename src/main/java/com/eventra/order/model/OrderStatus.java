@@ -8,6 +8,7 @@ public enum OrderStatus {
 	付款失敗(2),
 	付款逾時(3),
 	已付款(4),
+//	重複付款(5),
 	已退款(5);
 	
 	private final int code;
@@ -21,4 +22,5 @@ public enum OrderStatus {
 //付款失敗,
 //付款逾時,
 //已付款,
+//重複付款,
 //已退款;

@@ -50,9 +50,11 @@ public class RatingService {
 		boolean canRate = ORDER_ITEM_REPO.existsByOrder_Member_MemberIdAndExhibitionTicketType_ExhibitionIdAndOrder_OrderStatus(memberId, exhibitionId, OrderStatus.已付款);
 		// 再次確認可評分
 		if(canRate == true) {
+			System.out.println("can rate");
 			RatingVO ratingVOOriginal = RATING_REPO.getRating(exhibitionId, memberId);
 			// 1 過去沒有評分過 => 直接 save
 			if(ratingVOOriginal == null) {
+				System.out.println("haven't rated");
 				RatingVO ratingVONew = new RatingVO.Builder()
 						.exhibition(entityManager.getReference(ExhibitionVO.class, exhibitionId))
 						.member(entityManager.getReference(MemberVO.class, memberId))
