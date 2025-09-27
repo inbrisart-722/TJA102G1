@@ -106,8 +106,8 @@ public class BackendIndexController {
     
     @GetMapping("exhibitor/exhibition_list")
     public String goExhibitionListPage(Model model,@RequestParam(defaultValue = "0") int page,@RequestParam(defaultValue = "10") int size) {
-    	List<ExhibitionVO> exhibitions = exhibitionService.getAllExhibitions();
-    	model.addAttribute("exhibitions", exhibitions);
+//    	List<ExhibitionVO> exhibitions = exhibitionService.getAllExhibitions();
+//    	model.addAttribute("exhibitions", exhibitions);
     	
     	Page<ExhibitionVO> exhibitionPage = exhibitionService.getExhibitionsPage(page, size);
     	

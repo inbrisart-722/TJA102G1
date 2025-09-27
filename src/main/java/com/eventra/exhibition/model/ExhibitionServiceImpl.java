@@ -186,10 +186,10 @@ public class ExhibitionServiceImpl implements ExhibitionService {
         }
 	}
 	
-	// 實作展覽查詢方法
-	public List<ExhibitionVO> getAllExhibitions(){
-			return repository.findAll();
-	}
+//	// 實作展覽查詢方法
+//	public List<ExhibitionVO> getAllExhibitions(){
+//			return repository.findAll();
+//	}
 		
 	// 分頁查詢
 	public Page<ExhibitionVO> getExhibitionsPage(int page, int size){
@@ -264,7 +264,7 @@ public class ExhibitionServiceImpl implements ExhibitionService {
 	    	}
 	    }
 	    
-	    // 變更為草稿
+	    // 按儲存為草稿按鈕後變更展覽狀態為草稿
 	    if (Boolean.TRUE.equals(dto.getDraft())) {
             vo.setExhibitionStatusId(DRAFT_STATUS_ID);
         }
@@ -392,4 +392,35 @@ public class ExhibitionServiceImpl implements ExhibitionService {
 		
 		return dto;
 	}
+
+	private Pageable defaultPageable(int page, int size) {
+	    return PageRequest.of(page, size, Sort.by("startTime").descending());
+	}
+
+	@Override
+	public Page<ExhibitionVO> findAll(Integer exhibitorId, int page, int size) {
+		return repository.findByExhibitorVO_ExhibitorId(exhibitorId, defaultPageable(page, size));
+	}
+
+	@Override
+	public Page<ExhibitionVO> findDrafts(Integer exhibitorId, Integer draftStatusId, int page, int size) {
+		return repository.findDrafts(exhibitorId, (draftStatusId != null ? draftStatusId : DRAFT_STATUS_ID), defaultPageable(page, size));
+	}
+
+	@Override
+	public Page<ExhibitionVO> findNotOnSale(Integer exhibitorId, int page, int size) {
+		return repository.findNotOnSale(exhibitorId, defaultPageable(page, size));
+	}
+
+	@Override
+	public Page<ExhibitionVO> findOnSale(Integer exhibitorId, int page, int size) {
+		return repository.findOnSale(exhibitorId, defaultPageable(page, size));
+	}
+
+	@Override
+	public Page<ExhibitionVO> findEnded(Integer exhibitorId, int page, int size) {
+		return repository.findEnded(exhibitorId, defaultPageable(page, size));
+	}
+
+	
 }
