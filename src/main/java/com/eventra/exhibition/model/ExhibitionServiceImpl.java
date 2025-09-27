@@ -1,3 +1,4 @@
+
 package com.eventra.exhibition.model;
 
 import java.io.File;
@@ -16,6 +17,7 @@ import java.util.Set;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -28,8 +30,6 @@ import com.eventra.exhibitiontickettype.model.ExhibitionTicketTypeRepository;
 import com.eventra.comment.controller.CommentStatus;
 import com.eventra.comment.model.CommentRepository;
 import com.eventra.exhibitionstatus.model.ExhibitionStatusVO;
-
-import com.eventra.exhibitiontickettype.model.ExhibitionTicketTypeRepository;
 
 import com.eventra.exhibitiontickettype.model.ExhibitionTicketTypeVO;
 import com.eventra.exhibitor.backend.controller.dto.ExhibitionCreateDTO;
@@ -56,16 +56,18 @@ public class ExhibitionServiceImpl implements ExhibitionService {
 
 	@PersistenceContext
 	private EntityManager entityManager;
+	private String DEFAULT_PHOTO_LANDSCAPE;
 	
 	private static final int DEFAULT_STATUS_ID = 1;
 	private static final int DRAFT_STATUS_ID = 6;
 
 	@Autowired
-	public ExhibitionServiceImpl(ExhibitionRepository repository, CommentRepository commentRepository, ExhibitionTicketTypeRepository exhibitionTicketTypeRepository, TicketTypeRepository ticketTypeRepository) {
+	public ExhibitionServiceImpl(ExhibitionRepository repository, CommentRepository commentRepository, ExhibitionTicketTypeRepository exhibitionTicketTypeRepository, TicketTypeRepository ticketTypeRepository, @Value("${default.exhibition-photo-landscape}") String defaultPhotoLandscape) {
 		this.repository = repository;
 		this.exhibitionTicketTypeRepository = exhibitionTicketTypeRepository;
 		this.ticketTypeRepository = ticketTypeRepository;
 		this.commentRepository = commentRepository;
+		this.DEFAULT_PHOTO_LANDSCAPE = defaultPhotoLandscape;
 		
 	}
 
@@ -254,13 +256,13 @@ public class ExhibitionServiceImpl implements ExhibitionService {
 	    }
 	    // 同上，改成landscape
 	    MultipartFile landscape = dto.getPhotoLandscape(); 
-	    if(portrait != null && !portrait.isEmpty()) {  
-	    	String filename = "p_" + UUID.randomUUID() + "_" + portrait.getOriginalFilename();
+	    if(landscape != null && !landscape.isEmpty()) {  
+	    	String filename = "p_" + UUID.randomUUID() + "_" + landscape.getOriginalFilename();
 	    	try {
-	    		portrait.transferTo(baseDir.resolve(filename)); 
-	    		vo.setPhotoPortrait("uploads/exhibitions/" + id + "/" + filename); // 在資料庫欄位存相對路徑，供前端顯示用
+	    		landscape.transferTo(baseDir.resolve(filename)); 
+	    		vo.setPhotoLandscape("uploads/exhibitions/" + id + "/" + filename); // 在資料庫欄位存相對路徑，供前端顯示用
 	    	}catch(IOException e) {
-	    		throw new RuntimeException("存portrait失敗", e);
+	    		throw new RuntimeException("存landscape失敗", e);
 	    	}
 	    }
 	    
@@ -327,7 +329,6 @@ public class ExhibitionServiceImpl implements ExhibitionService {
 	    	}
 	    }
 	}
-    
 	// inbrisart 20250925 給展覽頁 SSR 帶入
 	/**
 	 * @param exhibitionId
@@ -335,11 +336,12 @@ public class ExhibitionServiceImpl implements ExhibitionService {
 	 */
 	public ExhibitionDTO getExhibitionInfoForPage(Integer exhibitionId) {
 		ExhibitionVO exhibition = repository.findById(exhibitionId).orElse(null);
-		Set<ExhibitionTicketTypeVO> etts = exhibition.getExhibitionTicketTypes();
 		if(exhibition == null) return null;
+		Set<ExhibitionTicketTypeVO> etts = exhibition.getExhibitionTicketTypes();
 		ExhibitionDTO dto = new ExhibitionDTO();
+		String photoLandscape = exhibition.getPhotoLandscape() != null ? exhibition.getPhotoLandscape() : DEFAULT_PHOTO_LANDSCAPE;
 		dto.setExhibitionId(exhibitionId);
-		dto.setPhotoLandscape(exhibition.getPhotoLandscape());
+		dto.setPhotoLandscape(photoLandscape);
 		dto.setExhibitionName(exhibition.getExhibitionName());
 		dto.setAverageRatingScore(exhibition.getAverageRatingScore());
 		dto.setTotalRatingCount(exhibition.getTotalRatingCount());
