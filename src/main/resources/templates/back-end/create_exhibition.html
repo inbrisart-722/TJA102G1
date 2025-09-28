@@ -491,7 +491,6 @@
         <h4>${document.getElementById('evName').value || '(未命名活動)'}</h4>
         <div class="text-secondary mb-2">${document.getElementById('startAt').value} ~ ${document.getElementById('endAt').value}</div>
         <div class="mb-2">地點：${document.getElementById('location').value || '-'}</div>
-        <div class="mb-3">主辦：${document.getElementById('organizer').value || '-'}</div>
         <h6 class="mt-3">票種</h6>
         <ul>${
           [...document.querySelectorAll('#ticketList .ticket-row')].map(r=>{
@@ -731,24 +730,28 @@
 	    console.warn('parse ticketData failed:', e);
 	  }
 	
-	  // 2) 預設 5 種（編輯時若有資料就不會用到）
+	// 2) 預設 5 種（建立頁會用；編輯頁用後端傳來的 ticketListJson）
 	  const DEFAULT_TICKETS = [
-	    { name:'全票',        price:'', active:true },
-	    { name:'學生票',      price:'', active:true },
-	    { name:'敬老票',      price:'', active:true },
-	    { name:'身心障礙者票', price:'', active:true },
-	    { name:'軍警票',      price:'', active:true },
+	    { name: '全票',        price: '', active: true },
+	    { name: '學生票',      price: '', active: true },
+	    { name: '敬老票',      price: '', active: true },
+	    { name: '身心障礙者票', price: '', active: true },
+	    { name: '軍警票',      price: '', active: true },
 	  ];
-	
-	  
+
 	  const ticketList = document.getElementById('ticketList');
-	  let ticketState = (Array.isArray(loadedTickets) && loadedTickets.length > 0)
-	    ? loadedTickets.map(t => ({
-	        name: t.name ?? '',
-	        price: (t.price === null || t.price === undefined) ? '' : String(t.price),
-	        active: true
-	      }))
-	    : DEFAULT_TICKETS;
+
+	  let ticketState;
+	  if (Array.isArray(loadedTickets) && loadedTickets.length > 0) {
+	    // 後端來的資料每列都有 enabled / price（可能為 null）/ name
+	    ticketState = loadedTickets.map(t => ({
+	      name: t.name ?? '',
+	      price: (t.price === null || t.price === undefined) ? '' : String(t.price),
+	      active: !!t.enabled, // 用 enabled 還原是否啟用
+	    }));
+	  } else {
+	    ticketState = DEFAULT_TICKETS;
+	  }
 	
 	  // 3) 渲染
 	  function renderTickets(){

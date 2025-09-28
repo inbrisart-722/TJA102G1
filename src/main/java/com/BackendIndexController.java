@@ -3,6 +3,7 @@ package com;
 import java.util.List;
 import java.util.Map;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -17,6 +18,8 @@ import com.eventra.exhibition.model.ExhibitionMapper;
 import com.eventra.exhibition.model.ExhibitionService;
 import com.eventra.exhibition.model.ExhibitionVO;
 import com.eventra.exhibitor.backend.controller.dto.ExhibitionCreateDTO;
+import com.eventra.tickettype.model.TicketTypeRepository;
+import com.eventra.tickettype.model.TicketTypeVO;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import jakarta.servlet.http.HttpSession;
@@ -28,9 +31,11 @@ public class BackendIndexController {
 	private static final Integer DRAFT_STATUS_ID = 6;
 	private final ExhibitionService exhibitionService;
 	private final Integer TEST_EXHIBITOR = 3;
+	private final TicketTypeRepository ticketTypeRepository;
 
-	public BackendIndexController(ExhibitionService exhibitionService) {
+	public BackendIndexController(ExhibitionService exhibitionService, TicketTypeRepository ticketTypeRepository) {
 		this.exhibitionService = exhibitionService;
+		this.ticketTypeRepository = ticketTypeRepository;
 	}
 	
     @GetMapping("exhibitor/back_end_homepage")
@@ -47,9 +52,27 @@ public class BackendIndexController {
     	ExhibitionCreateDTO exhibitionCreateDTO = new ExhibitionCreateDTO();
     	model.addAttribute("exhibitionCreateDTO", exhibitionCreateDTO);
     	
-    	// 新增這行：讓模板有可用的 JSON 字串（空陣列）
-        model.addAttribute("ticketListJson", "[]");
-    	return "back-end/create_exhibition";
+    	// 取全部票種，建立「可啟用/停用」的列資料
+    	List<TicketTypeVO> allTypes = ticketTypeRepository.findAll();
+
+        List<Map<String, Object>> ticketList = allTypes.stream()
+            .map(t -> {
+                java.util.Map<String, Object> m = new java.util.HashMap<>();
+                m.put("name", t.getTicketTypeName());
+                m.put("price", null);
+                m.put("enabled", true); // 建立頁預設開啟；想預設全關就改成 false
+                return m;
+            })
+            .collect(java.util.stream.Collectors.toList());
+
+        String ticketListJson = "[]";
+        try {
+            ticketListJson = new ObjectMapper().writeValueAsString(ticketList);
+        } catch (Exception ignore) {}
+
+        model.addAttribute("ticketList", ticketList);
+        model.addAttribute("ticketListJson", ticketListJson);
+        return "back-end/create_exhibition";
     }
     
     /**
@@ -75,28 +98,41 @@ public class BackendIndexController {
     	ExhibitionVO exhibition = exhibitionService.findById(id);
     	ExhibitionCreateDTO dto = ExhibitionMapper.toDTO(exhibition);
     	
-    	// 轉換票種 VO -> JS-friendly 結構
-    	List<Map<String, Object>> ticketList = (dto.getExhibitionTicketTypes() == null) ? List.of()
-    	        : dto.getExhibitionTicketTypes().stream()
-                .map(t -> Map.<String, Object>of(
-                    "name",  t.getTicketType().getTicketTypeName(),
-                    "price", t.getPrice()
-                ))
-                .toList();
-    	
-    	// 這裡用 Jackson 轉字串
+    	// 已設定的票種：名稱 -> 價格
+        java.util.Map<String, Integer> chosen =
+            (dto.getExhibitionTicketTypes() == null) ? java.util.Collections.emptyMap()
+            : dto.getExhibitionTicketTypes().stream()
+                .collect(java.util.stream.Collectors.toMap(
+                    t -> t.getTicketType().getTicketTypeName(),
+                    t -> t.getPrice()
+                ));
+
+        // 全部票種（每列都存在；有設定的 enabled=true 帶原價，未設定的 enabled=false）
+        List<TicketTypeVO> allTypes = ticketTypeRepository.findAll();
+
+        List<Map<String, Object>> ticketList = allTypes.stream()
+            .map(t -> {
+                String name = t.getTicketTypeName();
+                boolean enabled = chosen.containsKey(name);
+                Integer price = enabled ? chosen.get(name) : null;
+
+                java.util.Map<String, Object> m = new java.util.HashMap<>();
+                m.put("name", name);
+                m.put("price", price);
+                m.put("enabled", enabled);
+                return m;
+            })
+            .collect(java.util.stream.Collectors.toList());
+
         String ticketListJson = "[]";
         try {
             ticketListJson = new ObjectMapper().writeValueAsString(ticketList);
-        } catch (Exception e) {
-            // 可視需要記錄 log
-            // log.warn("Serialize ticketList failed", e);
-        }
-        
+        } catch (Exception ignore) {}
+
+        model.addAttribute("ticketList", ticketList);
         model.addAttribute("ticketListJson", ticketListJson);
-    	model.addAttribute("ticketList", ticketList);
-    	model.addAttribute("exhibitionCreateDTO", dto);
-    	return "back-end/create_exhibition";
+        model.addAttribute("exhibitionCreateDTO", dto);
+        return "back-end/create_exhibition"; 
     }
     
     @PostMapping("exhibitor/update_exhibition")
