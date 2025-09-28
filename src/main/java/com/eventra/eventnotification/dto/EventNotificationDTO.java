@@ -2,22 +2,32 @@ package com.eventra.eventnotification.dto;
 
 import java.sql.Timestamp;
 
+/**
+ * API 查詢用, 帶完整資訊
+ * 封裝後端要 回傳給 前端顯示所需的資訊
+ * 
+ * 與 NotificationMessageDTO 的差別
+ * - EventNotificationDTO: 包含完整展覽與通知資訊, API 查詢用
+ * - NotificationMessageDTO: 包含基本通知資訊. 傳輸用
+ * 
+ */
+
 public class EventNotificationDTO {
-	private Integer favoriteAnnouncementId;
-	private Integer exhibitionId;
-	private String title;
-	private String content;
-	private Boolean readStatus;
-	private Timestamp createdAt;
+	private Integer favoriteAnnouncementId;		// 通知ID
+	private Integer exhibitionId;				// 展覽ID
+	private String title;						// 標題
+	private String content;						// 內容
+	private Boolean readStatus;					// 是否已讀
+	private Timestamp createdAt;				// 建立時間
+	private String exhibitionName;				// 展覽名稱
+	private String location;					// 展覽地點
+	private String period; 						// 展覽期間
 
-	// 額外展覽資訊（選填）
-	private String exhibitionName;
-	private String location;
-	private String period; // start_time ~ end_time
-
+	// 無參數建構子
 	public EventNotificationDTO() {
 	}
 
+	// 有參數建構子
 	public EventNotificationDTO(Integer favoriteAnnouncementId, Integer exhibitionId, String title, String content, Boolean readStatus,
 			Timestamp createdAt, String exhibitionName, String location, String period) {
 		this.favoriteAnnouncementId = favoriteAnnouncementId;
@@ -31,7 +41,7 @@ public class EventNotificationDTO {
 		this.period = period;
 	}
 
-	// getter/setter
+	// getter / setter
 	public Integer getFavoriteAnnouncementId() {
 		return favoriteAnnouncementId;
 	}
