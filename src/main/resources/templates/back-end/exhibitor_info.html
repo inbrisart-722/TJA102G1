@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="zh-Hant">
+<html xmlns:th="http://www.thymeleaf.org" lang="zh-Hant">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
@@ -10,7 +10,6 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/overlayscrollbars@2.11.0/styles/overlayscrollbars.min.css"/>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css"/>
     <link rel="stylesheet" href="/back-end/css/adminlte.css" />
-    <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
     <style>
       .section-title{font-weight:700}
       .kv{display:flex; gap:1rem; padding:.75rem 1rem; background:var(--bs-tertiary-bg); border-radius:.5rem; align-items:center}
@@ -48,8 +47,8 @@
                 <a href="#" class="nav-link"><i class="nav-icon bi bi-circle-fill"></i><p>銷售管理</p></a>
                 <ul class="nav nav-treeview">
                   <li class="nav-item"><a href="/back-end/exhibitor/order_list" class="nav-link"><p>訂單列表</p></a></li>
-                  <li class="nav-item"><a href="#" class="nav-link"><p>銷售列表</p></a></li>
-                
+                  <!-- <li class="nav-item"><a href="#" class="nav-link"><p>銷售列表</p></a></li>
+                 -->
                 </ul>
               </li>
                <li class="nav-item menu-open">
@@ -73,12 +72,19 @@
 
       <!-- Main -->
       <main class="app-main">
+      <!-- 成功訊息 -->
+		<div class="container-fluid" th:if="${msg}">
+		  <div class="alert alert-success alert-dismissible fade show" role="alert">
+		    <span th:text="${msg}">更新成功！</span>
+		    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+		  </div>
+		</div>
         <div class="app-content-header">
           <div class="container-fluid">
             <div class="row align-items-center">
               <div class="col-sm-8"><h3 class="mb-0">會員中心－展商資訊</h3></div>
               <div class="col-sm-4 text-sm-end mt-2 mt-sm-0">
-                <button class="btn btn-outline-secondary btn-sm" id="btnEdit"><i class="bi bi-pencil me-1"></i>編輯</button>
+                <button type="button" class="btn btn-outline-secondary btn-sm" id="btnEdit"><i class="bi bi-pencil me-1"></i>編輯</button>
               </div>
             </div>
           </div>
@@ -89,17 +95,25 @@
             <div class="card mb-4">
               <div class="card-header"><span class="section-title">展商資訊</span></div>
               <div class="card-body">
-                <div class="kv mb-2"><div class="k">名稱</div><div id="vName">eventra</div></div>
+                <div class="kv mb-2"><div class="k">名稱</div><div id="vName"
+				     th:text="${exhibitor != null 
+				                 ? (!#strings.isEmpty(exhibitor.exhibitorRegistrationName) 
+				                      ? exhibitor.exhibitorRegistrationName 
+				                      : (!#strings.isEmpty(exhibitor.companyName) 
+				                           ? exhibitor.companyName 
+				                           : '-'))
+				                 : '-'}">-</div>
+				</div>
                 <!-- <div class="kv mb-2"><div class="k">聯絡資訊</div><div></div></div> -->
-                <div class="kv mb-2"><div class="k">電話</div><div id="vPhone">0912-345-678</div></div>
-                <div class="kv mb-2"><div class="k">信箱</div><div id="vEmail">eventra@gmail.com</div></div>
+                <div class="kv mb-2"><div class="k">電話</div><div id="vPhone" th:text="${exhibitor != null && exhibitor.contactPhone != null ? exhibitor.contactPhone : '-'}">-</div></div>
+                <div class="kv mb-2"><div class="k">信箱</div><div id="vEmail" th:text="${exhibitor != null && exhibitor.email != null ? exhibitor.email : '-'}">-</div></div>
               </div>
             </div>
 
             <div class="card">
               <div class="card-header"><span class="section-title">介紹</span></div>
               <div class="card-body">
-                <div class="intro-box" id="vIntro">（尚未填寫介紹）</div>
+                <div class="intro-box" id="vIntro" th:text="${exhibitor != null && exhibitor.about != null && !#strings.isEmpty(exhibitor.about) ? exhibitor.about : '(尚未填寫介紹)'}">（尚未填寫介紹）</div>
               </div>
             </div>
           </div>
@@ -117,34 +131,48 @@
       <div class="modal-dialog modal-lg modal-dialog-centered">
         <div class="modal-content">
           <div class="modal-header"><h5 class="modal-title">編輯展商資訊</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
-            <div class="modal-body">
-              <form id="vendorForm" class="row g-3">
-                <div class="col-md-6">
-                  <label class="form-label">名稱</label>
-                  <input type="text" class="form-control" id="fName" required value="XXX" />
-                </div>
-                <div class="col-md-6">
-                  <label class="form-label">聯絡電話</label>
-                  <input type="text" class="form-control" id="fPhone" value="09XX-XXX-XXX" />
-                </div>
-                <div class="col-md-12">
-                  <label class="form-label">信箱</label>
-                  <input type="email" class="form-control" id="fEmail" value="XXX@gmail.com" />
-                </div>
-                <div class="col-12">
-                  <label class="form-label">介紹</label>
-                  <!-- 改成純文字輸入框 -->
-                  <textarea class="form-control" id="fIntro" rows="6" placeholder="請輸入展商介紹..."></textarea>
-                </div>
-              </form>
-            </div>
-          <div class="modal-footer">
-            <button class="btn btn-outline-secondary" data-bs-dismiss="modal">取消</button>
-            <button class="btn btn-primary" id="btnSave">儲存</button>
-          </div>
-        </div>
-      </div>
-    </div>
+            <form id="vendorForm"
+		            th:action="@{/back-end/exhibitor/exhibitor_info/update}"
+		            method="post" class="needs-validation" novalidate>
+		        <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+		
+		        <div class="modal-body">
+		          <div class="row g-3">
+		            <div class="col-md-6">
+		              <label class="form-label">名稱</label>
+		              <input type="text" class="form-control" name="exhibitorRegistrationName"
+		                     th:value="${exhibitor != null ? exhibitor.exhibitorRegistrationName : ''}" required />
+		              <div class="invalid-feedback">請填寫名稱</div>
+		            </div>
+		
+		            <div class="col-md-6">
+		              <label class="form-label">聯絡電話</label>
+		              <input type="text" class="form-control" name="contactPhone"
+		                     th:value="${exhibitor != null ? exhibitor.contactPhone : ''}" />
+		            </div>
+		
+		            <div class="col-md-12">
+		              <label class="form-label">信箱</label>
+		              <input type="email" class="form-control" name="email"
+		                     th:value="${exhibitor != null ? exhibitor.email : ''}" />
+		            </div>
+		
+		            <div class="col-12">
+		              <label class="form-label">介紹</label>
+		              <textarea class="form-control" name="about" rows="6"
+		                        th:text="${exhibitor != null ? exhibitor.about : ''}"></textarea>
+		            </div>
+		          </div>
+		        </div>
+		
+		        <div class="modal-footer">
+		          <button class="btn btn-outline-secondary" data-bs-dismiss="modal" type="button">取消</button>
+		          <button class="btn btn-primary" type="submit">儲存</button>
+		        </div>
+		      </form>
+		    </div>
+		  </div>
+		</div>
     
 
     <!-- Scripts -->
@@ -153,56 +181,33 @@
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.min.js"></script>
     <script src="/back-end/js/adminlte.min.js"></script>
-    <script src="https://cdn.quilljs.com/1.3.6/quill.js"></script>
     <script src="/front-end/js/g1_10_custom_common_csrf.js"></script>
 
+   
     <script>
-    var quill = new Quill('#editor', {
-        theme: 'snow',
-        placeholder: '請輸入展商介紹...',
-        modules: {
-        toolbar: [
-            [{ header: [1, 2, 3, false] }],
-            ['bold', 'italic', 'underline', 'strike'],
-            [{ 'color': [] }, { 'background': [] }],
-            [{ 'list': 'ordered' }, { 'list': 'bullet' }],
-            [{ 'align': [] }],
-            ['link', 'image', 'code-block'],
-            ['clean']
-        ]
-        }
-    });
-    // 打開「編輯」時，把現有介紹灌進編輯器
-   const editModal = new bootstrap.Modal(document.getElementById('editModal'));
+	    // 開 Modal
+	    const editModal = new bootstrap.Modal(document.getElementById('editModal'));
+	    document.getElementById('btnEdit').addEventListener('click', () => {
+	      editModal.show();
+	    });
+	
+	    // （可留可不留）前端驗證：阻擋 HTML5 驗證沒過的提交
+	    document.getElementById('vendorForm').addEventListener('submit', function (e) {
+	      if (!this.checkValidity()) {
+	        e.preventDefault();
+	        e.stopPropagation();
+	      }
+	      this.classList.add('was-validated');
+	    });
+	  </script>
 
-    
-    document.getElementById('btnEdit').addEventListener('click', () => {
-        document.getElementById('fName').value  = document.getElementById('vName').textContent.trim();
-        document.getElementById('fPhone').value = document.getElementById('vPhone').textContent.trim();
-        document.getElementById('fEmail').value = document.getElementById('vEmail').textContent.trim();
-        const intro = document.getElementById('vIntro').textContent.trim();
-        document.getElementById('fIntro').value = (intro === '（尚未填寫介紹）') ? '' : intro;
-        editModal.show();
-    });
-
-    // 儲存：改抓 quill 的內容，而不是舊的 textarea
-    document.getElementById('btnSave').addEventListener('click', () => {
-        const name  = document.getElementById('fName').value.trim();
-        const phone = document.getElementById('fPhone').value.trim();
-        const email = document.getElementById('fEmail').value.trim();
-        const intro = document.getElementById('fIntro').value.trim();
-
-        if (!name) { alert('請填寫名稱'); return; }
-
-        document.getElementById('vName').textContent  = name || '-';
-        document.getElementById('vPhone').textContent = phone || '-';
-        document.getElementById('vEmail').textContent = email || '-';
-        document.getElementById('vIntro').textContent = intro || '（尚未填寫介紹）';
-
-        editModal.hide();
-    });
-
-    </script>
+	<!-- 更新成功後訊息自動收合 -->
+	<script>
+	  document.addEventListener('DOMContentLoaded', () => {
+	    const alertEl = document.querySelector('.alert.alert-success');
+	    if (alertEl) setTimeout(() => new bootstrap.Alert(alertEl).close(), 2500);
+	  });
+	</script>
 
     <!-- <script>
       // 開啟編輯

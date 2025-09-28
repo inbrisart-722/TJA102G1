@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.eventra.exhibition.model.ExhibitionMapper;
 import com.eventra.exhibition.model.ExhibitionService;
@@ -21,6 +22,8 @@ import com.eventra.exhibitor.backend.controller.dto.ExhibitionCreateDTO;
 import com.eventra.tickettype.model.TicketTypeRepository;
 import com.eventra.tickettype.model.TicketTypeVO;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.eventra.exhibitor.model.ExhibitorRepository;
+import com.eventra.exhibitor.model.ExhibitorVO;
 
 import jakarta.servlet.http.HttpSession;
 
@@ -32,10 +35,13 @@ public class BackendIndexController {
 	private final ExhibitionService exhibitionService;
 	private final Integer TEST_EXHIBITOR = 3;
 	private final TicketTypeRepository ticketTypeRepository;
+	private final ExhibitorRepository exhibitorRepository;
 
-	public BackendIndexController(ExhibitionService exhibitionService, TicketTypeRepository ticketTypeRepository) {
+	public BackendIndexController(ExhibitionService exhibitionService, TicketTypeRepository ticketTypeRepository,
+									ExhibitorRepository exhibitorRepository) {
 		this.exhibitionService = exhibitionService;
 		this.ticketTypeRepository = ticketTypeRepository;
+		this.exhibitorRepository = exhibitorRepository;
 	}
 	
     @GetMapping("exhibitor/back_end_homepage")
@@ -175,8 +181,33 @@ public class BackendIndexController {
     }
     
     @GetMapping("exhibitor/exhibitor_info")
-    public String exhibitorInfoPage() {
+    public String exhibitorInfoPage(Model model) {
+    	Integer exhibitorId = TEST_EXHIBITOR;
+    	ExhibitorVO exhibitor = exhibitorRepository.findById(exhibitorId).orElse(null);
+    	
+    	model.addAttribute("exhibitor", exhibitor);
     	return "back-end/exhibitor_info";
+    }
+    
+    @PostMapping("exhibitor/exhibitor_info/update")
+    public String updateExhibitorInfo(
+    		@RequestParam String exhibitorRegistrationName,
+    		@RequestParam(required = false) String contactPhone,
+    		@RequestParam(required = false) String email,
+    		@RequestParam(required = false) String about,
+    		RedirectAttributes ra) {
+    	
+    	ExhibitorVO e = exhibitorRepository.findById(TEST_EXHIBITOR)
+    					.orElseThrow(() -> new IllegalArgumentException("Exhibitor not found: " + TEST_EXHIBITOR)); 
+    	e.setExhibitorRegistrationName(exhibitorRegistrationName);
+    	e.setContactPhone(contactPhone);
+    	e.setEmail(email);
+    	e.setAbout(about);
+    	
+    	exhibitorRepository.save(e);
+    	
+    	ra.addFlashAttribute("msg", "更新成功!");
+    	return "redirect:/back-end/exhibitor/exhibitor_info";
     }
     
     @GetMapping("exhibitor/exhibitor_account_data")
