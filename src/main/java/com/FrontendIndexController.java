@@ -21,7 +21,8 @@ import com.eventra.cart_item.model.CartItemService;
 import com.eventra.cart_item.model.GetCartItemResDTO;
 import com.eventra.exhibition.model.ExhibitionDTO;
 import com.eventra.exhibition.model.ExhibitionServiceImpl;
-import com.eventra.favorite.model.FavoriteService;
+import com.eventra.exhibitor.model.ExhibitorService;
+import com.eventra.exhibitor.model.ExhibitorVO;
 import com.eventra.member.verif.model.VerifService;
 
 import jakarta.servlet.http.HttpServletRequest;
@@ -29,15 +30,15 @@ import jakarta.servlet.http.HttpServletRequest;
 @Controller
 @RequestMapping("/front-end")
 public class FrontendIndexController {
-  
-	@Autowired
-	private FavoriteService favSvc;
+
 	@Autowired
 	private CartItemService cartItemSvc;
 	@Autowired
 	private VerifService verifSvc;
 	@Autowired
 	private ExhibitionServiceImpl exhibitionSvc;
+	@Autowired
+    private ExhibitorService exhibitorService;
 	
 //	private static final Integer TEST_MEMBER = 3;
 
@@ -50,7 +51,6 @@ public class FrontendIndexController {
 		return "front-end/admin";
 	}
 	
-
 	// 1. 接住列表頁面 href: /front-end/exhibitions/
 	@GetMapping("/exhibitions/{exhibitionId}")
 	public String exhibitionsPageRedirect(@PathVariable("exhibitionId") Integer exhibitionId) {
@@ -67,6 +67,7 @@ public class FrontendIndexController {
 		model.addAttribute("exhibition", dto);
 		return "front-end/exhibitions";
 	}
+	
 	@GetMapping("/404")
 	public String Page404() {
 		return "front-end/404";
@@ -197,4 +198,20 @@ public class FrontendIndexController {
 		return "front-end/search_results";
 	}
 	
+	// 比照展覽頁方式
+	@GetMapping("/exhibitor_home/{exhibitorId}")
+	public String exhibitorHomePageRedirect(@PathVariable("exhibitorId") Integer exhibitorId) {
+	    return "redirect:/front-end/exhibitor_home?exhibitorId=" + exhibitorId;
+	}
+
+	@GetMapping("/exhibitor_home")
+	public String exhibitorHomePage(@RequestParam("exhibitorId") Integer exhibitorId, Model model) {
+	    ExhibitorVO exhibitor = exhibitorService.getExhibitorById(exhibitorId);
+	    if (exhibitor == null) {
+	        return "redirect:/front-end/404"; // 找不到展商就導 404
+	    }
+	    model.addAttribute("exhibitor", exhibitor);
+	    return "front-end/exhibitor_home";
+	}
+
 }

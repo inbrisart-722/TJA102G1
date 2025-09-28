@@ -173,5 +173,44 @@ public class ExhibitionListService {
         return result;
     }
 
+ // ========================================================================================================================
+    
+    /* ===== 展商主頁 ===== */
+    public List<ExhibitionListDTO> getExhibitionsByExhibitor(Integer exhibitorId) {
+        String sql = "SELECT e.exhibition_id, e.exhibition_name, " +
+                     "COALESCE(e.photo_landscape, '/img/0_exhibition/ChatGPT_exhibition_1.png'), " +
+                     "MIN(ett.price) AS minPrice, " +
+                     "MAX(ett.price) AS maxPrice, " +
+                     "e.start_time, e.end_time, e.location, e.total_rating_count " +
+                     "FROM exhibition e " +
+                     "JOIN exhibition_ticket_type ett ON e.exhibition_id = ett.exhibition_id " +
+                     "WHERE e.exhibitor_id = :exhibitorId " +
+                     "AND e.exhibition_status_id IN (3,4) " + // 限制顯示中/可售票
+                     "GROUP BY e.exhibition_id, e.exhibition_name, e.photo_landscape, " +
+                     "e.start_time, e.end_time, e.location, e.total_rating_count " +
+                     "ORDER BY e.start_time DESC";
+
+        Query query = entityManager.createNativeQuery(sql);
+        query.setParameter("exhibitorId", exhibitorId);
+
+        List<Object[]> list = query.getResultList();
+        List<ExhibitionListDTO> result = new ArrayList<>();
+
+        for (Object[] r : list) {
+            ExhibitionListDTO dto = new ExhibitionListDTO();
+            dto.setExhibitionId((Integer) r[0]);
+            dto.setExhibitionName((String) r[1]);
+            dto.setPhotoLandscape((String) r[2]);
+            dto.setMinPrice(((Number) r[3]).intValue());
+            dto.setMaxPrice(((Number) r[4]).intValue());
+            dto.setStartTime(r[5] != null ? ((Timestamp) r[5]).toLocalDateTime() : null);
+            dto.setEndTime(r[6] != null ? ((Timestamp) r[6]).toLocalDateTime() : null);
+            dto.setLocation((String) r[7]);
+            dto.setRatingCount(((Number) r[8]).intValue());
+            result.add(dto);
+        }
+        return result;
+    }
+
 
 }
