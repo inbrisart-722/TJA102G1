@@ -208,7 +208,8 @@
 			      enctype="multipart/form-data">
 			  <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
 			  <!-- 帶回原本的展覽 id（編輯時） -->
-			  <input type="hidden" th:field="*{exhibitionId}" />
+			  <!-- id="exhibitionIdHidden" 珮甄需要 -->
+			  <input type="hidden" th:field="*{exhibitionId}" id="exhibitionIdHidden" /> 
 				<div class="app-content">
 					<div class="container-fluid">
 
