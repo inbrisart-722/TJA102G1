@@ -13,6 +13,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.eventra.exhibition.model.ExhibitionRepository;
 import com.eventra.exhibition.model.ExhibitionVO;
+import com.eventra.member.model.MemberService;
 import com.eventra.order.ecpay.model.ECPayService;
 import com.eventra.order.linepay.model.LinePayService;
 import com.eventra.order_item.model.OrderItemVO;
@@ -38,20 +39,43 @@ public class OrderService {
 
 	private final ECPayService ECPAY_SERVICE;
 	private final LinePayService LINE_PAY_SERVICE;
+	private final MemberService MEMBER_SERVICE;
 
 	public OrderService(ExhibitionRepository exhibitionRepository,
 			OrderRepository orderRepository, PaymentAttemptRepository paymentAttemptRepository,
 			ECPayService ecpayService, 
-			LinePayService linePayService, @Value("${order.expiration-millis}") Long orderExpirationMillis, @Value("${payment.attempt.expiration-millis}") Long paymentAttemptExpirationMillis) {
+			LinePayService linePayService, 
+			MemberService memberService, @Value("${order.expiration-millis}") Long orderExpirationMillis, @Value("${payment.attempt.expiration-millis}") Long paymentAttemptExpirationMillis) {
 		this.EXHIBITION_REPO = exhibitionRepository;
 		this.ORDER_REPO = orderRepository;
 		this.PAYMENT_ATTEMPT_REPO = paymentAttemptRepository;
 		this.ECPAY_SERVICE = ecpayService;
 		this.LINE_PAY_SERVICE = linePayService;
+		this.MEMBER_SERVICE = memberService;
 		this.ORDER_EXPIRATION_MILLIS = orderExpirationMillis;
 		this.PAYMENT_ATTEMPT_EXPIRATION_MILLIS = paymentAttemptExpirationMillis;
 	}
 
+//	public findOrderItemsByLineUserId(String lineUserId, int page, int size) {
+//		Member member = memberRepo.findByLineUserId(lineUserId).orElseThrow();
+//	    Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "order.createdAt"));
+//
+//	    Slice<OrderItem> slice = orderItemRepo.findByOrderMemberIdAndOrderStatusIn(
+//	            member.getMemberId(),
+//	            List.of("已付款"),
+//	            pageable
+//	        );
+//
+//	        return new SliceImpl<>(
+//	            slice.getContent().stream().map(OrderItemDTO::fromEntity).toList(),
+//	            pageable,
+//	            slice.hasNext()
+//	        );
+//	}
+	
+//	Slice<OrderItemVO> findByOrder_MemberIdAndOrder_OrderStatusIn(Long memberId, Set<OrderStatus> statuses,
+//			Pageable pageable);
+	
 	public OrderProvider getOrderProvider(String orderUlid) {
 		return ORDER_REPO.findByOrderUlid(orderUlid).getOrderProvider();
 	}

@@ -1,6 +1,6 @@
 document.addEventListener("DOMContentLoaded", function() {
 
-	//	document.querySelector("a.icon-profile").click();
+	document.querySelector("a.icon-profile").click();
 
 	// 登出 這個特別用把事件冒泡改 capturing 套用同架構但避免 tabs.js 先取並且丟錯誤（沒section-5 等等）
 
@@ -342,6 +342,18 @@ document.addEventListener("DOMContentLoaded", function() {
 ////////////////////////////////////////////////////////////////
 
 document.addEventListener("DOMContentLoaded", function() {
+	
+	// 先處理 lineUserIdBoundAlready 參數
+	const params = new URLSearchParams(window.location.search);
+	const lineUserIdBoundAlready = params.get("lineUserIdBoundAlready");
+	// true -> 失敗
+	if(lineUserIdBoundAlready === "true"){alert("由於此 LINE 帳號已經與其他會員帳號進行綁定，因此綁定失敗！")}
+	
+	// false -> 恭喜成功 
+	if(lineUserIdBoundAlready === "false"){alert("LINE 帳號成功綁定，後續可以使用 LINE 官方帳號來進行會員專屬查詢囉！");}
+	
+	
+	
 	const user_img = document.querySelector("#user_img");
 	const file_input = document.querySelector("#js-upload-files");
 	const file_input_btn = document.querySelector("#js-upload-submit");
@@ -520,6 +532,7 @@ document.addEventListener("DOMContentLoaded", function() {
 // 取得基本資料區塊
 document.addEventListener("DOMContentLoaded", function() {
 
+	const btn_line_oauth2 = document.getElementById("line-oauth2");
 	const profile_summary = document.getElementById("profile_summary");
 	const related_account = document.getElementById("related_account");
 	// saved 區塊
@@ -603,6 +616,8 @@ document.addEventListener("DOMContentLoaded", function() {
 				console.log("i used oauth2 to log in !!");
 				// 先渲染非 OAuth2 會員才有的值
 				let oauth2provider;
+				
+				btn_line_oauth2.classList.add("oauth2-user")
 
 				if (result.githubId) oauth2provider = "GitHub";
 				if (result.googleId) oauth2provider = "Google";

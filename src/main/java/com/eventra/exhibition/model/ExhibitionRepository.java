@@ -1,5 +1,9 @@
 package com.eventra.exhibition.model;
 
+import java.time.LocalDateTime;
+
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -21,4 +25,6 @@ public interface ExhibitionRepository extends JpaRepository<ExhibitionVO, Intege
 	 @Query(value = "update ExhibitionVO e set e.soldTicketQuantity = e.soldTicketQuantity + :delta where e.exhibitionId = :eid "
 	 		+ "and e.soldTicketQuantity + :delta <= e.totalTicketQuantity")
 	 Integer updateSoldTicketQuantity(@Param("eid") Integer exhibitionId, @Param("delta") Integer delta);
+	 
+	 Slice<ExhibitionVO> findByStartTimeAfter(LocalDateTime now, Pageable pageable);
 }
