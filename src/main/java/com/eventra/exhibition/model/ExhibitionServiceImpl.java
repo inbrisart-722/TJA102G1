@@ -1,7 +1,6 @@
 
 package com.eventra.exhibition.model;
 
-import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -26,11 +25,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.eventra.exhibitiontickettype.model.ExhibitionTicketTypeRepository;
 import com.eventra.comment.controller.CommentStatus;
 import com.eventra.comment.model.CommentRepository;
 import com.eventra.exhibitionstatus.model.ExhibitionStatusVO;
-
+import com.eventra.exhibitiontickettype.model.ExhibitionTicketTypeRepository;
 import com.eventra.exhibitiontickettype.model.ExhibitionTicketTypeVO;
 import com.eventra.exhibitor.backend.controller.dto.ExhibitionCreateDTO;
 import com.eventra.exhibitor.model.ExhibitorDTO;
@@ -60,6 +58,7 @@ public class ExhibitionServiceImpl implements ExhibitionService {
 	
 	private static final int DEFAULT_STATUS_ID = 1;
 	private static final int DRAFT_STATUS_ID = 6;
+	private final String DEFAULT_PHOTO_LANDSCAPE;
 
 	@Autowired
 	public ExhibitionServiceImpl(ExhibitionRepository repository, CommentRepository commentRepository, ExhibitionTicketTypeRepository exhibitionTicketTypeRepository, TicketTypeRepository ticketTypeRepository, @Value("${default.exhibition-photo-landscape}") String defaultPhotoLandscape) {
@@ -68,7 +67,6 @@ public class ExhibitionServiceImpl implements ExhibitionService {
 		this.ticketTypeRepository = ticketTypeRepository;
 		this.commentRepository = commentRepository;
 		this.DEFAULT_PHOTO_LANDSCAPE = defaultPhotoLandscape;
-		
 	}
 
 	@Transactional

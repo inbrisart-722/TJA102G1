@@ -1,21 +1,17 @@
 // instead of setTimeout() short polling, use long polling 30s here
 const fetch_order_result = function() {
 	const params = new URLSearchParams(window.location.search);
-	const merchantTradeNo = params.get("merchantTradeNo");
-	console.log(merchantTradeNo);
+	const providerOrderId = params.get("providerOrderId");
+	console.log(providerOrderId);
 
-	csrfFetch(
-		"/api/front-end/protected/order/checkOrderStatus?merchantTradeNo=" +
-		merchantTradeNo,
+	csrfFetchToRedirect(
+		"/api/front-end/protected/order/checkOrderStatus?providerOrderId=" +
+		providerOrderId,
 		{
 			method: "GET",
 		}
 	)
 		.then((res) => {
-			if (res.status === 401) {
-				sessionStorage.setItem("redirect", window.location.pathname);
-				location.href = "/front-end/login";
-			}
 			if (!res.ok) throw new Error("checkOrderStatus: Not 2XX or 401");
 			return res.json();
 		})
@@ -25,12 +21,12 @@ const fetch_order_result = function() {
 			console.log(status);
 			if (status === "已付款") {
 				location.href =
-					"/front-end/order_success?merchantTradeNo=" +
-					merchantTradeNo;
+					"/front-end/order_success?providerOrderId=" +
+					providerOrderId;
 			}
 			else if (status === "付款失敗" && status === "付款逾時") {
 				location.href =
-					"/front-end/order_failure?merchantTradeNo=" +
+					"/front-end/order_failure?providerOrderId=" +
 					merchantTradeNo;
 			}
 			// ReturnURL 都沒回應的措施

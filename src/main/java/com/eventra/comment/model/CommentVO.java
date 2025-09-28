@@ -88,7 +88,7 @@ public class CommentVO implements Serializable {
 	private String content;
 
 //	@CreationTimestamp
-	@JsonFormat(pattern = "yyyy-MM-dd") // 輸出只用到這格式
+//	@JsonFormat(pattern = "yyyy-MM-dd") // 輸出只用到這格式
 	@Column(name = "created_at", insertable = false, updatable = false)
 	private Timestamp createdAt;
 

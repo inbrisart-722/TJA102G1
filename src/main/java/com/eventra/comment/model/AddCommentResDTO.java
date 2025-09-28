@@ -2,7 +2,9 @@ package com.eventra.comment.model;
 
 public class AddCommentResDTO {
 	private String status;
-	private CommentVO commentVO;
+	// commentId, createdAt, content, likecount, dislikecount, 
+	// memberId(暫無用）, nickname, profilePic, 
+	private CommentDTO comment;
 	private Integer commentCount;
 	private Integer replyCount; // 可代表 childCount 或 exhibitionCommentCount
 	
@@ -13,11 +15,11 @@ public class AddCommentResDTO {
 		this.status = status;
 		return this;
 	}
-	public CommentVO getCommentVO() {
-		return commentVO;
+	public CommentDTO getComment() {
+		return comment;
 	}
-	public AddCommentResDTO setCommentVO(CommentVO commentVO) {
-		this.commentVO = commentVO;
+	public AddCommentResDTO setComment(CommentDTO comment) {
+		this.comment = comment;
 		return this;
 	}
 	public Integer getCommentCount() {

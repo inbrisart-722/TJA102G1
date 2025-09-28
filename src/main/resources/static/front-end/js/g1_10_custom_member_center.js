@@ -30,13 +30,9 @@ document.addEventListener("DOMContentLoaded", function() {
 	let ordersByStatus = {};
 
 	// fetch 1 次而已: 載入用戶所有訂單 => 後續動態呼叫一堆 addEventListener
-	csrfFetch("/api/front-end/protected/order/getAllOrder", {
+	csrfFetchToRedirect("/api/front-end/protected/order/getAllOrder", {
 		method: "GET"
 	}).then((res) => {
-		if (res.status === 401) {
-			sessionStorage.setItem("redirect", window.location.pathname);
-			location.href = "/front-end/login";
-		}
 		if (!res.ok) throw new Error("getAllOrder: Not 2XX or 401");
 		return res.json();
 	})
@@ -246,17 +242,13 @@ document.addEventListener("DOMContentLoaded", function() {
 		if (!btn_repay) return;
 		const order_ulid = btn_repay.closest("div.order_row").querySelector("span.order_id > span").innerText;
 		console.log(order_ulid);
-		csrfFetch("/api/front-end/protected/order/ECPay/resending", {
+		csrfFetchToRedirect("/api/front-end/protected/order/ECPay/resending", {
 			method: "POST",
 			headers: {
 				"CONTENT-TYPE": "text/plain" // 純字串
 			},
 			body: order_ulid
 		}).then((res) => {
-			if (res.status === 401) {
-				sessionStorage.setItem("redirect", window.location.pathname);
-				location.href = "/front-end/login";
-			}
 			if (!res.ok) throw new Error("ECPay/resending: Not 2XX or 401");
 			return res.json();
 		}).then((result) => {
@@ -320,7 +312,7 @@ document.addEventListener("DOMContentLoaded", function() {
 		const form_data = new FormData();
 		form_data.append("user_photo", user_photo);
 
-		csrfFetch("/api/front-end/protected/member/update-photo", {
+		csrfFetchToRedirect("/api/front-end/protected/member/update-photo", {
 			method: "POST",
 			body: form_data,
 		})
@@ -547,7 +539,7 @@ document.addEventListener("DOMContentLoaded", function() {
 		btn_change_password_el.addEventListener("click", () => window.location.href = "/front-end/reset-password1")
 	};
 								
-	fetch("/api/front-end/protected/member/getMemberInfo", {
+	csrfFetchToRedirect("/api/front-end/protected/member/getMemberInfo", {
 		method: "GET"
 	})
 	.then(res => {

@@ -79,7 +79,7 @@ public class OrderRestController {
 	}
 	
 	@GetMapping("/protected/order/checkOrderStatus")
-	public ResponseEntity<Map<String, Object>> checkOrderStatus(@RequestParam("merchantTradeNo") String merchantTradeNo) {
+	public ResponseEntity<Map<String, Object>> checkOrderStatus(@RequestParam("providerOrderId") String providerOrderId) {
 		System.out.println("checking order status...");
 		
 		Map<String, Object> res = new HashMap<>();
@@ -87,7 +87,7 @@ public class OrderRestController {
 		
 		// 阻塞式 Long Polling（非 WebFlux）-> 高併發 效率不佳 -> SSE / WebSocket
 		for(int i = 0; i < 30; i++) {
-			orderStatus = ORDER_SERVICE.checkOrderStatus(merchantTradeNo);
+			orderStatus = ORDER_SERVICE.checkOrderStatus(providerOrderId);
 			if(orderStatus != OrderStatus.付款中) {
 				res.put("orderStatus", orderStatus);
 				return ResponseEntity.ok(res); 

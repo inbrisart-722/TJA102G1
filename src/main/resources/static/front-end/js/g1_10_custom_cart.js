@@ -68,10 +68,10 @@ function toggleCheckoutButton(enabled) {
 document.addEventListener("click", (e) => {
 	const a = e.target.closest("#send_payment");
 	if (!a) return;
-		e.preventDefault();
-		
-//	if (a && a.getAttribute("aria-disabled") === "true") {
-//	}
+	e.preventDefault();
+
+	//	if (a && a.getAttribute("aria-disabled") === "true") {
+	//	}
 
 	const all_icon_checked = document.querySelectorAll("i.icon-check");
 	let cartItemIds = [];
@@ -232,33 +232,34 @@ function formatTime(seconds) {
 
 document.addEventListener("DOMContentLoaded", function() {
 	// 取得所有購物車明細
-	csrfFetch("/api/front-end/protected/cartItem/getAllCartItem", {
-		method: "GET",
-		headers: {
-			"CONTENT-TYPE": "application/json",
-		},
-	})
-		.then((res) => {
-			if (res.status === 401) { // *理論上* getall 401 這裡不會觸發
-			        sessionStorage.setItem("redirect", window.location.pathname);
-			        location.href = "/front-end/login";
-			}
-			if (!res.ok) throw new Error("NOT OK");
-			else return res.json();
+	setTimeout(() => {
+		csrfFetchToRedirect("/api/front-end/protected/cartItem/getAllCartItem", {
+			method: "GET",
+			headers: {
+				"CONTENT-TYPE": "application/json",
+			},
 		})
-		.then((result) => {
-			console.log(result);
+			.then((res) => {
+				if (res.status === 401) { // *理論上* getall 401 這裡不會觸發
+					sessionStorage.setItem("redirect", window.location.pathname);
+					location.href = "/front-end/login";
+				}
+				if (!res.ok) throw new Error("NOT OK");
+				else return res.json();
+			})
+			.then((result) => {
+				console.log(result);
 
-			// 沒有 result 的時候要給一個索引，導去逛展覽 !!!!!!!!
+				// 沒有 result 的時候要給一個索引，導去逛展覽 !!!!!!!!
 
-			const tbody_el = document.getElementById("tbody_to_insert");
-			result.forEach((item) => {
-				console.log(item);
-				// {cartItemId: 4, exhibitionName: '紙上建築設計展', ticketTypeName: '敬老票', quantity: 1, price: 180, createdAt: '24:58'}
-				let tr = document.createElement("tr");
-				tr.dataset.cartItemId = item.cartItemId;
-				tr.className = `cart_item_row`;
-				tr.innerHTML = ` <td>
+				const tbody_el = document.getElementById("tbody_to_insert");
+				result.forEach((item) => {
+					console.log(item);
+					// {cartItemId: 4, exhibitionName: '紙上建築設計展', ticketTypeName: '敬老票', quantity: 1, price: 180, createdAt: '24:58'}
+					let tr = document.createElement("tr");
+					tr.dataset.cartItemId = item.cartItemId;
+					tr.className = `cart_item_row`;
+					tr.innerHTML = ` <td>
                     <div class="thumb_cart img_block">
                       <img
                         src="img/0_exhibition/ChatGPT_exhibition_1.png"
@@ -271,11 +272,11 @@ document.addEventListener("DOMContentLoaded", function() {
                     <span class="ticket_type">${item.ticketTypeName}</span>
                   </td>
                   <td><span class="ticket_time_left">${item.expirationTime
-					}</span></td>
+						}</span></td>
                   <td class="qty"><span class="quantity">${item.quantity
-					}</span></td>
+						}</span></td>
                   <td><span class="ticket_subtotal">$ ${item.price * item.quantity
-					}</span></td>
+						}</span></td>
                   <td class="actions">
                     <!-- icon-check / icon-check-empty -->
                     <button class="buy_checked">
@@ -284,32 +285,33 @@ document.addEventListener("DOMContentLoaded", function() {
                       &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;釋出
                     </button>
                   </td>`;
-				tbody_el.insertAdjacentElement("afterbegin", tr);
+					tbody_el.insertAdjacentElement("afterbegin", tr);
 
-				let remaining = parseTime(item.expirationTime);
-				const span_time_left = tr.querySelector("span.ticket_time_left");
-				// 每秒更新
-				const intervalId = setInterval(() => {
-					remaining--;
+					let remaining = parseTime(item.expirationTime);
+					const span_time_left = tr.querySelector("span.ticket_time_left");
+					// 每秒更新
+					const intervalId = setInterval(() => {
+						remaining--;
 
-					span_time_left.innerText = formatTime(remaining);
+						span_time_left.innerText = formatTime(remaining);
 
-					if (remaining <= 0) {
-						clearInterval(intervalId);
-						// 這裡可以觸發 "倒數結束" 的事件，例如 disable 按鈕 / 自動清空
-						span_time_left.innerText = "過期";
-					}
-				}, 1000);
+						if (remaining <= 0) {
+							clearInterval(intervalId);
+							// 這裡可以觸發 "倒數結束" 的事件，例如 disable 按鈕 / 自動清空
+							span_time_left.innerText = "過期";
+						}
+					}, 1000);
+				});
+
+				// 初始執行
+				updateCartSummary();
+			})
+			.catch((error) => {
+				console.log("error");
+				console.log(error);
+				toggleCheckoutButton(false);
 			});
-
-			// 初始執行
-			updateCartSummary();
-		})
-		.catch((error) => {
-			console.log("error");
-			console.log(error);
-			toggleCheckoutButton(false);
-		});
+	}, 250);
 
 	// 量測高度 → 設置 CSS 變數 → 加 class 觸發動畫 → 動畫結束後移除
 	function collapseRow(rowEl, { delay = 0 } = {}) {
@@ -351,7 +353,7 @@ document.addEventListener("DOMContentLoaded", function() {
 		const cart_item_id = btn_buy_release.closest("tr").dataset.cartItemId;
 		console.log(cart_item_id);
 
-		csrfFetch(
+		csrfFetchToRedirect(
 			"/api/front-end/protected/cartItem/removeOneCartItem?cartItemId=" +
 			cart_item_id,
 			{
@@ -388,7 +390,7 @@ document.addEventListener("DOMContentLoaded", function() {
 	btn_clear_cart.addEventListener("click", function(e) {
 		e.preventDefault();
 
-		csrfFetch("/api/front-end/protected/cartItem/removeAllCartItem", {
+		csrfFetchToRedirect("/api/front-end/protected/cartItem/removeAllCartItem", {
 			method: "DELETE",
 		})
 			.then((res) => {

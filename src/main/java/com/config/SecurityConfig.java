@@ -326,13 +326,18 @@ public class SecurityConfig {
 				.defaultAuthenticationEntryPointFor( // 對 /api/** 的請求
 						restEntryPoint, // 使用自訂 entry point → 回 401 + JSON
 						new AntPathRequestMatcher("/api/**"))
-				.defaultAuthenticationEntryPointFor( // 對其他（視為頁面）請求
+				// 對其他（視為頁面）請求
+				// 1. 前台
+				.defaultAuthenticationEntryPointFor( 
 						((req, res, authEx) -> {
 							String target = "/front-end/login?redirect=" + req.getRequestURI();
+							if(req.getQueryString() != null) target += "&" + req.getQueryString();
 							res.sendRedirect(target);
 						}), new AntPathRequestMatcher("/front-end/**"))
+				// 2. 後台
 				.defaultAuthenticationEntryPointFor(((req, res, authEx) -> {
 					String target = "/back-end/exhibitor/exhibitor_login?redirect=" + req.getRequestURI();
+					if(req.getQueryString() != null) target += "&" + req.getQueryString();
 					res.sendRedirect(target);
 				}), new AntPathRequestMatcher("/back-end/**"))
 				.defaultAuthenticationEntryPointFor(new LoginUrlAuthenticationEntryPoint("/platform/login"),
@@ -532,10 +537,14 @@ public class SecurityConfig {
 
 			// 1-2. 從 SavedRequest 拿看看
 			SavedRequest savedRequest = new HttpSessionRequestCache().getRequest(request, response);
+			// Spring Security 會把「被攔截的請求資訊」存進 HttpSessionRequestCache -> 可能是 /front-end/cart?continue=true 這種請求。
 			URI uri = (savedRequest != null) ? URI.create(savedRequest.getRedirectUrl()) : null;
+			// savedRequest.getRedirectUrl() 拿到完整 URL
+			// URI.create(...) 把字串轉成 java.net.URI 物件 → 就能用 .getPath()、.getQuery()、.getHost() 這些方法。
 			String path = uri != null ? uri.getPath() : null;
 			
 			// 2. 嘗試轉導，並排除 api 開頭的路徑，避免回 JSON .. -> 其實我 request Cache 已經擋掉，怕之後會改先放著
+			// 如果 path == null，代表根本沒有原始請求，就沒東西可以導回去 -> 這時候 fallback /front-end/index 才是合理行為。
 			if (path != null && !path.startsWith("/api")) {
 				targetUrl = savedRequest.getRedirectUrl();
 				response.sendRedirect(targetUrl);

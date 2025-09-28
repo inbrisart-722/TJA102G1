@@ -38,6 +38,12 @@ public class MemberRestController {
 		this.FILE_SERVICE = fileService;
 	}
 	
+	@GetMapping("/protected/member/getMyProfilePic")
+	public ResponseEntity<String> getMyProfilePic(Principal principal){
+		Integer memberId = principal != null ? Integer.valueOf(principal.getName()) : null;
+		String profilePic = MEMBER_SERVICE.getMyProfilePic(memberId);
+		return ResponseEntity.ok(profilePic);
+	}
 	@GetMapping("/protected/member/getMyMemberId")
 	public ResponseEntity<Integer> getMyMemberId(Principal principal){
 		Integer memberId = principal != null ? Integer.valueOf(principal.getName()) : null;

@@ -1,6 +1,27 @@
+let my_profile_pic;
 // 分開包了很多事件委派（但其實應該包一起）
 document.addEventListener("DOMContentLoaded", function() {
 
+	// 馬上打api去取頭像（不重導向）-> 可能會有 bug（取得比留言等處慢的時候 -> then 可解）
+	fetch("/api/front-end/protected/member/getMyProfilePic", {
+		method: "GET"
+	})
+	.then(res => {
+		if(!res.ok) throw new Error("getMyProfilePic: NOT 2XX");
+		else return res.text();
+	})
+	.then(pic => {
+		// 只有 default_pic 或 實際 member_pic 2種狀況
+		my_profile_pic = pic;
+		// 可以在此處理重新 refresh
+		const img = document.querySelector("section.top-reply > form.form_reply > img.replier_self");
+		img.src = my_profile_pic;
+	})
+	.catch(error => {
+		console.log(error);
+		my_profile_pic = "img/tourist_guide_pic.jpg";
+	});
+	
 	// 父層留言 + 子層回覆 新增 start
 	document.addEventListener("click", function(e) {
 		const btn_send = e.target.closest("form.form_reply > button");
@@ -34,7 +55,7 @@ document.addEventListener("DOMContentLoaded", function() {
 			};
 
 			// fetch 1 => 新增父子留言
-			csrfFetch("/api/front-end/protected/comment/addComment", {
+			csrfFetchToRedirect("/api/front-end/protected/comment/addComment", {
 				method: "POST",
 				headers: {
 					"Content-Type": "application/json",
@@ -42,10 +63,6 @@ document.addEventListener("DOMContentLoaded", function() {
 				body: JSON.stringify(send_data),
 			})
 				.then((res) => {
-					if (res.status === 401) {
-						sessionStorage.setItem("redirect", window.location.pathname);
-						location.href = "/front-end/login";
-					}
 					if (!res.ok) throw new error("addComment: Not 2XX or 401");
 					return res.json();
 				})
@@ -58,17 +75,16 @@ document.addEventListener("DOMContentLoaded", function() {
 						// 子層
 						const reply_body_html = document.createElement("div");
 						reply_body_html.className = "reply_body";
-						reply_body_html.dataset.commentId = result.commentVO.commentId;
+						reply_body_html.dataset.commentId = result.comment.commentId;
 						// member 圖片、member 暱稱 or 姓名
 						reply_body_html.innerHTML = `<!-- 單個回覆 -->
                         <img
-                          src="./img/avatar1.jpg"
+                          src="${result.comment.member.profilePic}"
                           alt="Image"
                           class="rounded-circle replier_others"
                         />
-                        <h6>${"result.memberId: " + result.commentVO.memberId
-							}</h6>
-                        <small>${result.commentVO.createdAt}</small>
+                        <h6>${result.comment.member.nickname}</h6>
+                        <small>${result.comment.createdAt}</small>
                         <div class="report_block">
                           <button>...</button>
                           <ul>
@@ -86,7 +102,7 @@ document.addEventListener("DOMContentLoaded", function() {
                       <!-- 單個回覆 end -->`;
 						const report_block = reply_body_html.querySelector(".report_block");
 						const p = document.createElement("p");
-						p.innerText = result.commentVO.content; // comment_value
+						p.innerText = result.comment.content; // comment_value
 						report_block.insertAdjacentElement("afterend", p);
 						// 找到插入區塊
 						const sub_reply_block = btn_send
@@ -101,16 +117,16 @@ document.addEventListener("DOMContentLoaded", function() {
 						const review_strip_single_html = document.createElement("div");
 						review_strip_single_html.className = "review_strip_single";
 						review_strip_single_html.dataset.commentId =
-							result.commentVO.commentId; // data-comment-id 設值
+							result.comment.commentId; // data-comment-id 設值
 						review_strip_single_html.innerHTML = `
                   <!-- 留言 header 部分 -->
                   <img
-                    src="img/avatar1.jpg"
+                    src="${result.comment.member.profilePic}"
                     alt="Image"
-                    class="rounded-circle"
+                    class="rounded-circle comment-avatar"
                   />
-                  <h4>${"result.memberId: " + result.commentVO.memberId}</h4>
-                  <small> ${result.commentVO.createdAt}&nbsp;&nbsp;</small>
+                  <h4>${result.comment.member.nickname}</h4>
+                  <small> ${result.comment.createdAt}&nbsp;&nbsp;</small>
                   <div class="report_block">
                     <button>...</button>
                     <ul>
@@ -136,7 +152,7 @@ document.addEventListener("DOMContentLoaded", function() {
                     <!-- 本人回覆輸入 -->
                     <form action="" class="form_reply sub">
                       <img
-                        src="./img/avatar1.jpg"
+                        src="${result.comment.member.profilePic}"
                         alt="Image"
                         class="rounded-circle replier_self"
                       />
@@ -157,7 +173,7 @@ document.addEventListener("DOMContentLoaded", function() {
 							review_strip_single_html.querySelector(".report_block");
 						const p = document.createElement("p");
 						p.className = "review_content";
-						p.innerText = result.commentVO.content; // comment_value
+						p.innerText = result.comment.content; // comment_value
 						report_block.insertAdjacentElement("afterend", p);
 						// 找到插入區塊
 						const top_reply = document.querySelector("section.top-reply");
@@ -377,11 +393,11 @@ document.addEventListener("DOMContentLoaded", function() {
 						// 圖片與會員姓名還沒處理 !!!!!!!
 						div.innerHTML = `
                       <img
-                        src="./img/avatar1.jpg"
+                        src="${c.member.profilePic}"
                         alt="Image"
-                        class="rounded-circle"
+                        class="rounded-circle comment-avatar"
                       />
-                      <h4>${"memberId: " + c.memberId}</h4>
+                      <h4>${c.member.nickname}</h4>
                       <small> ${c.createdAt}&nbsp;&nbsp;</small>
                       <div class="report_block">
                         <button>...</button>
@@ -414,7 +430,7 @@ document.addEventListener("DOMContentLoaded", function() {
                         <!-- 本人回覆輸入 -->
                         <form action="" class="form_reply sub">
                           <img
-                            src="./img/avatar1.jpg"
+                            src="${my_profile_pic}"
                             alt="Image"
                             class="rounded-circle replier_self"
                           />
@@ -521,11 +537,11 @@ document.addEventListener("DOMContentLoaded", function() {
 						div.innerHTML = `
           <!-- 單個回覆 -->
                         <img
-                          src="./img/avatar1.jpg"
+                          src="${r.member.profilePic}"
                           alt="Image"
                           class="rounded-circle replier_others"
                         />
-                        <h6>${"r.memberId: " + r.memberId}</h6>
+                        <h6>${r.member.nickname}</h6>
                         <small>${r.createdAt}</small>
                         <div class="report_block">
                           <button>...</button>
@@ -780,6 +796,8 @@ document.addEventListener("DOMContentLoaded", function() {
 		}
 	}
 
+	let flag_btn_add_cart_and_go = false;
+	
 	const addCartItem = function(send_data) {
 		const adults_el = document.querySelector("input#adults");
 		const students_el = document.querySelector("input#students");
@@ -787,7 +805,7 @@ document.addEventListener("DOMContentLoaded", function() {
 		const disabled_el = document.querySelector("input#disabled");
 		const mili_and_police_el = document.querySelector("input#mili_and_police");
 
-		csrfFetch("/api/front-end/protected/cartItem/addCartItem", {
+		csrfFetchToRedirect("/api/front-end/protected/cartItem/addCartItem", {
 			method: "POST",
 			headers: {
 				"Content-Type": "application/json",
@@ -795,24 +813,19 @@ document.addEventListener("DOMContentLoaded", function() {
 			body: JSON.stringify(send_data),
 		})
 			.then((res) => {
-				if (res.status === 401) {
+//				if (res.status === 401) {
 					// 存入localStorage
-					sessionStorage.setItem("redirect", window.location.pathname);
-					sessionStorage.setItem("send_data", JSON.stringify(send_data));
+//					sessionStorage.setItem("redirect", window.location.pathname);
+//					sessionStorage.setItem("send_data", JSON.stringify(send_data));
 					// 再轉導
-					window.location.href = "/front-end/login";
-				}
+//					window.location.href = "/front-end/login";
+//				}
 				if (!res.ok) {
 					throw new Error("addCartItem: Not 2XX or 401");
 				}
 				return res.text();
 			})
 			.then((result) => {
-				if (result === "success") {
-					showToast("已加入購物車", "success");
-				} else if (result === "failure") {
-					showToast("剩餘票數不足，加入購物車失敗", "error");
-				}
 				adults_el.value =
 					students_el.value =
 					elderly_el.value =
@@ -821,6 +834,14 @@ document.addEventListener("DOMContentLoaded", function() {
 					"0";
 				recalcTotal();
 				clearTable();
+				if (result === "success") {
+					showToast("已加入購物車", "success");
+					if(flag_btn_add_cart_and_go){
+						setTimeout(() => location.href = "/front-end/cart", 50)
+					}
+				} else if (result === "failure") {
+					showToast("剩餘票數不足，加入購物車失敗", "error");
+				}
 			})
 			.catch((error) => {
 				console.log("error");
@@ -840,7 +861,7 @@ document.addEventListener("DOMContentLoaded", function() {
 	//	}
 
 	const btn_add_cart = document.querySelector("a#add_cart");
-
+	
 	btn_add_cart.addEventListener("click", function(e) {
 		e.preventDefault();
 
@@ -901,7 +922,7 @@ document.addEventListener("DOMContentLoaded", function() {
 	btn_add_cart_and_go.addEventListener("click", function(e) {
 		e.preventDefault();
 		btn_add_cart.click();
-		location.href = "/front-end/cart";
+		flag_btn_add_cart_and_go = true;
 	});
 	// JavaScript 動態取得路徑的方法 by 小吳
 
@@ -975,7 +996,7 @@ document.addEventListener("DOMContentLoaded", function() {
 			commentId: comment_id,
 			reaction,
 		};
-		csrfFetch("/api/front-end/protected/commentReaction/updateReaction", {
+		csrfFetchToRedirect("/api/front-end/protected/commentReaction/updateReaction", {
 			method: "POST",
 			headers: {
 				"Content-Type": "application/json",
@@ -983,10 +1004,6 @@ document.addEventListener("DOMContentLoaded", function() {
 			body: JSON.stringify(send_data),
 		})
 			.then((res) => {
-				if (res.status === 401) {
-					sessionStorage.setItem("redirect", window.location.pathname);
-					location.href = "/front-end/login";
-				}
 				if (!res.ok) throw new Error("updateReaction: Not 2XX or 401");
 				return res.json();
 			})
@@ -1190,7 +1207,7 @@ document.addEventListener("DOMContentLoaded", function() {
 
 		if (ratingScore === originalRatingScore) return;
 
-		csrfFetch(
+		csrfFetchToRedirect(
 			"/api/front-end/protected/rating/upsertRating?exhibitionId=" +
 			2 + // test
 			"&ratingScore=" +
@@ -1202,10 +1219,6 @@ document.addEventListener("DOMContentLoaded", function() {
 			.then((res) => {
 				if (!res.ok) throw new Error("upsertRating: Not 2XX or 401");
 				// 其實前端已經擋不該評價的（包含未登入），但還是寫一次邏輯怕有人路徑亂送，後端取不到 Authentication 可能出錯
-				if (res.status === 401) {
-					sessionStorage.setItem("redirect", window.location.pathname);
-					location.href = "/front-end/login";
-				}
 				return res.json();
 			})
 			.then((result) => {
