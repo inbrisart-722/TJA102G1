@@ -29,6 +29,9 @@ public class PaymentAttemptVO implements Serializable{
 	@Column(name = "payment_attempt_id")
 	private Integer paymentAttemptId;
 	
+	@Column(name = "is_duplicate", insertable = false)
+	private Boolean isDuplicate;
+	
 	@Enumerated(EnumType.STRING)
 	@Column(name = "payment_attempt_status")
 	private PaymentAttemptStatus paymentAttemptStatus; // PENDING, EXPIRED, SUCCESS, FAILURE
@@ -79,6 +82,9 @@ public class PaymentAttemptVO implements Serializable{
 	private Timestamp updatedAt;
 	
 	/* **************** (2) LinePay-specific **************** */
+	@Column(name = "confirm_api_retry_count", columnDefinition = "TINYINT")
+	private Byte confirmApiRetryCount;
+	
 	@Column(name = "currency")
 	private String currency; // "TWD"
 	
@@ -110,6 +116,13 @@ public class PaymentAttemptVO implements Serializable{
 	}
 	public void setPaymentAttemptId(Integer paymentAttemptId) {
 		this.paymentAttemptId = paymentAttemptId;
+	}
+	
+	public Boolean getIsDuplicate() {
+		return isDuplicate;
+	}
+	public void setIsDuplicate(Boolean isDuplicate) {
+		this.isDuplicate = isDuplicate;
 	}
 	public PaymentAttemptStatus getPaymentAttemptStatus() {
 		return paymentAttemptStatus;
@@ -176,6 +189,12 @@ public class PaymentAttemptVO implements Serializable{
 	}
 	public void setUpdatedAt(Timestamp updatedAt) {
 		this.updatedAt = updatedAt;
+	}
+	public Byte getConfirmApiRetryCount() {
+		return confirmApiRetryCount;
+	}
+	public void setConfirmApiRetryCount(Byte confirmApiRetryCount) {
+		this.confirmApiRetryCount = confirmApiRetryCount;
 	}
 	public String getCurrency() {
 		return currency;

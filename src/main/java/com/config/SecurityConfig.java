@@ -2,6 +2,7 @@ package com.config; // 專案內的設定類別都放在 com.config 套件
 
 import java.net.URI;
 import java.time.Duration;
+import java.util.Arrays;
 
 import org.springframework.context.annotation.Bean; // 宣告 Spring Bean 用
 import org.springframework.context.annotation.Configuration; // 表示這是一個設定類別
@@ -19,7 +20,12 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService; // 載入使用者（你實作的 CustomUserDetailsService）
 import org.springframework.security.crypto.password.PasswordEncoder; // 密碼編碼介面
 import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
+import org.springframework.security.oauth2.client.oidc.authentication.OidcIdTokenDecoderFactory;
+import org.springframework.security.oauth2.client.registration.ClientRegistration;
 import org.springframework.security.oauth2.core.user.OAuth2User;
+import org.springframework.security.oauth2.jose.jws.MacAlgorithm;
+import org.springframework.security.oauth2.jose.jws.SignatureAlgorithm;
+import org.springframework.security.oauth2.jwt.JwtDecoderFactory;
 import org.springframework.security.web.SecurityFilterChain; // Spring Security 的過濾鏈
 import org.springframework.security.web.authentication.LoginUrlAuthenticationEntryPoint; // 未登入導頁用（給頁面）
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter; // 參考定位自訂 Filter 的相對位置
@@ -39,6 +45,7 @@ import com.security.jwt.JwtCookieAuthenticationFilter; // 你自訂：從 HttpOn
 import com.security.jwt.JwtUtil;
 import com.security.jwt.RestAuthenticationEntryPoint; // 你自訂：API 端未認證時回 401 JSON
 
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
@@ -216,6 +223,24 @@ public class SecurityConfig {
 		};
 	}
 
+	// OpenID Connect (OIDC) 是一個構建在 OAuth(Open Authorization) 2.0 之上的身份認證協議
+	// OIDC = 授權協議 + 身份認證
+	@Bean
+	public JwtDecoderFactory<ClientRegistration> idTokenDecoderFactory() {
+		OidcIdTokenDecoderFactory idTokenDecoderFactory = new OidcIdTokenDecoderFactory();
+		// 將所有 OIDC 用戶端預設 JWS 演算法設為 HS256（或針對特定用戶端判斷）
+
+		// 指定不同 provider 要用哪種演算法驗簽
+		idTokenDecoderFactory.setJwsAlgorithmResolver(clientRegistration -> {
+			if ("line".equals(clientRegistration.getRegistrationId())) {
+				return MacAlgorithm.HS256; // Line Login 用 HS256
+			}
+			// 其他預設 RS256，若還有其他 OIDC 用戶端走特殊演算法，得在此另外處理
+			return SignatureAlgorithm.RS256;
+		});
+		return idTokenDecoderFactory;
+	}
+
 	// ===================== 核心：安全過濾鏈 =====================
 	@Bean
 	// 建立並回傳 SecurityFilterChain（整個安全規則從這裡長出來）
@@ -277,9 +302,8 @@ public class SecurityConfig {
 																					// 頂多只是讓使用者被迫登出
 						new AntPathRequestMatcher("/api/front-end/order/ECPay/ReturnURL"),
 						new AntPathRequestMatcher("/front-end/ECPay/*"), // ClientBackURL + OrderResultURL
-						new AntPathRequestMatcher("/front-end/google/*") // 雖然目前只有 get
-
-				));
+						new AntPathRequestMatcher("/front-end/google/*"), // 雖然目前只有 get
+						new AntPathRequestMatcher("/api/front-end/linebot/webhook")));
 
 		// ========= Session：完全無狀態（靠 JWT，不用 HttpSession） =========
 		http.sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED)
@@ -328,16 +352,17 @@ public class SecurityConfig {
 						new AntPathRequestMatcher("/api/**"))
 				// 對其他（視為頁面）請求
 				// 1. 前台
-				.defaultAuthenticationEntryPointFor( 
-						((req, res, authEx) -> {
-							String target = "/front-end/login?redirect=" + req.getRequestURI();
-							if(req.getQueryString() != null) target += "&" + req.getQueryString();
-							res.sendRedirect(target);
-						}), new AntPathRequestMatcher("/front-end/**"))
+				.defaultAuthenticationEntryPointFor(((req, res, authEx) -> {
+					String target = "/front-end/login?redirect=" + req.getRequestURI();
+					if (req.getQueryString() != null)
+						target += "&" + req.getQueryString();
+					res.sendRedirect(target);
+				}), new AntPathRequestMatcher("/front-end/**"))
 				// 2. 後台
 				.defaultAuthenticationEntryPointFor(((req, res, authEx) -> {
 					String target = "/back-end/exhibitor/exhibitor_login?redirect=" + req.getRequestURI();
-					if(req.getQueryString() != null) target += "&" + req.getQueryString();
+					if (req.getQueryString() != null)
+						target += "&" + req.getQueryString();
 					res.sendRedirect(target);
 				}), new AntPathRequestMatcher("/back-end/**"))
 				.defaultAuthenticationEntryPointFor(new LoginUrlAuthenticationEntryPoint("/platform/login"),
@@ -375,8 +400,8 @@ public class SecurityConfig {
 				// 1. 必須要用 / 開頭 去指定路徑
 				// 2.「愈前面的規則優先度愈高」。
 				.requestMatchers("/front-end/order_success", "/front-end/order_failure").hasRole("MEMBER")
-				.requestMatchers("/front-end/admin", "/front-end/cart", "/front-end/payment", "/front-end/change-mail1", "/front-end/reset-password1",
-						"/api/front-end/protected/**")
+				.requestMatchers("/front-end/admin", "/front-end/cart", "/front-end/payment", "/front-end/change-mail1",
+						"/front-end/reset-password1", "/api/front-end/protected/**")
 				.hasRole("MEMBER")
 				.requestMatchers("/back-end/exhibitor/exhibitor_login", "/front-end/exhibitor_register").permitAll()
 //                .requestMatchers("/platform/login", "/platform/register")
@@ -395,11 +420,12 @@ public class SecurityConfig {
 				// 就算你改成 DSL 寫法 (Spring Security 6.2 的新方式)，只要你想要對 STOMP 訊息 (@MessageMapping →
 				// /app/**，@SendTo → /topic/**) 做授權，就還是要引入 spring-security-messaging。
 				.requestMatchers("/app/chat") // 顯式放行 websocket
-				.hasRole("MEMBER")
-				.requestMatchers("/topic/messages")
-				.permitAll()
-				.anyRequest()
-				.permitAll()
+				.hasRole("MEMBER").requestMatchers("/topic/messages").permitAll()
+				// 這兩行完全沒用，還沒走到 FilterSecurityInterceptor 就會被
+				// OAuth2AuthorizationRequestRedirectFilter 攔截並且處理 redirect
+//				.requestMatchers("/oauth2/authorization/line")
+//				.hasRole("MEMBER")
+				.anyRequest().permitAll()
 
 		// .permitAll() 完全不攔截
 		// .denyAll() 完全拒絕
@@ -499,11 +525,59 @@ public class SecurityConfig {
 		// SecurityContextHolder.getContext().setAuthentication(authentication);
 		// 4. 接著呼叫此處預設的 successHandler
 		http.oauth2Login(oauth -> oauth.successHandler((request, response, authentication) -> {
+			// authentication -> OAuth2AuthenticationToken -> 代表此次 OAuth2/OIDC 的登入結果
+
+			// 拿出預設是 DefaultOidcUser / DefaultOAuth2User (看 provider 是否是 OIDC) 代表用戶的 profile
+			// claims。
+			// line scope = opid -> 標準 claims -> sub(關鍵 LINE userId), iss, aud, exp, iat
 			OAuth2User oauthUser = (OAuth2User) authentication.getPrincipal();
-			// google / github / meta
+			// google / github / meta / line
 			String provider = ((OAuth2AuthenticationToken) authentication).getAuthorizedClientRegistrationId();
 
-			// DB 查或建會員
+			// 1st type: line 只能是綁定用途，不能為主身份 -> 拉出 JWT sub 塞會員 line_id 就放走
+			if ("line".equals(provider)) {
+				// 只拿 LINE userId
+				String lineUserId = oauthUser.getAttribute("sub");
+				// 確認此 line user id 尚未綁定
+				if (MEMBER_SERVICE.checkIfLineUserIdBound(lineUserId) == true) {
+					response.sendRedirect("/front-end/admin?lineUserIdBoundAlready=true");
+					return;
+				}
+				
+				// 找出目前登入的會員（利用 cookie 提取）
+				Cookie[] cookies = request.getCookies();
+				String token = null;
+				String at = Arrays.stream(cookies).filter(c -> MEM_ACCESS_COOKIE.equals(c.getName()))
+						.map(Cookie::getValue).findFirst().orElse(null);
+				if (at != null && JWT_UTIL.validate(at))
+					token = at;
+				if (token == null) {
+					String rt = Arrays.stream(cookies).filter(c -> MEM_REFRESH_COOKIE.equals(c.getName()))
+							.map(Cookie::getValue).findFirst().orElse(null);
+					if (rt != null && JWT_UTIL.validate(rt) && JWT_UTIL.isRefreshToken(rt)) {
+						String username = JWT_UTIL.getUsername(rt);
+						String newAt = JWT_UTIL.generateAccess(username, MEM_ACCESS_TTL);
+						ResponseCookie newAccess = ResponseCookie.from(MEM_ACCESS_COOKIE, newAt).httpOnly(true)
+								.secure(true) // ⚠️ 測試環境 false，正式要 true
+								.sameSite("None").path("/").maxAge(MEM_ACCESS_TTL).build();
+						response.addHeader("Set-Cookie", newAccess.toString());
+						token = newAt;
+					}
+				}
+				// 1. 用戶沒登入直接打此節點回來根本沒身份 -> 重導向
+				// 2. 極端情況，用戶已經登入去綁 line id，但綁的過程中 at, rt 都剛好失效
+				if (token == null) {
+					response.sendRedirect("/front-end/login?redirect=/front-end/admin");
+					return;
+				}
+
+				Integer memberId = Integer.valueOf(JWT_UTIL.getUsername(token));
+				MEMBER_SERVICE.setLineUserId(lineUserId, memberId);
+				response.sendRedirect("/front-end/admin?lineUserIdBoundAlready=false"); // 回到理論上唯一的入口（後續看要不要 UI 給個成功綁定）
+				return;
+			}
+
+			// 2nd type: google/github/meta 可以為主身份 -> DB 查或建會員
 			MemberVO member = MEMBER_SERVICE.loadOrCreateFromOAuth2(provider, oauthUser);
 
 			// OAuth2 成功 → 清掉舊的 JWT Cookie → 發新的 Token（Access+Refresh） →
@@ -529,7 +603,7 @@ public class SecurityConfig {
 			SecurityContextHolder.getContext().setAuthentication(
 					new UsernamePasswordAuthenticationToken(memberToken, null, memberToken.getAuthorities()));
 
-			String targetUrl = null; 
+			String targetUrl = null;
 			// 1-1. 從 session 拿看看（配合 login 頁面塞入）
 //			HttpSession session = request.getSession(false);
 //			if(session != null) targetUrl = String.valueOf(session.getAttribute("OAuth2Redirect"));
@@ -537,12 +611,14 @@ public class SecurityConfig {
 
 			// 1-2. 從 SavedRequest 拿看看
 			SavedRequest savedRequest = new HttpSessionRequestCache().getRequest(request, response);
-			// Spring Security 會把「被攔截的請求資訊」存進 HttpSessionRequestCache -> 可能是 /front-end/cart?continue=true 這種請求。
+			// Spring Security 會把「被攔截的請求資訊」存進 HttpSessionRequestCache -> 可能是
+			// /front-end/cart?continue=true 這種請求。
 			URI uri = (savedRequest != null) ? URI.create(savedRequest.getRedirectUrl()) : null;
 			// savedRequest.getRedirectUrl() 拿到完整 URL
-			// URI.create(...) 把字串轉成 java.net.URI 物件 → 就能用 .getPath()、.getQuery()、.getHost() 這些方法。
+			// URI.create(...) 把字串轉成 java.net.URI 物件 → 就能用 .getPath()、.getQuery()、.getHost()
+			// 這些方法。
 			String path = uri != null ? uri.getPath() : null;
-			
+
 			// 2. 嘗試轉導，並排除 api 開頭的路徑，避免回 JSON .. -> 其實我 request Cache 已經擋掉，怕之後會改先放著
 			// 如果 path == null，代表根本沒有原始請求，就沒東西可以導回去 -> 這時候 fallback /front-end/index 才是合理行為。
 			if (path != null && !path.startsWith("/api")) {
@@ -551,14 +627,16 @@ public class SecurityConfig {
 			}
 
 			// 3. fallback
-			else response.sendRedirect("/front-end/index");
+			else
+				response.sendRedirect("/front-end/index");
 		})
 				// VER. 失敗暫放（未測）
 				.failureHandler((request, response, exception) -> {
 					// 🔴 OAuth2 流程失敗（使用者拒絕授權、redirect_uri 錯誤、token 交換失敗...）
 					System.err.println("OAuth2 login failed: " + exception.getMessage());
+					exception.printStackTrace();
 
-					// 清除 Cookie，避免殘留舊的 access_token/refresh_token
+					// 清除 Cookie，避免殘留舊的 access_token/refresh_token (session 因為半殘所以還會有狀態 可能沒清乾淨）
 					response.addHeader(HttpHeaders.SET_COOKIE, ResponseCookie.from(MEM_ACCESS_COOKIE, "").httpOnly(true)
 							.secure(true).sameSite("None").path("/").maxAge(0).build().toString());
 					response.addHeader(HttpHeaders.SET_COOKIE, ResponseCookie.from(MEM_REFRESH_COOKIE, "")
@@ -571,19 +649,16 @@ public class SecurityConfig {
 		// RequestCache -> 設定只讓頁面請求進 cache, 忽略 api 請求，否則會導回到 api 位址，不合理！
 		// Spring Security 預設會用 HttpSessionRequestCache 紀錄「使用者被攔下來時，原本想要存取的 URL」
 		// 登入成功後，Security 就會把使用者導回這個 URL
-		http
-		  .requestCache(cache -> cache
-		      .requestCache(new HttpSessionRequestCache() {
-		          @Override
-		          public void saveRequest(HttpServletRequest request, HttpServletResponse response) {
-		              String uri = request.getRequestURI();
-		              if (!uri.startsWith("/api")) {
-		                  super.saveRequest(request, response);
-		              }
-		          }
-		      })
-		  );
-		
+		http.requestCache(cache -> cache.requestCache(new HttpSessionRequestCache() {
+			@Override
+			public void saveRequest(HttpServletRequest request, HttpServletResponse response) {
+				String uri = request.getRequestURI();
+				if (!uri.startsWith("/api")) {
+					super.saveRequest(request, response);
+				}
+			}
+		}));
+
 		return http.build(); // 建構並回傳 SecurityFilterChain
 	}
 }

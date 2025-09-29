@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -12,12 +13,15 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
+import org.springframework.data.domain.SliceImpl;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -393,6 +397,40 @@ public class ExhibitionServiceImpl implements ExhibitionService {
 		dto.setTotalCommentCount(totalCommentCount);
 		
 		return dto;
+	}
+	
+	public List<ExhibitionLineBotCarouselDTO> findHotExhibitionsForLineBot(){
+		return null;
+	}
+	
+	public Slice<ExhibitionLineBotCarouselDTO> findUpcomingExhibitionsForLineBot(int page, int size){
+		Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.ASC, "startTime"));
+		
+		Slice<ExhibitionVO> exhibitionsSlice = repository.findByStartTimeAfter(LocalDateTime.now(), pageable); 
+		List<ExhibitionVO> exhibitions = exhibitionsSlice.getContent();
+		
+		List<ExhibitionLineBotCarouselDTO> dtos =
+			exhibitions.stream().map(vo -> {
+			ExhibitionLineBotCarouselDTO dto = new ExhibitionLineBotCarouselDTO();
+			dto
+				.setExhibitionName(vo.getExhibitionName())
+//				.setPhotoPortrait(vo.getPhotoPortrait())
+				// 測試
+				.setPhotoPortrait("https://scdn.line-apps.com/n/channel_devcenter/img/fx/01_1_cafe.png")
+				.setAverageRatingScore(vo.getAverageRatingScore())
+				.setLocation(vo.getLocation())
+				.setStartTime(vo.getStartTime())
+				.setEndTime(vo.getEndTime())
+				// 測試
+				.setPageUrl("http://localhost:8088/front-end/exhibitions?exhibitionId=" + vo.getExhibitionId());
+			return dto;
+		}).collect(Collectors.toList());
+		
+		return new SliceImpl<>(dtos, pageable, exhibitionsSlice.hasNext());
+	}
+	
+	public List<ExhibitionLineBotCarouselDTO> findNewExhibitionsForLineBot(){
+		return null;
 	}
 	
 }
