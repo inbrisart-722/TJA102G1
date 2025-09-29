@@ -55,7 +55,6 @@ public class ExhibitionServiceImpl implements ExhibitionService {
 	private final ExhibitionRepository repository;
 	private final ExhibitionTicketTypeRepository exhibitionTicketTypeRepository;
 	private final TicketTypeRepository ticketTypeRepository;
-	private final CommentRepository commentRepository;
 	private record TicketJsonItem(String name, Integer price) {
 	}
 	
@@ -68,7 +67,6 @@ public class ExhibitionServiceImpl implements ExhibitionService {
 
 	@PersistenceContext
 	private EntityManager entityManager;
-	private String DEFAULT_PHOTO_LANDSCAPE;
 	
 	private static final int DEFAULT_STATUS_ID = 1;
 	private static final int DRAFT_STATUS_ID = 6;
