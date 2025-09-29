@@ -211,8 +211,43 @@ public class BackendIndexController {
     }
     
     @GetMapping("exhibitor/exhibitor_account_data")
-    public String exhibitorAccountDataPage() {
+    public String exhibitorAccountDataPage(Model model) {
+    	Integer exhibitorId = TEST_EXHIBITOR;
+        ExhibitorVO exhibitor = exhibitorRepository.findById(exhibitorId).orElse(null);
+        model.addAttribute("exhibitor", exhibitor);
     	return "back-end/exhibitor_account_data";
+    }
+    
+    @PostMapping("exhibitor/exhibitor_account_data/update")
+    public String updateExhibitorAccountData(
+            @RequestParam String businessIdNumber,     
+            @RequestParam String email,                
+            @RequestParam String contactName,          
+            @RequestParam String contactPhone,         
+            @RequestParam String companyName,          
+            @RequestParam String exhibitorRegistrationName, 
+            @RequestParam String bankAccountName,      
+            @RequestParam String bankCode,             
+            @RequestParam String bankAccountNumber,    
+            RedirectAttributes ra) {
+
+        ExhibitorVO e = exhibitorRepository.findById(TEST_EXHIBITOR)
+                .orElseThrow(() -> new IllegalArgumentException("Exhibitor not found: " + TEST_EXHIBITOR));
+
+        e.setBusinessIdNumber(businessIdNumber);
+        e.setEmail(email);
+        e.setContactName(contactName);
+        e.setContactPhone(contactPhone);
+        e.setCompanyName(companyName);
+        e.setExhibitorRegistrationName(exhibitorRegistrationName);
+        e.setBankAccountName(bankAccountName);
+        e.setBankCode(bankCode);
+        e.setBankAccountNumber(bankAccountNumber);
+
+        exhibitorRepository.save(e);
+
+        ra.addFlashAttribute("msg", "帳戶資料已更新！");
+        return "redirect:/back-end/exhibitor/exhibitor_account_data";
     }
     
     @GetMapping("exhibitor/exhibitor_login")
