@@ -428,11 +428,29 @@ public class LinePayService {
 	// 3-1. confirm request 用戶授權完成回到 confirmUrl 以後 
 	// POST /v3/payments/{transactionId}/confirm
 	public String paymentConfirm(String providerOrderId) {
-		// 要處理重送問題（重複付款）
+		
 		
 		PaymentAttemptVO paymentAttempt = PAYMENT_ATTEMPT_REPO.findByProviderOrderId(providerOrderId).orElse(null);
 		
 		if(paymentAttempt == null) return null; // -> 付款成功 line pay 導用戶回來的頁面 有人亂輸入的話 要處理
+		
+		PaymentAttemptStatus status = paymentAttempt.getPaymentAttemptStatus();
+		// 重複付款處理
+		// -> 這條 payment 還沒成功付款，但其他條 payment 早就成功付款過了！！
+		if(status != PaymentAttemptStatus.SUCCESS &&
+			paymentAttempt.getOrder().getOrderStatus() == OrderStatus.已付款) {
+			// 呼叫取消此次授權（避免用戶重複保留的款項 多被扣住一週（？））
+			// 其實不呼叫也可，但就是用戶的那筆錢會被多扣一週（？）
+			paymentAuthorizationsVoid(providerOrderId);
+		}
+			
+		// 重複通知處理 
+		// -> SUCCESS -> 這條 payment 已經更新成功過了 -> Line pay 重送的通知
+		// -> CHECKING -> 不理，照常跑
+		if(status == PaymentAttemptStatus.SUCCESS &&
+			paymentAttempt.getOrder().getOrderStatus() == OrderStatus.已付款) {
+			return null;
+		}
 
 		LinePayPaymentConfirmReqDTO pcReq = new LinePayPaymentConfirmReqDTO();
 		pcReq.setAmount(paymentAttempt.getTradeAmt()).setCurrency(paymentAttempt.getCurrency());
@@ -471,7 +489,7 @@ public class LinePayService {
 			// 1. 立即重打 api -> confirm API 是 冪等的，重複呼叫同一個 transactionId 不會重複扣款。
 			if(paymentAttempt.getConfirmApiRetryCount() <= 1)
 				retryPaymentConfirm(paymentAttempt.getProviderOrderId());
-			// 2. 後續 job 掃描... 
+			// 2. 後續由上方的 @Async job 掃描... 
 			return null;
 		}
 		
@@ -502,13 +520,40 @@ public class LinePayService {
 	// 4. 取消授權 -> payment attempt 過期回來沒票就要主動取消授權
 	// POST /v3/payments/authorizations/{transactionId}/void
 	// **目前** 只會被 confirm url 回來重複付款的方法呼叫
-	public void paymentAuthorizationsVoid() {
+	public void paymentAuthorizationsVoid(String providerOrderId) {
 		// 使用者體驗
 			// 1. 等過期：要等 LINE Pay 的授權到期（通常 7 天），這段期間顧客信用卡額度會被占用。
 				// 假設顧客額度 10,000，授權 5,000，雖然錢沒扣走，但額度只剩 5,000 可用。
 				// 顧客這時去刷別的東西可能會失敗，體驗不好。
 			// 2. 立即取消授權：商戶打 void API，授權立刻釋放，顧客額度馬上恢復。
 				// 👉 這就是為什麼支付平台（LINE Pay、ECPay、Stripe）都會建「取消授權 API」：是為了顧客體驗。
+		
+		PaymentAttemptVO paymentAttempt = PAYMENT_ATTEMPT_REPO.findByProviderOrderId(providerOrderId).orElseThrow();
+		
+		String providerTransactionId = paymentAttempt.getProviderTransactionId();
+		String apiPath = "/v3/payments/authorizations/" + providerTransactionId + "/void"; // endpoint
+		String nonce = UUID.randomUUID().toString(); // 避免重放攻擊，類似一次性密碼，使用過的 nonce 會被標示無效，攻擊者就無法多次請求隨意多次扣款等等
+		String message = CHANNEL_SECRET + apiPath + nonce;
+		String signature = signHmacSHA256(CHANNEL_SECRET, message);
+
+		 LinePayPaymentVoidResDTO pvRes =
+				REST_CLIENT.post()
+                .uri(apiPath)
+                .header("Content-Type", "application/json")
+                .header("X-LINE-ChannelId", CHANNEL_ID)
+                .header("X-LINE-Authorization-Nonce", nonce)
+                .header("X-LINE-Authorization", signature)
+                .retrieve()
+                .body(LinePayPaymentVoidResDTO.class);
+		 
+		 // 取消授權失敗
+		 if(!"0000".equals(pvRes.getReturnCode())) {
+			 System.out.println("取消授權失敗");
+		 }
+		 // 取消授權成功
+		 else if ("0000".equals(pvRes.getReturnCode())) {
+			 System.out.println("取消授權失敗");
+		 }
 	}
 	
 	// 5. 查詢已授權的付款 -> 不能拿這條來查未完成授權的認證階段資訊

@@ -346,11 +346,27 @@ document.addEventListener("DOMContentLoaded", function() {
 	// 先處理 lineUserIdBoundAlready 參數
 	const params = new URLSearchParams(window.location.search);
 	const lineUserIdBoundAlready = params.get("lineUserIdBoundAlready");
-	// true -> 失敗
-	if(lineUserIdBoundAlready === "true"){alert("由於此 LINE 帳號已經與其他會員帳號進行綁定，因此綁定失敗！")}
 	
-	// false -> 恭喜成功 
-	if(lineUserIdBoundAlready === "false"){alert("LINE 帳號成功綁定，後續可以使用 LINE 官方帳號來進行會員專屬查詢囉！");}
+	if(lineUserIdBoundAlready){
+		// true -> 失敗
+		if(lineUserIdBoundAlready === "true"){
+			alert("由於此 LINE 帳號已經與其他會員帳號進行綁定，因此綁定失敗！")
+		}
+		// false -> 恭喜成功 
+		else if(lineUserIdBoundAlready === "false"){
+			alert("LINE 帳號成功綁定，後續可以使用 LINE 官方帳號來進行會員專屬查詢囉！");
+		}
+		// 彈窗顯示後，從 URL 中移除這個參數
+		// 1. 移除特定的參數
+		params.delete('lineUserIdBoundAlready');
+		        
+		// 2. 建立新的 URL
+		const newUrl = window.location.pathname + '?' + params.toString();
+		        
+		// 3. 使用 history.replaceState() 更新 URL
+		// 這樣就不會留下瀏覽歷史記錄，也不會重新載入頁面
+		window.history.replaceState({}, document.title, newUrl);
+	}
 	
 	
 	

@@ -23,9 +23,13 @@ import com.eventra.exhibition.model.ExhibitionLineBotCarouselDTO;
 import com.eventra.exhibition.model.ExhibitionServiceImpl;
 import com.eventra.linebot.util.LineBotFlexBuilder;
 import com.eventra.member.model.MemberService;
+import com.eventra.order.model.OrderLineBotCarouselDTO;
+import com.eventra.order.model.OrderService;
+import com.eventra.order.model.OrderStatus;
+import com.eventra.order_item.model.OrderItemLineBotCarouselDTO;
+import com.eventra.order_item.model.OrderItemService;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.util.JsonCodec;
 
@@ -39,11 +43,14 @@ public class LineBotWebhookService {
 		// 有多個 private replyWithXxx() 方法，對應不同訊息格式
 	// 3. 最後統一由 sendReply() 發出
 
+	private static final Integer SIZE = 5;
     private final String CHANNEL_SECRET;
     private final String CHANNEL_ACCESS_TOKEN;
     private final JsonCodec JSON_CODEC; 
     private final ExhibitionServiceImpl EXHIBITION_SERVICE;
     private final MemberService MEMBER_SERVICE;
+    private final OrderService ORDER_SERVICE;
+    private final OrderItemService ORDER_ITEM_SERVICE;
 
     private final ObjectMapper om = new ObjectMapper();
     private final HttpClient http = HttpClient.newHttpClient();
@@ -54,12 +61,16 @@ public class LineBotWebhookService {
             @Value("${line.channel.access-token}") String channelAccessToken,
             ExhibitionServiceImpl exhibitionService,
             MemberService memberService,
+            OrderService orderService,
+            OrderItemService orderItemService,
             JsonCodec jsonCodec) {
         this.CHANNEL_SECRET = channelSecret;
         this.CHANNEL_ACCESS_TOKEN = channelAccessToken;
         this.JSON_CODEC = jsonCodec;
         this.EXHIBITION_SERVICE = exhibitionService;
         this.MEMBER_SERVICE = memberService;
+        this.ORDER_SERVICE = orderService;
+        this.ORDER_ITEM_SERVICE = orderItemService;
     }
 
     /* ========== 1st part: webhook 入口，主方法 ========== */
@@ -103,6 +114,14 @@ public class LineBotWebhookService {
     }
     
     /* ========== 2nd part: Event Handlers 根據訊息格式的分流 ========== */
+    private void handleFollowEvent(JsonNode event) throws Exception {
+        String replyToken = event.path("replyToken").asText();
+//        replyWithText(replyToken, "感謝加入好友！輸入『查展覽』開始體驗。");
+        try { Thread.sleep(100); }
+        catch (InterruptedException e) { System.out.println(e.toString()); }
+        replyWithQuickReplyBindAccount(replyToken, "💡小提示：建議先完成 eventra 會員綁定以便使用完整查詢功能");
+    }
+    
     private void handleMessageEvent(JsonNode event) throws Exception {
         String replyToken = event.path("replyToken").asText();
         // text, image, sticker -> 只處理 text (其他的要拿 id 去 messaging api 抓實際圖片檔
@@ -110,10 +129,10 @@ public class LineBotWebhookService {
         System.out.println(userText);
 
         // 簡單分支：文字指令
-        if ("查展覽".equals(userText)) {
-            replyWithText(replyToken, "這裡會接你的展覽查詢 API 回應");
+        if ("如何綁定 LINE 帳號？".equals(userText)) {
+        	replyWithQuickReplyBindAccount(replyToken, "您好，請點擊以下按鈕綁定 Eventra 會員！");
         } else if ("推薦展覽有哪些？".equals(userText)) {
-        	replyWithQuickReplyExhibition(replyToken, "您好，今天想要找「熱門展覽」還是「最新展覽」呢？");
+        	replyWithQuickReplyExhibition(replyToken, "您好，今天想要找「熱門展覽」、「即將開展的展覽」還是「最新展覽」呢？");
         } else if ("離我最近的展覽有哪些？".equals(userText)) {
             replyWithQuickReplyLocation(replyToken, "請分享您的位置，我將為您尋找最近的店家。");
         } else if ("查詢我的訂單！".equals(userText)){
@@ -124,19 +143,13 @@ public class LineBotWebhookService {
         		replyWithQuickReplyMyOrder(replyToken, "您想查詢哪種訂單狀態的訂單明細呢？（💡小提示：查詢已付款訂單之明細可以領取 QR Code 哦！）");
         	// 1-2. 無
         	} else {
-        		replyWithQuickReply(replyToken, "您尚未將此 LINE 帳號綁定至 eventra 會員哦！");
+        		replyWithQuickReplyBindAccount(replyToken, "您尚未將此 LINE 帳號綁定至 Eventra 會員哦！");
         	}
         } else {
-        	replyWithQuickReply2(replyToken, "歡迎來到 Eventra！請選擇：");
+        	replyWithQuickReplyDefault(replyToken, "歡迎來到 Eventra！請從以下按鈕選擇指示！");
         }
         // reply 方法預計使用
         // 1. quick reply (text, template, flex) -> Quick Reply = 一個文字訊息底下，帶一排「可點選的按鈕（items）」
-    }
-
-    private void handleFollowEvent(JsonNode event) throws Exception {
-        String replyToken = event.path("replyToken").asText();
-//        replyWithText(replyToken, "感謝加入好友！輸入『查展覽』開始體驗。");
-        replyWithQuickReply(replyToken, "感謝加入好友！請先完成會員綁定以便使用完整查詢功能");
     }
 
     private void handlePostbackEvent(JsonNode event) throws Exception {
@@ -150,13 +163,17 @@ public class LineBotWebhookService {
     			.collect(Collectors.toMap(a -> a[0], a -> a[1]));
     	
     	String action = params.get("action");
-    	String type = params.get("type");
-    	Integer page = Integer.valueOf(params.get("page"));
     	
-    	System.out.println("action=" + action + ", type=" + type + ", page=" + page);
-    	
+    	/* ========== 1st part ========== */
     	// "推薦展覽有哪些？" -> quick reply -> 點擊 quick reply -> 此處處理！
     	if ("search_exhibition".equals(action)) {
+    		
+        	String type = params.get("type");
+        	Integer page = Integer.valueOf(params.get("page"));
+        	System.out.println("search_exhibition ---> action=" + action + ", type=" + type + ", page=" + page);
+
+        	String json = null;
+        	
             if ("hot".equals(type)) {
                 // 呼叫熱門展覽 service
 //            	List<ExhibitionLineBotCarouselDTO> hotList = EXHIBITION_SERVICE.findHotExhibitionsForLineBot();
@@ -166,9 +183,9 @@ public class LineBotWebhookService {
 //            	sendReply(carouselJson);
             }  else if ("upcoming".equals(type)) {
                 // 呼叫最新展覽 service
-            	Slice<ExhibitionLineBotCarouselDTO> upcomingList = EXHIBITION_SERVICE.findUpcomingExhibitionsForLineBot(page, 5);
-            	ObjectNode carousel = FLEX_BUILDER.buildCarousel(upcomingList.getContent(), upcomingList.hasNext(), action, type, page + 1);
-            	replyWithCarousel(replyToken, carousel);
+            	Slice<ExhibitionLineBotCarouselDTO> upcomingList = EXHIBITION_SERVICE.findUpcomingExhibitionsForLineBot(page, SIZE);
+            	ObjectNode carousel = FLEX_BUILDER.buildExhibitionCarousel(upcomingList.getContent(), upcomingList.hasNext(), action, type, page + 1);
+            	json = FLEX_BUILDER.wrapFlexReply(replyToken, carousel);
             }
             else if ("new".equals(type)) {
                 // 呼叫最新展覽 service
@@ -178,8 +195,46 @@ public class LineBotWebhookService {
 //            	// 處理 page
 //            	sendReply(carouselJson);
             }
+            sendReply(json);
+    	}
+
+    	/* ========== 2nd part ========== */
+    	else if ("search_order".equals(action)) {
+        	String type = params.get("type");
+        	Integer page = Integer.valueOf(params.get("page"));
+        	System.out.println("search_order ---> action=" + action + ", type=" + type + ", page=" + page);
+    		String lineUserId = event.path("source").path("userId").asText();
+    		
+    		OrderStatus orderStatus = switch (type) {
+    			case "1" -> OrderStatus.已付款;
+    			case "2" -> OrderStatus.付款中;
+    			case "3" -> OrderStatus.付款失敗;
+    			case "4" -> OrderStatus.付款逾時;
+    			case "5" -> OrderStatus.已退款;
+    			default -> OrderStatus.已付款; // 必須有
+    		};
+    		
+    		Slice<OrderLineBotCarouselDTO> orders = ORDER_SERVICE.findOrdersByLineUserId(lineUserId, orderStatus, page, SIZE);
+    		
+    		ObjectNode carousel = FLEX_BUILDER.buildOrderCarousel(orders.getContent(), orders.hasNext(), action, type, page + 1);
+        	String json = FLEX_BUILDER.wrapFlexReply(replyToken, carousel);
+        	sendReply(json);
     	}
     	
+    	/* ========== 3rd part ========== */
+    	// action=get_ticket_qr&orderId=" + o.getOrderUlid() + "&page=0");
+    	else if ("get_ticket_qr".equals(action)) {
+    		String orderUlid = params.get("orderUlid");
+        	Integer page = Integer.valueOf(params.get("page"));
+        	System.out.println("search_order ---> action=" + action + ", orderUlid=" + orderUlid + ", page=" + page);
+        	String lineUserId = event.path("source").path("userId").asText();
+        	
+        	Slice<OrderItemLineBotCarouselDTO> orderItems = ORDER_ITEM_SERVICE.findOrderItemsByLineUserId(lineUserId, orderUlid, OrderStatus.已付款, page, SIZE);
+        	ObjectNode carousel = FLEX_BUILDER.buildOrderItemCarousel(orderItems.getContent(), orderItems.hasNext(), action, orderUlid, page + 1);
+        	String json = FLEX_BUILDER.wrapFlexReply(replyToken, carousel);
+        	System.out.println(json.toString());
+        	sendReply(json);
+    	}
     }
 
     // ========== Replies: 常見 ==========
@@ -191,32 +246,15 @@ public class LineBotWebhookService {
     	// Image carousel template
     // 7. Flex Message
     
-    private void replyWithCarousel(String replyToken, ObjectNode carousel) throws Exception{
-    	ObjectNode flexMessage = om.createObjectNode();
-    	flexMessage.put("type", "flex");
-    	flexMessage.put("altText", "展覽清單"); // 使用者手機上通知文字
-    	flexMessage.set("contents", carousel);
-
-    	ArrayNode messages = om.createArrayNode();
-    	messages.add(flexMessage);
-
-    	ObjectNode payload = om.createObjectNode();
-    	payload.put("replyToken", replyToken);
-    	payload.set("messages", messages);
-
-    	String payloadJson = JSON_CODEC.write(payload);
-    	sendReply(payloadJson);
-    }
-    
-    private void replyWithText(String replyToken, String text) throws Exception {
-        String json = """
-        {
-          "replyToken": "%s",
-          "messages": [{ "type": "text", "text": "%s" }]
-        }
-        """.formatted(replyToken, text);
-        sendReply(json);
-    }
+//    private void replyWithText(String replyToken, String text) throws Exception {
+//        String json = """
+//        {
+//          "replyToken": "%s",
+//          "messages": [{ "type": "text", "text": "%s" }]
+//        }
+//        """.formatted(replyToken, text);
+//        sendReply(json);
+//    }
 
     private void replyWithQuickReplyExhibition(String replyToken, String text) throws Exception {
     	// postback -> 傳送隱藏 data 給 webhook -> {"type": "postback", "label": "我要付款", "data": "action=pay&itemid=123"}
@@ -228,9 +266,9 @@ public class LineBotWebhookService {
             "text": "%s",
             "quickReply": {
               "items": [
-                { "type": "action", "action": { "type": "postback", "label": "找熱門展覽", "data": "action=search_exhibition&type=hot&page=0" } },
-                { "type": "action", "action": { "type": "postback", "label": "找即將開展的展覽", "data": "action=search_exhibition&type=upcoming&page=0" } },
-                { "type": "action", "action": { "type": "postback", "label": "找最新展覽", "data": "action=search_exhibition&type=new&page=0" } }
+                { "type": "action", "action": { "type": "postback", "label": "熱門展覽", "data": "action=search_exhibition&type=hot&page=0" } },
+                { "type": "action", "action": { "type": "postback", "label": "即將開展的展覽", "data": "action=search_exhibition&type=upcoming&page=0" } },
+                { "type": "action", "action": { "type": "postback", "label": "最新展覽", "data": "action=search_exhibition&type=new&page=0" } }
               ]
             }
           }]
@@ -286,14 +324,7 @@ public class LineBotWebhookService {
         sendReply(json);
     }
     
-    private void replyWithQuickReply2(String replyToken, String text) throws Exception {
-    	// action.type
-    		// uri -> 直接打開網址 -> {"type": "uri", "label": "前往網站", "uri": "https://example.com"}
-    		// message -> 送文字給 bot -> {"type": "message", "label": "查詢訂單", "text": "我要查訂單"} 
-    		// postback -> 傳送隱藏 data 給 webhook -> {"type": "postback", "label": "我要付款", "data": "action=pay&itemid=123"}
-    		// location -> 打開地圖選擇位置 -> { "type": "location", "label": "傳送位置" }
-    	// action.label -> 按鈕顯示，1~20 字
-    	// action.text -> 使用者按下去後，LINE 會送出這段訊息來給 bot(webhook) -> 用 handleMessageEvent 分流去接
+    private void replyWithQuickReplyDefault(String replyToken, String text) throws Exception {
         String json = """
         {
           "replyToken": "%s",
@@ -302,9 +333,10 @@ public class LineBotWebhookService {
             "text": "%s",
             "quickReply": {
               "items": [
-        		{ "type": "action", "action": { "type": "uri", "label": "立即至會員中心綁定此 LINE 帳號", "uri": "http://localhost:8088/front-end/admin" } },
-                { "type": "action", "action": { "type": "message", "label": "熱門展覽有哪些？", "text": "查展覽" } },
-                { "type": "action", "action": { "type": "message", "label": "最新展覽有哪些？", "text": "我的訂單" } }
+        		{ "type": "action", "action": { "type": "message", "label": "如何綁定 LINE 帳號？", "text": "如何綁定 LINE 帳號？" } },
+                { "type": "action", "action": { "type": "message", "label": "推薦展覽有哪些？", "text": "推薦展覽有哪些？" } },
+                { "type": "action", "action": { "type": "message", "label": "離我最近的展覽有哪些？", "text": "離我最近的展覽有哪些？" } },
+                { "type": "action", "action": { "type": "message", "label": "查詢我的訂單！", "text": "查詢我的訂單！" } }
               ]
             }
           }]
@@ -313,7 +345,7 @@ public class LineBotWebhookService {
         sendReply(json);
     }
 
-    private void replyWithQuickReply(String replyToken, String text) throws Exception {
+    private void replyWithQuickReplyBindAccount(String replyToken, String text) throws Exception {
     	String json = """
 		        {
 		          "replyToken": "%s",
@@ -339,7 +371,7 @@ public class LineBotWebhookService {
                 .header("Authorization", "Bearer " + CHANNEL_ACCESS_TOKEN)
                 .POST(HttpRequest.BodyPublishers.ofString(json))
                 .build();
-        http.send(req, HttpResponse.BodyHandlers.discarding());
+        http.send(req, HttpResponse.BodyHandlers.ofString());
     }
     
     // ========== 驗簽 ==========
