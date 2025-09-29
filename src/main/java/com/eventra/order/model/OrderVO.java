@@ -34,6 +34,10 @@ public class OrderVO implements Serializable{
 	@Column(name ="order_ulid", nullable = false)
 	private String orderUlid;
 	
+	@Enumerated(EnumType.STRING)
+	@Column(name = "order_provider")
+	private OrderProvider orderProvider;
+	
 	@JsonIgnore
 	@OneToMany(mappedBy="order")
 	private Set<OrderItemVO> orderItems;
@@ -76,6 +80,12 @@ public class OrderVO implements Serializable{
 	}
 	public void setOrderId(Integer orderId) {
 		this.orderId = orderId;
+	}
+	public OrderProvider getOrderProvider() {
+		return orderProvider;
+	}
+	public void setOrderProvider(OrderProvider orderProvider) {
+		this.orderProvider = orderProvider;
 	}
 	public OrderStatus getOrderStatus() {
 		return orderStatus;
@@ -152,6 +162,7 @@ public class OrderVO implements Serializable{
 
 	   public static class Builder {
 	        private String orderUlid;
+	        private OrderProvider orderProvider; 
 	        private OrderStatus orderStatus;
 	        private MemberVO member;
 	        private Integer totalAmount;
@@ -159,6 +170,10 @@ public class OrderVO implements Serializable{
 
 	        public Builder orderUlid(String orderUlid) {
 	            this.orderUlid = orderUlid;
+	            return this;
+	        }
+	        public Builder orderProvider(OrderProvider orderProvider) {
+	            this.orderProvider = orderProvider;
 	            return this;
 	        }
 	        public Builder orderStatus(OrderStatus orderStatus) {
@@ -181,6 +196,7 @@ public class OrderVO implements Serializable{
 	        public OrderVO build() {
 	            OrderVO order = new OrderVO();
 	            order.setOrderUlid(this.orderUlid);
+	            order.setOrderProvider(this.orderProvider);
 	            order.setOrderStatus(this.orderStatus);
 	            order.setMember(this.member);
 	            order.setTotalAmount(this.totalAmount);

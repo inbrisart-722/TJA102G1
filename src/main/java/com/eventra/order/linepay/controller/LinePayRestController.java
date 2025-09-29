@@ -22,6 +22,16 @@ public class LinePayRestController {
 		this.LINE_PAY_SVC = linePayService;
 	}
 	
+	
+	@PostMapping("/protected/linepay/resending-payment-request")
+	public ResponseEntity<LinePaySendingResDTO> resendingPaymentRequest(@RequestBody String orderUlid, Principal principal){
+		Integer memberId = principal != null ? Integer.valueOf(principal.getName()) : null;
+		System.out.println("LinePay Resending: " + memberId + "!!!!!!!!!!");
+		// 有需要判斷 memberId 不吻合不給送？
+		
+		return ResponseEntity.ok(LINE_PAY_SVC.resendPaymentRequest(orderUlid));
+	}
+	
 	@PostMapping("/protected/linepay/payment-request")
 	public ResponseEntity<LinePaySendingResDTO> paymentRequest(@RequestBody LinePaySendingReqDTO req, Principal principal){
 		

@@ -37,6 +37,9 @@ public interface CommentRepository extends JpaRepository<CommentVO, Integer>{
 	@Query(value = "update CommentVO c set c.dislikeCount = c.dislikeCount + :delta where c.commentId = :cid")
 	Integer updateDislikeCount(@Param("cid") Integer commentId, @Param("delta") Integer delta);
 	
-	@Query(value = "select count(c) from CommentVO c where c.commentStatus = :cs and c.exhibition.exhibitionId = :eid")
+	@Query("select count(c) from CommentVO c " +
+		       "where c.exhibition.exhibitionId = :eid " +
+		       "and ( (c.parentComment is null and c.commentStatus = :cs) " +
+		       "   or (c.parentComment is not null and c.commentStatus = :cs and c.parentComment.commentStatus = :cs) )")
 	Long countByExhibitionId(@Param("cs") CommentStatus commentStatus, @Param("eid") Integer exhibitionId);
 }

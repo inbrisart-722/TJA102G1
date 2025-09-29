@@ -37,6 +37,17 @@ public class MemberService {
 		this.DEFAULT_PROFILE_PIC = defaultProfilePic;
 	}
 	
+	public Boolean checkIfLineUserIdBound(String lineUserId) {
+		if(MEMBER_REPO.findByLineUserId(lineUserId).orElse(null) == null)
+			return false;
+		else return true;
+	}
+	
+	public void setLineUserId(String lineUserId, Integer memberId) {
+		MemberVO member = MEMBER_REPO.findById(memberId).orElseThrow();
+		member.setLineUserId(lineUserId);
+	}
+	
 	public String getMyProfilePic(Integer memberId) {
 		MemberVO member = MEMBER_REPO.findById(memberId).orElse(null);
 		if(member == null) return DEFAULT_PROFILE_PIC;

@@ -1206,10 +1206,13 @@ document.addEventListener("DOMContentLoaded", function() {
 		console.log(originalRatingScore);
 
 		if (ratingScore === originalRatingScore) return;
+		
+		const params = new URLSearchParams(window.location.search);
+		const exhibitionId = params.get("exhibitionId");
 
 		csrfFetchToRedirect(
 			"/api/front-end/protected/rating/upsertRating?exhibitionId=" +
-			2 + // test
+			exhibitionId +
 			"&ratingScore=" +
 			ratingScore,
 			{
@@ -1249,7 +1252,9 @@ document.addEventListener("DOMContentLoaded", function() {
 	// 瀏覽器會打開一條 持續不關閉的 HTTP GET 請求。
 	// 伺服器（Spring）回應的 body 就是一個 不斷追加資料的文字流（text/event-stream）。
 	// 瀏覽器內建解析器會讀這個流，每當遇到 \n\n 就觸發一個 message 事件。
-	const eventSource = new EventSource("/api/sse/exhibition-ticket/subscribe")
+	const params = new URLSearchParams(window.location.search);
+	const exhibitionId = params.get("exhibitionId");
+	const eventSource = new EventSource("/api/sse/exhibition-ticket/subscribe/" + exhibitionId);
 
 	// 後端 -> emitter.send(SseEmitter.event().name("ticket-update").data(remaining));
 	eventSource.addEventListener("ticket-update", function(event) {

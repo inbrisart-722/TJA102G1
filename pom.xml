@@ -20,6 +20,22 @@
 	</properties>
 	<dependencies>
 		<!-- 柏燁 start -->
+		
+		<!-- 基本的 QR Code 生成與解析 API。-->
+		<!-- 如果只想產生 BitMatrix，用這個就行。-->
+		<dependency>
+			<groupId>com.google.zxing</groupId>
+			<artifactId>core</artifactId>
+			<version>3.5.1</version>
+		</dependency>
+
+		<!-- 提供額外的工具，例如 MatrixToImageWriter，能直接把 QR Code 畫成 PNG / JPG。-->
+		<!-- Demo 和實務上都很常用。-->
+		<dependency>
+			<groupId>com.google.zxing</groupId>
+			<artifactId>javase</artifactId>
+			<version>3.5.1</version>
+		</dependency>
 
 		<!-- Spring WebSocket -->
 		<!-- 原生 WebSocket endpoint -->
