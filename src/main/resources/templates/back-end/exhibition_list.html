@@ -103,7 +103,7 @@
 							<ul class="nav nav-treeview">
 								<li class="nav-item"><a
 									href="/back-end/exhibitor/order_list" class="nav-link"><p>訂單列表</p></a></li>
-								<li class="nav-item"><a href="#" class="nav-link"><p>銷售列表</p></a></li>
+								<!-- <li class="nav-item"><a href="#" class="nav-link"><p>銷售列表</p></a></li> -->
 							</ul></li>
 						<li class="nav-item menu-open"><a href="#" class="nav-link"><i
 								class="nav-icon bi bi-circle-fill"></i>
@@ -142,39 +142,53 @@
 
 			<div class="app-content">
 				<div class="container-fluid">
-					<div class="card">
-						<div class="card-header d-flex flex-wrap gap-2 align-items-center">
-							<div class="filter-chips btn-group" role="group"
-								aria-label="tabs">
-								<button type="button"
-									class="btn btn-outline-secondary btn-sm active" data-tab="all">All</button>
-								<button type="button" class="btn btn-outline-secondary btn-sm"
-									data-tab="draft">草稿</button>
-								<button type="button" class="btn btn-outline-secondary btn-sm"
-									data-status="尚未開賣">尚未開賣</button>
-								<button type="button" class="btn btn-outline-secondary btn-sm"
-									data-status="售票中">售票中</button>
-								<button type="button" class="btn btn-outline-secondary btn-sm"
-									data-status="已結束">已結束</button>
-							</div>
-							<div class="vr mx-1"></div>
-							<div class="dropdown">
-								<button class="btn btn-outline-secondary btn-sm dropdown-toggle"
-									data-bs-toggle="dropdown">審核狀態</button>
-								<ul class="dropdown-menu" id="auditMenu">
-									<li><a class="dropdown-item" data-audit="">全部</a></li>
-									<li><a class="dropdown-item" data-audit="待審核">待審核</a></li>
-									<li><a class="dropdown-item" data-audit="已通過">已通過</a></li>
-									<li><a class="dropdown-item" data-audit="未通過">未通過</a></li>
-								</ul>
-							</div>
-							<div class="ms-auto d-flex gap-2">
-								<div class="input-group input-group-sm" style="width: 240px;">
-									<span class="input-group-text"><i class="bi bi-search"></i></span>
-									<input type="text" class="form-control" id="q"
-										placeholder="搜尋展覽名稱…">
-								</div>
-							</div>
+				<div class="card">
+  					<div class="card-header d-flex flex-wrap gap-2 align-items-center">
+					<div class="filter-chips btn-group" role="group" aria-label="tabs">
+						  <a class="btn btn-outline-secondary btn-sm"
+						     th:classappend="${tab}=='all' ? ' active'"
+						     th:href="@{/back-end/exhibitor/exhibition_list(tab='all', page=0, size=${param.size} ?: 10, q=${q})}">
+						    All
+						  </a>
+						  <a class="btn btn-outline-secondary btn-sm"
+						     th:classappend="${tab}=='draft' ? ' active'"
+						     th:href="@{/back-end/exhibitor/exhibition_list(tab='draft', page=0, size=${param.size} ?: 10, q=${q})}">
+						    草稿
+						  </a>
+						  <a class="btn btn-outline-secondary btn-sm"
+						     th:classappend="${tab}=='not_on_sale' ? ' active'"
+						     th:href="@{/back-end/exhibitor/exhibition_list(tab='not_on_sale', page=0, size=${param.size} ?: 10, q=${q})}">
+						    尚未開賣
+						  </a>
+						  <a class="btn btn-outline-secondary btn-sm"
+						     th:classappend="${tab}=='on_sale' ? ' active'"
+						     th:href="@{/back-end/exhibitor/exhibition_list(tab='on_sale', page=0, size=${param.size} ?: 10, q=${q})}">
+						    售票中
+						  </a>
+						  <a class="btn btn-outline-secondary btn-sm"
+						     th:classappend="${tab}=='ended' ? ' active'"
+						     th:href="@{/back-end/exhibitor/exhibition_list(tab='ended', page=0, size=${param.size} ?: 10, q=${q})}">
+						    已結束
+						  </a>
+					</div>
+						<div class="vr mx-1"></div> 
+						<div class="dropdown"> <button class="btn btn-outline-secondary btn-sm dropdown-toggle" data-bs-toggle="dropdown">審核狀態</button> 
+						<ul class="dropdown-menu" id="auditMenu"> <li><a class="dropdown-item" data-audit="">全部</a></li> <li><a class="dropdown-item" data-audit="待審核">待審核</a></li> 
+						<li><a class="dropdown-item" data-audit="已通過">已通過</a></li> 
+						<li><a class="dropdown-item" data-audit="未通過">未通過</a></li> 
+						</ul>
+						 </div>
+						 <form th:action="@{/back-end/exhibitor/exhibition_list}" method="get" class="ms-auto d-flex gap-2">
+						   <!-- 保留目前的分頁/分頁大小/目前的tab -->
+						   <input type="hidden" name="tab" th:value="${tab}">
+						   <input type="hidden" name="page" value="0"><!-- 搜尋時回到第一頁 -->
+						   <input type="hidden" name="size" th:value="${param.size} ?: 10">
+						
+						   <div class="input-group input-group-sm" style="width: 240px;">
+						     <span class="input-group-text"><i class="bi bi-search"></i></span>
+						     <input type="text" class="form-control" name="q" th:value="${q}" placeholder="搜尋展覽名稱…">
+						   </div>
+						 </form>
 						</div>
 
 						<div class="card-body p-0 tableFixHead">
@@ -200,7 +214,7 @@
 											th:text="${#temporals.format(ex.endTime, 'yyyy/MM/dd HH:mm')}"></span>
 										</td>
 										<td><span class="status-pill"
-											th:text="${ex.exhibitionStatus.exhibitionStatus}">1</span></td>
+											th:text="${ex.saleStatus}">尚未開賣</span></td>
 										<td th:text="${ex.totalTicketQuantity}">0</td>
 										<td class="text-end">
 											<!-- 編輯模式 --> 
@@ -221,7 +235,7 @@
 						</div>
 
 						<div
-							class="card-footer d-flex justify-content-between align-items-center">
+							class="card-footer d-flex flex-column align-items-center">
 
 							<!-- 左邊顯示分頁資訊 -->
 							<small class="text-secondary"> 第 <span
@@ -232,12 +246,12 @@
 
 							<!-- 右邊顯示分頁按鈕 -->
 							<nav>
-								<ul class="pagination pagination-sm mb-0">
+								<ul class="pagination pagination-sm mb-0 justify-content-center">
 									<!-- 上一頁 -->
 									<li class="page-item"
 										th:classappend="${currentPage == 0} ? 'disabled'"><a
 										class="page-link"
-										th:href="@{/back-end/exhibitor/exhibition_list(page=${currentPage - 1}, size=${10})}">«</a>
+										th:href="@{/back-end/exhibitor/exhibition_list(tab=${tab}, q=${q},page=${currentPage - 1}, size=${10}, q=${q})}">«</a>
 									</li>
 
 									<!-- 頁碼 -->
@@ -245,14 +259,14 @@
 										th:each="i : ${#numbers.sequence(0, totalPages - 1)}"
 										th:classappend="${i == currentPage} ? 'active'"><a
 										class="page-link"
-										th:href="@{/back-end/exhibitor/exhibition_list(page=${i}, size=${10})}"
+										th:href="@{/back-end/exhibitor/exhibition_list(tab=${tab}, q=${q},page=${i}, size=${10}, q=${q})}"
 										th:text="${i + 1}"></a></li>
 
 									<!-- 下一頁 -->
 									<li class="page-item"
 										th:classappend="${currentPage == totalPages - 1} ? 'disabled'">
 										<a class="page-link"
-										th:href="@{/back-end/exhibitor/exhibition_list(page=${currentPage + 1}, size=${10})}">»</a>
+										th:href="@{/back-end/exhibitor/exhibition_list(tab=${tab}, q=${q},page=${currentPage + 1}, size=${10}, q=${q})}">»</a>
 									</li>
 								</ul>
 							</nav>

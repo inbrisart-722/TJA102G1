@@ -17,6 +17,8 @@ public class ExhibitionCreateDTO {
 	
 	private Integer exhibitionId;
 	
+	private Boolean draft;
+	
 	private String ticketJson;
 	
 	/**
@@ -67,6 +69,14 @@ public class ExhibitionCreateDTO {
 
 	public void setExhibitionId(Integer exhibitionId) {
 		this.exhibitionId = exhibitionId;
+	}
+	
+	public Boolean getDraft() {
+		return draft;
+	}
+
+	public void setDraft(Boolean draft) {
+		this.draft = draft;
 	}
 
 	public String getTicketJson() {

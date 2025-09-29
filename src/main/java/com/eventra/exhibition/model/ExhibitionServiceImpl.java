@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Comparator;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -29,7 +30,11 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.eventra.comment.controller.CommentStatus;
 import com.eventra.comment.model.CommentRepository;
+
+import com.eventra.exhibitionstatus.model.ExhibitionStatusVO;
+
 import com.eventra.eventnotification.model.EventNotificationService.NotificationType;
+
 import com.eventra.exhibitiontickettype.model.ExhibitionTicketTypeRepository;
 import com.eventra.exhibitiontickettype.model.ExhibitionTicketTypeVO;
 import com.eventra.exhibitor.backend.controller.dto.ExhibitionCreateDTO;
@@ -50,9 +55,12 @@ public class ExhibitionServiceImpl implements ExhibitionService {
 	private final ExhibitionRepository repository;
 	private final ExhibitionTicketTypeRepository exhibitionTicketTypeRepository;
 	private final TicketTypeRepository ticketTypeRepository;
+	private final CommentRepository commentRepository;
 	private record TicketJsonItem(String name, Integer price) {
 	}
 	
+
+
 	private final CommentRepository commentRepository;
 	
 	// peichenlu: 收藏展覽通知(event notification) 需要
@@ -60,8 +68,10 @@ public class ExhibitionServiceImpl implements ExhibitionService {
 
 	@PersistenceContext
 	private EntityManager entityManager;
+	private String DEFAULT_PHOTO_LANDSCAPE;
 	
 	private static final int DEFAULT_STATUS_ID = 1;
+	private static final int DRAFT_STATUS_ID = 6;
 	private final String DEFAULT_PHOTO_LANDSCAPE;
 
 	@Autowired
@@ -87,12 +97,17 @@ public class ExhibitionServiceImpl implements ExhibitionService {
 		// 1) 將 DTO 資料轉換成 Entity(VO)
 		ExhibitionVO exhibitionVO = ExhibitionMapper.toVO(dto);
 
-		
+		// 若是草稿 -> 草稿id，否則預設
+		if(Boolean.TRUE.equals(dto.getDraft())) {
+			exhibitionVO.setExhibitionStatusId(DRAFT_STATUS_ID);
+		}else if(exhibitionVO.getExhibitionStatusId() == null) {
+			exhibitionVO.setExhibitionStatusId(DEFAULT_STATUS_ID);
+		}
 		
 //	    exhibitionVO.setExhibitionStatus(entityManager.getReference(ExhibitionStatusVO.class, 1));
 		
 		if (exhibitionVO.getExhibitionStatusId() == null) {
-	        exhibitionVO.setExhibitionStatusId(DEFAULT_STATUS_ID); // <— 加在這裡
+	        exhibitionVO.setExhibitionStatusId(DEFAULT_STATUS_ID); 
 	    }
 
 		exhibitionVO.setExhibitorVO(entityManager.getReference(ExhibitorVO.class, exhibitorId));
@@ -186,10 +201,10 @@ public class ExhibitionServiceImpl implements ExhibitionService {
         }
 	}
 	
-	// 實作展覽查詢方法
-	public List<ExhibitionVO> getAllExhibitions(){
-			return repository.findAll();
-	}
+//	// 實作展覽查詢方法
+//	public List<ExhibitionVO> getAllExhibitions(){
+//			return repository.findAll();
+//	}
 		
 	// 分頁查詢
 	public Page<ExhibitionVO> getExhibitionsPage(int page, int size){
@@ -255,15 +270,20 @@ public class ExhibitionServiceImpl implements ExhibitionService {
 	    }
 	    // 同上，改成landscape
 	    MultipartFile landscape = dto.getPhotoLandscape(); 
-	    if(portrait != null && !portrait.isEmpty()) {  
-	    	String filename = "p_" + UUID.randomUUID() + "_" + portrait.getOriginalFilename();
+	    if(landscape != null && !landscape.isEmpty()) {  
+	    	String filename = "l_" + UUID.randomUUID() + "_" + landscape.getOriginalFilename();
 	    	try {
-	    		portrait.transferTo(baseDir.resolve(filename)); 
-	    		vo.setPhotoPortrait("uploads/exhibitions/" + id + "/" + filename); // 在資料庫欄位存相對路徑，供前端顯示用
+	    		landscape.transferTo(baseDir.resolve(filename)); 
+	    		vo.setPhotoLandscape("uploads/exhibitions/" + id + "/" + filename); // 在資料庫欄位存相對路徑，供前端顯示用
 	    	}catch(IOException e) {
-	    		throw new RuntimeException("存portrait失敗", e);
+	    		throw new RuntimeException("存landscape失敗", e);
 	    	}
 	    }
+	    
+	    // 按儲存為草稿按鈕後變更展覽狀態為草稿
+	    if (Boolean.TRUE.equals(dto.getDraft())) {
+            vo.setExhibitionStatusId(DRAFT_STATUS_ID);
+        }
 	    // 4)
 	    repository.save(vo); // 儲存展覽本體，把剛剛更新的圖片路徑寫回資料庫
 	    
@@ -276,7 +296,7 @@ public class ExhibitionServiceImpl implements ExhibitionService {
 	    Map<String, Integer> incomingByName = new LinkedHashMap<>(); // 用名稱作key，LinkedHashMap保留順序
 	    for(TicketJsonItem it : items) {
 	    	String name = (it.name() == null ? "" : it.name().trim()); // 取出名稱並去頭尾空白，null視為空字串
-	    	if(name.isEmpty() || it.price == null) { // 名稱空或價格為空的資料忽略
+	    	if(name.isEmpty() || it.price() == null) { // 名稱空或價格為空的資料忽略
 	    		continue;
 	    	}
 	    	incomingByName.put(name, it.price());
@@ -398,6 +418,36 @@ public class ExhibitionServiceImpl implements ExhibitionService {
 		
 		return dto;
 	}
+
+	private Pageable defaultPageable(int page, int size) {
+	    return PageRequest.of(page, size, Sort.by("startTime").descending());
+	}
+
+	@Override
+	public Page<ExhibitionVO> findAll(Integer exhibitorId, int page, int size, String q) {
+		return repository.findByExhibitorVO_ExhibitorIdAndExhibitionNameContainingIgnoreCase(exhibitorId, (q == null ? "" : q), defaultPageable(page, size));
+	}
+
+	@Override
+	public Page<ExhibitionVO> findDrafts(Integer exhibitorId, Integer draftStatusId, int page, int size, String q) {
+		return repository.findDrafts(exhibitorId, (draftStatusId != null ? draftStatusId : DRAFT_STATUS_ID), (q == null ? "" : q), defaultPageable(page, size));
+	}
+
+	@Override
+	public Page<ExhibitionVO> findNotOnSale(Integer exhibitorId, int page, int size, String q) {
+		return repository.findNotOnSale(exhibitorId, DRAFT_STATUS_ID, (q == null ? "" : q), defaultPageable(page, size));
+	}
+
+	@Override
+	public Page<ExhibitionVO> findOnSale(Integer exhibitorId, int page, int size, String q) {
+		return repository.findOnSale(exhibitorId, DRAFT_STATUS_ID, (q == null ? "" : q), defaultPageable(page, size));
+	}
+
+	@Override
+	public Page<ExhibitionVO> findEnded(Integer exhibitorId, int page, int size, String q) {
+		return repository.findEnded(exhibitorId, DRAFT_STATUS_ID, (q == null ? "" : q), defaultPageable(page, size));
+	}
+
 	
 	public List<ExhibitionLineBotCarouselDTO> findHotExhibitionsForLineBot(){
 		return null;

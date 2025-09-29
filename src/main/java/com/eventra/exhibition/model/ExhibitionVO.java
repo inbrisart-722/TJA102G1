@@ -26,6 +26,7 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
+import jakarta.persistence.Transient;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.PositiveOrZero;
@@ -290,6 +291,28 @@ public class ExhibitionVO {
 
 	public void setAverageRatingScore(Double averageRatingScore) {
 		this.averageRatingScore = averageRatingScore;
+	}
+	
+	@Transient
+	public String getSaleStatus() {
+		if(this.getExhibitionStatusId() != null && this.getExhibitionStatusId() == 6) {
+			return "草稿";
+		}
+		
+		LocalDateTime now = LocalDateTime.now();
+		LocalDateTime start = this.getTicketStartTime(); // 開賣時間
+		LocalDateTime end = this.getEndTime(); // 結束時間
+		
+		if(start != null && start.isBefore(now) && (end == null || end.isAfter(now))) {
+			return "售票中";
+		}
+		if(start != null && start.isAfter(now)) {
+			return "尚未開賣";
+		}
+		if(end != null && end.isBefore(now)) {
+			return "已結束";
+		}
+		return "尚未開賣";
 	}
 }
 
