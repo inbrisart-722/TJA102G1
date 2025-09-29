@@ -52,7 +52,7 @@
 
 	<!-- 1400*470px 背景圖區 -->
 	<section class="parallax-window" data-parallax="scroll"
-		data-image-src="img/0_exhibition/banner.jpg" data-natural-width="1400"
+		data-image-src="img/0_exhibition/exhibitor_home.jpg" data-natural-width="1400"
 		data-natural-height="470">
 		<div class="parallax-content-1 opacity-mask"
 			data-opacity-mask="rgba(0, 0, 0, 0.6)">
@@ -68,49 +68,8 @@
 					<h3>全部展覽</h3>
 					<!-- 展覽卡片 -->
 					<div>
-						<!-- 1 -->
-						<div class="strip_all_tour_list">
-							<a href="single_tour.html">
-								<div class="row">
-									<div class="col-lg-4 col-md-4 position-relative">
-										<div class="img_list">
-											<img src="img/0_exhibition/ChatGPT_exhibition_1.png"
-												alt="Image">
-										</div>
-									</div>
-									<div class="col-lg-6 col-md-6">
-										<div class="tour_list_desc">
-											<div>
-												<h3>感官解放：藝術的另一種語言</h3>
-												<p>
-													<span class="start_time">2025/08/01</span> ~ <span
-														class="end_time">2025/08/01</span>
-												</p>
-												<p>
-													<span class="location">台北市中山區南京東路三段219號4樓</span>
-												</p>
-												<p>
-													<span class="rating"> <i class="icon-star voted "></i>
-														<i class="icon-star voted"></i> <i
-														class="icon-star-half-alt voted"></i> <i
-														class="icon-star-empty"></i> <i class="icon-star-empty"></i>
-													</span>(22)
-												</p>
-											</div>
-										</div>
-									</div>
-									<div class="col-lg-2 col-md-2">
-										<div class="price_list">
-											<div>
-												<span class="currency">$</span>2,000 - 2,500
-											</div>
-										</div>
-
-									</div>
-								</div>
-							</a>
-						</div>
-
+						<!-- 由 g1_6_exhibitions_exhibitor_homePage.js 帶入 -->
+						
 						<!-- 分頁區 -->
 						<nav aria-label="Page navigation">
 							<ul class="pagination justify-content-center">
@@ -128,23 +87,22 @@
 								</a></li>
 							</ul>
 						</nav>
+						
 					</div>
 				</div>
 
-				<!-- 展商資訊區 -->
+				<!-- 展商資訊區 Thymeleaf 帶入 -->
 				<aside class="col-lg-3">
 					<div class="recommend-sidebar sticky-sidebar">
 						<!-- 1: 公司名稱 -->
 						<div class="sidebar-block">
-							<h3 class="company-name">藝術展覽股份有限公司</h3>
+							<h3 class="company-name" th:text="${exhibitor.companyName}"></h3>
 						</div>
 
 						<!-- 2: 關於我們 -->
 						<div class="sidebar-block">
 							<h4>關於我們</h4>
-							<p class="text-muted">
-								國立臺灣交響樂團創立於民國34年，為臺灣歷史最悠久的交響樂團。101年5月改隸文化部。團址座落於臺中霧峰，有專屬音樂廳、大小排練室，是擁有完整軟硬體的全方位音樂團體。自創團以來，邀請國內外優秀音樂家參與演出，開啟國人欣賞古典音樂的風氣。108年起，國際知名音樂家水藍先生再度受邀擔任本團首席客席指揮，與歐陽慧剛團長共同合作，推動國立臺灣交響樂團「精進技藝、傳統創新、教育扎根、美學推廣」的任務，提昇全民音樂生活，讓音樂就如同空氣、水、陽光一般的在你我身邊。
-							</p>
+							<p class="text-muted" th:text="${exhibitor.about}"></p>
 						</div>
 
 						<!-- 3: 聯絡資訊 -->
@@ -152,16 +110,16 @@
 							<h4>聯絡資訊</h4>
 							<div class="contact-box">
 								<p>
-									<i class="icon-phone"></i> <span>04-2339-1141</span>
+									<i class="icon-phone"></i> <span th:text="${exhibitor.contactPhone}"></span>
 								</p>
 								<p>
-									<i class="icon-mail-alt"></i> <span>contact@yanyi.comcontact@yanyi.com</span>
+									<i class="icon-mail-alt"></i> <span th:text="${exhibitor.email}"></span>
 								</p>
 								<p>
-									<i class="icon-location-7"></i> <span>台中市霧峰區中正路738之2號台中市霧峰區中正路738之2號</span>
+									<i class="icon-location-7"></i> <span th:text="${exhibitor.companyAddress}"></span>
 								</p>
 								<p>
-									<a href="#" class="button_intro">官方網站</a>
+									<a th:href="${exhibitor.websiteUrl}" class="button_intro">官方網站</a>
 								</p>
 							</div>
 						</div>
@@ -247,6 +205,8 @@
 	<script src="js/g1_10_custom_common.js"></script>
 	<script src="js/g1_6_search_history.js"></script> <!-- 存搜尋紀錄用 -->
 	<script src="js/g1_6_search_modal.js"></script> <!-- 導頁至搜尋結果頁用 -->
+	<script src="js/g1_6_exhibitions_exhibitor_homePage.js"></script> <!-- 載入展覽用 -->
+	
 </body>
 
 </html>

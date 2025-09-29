@@ -1,4 +1,3 @@
-
 package com.eventra.exhibition.model;
 
 import java.io.IOException;
@@ -30,11 +29,13 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.eventra.comment.controller.CommentStatus;
 import com.eventra.comment.model.CommentRepository;
+import com.eventra.eventnotification.model.EventNotificationService.NotificationType;
 import com.eventra.exhibitiontickettype.model.ExhibitionTicketTypeRepository;
 import com.eventra.exhibitiontickettype.model.ExhibitionTicketTypeVO;
 import com.eventra.exhibitor.backend.controller.dto.ExhibitionCreateDTO;
 import com.eventra.exhibitor.model.ExhibitorDTO;
 import com.eventra.exhibitor.model.ExhibitorVO;
+import com.eventra.notificationpush.model.NotificationPushService;
 import com.eventra.tickettype.model.TicketTypeRepository;
 import com.eventra.tickettype.model.TicketTypeVO;
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -53,6 +54,9 @@ public class ExhibitionServiceImpl implements ExhibitionService {
 	}
 	
 	private final CommentRepository commentRepository;
+	
+	// peichenlu: 收藏展覽通知(event notification) 需要
+	private final NotificationPushService notificationPushService;
 
 	@PersistenceContext
 	private EntityManager entityManager;
@@ -61,12 +65,13 @@ public class ExhibitionServiceImpl implements ExhibitionService {
 	private final String DEFAULT_PHOTO_LANDSCAPE;
 
 	@Autowired
-	public ExhibitionServiceImpl(ExhibitionRepository repository, CommentRepository commentRepository, ExhibitionTicketTypeRepository exhibitionTicketTypeRepository, TicketTypeRepository ticketTypeRepository, @Value("${default.exhibition-photo-landscape}") String defaultPhotoLandscape) {
+	public ExhibitionServiceImpl(ExhibitionRepository repository, CommentRepository commentRepository, ExhibitionTicketTypeRepository exhibitionTicketTypeRepository, TicketTypeRepository ticketTypeRepository, @Value("${default.exhibition-photo-landscape}") String defaultPhotoLandscape, NotificationPushService notificationPushService) {
 		this.repository = repository;
 		this.exhibitionTicketTypeRepository = exhibitionTicketTypeRepository;
 		this.ticketTypeRepository = ticketTypeRepository;
 		this.commentRepository = commentRepository;
 		this.DEFAULT_PHOTO_LANDSCAPE = defaultPhotoLandscape;
+		this.notificationPushService = notificationPushService;
 	}
 
 	@Transactional
@@ -191,11 +196,6 @@ public class ExhibitionServiceImpl implements ExhibitionService {
 		Pageable pageable = PageRequest.of(page, size, Sort.by("startTime").descending());
 		return repository.findAll(pageable);
 	}
-	
-	
-//	/* 更新展覽時觸發通知用, 編輯展覽會呼叫此方法 */
-//	@Transactional
-	
 
 	// 查詢單筆
 	public ExhibitionVO findById(Integer id) {
@@ -217,6 +217,12 @@ public class ExhibitionServiceImpl implements ExhibitionService {
 	    // （可選）安全檢查：確認是此展商的展覽
 	    // if (!vo.getExhibitorVO().getExhibitorId().equals(exhibitorId)) throw new AccessDeniedException("無權限");
 
+	    // peichenlu: 展覽資訊判斷異動 (LOCATION_CHANGE / TIME_CHANGE)
+	    boolean locationChanged = dto.getLocation() != null && !dto.getLocation().equals(vo.getLocation());
+        boolean timeChanged =
+                (dto.getStartTime() != null && !dto.getStartTime().equals(vo.getStartTime())) ||
+                (dto.getEndTime() != null && !dto.getEndTime().equals(vo.getEndTime()));
+	    
 	    // 2) 更新基本欄位
 	    vo.setExhibitionName(dto.getExhibitionName());
 	    vo.setStartTime(dto.getStartTime());
@@ -316,6 +322,16 @@ public class ExhibitionServiceImpl implements ExhibitionService {
 	    		}
 	    	}
 	    }
+	    
+	    // peichenlu: 發送通知
+	    if (locationChanged) {
+	    	notificationPushService.sendExhibitionNotification(vo.getExhibitionId(), NotificationType.LOCATION_CHANGE);
+        }
+        if (timeChanged) {
+        	notificationPushService.sendExhibitionNotification(vo.getExhibitionId(), NotificationType.TIME_CHANGE);
+
+        }
+	    
 	}
 	// inbrisart 20250925 給展覽頁 SSR 帶入
 	/**

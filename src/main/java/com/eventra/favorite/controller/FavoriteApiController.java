@@ -46,36 +46,33 @@ public class FavoriteApiController {
 	// ========== 載入會員所有收藏清單(status = 1) ==========
 	@GetMapping("/list")
 	public List<FavoriteDTO> listFavorites() {
-		// 1. 從 SecurityContextHolder 拿登入id
+	    // 1. 從 SecurityContextHolder 拿登入id
 	    Integer memId = Integer.valueOf(SecurityContextHolder.getContext().getAuthentication().getName());
-	    
-		// 2. 取會員收藏清單 (只撈 favorite_status = 1的資料)
-	    List<FavoriteVO> voList = favSvc.findFavoritesByMember(memId);
-		
-		// 3. 建立 List 容器, 用來存放轉換好的 FavoriteDTO (第1層 集合)
-	    List<FavoriteDTO> dtoList = new ArrayList<>();
-	    
-		// 4. 用 for 迴圈把每筆 VO 轉成 DTO
-		for (FavoriteVO fav : voList) {
-			// (1) 預設展覽名稱= "查無展覽名稱"
-			String name = "查無展覽名稱";
-			
-			// (2) 用 exhibitionId 查 Exhibition 資料表, 若有找到就取出展覽名稱
-			Optional<ExhibitionVO> opt = exhRepo.findById(fav.getExhibitionId());
-	        if (opt.isPresent()) {
-	            name = opt.get().getExhibitionName();
-	        }
-            
-            // (3) 收藏狀態, 預設 false
-	        boolean status = (fav.getFavoriteStatus() != null && fav.getFavoriteStatus() == 1);
-            
-            // (5) 把 DTO 放進 List 容器
-            dtoList.add(new FavoriteDTO(fav.getExhibitionId(), name, status));
-        }
 
-		// 5. 回傳 DTO 清單, 會自動轉成 JSON 回傳前端
-        return dtoList; 
+	    // 2. 取會員收藏清單 (只撈 favorite_status = 1的資料，已 JOIN FETCH exhibition)
+	    List<FavoriteVO> voList = favSvc.findFavoritesByMember(memId);
+
+	    // 3. 建立 List 容器, 用來存放轉換好的 FavoriteDTO
+	    List<FavoriteDTO> dtoList = new ArrayList<>();
+
+	    // 4. 用 for 迴圈把每筆 VO 轉成 DTO
+	    for (FavoriteVO fav : voList) {
+	        // (1) 直接從關聯 exhibition 拿展覽名稱
+	        String name = (fav.getExhibition() != null) 
+	                        ? fav.getExhibition().getExhibitionName() 
+	                        : "查無展覽名稱";
+
+	        // (2) 收藏狀態
+	        boolean status = (fav.getFavoriteStatus() != null && fav.getFavoriteStatus() == 1);
+
+	        // (3) 建立 DTO
+	        dtoList.add(new FavoriteDTO(fav.getExhibitionId(), name, status));
+	    }
+
+	    // 5. 回傳 DTO 清單, 會自動轉成 JSON 回傳前端
+	    return dtoList; 
 	}
+
 
 	// ========== 檢查會員是否已收藏展覽(status = 1) ==========
 	@GetMapping("/check")

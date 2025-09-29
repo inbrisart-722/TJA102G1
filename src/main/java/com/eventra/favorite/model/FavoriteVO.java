@@ -22,32 +22,32 @@ public class FavoriteVO implements Serializable {
 	private static final long serialVersionUID = 1L;
 
 	@Id
-	@Column(name = "favorite_id", insertable = false)
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private Integer favoriteId;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "favorite_id")
+    private Integer favoriteId;
 
-	@Column(name ="member_id")
-	private Integer memberId;
-	
-	@ManyToOne(fetch = FetchType.LAZY) // 降低不必要載入
-	@JoinColumn(name = "member_id", referencedColumnName = "member_id", insertable=false, updatable=false)
-	private MemberVO member;
-	
-	@Column(name ="exhibition_id")
-	private Integer exhibitionId; 
-	
-	@ManyToOne(fetch = FetchType.LAZY) // 降低不必要載入
-	@JoinColumn(name = "exhibition_id", referencedColumnName = "exhibition_id", insertable=false, updatable=false)
-	private ExhibitionVO exhibition;
-	
-	@Column(name ="favorite_status", insertable = false)
-	private Integer favoriteStatus;
+    @Column(name ="member_id")
+    private Integer memberId;
+    
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "member_id", referencedColumnName = "member_id", insertable=false, updatable=false)
+    private MemberVO member;
+    
+    @Column(name ="exhibition_id")
+    private Integer exhibitionId; 
+    
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "exhibition_id", referencedColumnName = "exhibition_id", insertable=false, updatable=false)
+    private ExhibitionVO exhibition;
+    
+    @Column(name ="favorite_status")
+    private Integer favoriteStatus;
 
-	@Column(name ="created_at", insertable = false, updatable = false)
-	private Timestamp createdAt;
-	
-	@Column(name ="updated_at", insertable = false, updatable = false)
-	private Timestamp updatedAt;
+    @Column(name ="created_at", insertable = false, updatable = false)
+    private Timestamp createdAt;
+    
+    @Column(name ="updated_at", insertable = false, updatable = false)
+    private Timestamp updatedAt;
 
 	
 	// 無參數建構子

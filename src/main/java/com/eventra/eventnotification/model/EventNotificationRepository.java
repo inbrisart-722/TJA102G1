@@ -9,14 +9,15 @@ import org.springframework.transaction.annotation.Transactional;
 
 public interface EventNotificationRepository extends JpaRepository<EventNotificationVO, Integer> {
 		
-	// 查詢會員所有收藏通知
-	@Query(value="SELECT * FROM event_notification " +
-				 "WHERE member_id = :memId " +
-				 "ORDER BY created_at DESC",
-				 nativeQuery = true)
-	List<EventNotificationVO> findNotificationsByMember(@Param("memId") Integer memberId);
-	
-	// 修改單筆收藏通知狀態為已讀
+	// 查詢會員所有通知 (依建立時間由新到舊排序)	
+	// 一次查出通知 + 展覽資料 (避免 N + 1 問題)
+	@Query("SELECT n FROM EventNotificationVO n " +
+			"LEFT JOIN FETCH n.exhibition e " +
+			"WHERE n.memberId = :memId " +
+			"ORDER BY n.createdAt DESC")
+	List<EventNotificationVO> findNotificationsWithExhibition(@Param("memId") Integer memberId);
+
+	// 更新 [單一]通知為已讀狀態
 	@Transactional 
 	@Modifying 
 	@Query(value="UPDATE event_notification " +
@@ -24,8 +25,8 @@ public interface EventNotificationRepository extends JpaRepository<EventNotifica
 				 "WHERE favorite_announcement_id = :annId",
 				 nativeQuery = true)
 	public void updateOneReadStatus(@Param("status")Boolean readStatus, @Param("annId")int favoriteAnnouncementId);
-	
-	// 修改會員所有收藏通知狀態為已讀
+
+	// 更新 [全部]通知為已讀狀態
 	@Transactional
 	@Modifying
 	@Query(value="UPDATE event_notification " +
@@ -34,5 +35,17 @@ public interface EventNotificationRepository extends JpaRepository<EventNotifica
 				 nativeQuery = true)
 	public void updateAllReadStatus(@Param("status")Boolean readStatus, @Param("memId")int memberId);
 	
+	// [開賣提醒通知用] 檢查某會員、某展覽、某通知類型是否已經發送過, 用來避免重複發送相同通知
+	boolean existsByMemberIdAndExhibitionIdAndNotificationType(
+			Integer memberId,
+			Integer exhibitionId,
+			String notificationType);
 	
+	// [低庫存通知用] 檢查某會員、某展覽、某通知類型、某門檻數量是否已經發送過, 用來避免重複發送相同通知
+	boolean existsByMemberIdAndExhibitionIdAndNotificationTypeAndThreshold(
+		    Integer memberId,
+		    Integer exhibitionId,
+		    String notificationType,
+		    Integer threshold);
+
 }

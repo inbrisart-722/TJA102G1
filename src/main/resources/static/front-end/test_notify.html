@@ -2,44 +2,48 @@
 <html lang="zh-TW">
 <head>
   <meta charset="UTF-8">
-  <title>Admin 發送展覽通知</title>
+  <title>測試更新展覽 API</title>
   <script src="/front-end/js/g1_10_custom_common_csrf.js"></script>
 </head>
 <body>
-  <h2>Admin 發送展覽通知</h2>
-
+  <h2>測試更新展覽</h2>
   <label>展覽 ID：</label>
-  <input id="exhId" type="number" placeholder="輸入展覽ID"><br><br>
+  <input id="exhId" type="number" value="1"><br><br>
 
-  <label>通知類型：</label>
-  <select id="notifyType">
-    <option value="">請選擇</option>
-    <option value="ticketStart">開賣提醒</option>
-    <option value="ticketLow">售票緊急</option>
-    <option value="locationChange">地點異動</option>
-    <option value="timeChange">檔期異動</option>
-  </select><br><br>
+  <label>地點：</label>
+  <input id="location" type="text" value="華山文創園區"><br><br>
 
-  <button onclick="sendNotify()">發送通知</button>
+  <label>開始時間：</label>
+  <input id="startTime" type="text" value="2025-10-01T09:00:00"><br><br>
+
+  <label>結束時間：</label>
+  <input id="endTime" type="text" value="2025-10-15T18:00:00"><br><br>
+
+  <button onclick="updateExhibition()">更新展覽</button>
 
   <script>
-    function sendNotify() {
+    function updateExhibition() {
       const exhId = document.getElementById("exhId").value;
-      const type = document.getElementById("notifyType").value;
+      const location = document.getElementById("location").value;
+      const startTime = document.getElementById("startTime").value;
+      const endTime = document.getElementById("endTime").value;
 
-      if (!exhId || !type) {
-        alert("請輸入展覽ID並選擇通知類型");
-        return;
-      }
+      const body = {
+        exhibitionName: "測試展覽",
+        location: location,
+        startTime: startTime,
+        endTime: endTime
+      };
 
-      // 只要傳 exhId + type，後端會自己生成 title/content
-      csrfFetch(`/api/exhibitions/${exhId}/notify?type=${type}`, {
-        method: "POST"
+      csrfFetch(`/api/admin/exhibitions/${exhId}/update`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(body)
       })
-      .then(res => res.text())
+      .then(res => res.json())
       .then(data => {
-        alert("後端回應: " + data);
-        console.log("後端回應:", data);
+        console.log("更新後的展覽資料:", data);
+        alert("展覽已更新，請檢查通知是否發送");
       })
       .catch(err => console.error("錯誤:", err));
     }
