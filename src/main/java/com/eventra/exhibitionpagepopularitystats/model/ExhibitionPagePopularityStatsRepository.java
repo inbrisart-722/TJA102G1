@@ -10,13 +10,11 @@ public interface ExhibitionPagePopularityStatsRepository extends JpaRepository<E
 	
 	// 更新當日展覽點擊數
 	// 回傳結果: 0(當天無資料) 或 1(表示表示展覽有紀錄且累加成功)
-	@Transactional
-    @Modifying
-    @Query(value = "UPDATE exhibition_page_popularity_stats " +
-                   "SET exhibition_page_view_count = exhibition_page_view_count + 1 " + // 累加
-                   "WHERE exhibition_id = :exhId " +
-                   "AND view_date = CURRENT_DATE",
-                   nativeQuery = true)
-    int incrementTodayViewCount(@Param("exhId") Integer exhibitionId);
+	@Modifying
+	@Query("UPDATE ExhibitionPagePopularityStatsVO e " +
+	       "SET e.exhibitionPageViewCount = e.exhibitionPageViewCount + 1 " +
+	       "WHERE e.exhibitionId = :exhId AND e.viewDate = CURRENT_DATE")
+	int incrementTodayViewCount(@Param("exhId") Integer exhibitionId);
+
 
 }
