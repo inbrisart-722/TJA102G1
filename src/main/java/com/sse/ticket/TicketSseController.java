@@ -1,6 +1,7 @@
 package com.sse.ticket;
 
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
@@ -33,8 +34,8 @@ public class TicketSseController {
 	// Spring 會回傳一個 SseEmitter 物件
 		// 讓 Server 可以持續透過這個 emitter 把事件推送給 Client，而不是一次性回傳就結束
 	
-	@GetMapping("/subscribe")
-	public SseEmitter subscribe() {
+	@GetMapping("/subscribe/{exhibitionId}")
+	public SseEmitter subscribe(@PathVariable("exhibitionId") Integer exhibitionId) {
 		// 呼叫 service，建立一個新的 SseEmitter 並回傳給客戶端
         // 這個 emitter 後續就會被存在 service 中，用來推送票務更新
 		// text/event-stream 是 HTTP 回應的 Content-Type → 告訴瀏覽器這是一條 SSE 連線
@@ -56,6 +57,6 @@ public class TicketSseController {
 			// 錯誤 → 傳送資料時丟 exception（例如 client 斷網）
 				// 會觸發 .onError() callback
 			// 前端手動關閉 → 呼叫 es.close()
-		return sseService.createEmitter();
+		return sseService.createEmitter(exhibitionId);
 	}
 }

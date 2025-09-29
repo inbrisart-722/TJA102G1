@@ -41,7 +41,10 @@ public class MemberVO {
     @Column(name = "updated_at", insertable = false, updatable = false)
     private Timestamp updatedAt;
     
-    /* OAuth2 專用欄位 */
+    /* OAuth2/OIDC 專用欄位 */
+    
+    @Column(name = "line_user_id")
+    private String lineUserId;
     
     @Column(name = "google_id")
     private String googleId;
@@ -54,6 +57,13 @@ public class MemberVO {
     
     /* getter | setter */
     
+    
+    public String getLineUserId() {
+    	return lineUserId;
+    }
+    public void setLineUserId(String lineUserId) {
+    	this.lineUserId = lineUserId;
+    }
     public String getAsid() {
 		return asid;
 	}

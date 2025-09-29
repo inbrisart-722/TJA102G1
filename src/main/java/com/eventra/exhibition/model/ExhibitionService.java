@@ -37,6 +37,7 @@ public interface ExhibitionService {
 	ExhibitionVO findById(Integer id);
 	
 	void updateExhibition(ExhibitionCreateDTO dto, Integer id);
+
   
 //	/* 更新展覽時觸發通知用, 編輯展覽會呼叫此方法 */
 //	ExhibitionVO updateExhibition(Integer exhibitionId, ExhibitionCreateDTO dto);
@@ -51,4 +52,6 @@ public interface ExhibitionService {
     Page<ExhibitionVO> findOnSale(Integer exhibitorId, int page, int size, String q);
 
     Page<ExhibitionVO> findEnded(Integer exhibitorId, int page, int size, String q);
+
+  
 }

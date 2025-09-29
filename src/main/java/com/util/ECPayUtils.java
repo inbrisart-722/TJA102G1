@@ -10,7 +10,7 @@ import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Component;
 
-import com.eventra.order.model.ECPayCallbackReqDTO;
+import com.eventra.order.ecpay.model.ECPayCallbackReqDTO;
 import com.properties.ECPayProperties;
 
 @Component

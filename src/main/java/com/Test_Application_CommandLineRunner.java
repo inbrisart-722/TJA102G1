@@ -1,23 +1,26 @@
 package com;
 
-import java.util.List;
-import java.util.Map;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
-import com.eventra.order.linepay.model.LinePayPaymentRequestReqDTO;
-import com.eventra.order.linepay.model.LinePayPaymentRequestResDTO;
-import com.eventra.order.linepay.model.LinePayService;
+import com.eventra.linebot.util.RichMenuInitializer;
 
 @SpringBootApplication
 public class Test_Application_CommandLineRunner implements CommandLineRunner {
 
 //	@Autowired
 //	private LinePayService LINE_PAY_SVC; 
+	
+//	@Autowired
+//	private LineBotPushService LINE_BOT_PUSH_SERVICE;
+	
+//	@Autowired
+//	private RichMenuInitializer RICH_MENU_INITIALIZER;
 	
 //	@Value("${linepay.channel-id}") String channelId;
 //	@Value("${linepay.channel-secret}") String channelSecret;
@@ -31,6 +34,11 @@ public class Test_Application_CommandLineRunner implements CommandLineRunner {
 
     @Override
     public void run(String...args) throws Exception {
+    	
+//    	LINE_BOT_PUSH_SERVICE.pushText("Ua69e70c501c86f90e191d1534708f631", "你很棒哦");
+    	
+//    	Path img = Paths.get("/Users/inbrisart/Desktop/img/S__34857062.jpg");
+//    	RICH_MENU_INITIALIZER.initRichMenu(img);
     	
 //    	System.out.println(channelId);
 //    	System.out.println(channelSecret);

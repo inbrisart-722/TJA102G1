@@ -1,7 +1,12 @@
 package com.eventra.exhibition.model;
 
+
 import org.springframework.data.domain.Page;
+import java.time.LocalDateTime;
+
+import java.util.List;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -78,4 +83,18 @@ public interface ExhibitionRepository extends JpaRepository<ExhibitionVO, Intege
 
 	// 全部（分頁）
 	Page<ExhibitionVO> findByExhibitorVO_ExhibitorIdAndExhibitionNameContainingIgnoreCase(Integer exhibitorId, String exhibitionName, Pageable pageable);
+
+	 /** 
+	  * peichenlu
+	  * [收藏展覽通知(event notification) - 開賣提醒]
+	  * 查詢 即將開賣 的展覽, 開賣時間在 now ~ until 之間
+	  *
+	  */
+	 @Query("SELECT e FROM ExhibitionVO e " +
+		       "WHERE e.ticketStartTime IS NOT NULL " +
+		       "AND e.ticketStartTime BETWEEN :now AND :until")
+	 List<ExhibitionVO> findExhibitionsStartingWithin(@Param("now") LocalDateTime now, @Param("until") LocalDateTime until);
+	 
+	 Slice<ExhibitionVO> findByStartTimeAfter(LocalDateTime now, Pageable pageable);
+
 }

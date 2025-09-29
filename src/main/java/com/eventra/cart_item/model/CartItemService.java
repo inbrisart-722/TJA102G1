@@ -92,8 +92,7 @@ public class CartItemService {
 		Integer totalTicketQuantity = EXHIBITION_REPO.findById(exhibitionId).orElseThrow().getTotalTicketQuantity();
 		Integer soldTicketQuantity = EXHIBITION_REPO.findById(exhibitionId).orElseThrow().getSoldTicketQuantity();
 
-		TICKET_SSE_SERVICE.broadcastTicketCount(totalTicketQuantity - soldTicketQuantity);
-		// 後端回應 ... 還有沒有票！！！（這邊很重要）updateSoldTicketQuantity 就可能失敗
+		TICKET_SSE_SERVICE.broadcastTicketCount(exhibitionId, totalTicketQuantity - soldTicketQuantity);
 	}
 
 	public String removeOneCartItem(Integer cartItemId, Integer memberId) {
