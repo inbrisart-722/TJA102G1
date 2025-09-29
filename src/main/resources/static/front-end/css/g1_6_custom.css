@@ -380,6 +380,12 @@ div.search_block>a {
 	margin-bottom: 40px;
 }
 
+.col-lg-8 .seg-wrap {
+	display: flex;
+	justify-content: center;
+	margin-bottom: 40px;
+}
+
 .seg-link {
 	padding: 0.5rem 1.25rem;
 	border-radius: 9999px;
