@@ -26,7 +26,9 @@ import com.eventra.cart_item.model.CartItemRedisRepository;
 import com.eventra.cart_item.model.CartItemRedisVO;
 import com.eventra.exhibition.model.ExhibitionRepository;
 import com.eventra.exhibitiontickettype.model.ExhibitionTicketTypeVO;
+import com.eventra.linebot.model.LineBotPushService;
 import com.eventra.member.model.MemberVO;
+import com.eventra.order.model.OrderLineBotCarouselDTO;
 import com.eventra.order.model.OrderProvider;
 import com.eventra.order.model.OrderRepository;
 import com.eventra.order.model.OrderStatus;
@@ -66,6 +68,9 @@ public class LinePayService {
 	private final OrderRepository ORDER_REPO;
 	private final OrderItemRepository ORDER_ITEM_REPO;
 	private final PaymentAttemptRepository PAYMENT_ATTEMPT_REPO;
+	
+	// line bot push 推播使用
+	private final LineBotPushService LINE_BOT_PUSH_SERVICE;
 
 	public LinePayService(
 			@Value("${linepay.channel-id}") String channelId,
@@ -74,7 +79,8 @@ public class LinePayService {
 			@Value("${linepay.confirm-url-prefix}") String confirmUrlPrefix,
 			@Value("${linepay.cancel-url-prefix}") String cancelUrlPrefix,
 			RestClient.Builder restClientBuilder, JsonCodec jsonCodec, ExhibitionRepository exhibitionRepo, CartItemRedisRepository cartItemRedisRepo,
-			OrderRepository orderRepo, OrderItemRepository orderItemRepo, PaymentAttemptRepository paymentAttemptRepo, @Value("${order.expiration-millis}") Long orderExpirationMillis) {
+			OrderRepository orderRepo, OrderItemRepository orderItemRepo, PaymentAttemptRepository paymentAttemptRepo, @Value("${order.expiration-millis}") Long orderExpirationMillis,
+			LineBotPushService lineBotPushService) {
 		
 		this.CHANNEL_ID = channelId;
 		this.CHANNEL_SECRET = channelSecret;
@@ -89,11 +95,14 @@ public class LinePayService {
 		this.ORDER_ITEM_REPO = orderItemRepo;
 		this.PAYMENT_ATTEMPT_REPO = paymentAttemptRepo;
 		this.ORDER_EXPIRATION_MILLIS = orderExpirationMillis;
+		this.LINE_BOT_PUSH_SERVICE = lineBotPushService;
 	}
 
 	public void cleanExpiredLinePayPaymentAttempt(PaymentAttemptVO paymentAttempt) {
+		System.out.println("clenaing Expired LinePay payment attempts");
 		// 1. 拿出 order 等後續要更新的物件
 		OrderVO order = paymentAttempt.getOrder();
+		String lineUserId = order.getMember().getLineUserId();
 		
 		// 2. 拿出核心 transactionId
 		String transactionId = paymentAttempt.getProviderTransactionId();
@@ -103,6 +112,7 @@ public class LinePayService {
 		// 4. 從 api res 拆出 returnCode + returnMessage
 		String returnCode = res.getReturnCode();
 		String returnMessage = res.getReturnMessage();
+		paymentAttempt.setRtnCode(returnCode);
 		paymentAttempt.setRtnMsg(returnMessage);
 		// 5. 開始針對不同 returnCode 做出相對應處理
 		
@@ -128,6 +138,7 @@ public class LinePayService {
 				// 2-2. 釋票
 				releaseTickets(order);
 			}
+			if(lineUserId != null) lineBotPush(lineUserId, order);
 		}
 		if("0122".equals(returnCode)) {
 			// 1. 失敗，掃 failure
@@ -141,6 +152,7 @@ public class LinePayService {
 				// 2-2. 釋票
 				releaseTickets(order);
 			}
+			if(lineUserId != null) lineBotPush(lineUserId, order);
 		}
 		if("0000".equals(returnCode)) {
 			// 先當過期，掃 expired
@@ -160,6 +172,7 @@ public class LinePayService {
 				// 2-2. 釋票
 				releaseTickets(order);
 			}
+			if(lineUserId != null) lineBotPush(lineUserId, order);
 		}
 		if("0110".equals(returnCode)) {
 			// 成功，可呼叫confirm api
@@ -387,6 +400,8 @@ public class LinePayService {
 	// **目前** 只有透過 clean expired line pay payment attempt 來呼叫
 	public LinePayPaymentRequestCheckResDTO paymentRequestCheck(String transactionId) {
 		
+		System.out.println("clenaing Expired LinePay payment attempts -- inside function");
+		
 		String apiPath = "/v3/payments/requests/" + transactionId + "/check"; // endpoint
 		String nonce = UUID.randomUUID().toString(); // 避免重放攻擊，類似一次性密碼，使用過的 nonce 會被標示無效，攻擊者就無法多次請求隨意多次扣款等等
 		String message = CHANNEL_SECRET + apiPath + nonce;
@@ -431,6 +446,8 @@ public class LinePayService {
 		
 		
 		PaymentAttemptVO paymentAttempt = PAYMENT_ATTEMPT_REPO.findByProviderOrderId(providerOrderId).orElse(null);
+		OrderVO order = paymentAttempt.getOrder();
+		String lineUserId = order.getMember().getLineUserId();
 		
 		if(paymentAttempt == null) return null; // -> 付款成功 line pay 導用戶回來的頁面 有人亂輸入的話 要處理
 		
@@ -438,17 +455,18 @@ public class LinePayService {
 		// 重複付款處理
 		// -> 這條 payment 還沒成功付款，但其他條 payment 早就成功付款過了！！
 		if(status != PaymentAttemptStatus.SUCCESS &&
-			paymentAttempt.getOrder().getOrderStatus() == OrderStatus.已付款) {
+			order.getOrderStatus() == OrderStatus.已付款) {
 			// 呼叫取消此次授權（避免用戶重複保留的款項 多被扣住一週（？））
-			// 其實不呼叫也可，但就是用戶的那筆錢會被多扣一週（？）
+			// 其實不呼叫也可，但就是用戶的那筆錢會被多扣著一週（？）
 			paymentAuthorizationsVoid(providerOrderId);
+			return null;
 		}
-			
+		
 		// 重複通知處理 
 		// -> SUCCESS -> 這條 payment 已經更新成功過了 -> Line pay 重送的通知
 		// -> CHECKING -> 不理，照常跑
 		if(status == PaymentAttemptStatus.SUCCESS &&
-			paymentAttempt.getOrder().getOrderStatus() == OrderStatus.已付款) {
+			order.getOrderStatus() == OrderStatus.已付款) {
 			return null;
 		}
 
@@ -499,22 +517,40 @@ public class LinePayService {
 			// 1-1: paymentAttempt
 			paymentAttempt.setPaymentAttemptStatus(PaymentAttemptStatus.SUCCESS);
 			// 1-2: order
-			OrderVO order = paymentAttempt.getOrder();
 			order.setOrderStatus(OrderStatus.已付款);
 			// 1-3: orderItems -> 產票號
 			Set<OrderItemVO> orderItems = order.getOrderItems();
 			for(OrderItemVO orderItem : orderItems)
 				if(orderItem.getTicketCode() == null) // 這裡會有必要嗎？
 					orderItem.setTicketCode(genTicketCode(orderItem.getOrderItemUlid()));
+			
 		}
+		/* ********* *th step : line bot push message ********* */
+		if(lineUserId != null) lineBotPush(lineUserId, order); // 這 method 中狀況基本只有 confirm 也成功才出去
 				
 		return null;
 	}
 	
 	// 3-2. 用戶授權失敗 -> 回到 cancelUrl
 	// no api related (only db update)
-	public void paymentCancel() {
+	public void paymentCancel(String providerOrderId) {
+		PaymentAttemptVO paymentAttempt = PAYMENT_ATTEMPT_REPO.findByProviderOrderId(providerOrderId).orElseThrow();
+		OrderVO order = paymentAttempt.getOrder();
+		String lineUserId = order.getMember().getLineUserId();
 		
+		// 1. 失敗，掃 failure
+		paymentAttempt.setPaymentAttemptStatus(PaymentAttemptStatus.FAILURE);
+		order.setOrderStatus(OrderStatus.付款失敗);
+		
+		// 2. 還可以嘗試付款，並且不釋出票，除非過期就要直接釋出且無法繼續嘗試
+		Long createdAt = order.getCreatedAt().getTime();
+		if(System.currentTimeMillis() - createdAt > ORDER_EXPIRATION_MILLIS) {
+			// 2-1. order -> 逾時
+			order.setOrderStatus(OrderStatus.付款逾時);
+			// 2-2. 釋票
+			releaseTickets(order);
+		}
+		if(lineUserId != null) lineBotPush(lineUserId, order);
 	}
 	
 	// 4. 取消授權 -> payment attempt 過期回來沒票就要主動取消授權
@@ -531,11 +567,18 @@ public class LinePayService {
 		PaymentAttemptVO paymentAttempt = PAYMENT_ATTEMPT_REPO.findByProviderOrderId(providerOrderId).orElseThrow();
 		
 		String providerTransactionId = paymentAttempt.getProviderTransactionId();
+		
+		System.out.println(providerTransactionId);
+		
+		
+//		String apiPath = "/v3/payments/" + providerTransactionId + "/refund"; // endpoint
 		String apiPath = "/v3/payments/authorizations/" + providerTransactionId + "/void"; // endpoint
 		String nonce = UUID.randomUUID().toString(); // 避免重放攻擊，類似一次性密碼，使用過的 nonce 會被標示無效，攻擊者就無法多次請求隨意多次扣款等等
 		String message = CHANNEL_SECRET + apiPath + nonce;
 		String signature = signHmacSHA256(CHANNEL_SECRET, message);
 
+		System.out.println(apiPath);
+		
 		 LinePayPaymentVoidResDTO pvRes =
 				REST_CLIENT.post()
                 .uri(apiPath)
@@ -546,13 +589,24 @@ public class LinePayService {
                 .retrieve()
                 .body(LinePayPaymentVoidResDTO.class);
 		 
+		 System.out.println(pvRes.getReturnCode() + ": " + pvRes.getReturnMessage());
+		 
+		 // 測試目前取消授權都會失敗 1150
+		 // 可能原因1
+		 	// 如果你在 check 看到 reserved transaction，但其實它的 paymentType 不是 credit-card reservation（例如有些情況是 immediate capture），那 LINE Pay 會回 1150。
+		 // 可能原因2
+		 	// 有些交易 flow 在 sandbox 裡會 永遠回 1150，因為 sandbox 沒有真的維護授權池。
+		 	// LINE 官方 FAQ 提到過：sandbox 的授權交易有時候不能成功 void，因為它們會直接 auto-confirm。
+		 
 		 // 取消授權失敗
 		 if(!"0000".equals(pvRes.getReturnCode())) {
-			 System.out.println("取消授權失敗");
+			 System.out.println("取消授權失敗！");
+			 paymentAttempt.setIsDuplicateResolved(false);
 		 }
 		 // 取消授權成功
 		 else if ("0000".equals(pvRes.getReturnCode())) {
-			 System.out.println("取消授權失敗");
+			 System.out.println("取消授權成功！");
+			 paymentAttempt.setIsDuplicateResolved(true);
 		 }
 	}
 	
@@ -565,6 +619,18 @@ public class LinePayService {
 	// POST /v3/payments/{transactionId}/refund
 	public void paymentRefund() {
 		
+	}
+	
+	private void lineBotPush(String lineUserId, OrderVO order) { 
+		OrderLineBotCarouselDTO dto = new OrderLineBotCarouselDTO();
+		dto.setOrderStatus(order.getOrderStatus())
+			.setOrderUlid(order.getOrderUlid())
+			.setTotalAmount(order.getTotalAmount())
+			.setTotalQuantity(order.getTotalQuantity());
+		
+		// 如果有 lineUserId 才推播
+		try { LINE_BOT_PUSH_SERVICE.pushOrder(lineUserId, dto); }
+		catch (Exception e) {System.out.println(e.toString());}
 	}
 	
 	private void releaseTickets(OrderVO order) {

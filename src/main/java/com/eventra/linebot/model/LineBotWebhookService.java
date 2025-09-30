@@ -21,6 +21,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.eventra.exhibition.model.ExhibitionLineBotCarouselDTO;
 import com.eventra.exhibition.model.ExhibitionServiceImpl;
+import com.eventra.exhibition.model.ExhibitionVO;
 import com.eventra.linebot.util.LineBotFlexBuilder;
 import com.eventra.member.model.MemberService;
 import com.eventra.order.model.OrderLineBotCarouselDTO;
@@ -31,6 +32,7 @@ import com.eventra.order_item.model.OrderItemService;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.google.common.base.Objects;
 import com.util.JsonCodec;
 
 @Service
@@ -119,7 +121,7 @@ public class LineBotWebhookService {
 //        replyWithText(replyToken, "感謝加入好友！輸入『查展覽』開始體驗。");
         try { Thread.sleep(100); }
         catch (InterruptedException e) { System.out.println(e.toString()); }
-        replyWithQuickReplyBindAccount(replyToken, "💡小提示：建議先完成 eventra 會員綁定以便使用完整查詢功能");
+        replyWithQuickReplyBindAccount(replyToken, "💡小提示：建議先完成 Eventra 會員綁定以便使用完整查詢功能");
     }
     
     private void handleMessageEvent(JsonNode event) throws Exception {
@@ -145,11 +147,23 @@ public class LineBotWebhookService {
         	} else {
         		replyWithQuickReplyBindAccount(replyToken, "您尚未將此 LINE 帳號綁定至 Eventra 會員哦！");
         	}
-        } else {
+        
+        } else if (Objects.equal("location", event.path("message").path("type").asText())){
+        	Double lat = event.path("message").path("latitude").asDouble(); 
+        	Double lng = event.path("message").path("longitude").asDouble();
+        	// 手動開啟一次 carousel 循環（不像其他是從 postback message 開始）
+        	int page = 0;
+        	String action = "search_exhibition";
+        	String type = "nearest";
+            Slice<ExhibitionLineBotCarouselDTO> nearestList = EXHIBITION_SERVICE.findNearestExhibitionsForLineBot(lat, lng, page, SIZE);
+            
+        	ObjectNode carousel = FLEX_BUILDER.buildExhibitionCarousel(nearestList.getContent());
+        	String json = FLEX_BUILDER.wrapFlexReply(replyToken, carousel);
+            sendReply(json);
+        }
+        else {
         	replyWithQuickReplyDefault(replyToken, "歡迎來到 Eventra！請從以下按鈕選擇指示！");
         }
-        // reply 方法預計使用
-        // 1. quick reply (text, template, flex) -> Quick Reply = 一個文字訊息底下，帶一排「可點選的按鈕（items）」
     }
 
     private void handlePostbackEvent(JsonNode event) throws Exception {
@@ -186,15 +200,22 @@ public class LineBotWebhookService {
             	Slice<ExhibitionLineBotCarouselDTO> upcomingList = EXHIBITION_SERVICE.findUpcomingExhibitionsForLineBot(page, SIZE);
             	ObjectNode carousel = FLEX_BUILDER.buildExhibitionCarousel(upcomingList.getContent(), upcomingList.hasNext(), action, type, page + 1);
             	json = FLEX_BUILDER.wrapFlexReply(replyToken, carousel);
-            }
-            else if ("new".equals(type)) {
+            } else if ("new".equals(type)) {
                 // 呼叫最新展覽 service
 //            	List<ExhibitionLineBotCarouselDTO> newList = EXHIBITION_SERVICE.findNewExhibitionsForLineBot();
 //            	ObjectNode carousel = FLEX_BUILDER.buildCarousel(newList);
 //            	String carouselJson = JSON_CODEC.write(carousel);
 //            	// 處理 page
 //            	sendReply(carouselJson);
-            }
+            } 
+//            else if ("nearest".equals(type)) {
+//            	Double lat = event.path("message").path("latitude").asDouble(); 
+//            	Double lng = event.path("message").path("longitude").asDouble();
+//            	// 手動開啟一次 carousel 循環（不像其他是從 postback message 開始）
+//                Slice<ExhibitionLineBotCarouselDTO> nearestList = EXHIBITION_SERVICE.findNearestExhibitionsForLineBot(lat, lng, page, SIZE);
+//            	ObjectNode carousel = FLEX_BUILDER.buildExhibitionCarousel(nearestList.getContent(), nearestList.hasNext(), action, type, page + 1);
+//            	json = FLEX_BUILDER.wrapFlexReply(replyToken, carousel);
+//            }
             sendReply(json);
     	}
 
@@ -202,7 +223,7 @@ public class LineBotWebhookService {
     	else if ("search_order".equals(action)) {
         	String type = params.get("type");
         	Integer page = Integer.valueOf(params.get("page"));
-        	System.out.println("search_order ---> action=" + action + ", type=" + type + ", page=" + page);
+        	System.out.println("search_order --->  action=" + action + ", type=" + type + ", page=" + page);
     		String lineUserId = event.path("source").path("userId").asText();
     		
     		OrderStatus orderStatus = switch (type) {
@@ -365,13 +386,16 @@ public class LineBotWebhookService {
     
     /* ========== 3rd part: webhook 統一回應出口 ========== */
     private void sendReply(String json) throws Exception {
-        HttpRequest req = HttpRequest.newBuilder()
+        HttpRequest request = HttpRequest.newBuilder()
                 .uri(URI.create("https://api.line.me/v2/bot/message/reply"))
                 .header("Content-Type", "application/json")
                 .header("Authorization", "Bearer " + CHANNEL_ACCESS_TOKEN)
                 .POST(HttpRequest.BodyPublishers.ofString(json))
                 .build();
-        http.send(req, HttpResponse.BodyHandlers.ofString());
+        
+        HttpResponse<String> response = http.send(request, HttpResponse.BodyHandlers.ofString());
+        System.out.println("LINE Webhook reply API 回應狀態: " + response.statusCode());
+        System.out.println("LINE Webhook reply API 回應內容: " + response.body());
     }
     
     // ========== 驗簽 ==========

@@ -31,6 +31,7 @@ public class LinePayController {
 	@GetMapping("/linepay/cancel-url")
 	public String cancelUrl(@RequestParam("providerOrderId") String providerOrderId) {
 		System.out.println("linepay: cancel-url 失敗訊息回來啦！");
+		LINE_PAY_SVC.paymentCancel(providerOrderId);
 		// 付款失敗（一大堆原因）例如 
 //		1104	您的商店尚未在合作商店中心註冊成為合作商店。請確認輸入的credentials是否正確。
 //		1105	該合作商店目前無法使用LINE Pay。

@@ -18,6 +18,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.eventra.exhibition.model.ExhibitionRepository;
 import com.eventra.exhibition.model.ExhibitionVO;
+import com.eventra.linebot.model.LineBotPushService;
 import com.eventra.member.model.MemberRepository;
 import com.eventra.member.model.MemberVO;
 import com.eventra.order.ecpay.model.ECPayService;
@@ -49,6 +50,9 @@ public class OrderService {
 	private final ECPayService ECPAY_SERVICE;
 	private final LinePayService LINE_PAY_SERVICE;
 	private final MemberRepository MEMBER_REPO;
+	
+	// line bot push 推播使用
+	private final LineBotPushService LINE_BOT_PUSH_SERVICE;
 
 	public OrderService(ExhibitionRepository exhibitionRepository,
 			OrderRepository orderRepository,
@@ -56,7 +60,8 @@ public class OrderService {
 			PaymentAttemptRepository paymentAttemptRepository,
 			ECPayService ecpayService, 
 			LinePayService linePayService, 
-			MemberRepository memberRepository, @Value("${order.expiration-millis}") Long orderExpirationMillis, @Value("${payment.attempt.expiration-millis}") Long paymentAttemptExpirationMillis) {
+			MemberRepository memberRepository, @Value("${order.expiration-millis}") Long orderExpirationMillis, @Value("${payment.attempt.expiration-millis}") Long paymentAttemptExpirationMillis,
+			LineBotPushService lineBotPushService) {
 		this.EXHIBITION_REPO = exhibitionRepository;
 		this.ORDER_REPO = orderRepository;
 		this.ORDER_ITEM_REPO = orderItemRepository;
@@ -66,6 +71,7 @@ public class OrderService {
 		this.MEMBER_REPO= memberRepository;
 		this.ORDER_EXPIRATION_MILLIS = orderExpirationMillis;
 		this.PAYMENT_ATTEMPT_EXPIRATION_MILLIS = paymentAttemptExpirationMillis;
+		this.LINE_BOT_PUSH_SERVICE = lineBotPushService;
 	}
 
 	public Slice<OrderLineBotCarouselDTO> findOrdersByLineUserId(String lineUserId, OrderStatus orderStatus, int page, int size){
