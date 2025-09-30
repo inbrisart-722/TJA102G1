@@ -6,7 +6,7 @@ import java.util.Map;
 import com.eventra.exhibitor.model.ExhibitorDTO;
 
 // inbrisart 20250925 給展覽頁 SSR 帶入
-public class ExhibitionDTO {
+public class ExhibitionPageDTO {
 	// 頂層
 	private String photoLandscape;
 	private Integer exhibitionId; // 珮甄會用到 body dataset attribute
@@ -17,6 +17,9 @@ public class ExhibitionDTO {
 	private Integer cheapestTicketPrice;
 	// ticketTypeName -> price
 	private Map<Integer, Integer> tickets;
+	private Boolean isTicketStart; 
+	private Boolean isExhibitionEnded;
+	private LocalDateTime ticketStartTime;
 	// 展覽資訊區
 	private LocalDateTime startTime;
 	private LocalDateTime endTime;
@@ -24,7 +27,26 @@ public class ExhibitionDTO {
 	private String description;
 	private ExhibitorDTO exhibitor; // 帶入 id 後拼接展商主頁網址
 	private Integer totalCommentCount;
+
 	
+	public Boolean getIsExhibitionEnded() {
+		return isExhibitionEnded;
+	}
+	public void setIsExhibitionEnded(Boolean isExhibitionEnded) {
+		this.isExhibitionEnded = isExhibitionEnded;
+	}
+	public Boolean getIsTicketStart() {
+		return isTicketStart;
+	}
+	public void setIsTicketStart(Boolean isTicketStart) {
+		this.isTicketStart = isTicketStart;
+	}
+	public LocalDateTime getTicketStartTime() {
+		return ticketStartTime;
+	}
+	public void setTicketStartTime(LocalDateTime ticketStartTime) {
+		this.ticketStartTime = ticketStartTime;
+	}
 	public String getPhotoLandscape() {
 		return photoLandscape;
 	}

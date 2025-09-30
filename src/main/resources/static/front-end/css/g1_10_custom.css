@@ -184,13 +184,19 @@ a:focus {
   outline: none;
 } */
 
+div#related_exhib {
+	min-height: 200px;
+	display: flex;
+	flex-direction: column;
+	align-items: stretch;
+}
 div#related_exhib div.sidebar_exhib_block > a {
   color: #333;
 }
 
 div#related_exhib > h3.inner {
   padding-top: 10px;
-  padding-bottom: 20px;
+/*   padding-bottom: 20px; */
 }
 
 div#related_exhib > hr {
@@ -201,6 +207,13 @@ div#related_exhib > hr {
 div#related_exhib div.sidebar_exhib_block {
   height: 85px;
 }
+
+div#related_exhib div.sidebar_exhib_block span.sidebar_exhib_loc{
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+}	
+
 div#related_exhib div.sidebar_exhib_block div.sidebar_exhib_img {
   height: 100%;
   margin-top: 0.75%;
@@ -868,4 +881,21 @@ div.modal__actions > button {
 
 .btn_fav.active i {
   color: #ff5a5f; /* 收藏後紅色 */
+}
+a#add_cart {
+	padding: 12px 20px;
+}
+a#add_cart.disabled, a#add_cart_and_go.disabled{
+	background-color: darkgray;
+	color: white;
+	border: 0;
+	cursor: normal;
+/* 	直接在瀏覽器層級阻擋了所有的點擊事件。 */
+	pointer-events: none;
+}
+span.ticket_not_selling {
+	text-align: center;
+	display: block;
+	margin: 30px 0 36px 0;
+	font-size: 12px;
 }

@@ -6,11 +6,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.eventra.exhibition.model.ExhibitionRepository;
+import com.eventra.exhibition.model.ExhibitionVO;
 import com.eventra.exhibitiontickettype.model.ExhibitionTicketTypeRepository;
 import com.eventra.exhibitiontickettype.model.ExhibitionTicketTypeVO;
 import com.eventra.member.model.MemberRepository;
@@ -152,8 +152,12 @@ public class CartItemService {
 		listOfVOs.forEach(vo -> {
 			String expirationTime = MillisToMinutesSecondsUtil
 					.convert(CART_EXPIRY_MILLIS - (System.currentTimeMillis() - vo.getCreatedAt()));
+			
+			ExhibitionVO exhibition = EXHIBITION_REPO.findById(vo.getExhibitionId()).orElseThrow();
+			String photoPortrait = exhibition.getPhotoPortrait();
+			
 			GetCartItemResDTO dto = new GetCartItemResDTO.Builder().cartItemId(vo.getCartItemId())
-					.exhibitionName(vo.getExhibitionName()).ticketTypeName(vo.getTicketTypeName())
+					.photoPortrait(photoPortrait).exhibitionName(vo.getExhibitionName()).ticketTypeName(vo.getTicketTypeName())
 					.quantity(vo.getQuantity()).price(vo.getPrice()).expirationTime(expirationTime).build();
 			listOfDTOs.add(dto);
 		});
@@ -172,8 +176,10 @@ public class CartItemService {
 			String expirationTime = MillisToMinutesSecondsUtil
 					.convert(CART_EXPIRY_MILLIS - (System.currentTimeMillis() - el.getCreatedAt()));
 
+			ExhibitionVO exhibition = EXHIBITION_REPO.findById(el.getExhibitionId()).orElseThrow();
+			String photoPortrait = exhibition.getPhotoPortrait();
 			GetCartItemResDTO resDTO = new GetCartItemResDTO.Builder().cartItemId(el.getCartItemId())
-					.exhibitionName(el.getExhibitionName()).ticketTypeName(el.getTicketTypeName())
+					.photoPortrait(photoPortrait).exhibitionName(el.getExhibitionName()).ticketTypeName(el.getTicketTypeName())
 					.quantity(el.getQuantity()).price(el.getPrice()).expirationTime(expirationTime).build();
 
 			listOfResDTOs.add(resDTO);

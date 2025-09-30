@@ -19,7 +19,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import com.eventra.cart_item.model.CartItemService;
 import com.eventra.cart_item.model.GetCartItemResDTO;
-import com.eventra.exhibition.model.ExhibitionDTO;
+import com.eventra.exhibition.model.ExhibitionPageDTO;
 import com.eventra.exhibition.model.ExhibitionServiceImpl;
 import com.eventra.exhibitor.model.ExhibitorService;
 import com.eventra.exhibitor.model.ExhibitorVO;
@@ -60,7 +60,7 @@ public class FrontendIndexController {
 	// 2. 為了同時確保 css, js 可取到，"目前"必要的轉導
 	@GetMapping("/exhibitions")
 	public String exhibitionsPage(@RequestParam("exhibitionId") Integer exhibitionId, Model model) {
-		ExhibitionDTO dto = exhibitionSvc.getExhibitionInfoForPage(exhibitionId);
+		ExhibitionPageDTO dto = exhibitionSvc.getExhibitionInfoForPage(exhibitionId);
 		// fallback -> exhibitionId 查不到對應展覽
 		if(dto == null) return "redirect:/front-end/404";
 		// success -> 塞 dto 並轉交 template-resolver

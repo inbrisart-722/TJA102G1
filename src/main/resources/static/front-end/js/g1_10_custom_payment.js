@@ -5,6 +5,39 @@ document.addEventListener("DOMContentLoaded", function() {
 	btn_third_party_payment.addEventListener("click", (e) => {
 		e.preventDefault();
 
+
+		// 1. 是否填入載具
+		const carrierInput = document.getElementById("carrier_text");
+		const value = carrierInput.value.trim();
+
+		// 手機條碼規則
+		const regex = /^\/[0-9A-Z.\-\+]{7}$/;
+
+		// 找錯誤訊息元素
+		let errorMsg = document.getElementById("carrier_error");
+		if (errorMsg) errorMsg.remove();
+
+		if (!value || !regex.test(value)) {
+			// 顯示錯誤提示
+			errorMsg = document.createElement("div");
+			errorMsg.id = "carrier_error";
+			errorMsg.style.color = "red";
+			errorMsg.style.marginTop = "5px";
+			carrierInput.insertAdjacentElement("afterend", errorMsg);
+			errorMsg.textContent = "手機條碼／載具格式錯誤：必須是「/」開頭，後面7個字元為大寫英文、數字或 . - +";
+			carrierInput.focus();
+			return;
+		}
+
+		// 2. 是否勾選
+		const agreement_el = document.querySelector("input#agreement");
+		if (agreement_el.checked === false) {
+			alert("請「詳閱並勾選」同意買賣契約書！");
+			return;
+		}
+
+		///////////////////////////////////////////////////
+
 		// 0. 無論如何都先把 cartItemIds 收集起來（兩種支付方式都會用到）
 		const all_tr_el = document.querySelectorAll("tr[data-cart-item-id]");
 
@@ -31,8 +64,8 @@ document.addEventListener("DOMContentLoaded", function() {
 				if (!res.ok) throw new Error("linepay/payment-request: NOT 2XX");
 				else return res.json();
 			}).then(data => {
-//				console.log(data.status);
-				if(data.status?.toUpperCase() !== "SUCCESS")
+				//				console.log(data.status);
+				if (data.status?.toUpperCase() !== "SUCCESS")
 					alert(data.message); // 失敗的 message 是拿來 alert 用戶
 				else window.location.href = data.message; // 只有成功的 message 才是拿來轉導
 			}).catch(error => {

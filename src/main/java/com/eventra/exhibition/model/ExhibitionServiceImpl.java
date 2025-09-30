@@ -356,11 +356,11 @@ public class ExhibitionServiceImpl implements ExhibitionService {
 	 * @param exhibitionId
 	 * @return
 	 */
-	public ExhibitionDTO getExhibitionInfoForPage(Integer exhibitionId) {
+	public ExhibitionPageDTO getExhibitionInfoForPage(Integer exhibitionId) {
 		ExhibitionVO exhibition = repository.findById(exhibitionId).orElse(null);
 		if(exhibition == null) return null;
 		Set<ExhibitionTicketTypeVO> etts = exhibition.getExhibitionTicketTypes();
-		ExhibitionDTO dto = new ExhibitionDTO();
+		ExhibitionPageDTO dto = new ExhibitionPageDTO();
 		String photoLandscape = exhibition.getPhotoLandscape() != null ? exhibition.getPhotoLandscape() : DEFAULT_PHOTO_LANDSCAPE;
 		dto.setExhibitionId(exhibitionId);
 		dto.setPhotoLandscape(photoLandscape);
@@ -368,7 +368,11 @@ public class ExhibitionServiceImpl implements ExhibitionService {
 		dto.setAverageRatingScore(exhibition.getAverageRatingScore());
 		dto.setTotalRatingCount(exhibition.getTotalRatingCount());
 		dto.setLeftTicketQuantity(exhibition.getTotalTicketQuantity() - exhibition.getSoldTicketQuantity());
-		
+		dto.setTicketStartTime(exhibition.getTicketStartTime());
+		Boolean isTicketStart = LocalDateTime.now().isAfter(exhibition.getTicketStartTime());
+		dto.setIsTicketStart(isTicketStart);
+		Boolean isExhibitionEnded = LocalDateTime.now().isAfter(exhibition.getEndTime());
+		dto.setIsExhibitionEnded(isExhibitionEnded);
 		Map<Integer, Integer> tickets = new HashMap<>();
 		Set<ExhibitionTicketTypeVO> ettVOs = exhibition.getExhibitionTicketTypes();
 		for(ExhibitionTicketTypeVO ettVO : ettVOs)
@@ -411,7 +415,7 @@ public class ExhibitionServiceImpl implements ExhibitionService {
 			.setExhibitorDisplayName(exhibitorDisplayName);
 		
 		dto.setExhibitor(exhibitorDTO); 
-		Integer totalCommentCount = commentRepository.countByExhibitionId(CommentStatus.正常, exhibitionId);
+		Integer totalCommentCount = commentRepository.countByExhibitionId(CommentStatus.正常.toString(), exhibitionId);
 		System.out.println("totalCommentCount: " + totalCommentCount);
 		dto.setTotalCommentCount(totalCommentCount);
 		
@@ -447,6 +451,28 @@ public class ExhibitionServiceImpl implements ExhibitionService {
 		return repository.findEnded(exhibitorId, DRAFT_STATUS_ID, (q == null ? "" : q), defaultPageable(page, size));
 	}
 
+	public ExhibitionSidebarResultDTO findSidebarExhibitionsByRatingScore(Integer exhibitionId, Double averageRatingScore){
+		Pageable pageable = PageRequest.ofSize(5);
+		Slice<ExhibitionVO> exhibitionsSlice = repository.findExhibitionsByAverageRatingScoreDesc(averageRatingScore, exhibitionId, pageable);
+		
+		List<ExhibitionSidebarDTO> dtos = exhibitionsSlice.getContent()
+				.stream().map(vo -> new ExhibitionSidebarDTO()
+						.setAverageRatingScore(vo.getAverageRatingScore())
+						.setExhibitionId(vo.getExhibitionId())
+						.setPhotoPortrait(vo.getPhotoPortrait())
+						.setExhibitionName(vo.getExhibitionName())
+						.setLocation(vo.getLocation())
+						.setStartTime(vo.getStartTime())
+						.setEndTime(vo.getEndTime())
+						.setTotalRatingCount(vo.getTotalRatingCount())
+				).collect(Collectors.toList());
+		
+		ExhibitionSidebarResultDTO dtoResult = new ExhibitionSidebarResultDTO();
+		dtoResult.setHasNextPage(exhibitionsSlice.hasNext())
+				 .setList(dtos);
+		
+		return dtoResult;
+	}
 	
 	public Slice<ExhibitionLineBotCarouselDTO> findHotExhibitionsForLineBot(){
 		return null;

@@ -114,4 +114,8 @@ public interface ExhibitionRepository extends JpaRepository<ExhibitionVO, Intege
 	        ORDER BY distance
 	        """, nativeQuery = true)
 	    Slice<ExhibitionVO> findNearestExhibition(@Param("lat") Double lat, @Param("lng") Double lng, Pageable pageable);
+	    
+	    @Query("SELECT e FROM ExhibitionVO e WHERE (e.averageRatingScore < :score) OR "
+	    		+ " (e.averageRatingScore = :score AND e.exhibitionId > :eid) ORDER BY e.averageRatingScore DESC")
+	    Slice<ExhibitionVO> findExhibitionsByAverageRatingScoreDesc(@Param("score") Double score, @Param("eid") Integer exhibitionId, Pageable pageable);
 }
