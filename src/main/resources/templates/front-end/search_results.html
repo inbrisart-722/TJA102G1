@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -29,6 +28,7 @@
 
 <!-- CUSTOM CSS -->
 <link href="css/g1_6_custom.css" rel="stylesheet" />
+<link href="css/g1_10_custom.css" rel="stylesheet" />
 <link href="css/g1_10_custom_common.css" rel="stylesheet" />
 </head>
 
@@ -64,7 +64,7 @@
 	<main>
 		<div class="container margin_60">
 			<div class="row">
-				<div class="col-lg-9">
+				<div class="col-lg-8">
 					<!-- filtersBar -->
 					<section id="filtersBar" class="card border-0 shadow-sm mb-4">
 						<div class="card-body">
@@ -186,41 +186,72 @@
 					<!-- 分頁區 -->
 					<nav aria-label="Page navigation">
 						<ul class="pagination justify-content-center">
-							<li class="page-item"><a class="page-link" href="#"
-								aria-label="Previous"> <span aria-hidden="true">&laquo;</span>
-									<span class="sr-only">上一頁</span>
-							</a></li>
-							<li class="page-item active"><span class="page-link">1</span>
-							</li>
-							<li class="page-item"><a class="page-link" href="#">2</a></li>
-							<li class="page-item"><a class="page-link" href="#">3</a></li>
-							<li class="page-item"><a class="page-link" href="#"
-								aria-label="Next"> <span class="sr-only">下一頁</span> <span
-									aria-hidden="true">&raquo;</span>
-							</a></li>
 						</ul>
 					</nav>
 				</div>
 
 				<!-- 為你推薦區 隨機展示 -->
-				<aside class="col-lg-3">
-					<h3>為您推薦</h3>
-					<div class="recommend">
-						<!-- 1 -->
-						<a href="#" class="recommend_item">
-							<div class="row g-2">
-								<div class="col-4">
-									<img src="img/0_exhibition/ChatGPT_exhibition_1.png" alt="推薦圖片" />
-								</div>
-								<div class="col-8">
-									<h4>九月啊九月</h4>
-									<p>
-										<span class="start_time">2025/08/01</span> ~ <span
-											class="end_time">2025/08/01</span>
-									</p>
-								</div>
+				<aside class="col-lg-4" id="sidebar">
+				
+					<div id="related_exhib">
+						<h3 class="inner">推薦展覽</h3>
+						<div>
+							<div class="sidebar_exhib_block">
+								<a href="">
+									<div class="sidebar_exhib_img">
+										<img src="img/0_exhibition/ChatGPT_exhibition_1.png"
+											alt="推薦圖片" />
+									</div> <span class="sidebar_exhib_title">當代藝術畫展 - TibaMe</span> <span
+									class="sidebar_exhib_loc"><i class="icon-location"></i>&nbsp;台北市立美術館</span>
+									<span class="sidebar_exhib_time"><i class="icon-clock"></i>&nbsp;08/12~08/25</span>
+									<div class="rating">
+										<i class="icon-star voted"></i><i class="icon-star voted"></i><i
+											class="icon-star voted"></i><i class="icon-star voted"></i><i
+											class="icon-star-half-alt voted"></i> <span><small>(75)</small></span>
+									</div>
+								</a>
 							</div>
-						</a>
+						</div>
+						<hr />
+						<div>
+							<div class="sidebar_exhib_block">
+								<a href="">
+									<div class="sidebar_exhib_img">
+										<img src="img/0_exhibition/ChatGPT_exhibition_1.png"
+											alt="推薦圖片" />
+									</div> <span class="sidebar_exhib_title">當代藝術畫展 - TibaMe</span> <span
+									class="sidebar_exhib_loc"><i class="icon-location"></i>&nbsp;台北市立美術館</span>
+									<span class="sidebar_exhib_time"><i class="icon-clock"></i>&nbsp;08/12~08/25</span>
+									<div class="rating">
+										<i class="icon-star voted"></i><i class="icon-star voted"></i><i
+											class="icon-star voted"></i><i class="icon-star voted"></i><i
+											class="icon-star-half-alt voted"></i> <span><small>(75)</small></span>
+									</div>
+								</a>
+							</div>
+						</div>
+						<hr />
+						<div>
+							<div class="sidebar_exhib_block">
+								<a href="">
+									<div class="sidebar_exhib_img">
+										<img src="img/0_exhibition/ChatGPT_exhibition_1.png"
+											alt="推薦圖片" />
+									</div> <span class="sidebar_exhib_title">當代藝術畫展 - TibaMe</span> <span
+									class="sidebar_exhib_loc"><i class="icon-location"></i>&nbsp;台北市立美術館</span>
+									<span class="sidebar_exhib_time"><i class="icon-clock"></i>&nbsp;08/12~08/25</span>
+									<div class="rating">
+										<i class="icon-star voted"></i><i class="icon-star voted"></i><i
+											class="icon-star voted"></i><i class="icon-star voted"></i><i
+											class="icon-star-half-alt voted"></i> <span><small>(75)</small></span>
+									</div>
+								</a>
+							</div>
+						</div>
+
+						<div id="more_related_exhib">
+							<button class="btn_full btn_full_exhib">查看更多</button>
+						</div>
 					</div>
 				</aside>
 			</div>
@@ -301,6 +332,7 @@
 
 	<script src="js/g1_10_custom_common_csrf.js"></script>
 	<script src="js/g1_10_custom_common.js"></script>
+	<script src="js/g1_10_custom_exhibition.js"></script>
 	<script src="js/g1_6_search_results.js"></script>
 	<script src="js/g1_6_search_history.js"></script> <!-- 存搜尋紀錄用 -->
 	<script src="js/g1_6_search_modal.js"></script> <!-- 導頁至搜尋結果頁用 -->

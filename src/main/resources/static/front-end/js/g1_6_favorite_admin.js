@@ -1,6 +1,36 @@
 // g1_6_favorite_admin.js
 // 專門處理 會員中心 - 收藏清單列表載入與切換收藏
 
+// 依平均分數顯示星星
+function renderStars(avg, count) {
+    let stars = "";
+    const fullStars = Math.floor(avg);             // 整星數
+    const hasHalf = avg - fullStars >= 0.1;       // 大於等於 0.1 算半星
+    const emptyStars = 5 - fullStars - (hasHalf ? 1 : 0);
+
+    // 整星
+    for (let i = 0; i < fullStars; i++) {
+        stars += `<i class="icon-star voted"></i>`;
+    }
+
+    // 半星
+    if (hasHalf) {
+        stars += `<i class="icon-star-half-alt voted"></i>`;
+    }
+
+    // 空星
+    for (let i = 0; i < emptyStars; i++) {
+        stars += `<i class="icon-star-empty"></i>`;
+    }
+	
+	// 平均分數顯示到 1 位小數
+	    const avgDisplay = avg ? avg.toFixed(1) : "0.0";
+
+    return `${stars} <span><small>&nbsp;${avgDisplay} &nbsp;&nbsp;(${count || 0})</small></span>`;
+}
+
+
+
 // 收藏清單列表載入
 document.addEventListener("DOMContentLoaded", () => {
     const container = document.getElementById("favListContainer");
@@ -32,12 +62,8 @@ document.addEventListener("DOMContentLoaded", () => {
                         </div>
                         <div class="hotel_title">
                             <h3>${fav.exhibitionName}</h3>
-                            <div class="rating">
-                                <i class="icon-star voted"></i>
-                                <i class="icon-star voted"></i>
-                                <i class="icon-star voted"></i>
-                                <i class="icon-star voted"></i>
-                                <i class="icon-star-empty"></i>
+							<div class="rating">
+                                ${renderStars(fav.averageRatingScore, fav.totalRatingCount)}
                             </div>
                             <div>
                                 <button type="button"

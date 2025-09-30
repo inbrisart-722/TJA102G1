@@ -37,9 +37,9 @@ public class FavoriteProtectedApiController {
 	        boolean favoriteStatus = favSvc.toggleFavorite(memId, exhId);
 
             // 2. 回傳新的收藏狀態 (DTO 給前端 AJAX 用)
-            return new FavoriteDTO(exhId, null, favoriteStatus);
+            return new FavoriteDTO(exhId, null, favoriteStatus, null, null);
         } catch (Exception e) {
-            return new FavoriteDTO(exhId, null, false);
+            return new FavoriteDTO(exhId, null, false, null, null);
         }
     }
 
@@ -57,25 +57,23 @@ public class FavoriteProtectedApiController {
 		    List<FavoriteDTO> dtoList = new ArrayList<>();
 		    
 			// 4. 用 for 迴圈把每筆 VO 轉成 DTO
-			for (FavoriteVO fav : voList) {
-				// (1) 預設展覽名稱= "查無展覽名稱"
-				String name = "查無展覽名稱";
-				
-				// (2) 用 exhibitionId 查 Exhibition 資料表, 若有找到就取出展覽名稱
-				Optional<ExhibitionVO> opt = exhRepo.findById(fav.getExhibitionId());
+		    for (FavoriteVO fav : voList) {
+		        Optional<ExhibitionVO> opt = exhRepo.findById(fav.getExhibitionId());
 		        if (opt.isPresent()) {
-		            name = opt.get().getExhibitionName();
-		        }
-	            
-	            // (3) 收藏狀態, 預設 false
-		        boolean status = (fav.getFavoriteStatus() != null && fav.getFavoriteStatus() == 1);
-	            
-	            // (5) 把 DTO 放進 List 容器
-	            dtoList.add(new FavoriteDTO(fav.getExhibitionId(), name, status));
-	        }
+		            ExhibitionVO exh = opt.get();
+		            String name = exh.getExhibitionName();
+		            boolean status = (fav.getFavoriteStatus() != null && fav.getFavoriteStatus() == 1);
 
-			// 5. 回傳 DTO 清單, 會自動轉成 JSON 回傳前端
-	        return dtoList; 
+		            dtoList.add(new FavoriteDTO(
+		                fav.getExhibitionId(),
+		                name,
+		                status,
+		                exh.getAverageRatingScore(),   // Formula 已經算好
+		                exh.getTotalRatingCount()      // 評價總數
+		            ));
+		        }
+		    }
+		    return dtoList;
 		}
 
 		// ========== 檢查會員是否已收藏展覽(status = 1) ==========
@@ -93,13 +91,13 @@ public class FavoriteProtectedApiController {
 					FavoriteVO fav = opt.get();
 					// 收藏狀態 = 1, 有收藏
 					boolean isFavorited = (fav.getFavoriteStatus() != null && fav.getFavoriteStatus() == 1);
-	                return new FavoriteDTO(exhId, null, isFavorited);
+	                return new FavoriteDTO(exhId, null, isFavorited, null, null);
 				} else {
 					// 收藏狀態 = 0 / null, 沒收藏
-					return new FavoriteDTO(exhId, null, false);
+					return new FavoriteDTO(exhId, null, false, null, null);
 				}
 			} catch (Exception e) {
-				return new FavoriteDTO(exhId, null, false);
+				return new FavoriteDTO(exhId, null, false, null, null);
 			}
 		}
 }

@@ -37,9 +37,9 @@ public class FavoriteApiController {
 	        boolean favoriteStatus = favSvc.toggleFavorite(memId, exhId);
 
             // 2. 回傳新的收藏狀態 (DTO 給前端 AJAX 用)
-            return new FavoriteDTO(exhId, null, favoriteStatus);
+            return new FavoriteDTO(exhId, null, favoriteStatus, null, null);
         } catch (Exception e) {
-            return new FavoriteDTO(exhId, null, false);
+            return new FavoriteDTO(exhId, null, false, null, null);
         }
     }
 	
@@ -66,7 +66,7 @@ public class FavoriteApiController {
 	        boolean status = (fav.getFavoriteStatus() != null && fav.getFavoriteStatus() == 1);
 
 	        // (3) 建立 DTO
-	        dtoList.add(new FavoriteDTO(fav.getExhibitionId(), name, status));
+	        dtoList.add(new FavoriteDTO(fav.getExhibitionId(), name, status, null, null));
 	    }
 
 	    // 5. 回傳 DTO 清單, 會自動轉成 JSON 回傳前端
@@ -89,13 +89,13 @@ public class FavoriteApiController {
 				FavoriteVO fav = opt.get();
 				// 收藏狀態 = 1, 有收藏
 				boolean isFavorited = (fav.getFavoriteStatus() != null && fav.getFavoriteStatus() == 1);
-                return new FavoriteDTO(exhId, null, isFavorited);
+                return new FavoriteDTO(exhId, null, isFavorited, null, null);
 			} else {
 				// 收藏狀態 = 0 / null, 沒收藏
-				return new FavoriteDTO(exhId, null, false);
+				return new FavoriteDTO(exhId, null, false, null, null);
 			}
 		} catch (Exception e) {
-			return new FavoriteDTO(exhId, null, false);
+			return new FavoriteDTO(exhId, null, false, null, null);
 		}
 	}
 

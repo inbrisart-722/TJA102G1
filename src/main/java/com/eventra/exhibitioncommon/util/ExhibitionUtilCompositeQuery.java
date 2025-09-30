@@ -61,77 +61,113 @@ public class ExhibitionUtilCompositeQuery {
 	
 	// ========================================================================================================================
 	
-	/* ===== 複合條件 ===== */
-	
-	// 組合以上 predicate, 回傳 DTO 的查詢
-		public static List<ExhibitionListDTO> getAllC(Map<String, String[]> map, EntityManager em) { // map(放前端傳來的條件), em(建立查詢物件)
-			// 創建 CriteriaBuilder
-	        CriteriaBuilder cb = em.getCriteriaBuilder();
-	        
-	        // 創建 CriteriaQuery
-	        CriteriaQuery<Object[]> cq = cb.createQuery(Object[].class);
-	        
-	        // 創建 Root (查詢資料表)
-	        Root<ExhibitionVO> root = cq.from(ExhibitionVO.class);
-	        // LEFT JOIN, 沒有票種也能查展覽
-	        Join<ExhibitionVO, ExhibitionTicketTypeVO> ticket = root.join("exhibitionTicketTypes", JoinType.LEFT);
+	/* ===== 複合條件 (查詢分頁版) ===== */
+    public static List<ExhibitionListDTO> getAllC(
+            Map<String, String[]> map,
+            EntityManager em,
+            int offset,
+            int size) {
 
-	        // 收集所有條件, 最後一次性套到 WHERE
-	        List<Predicate> predicateList = new ArrayList<>(); 
-	        
-	        // 固定條件: 只查展覽狀態 3 (尚未開賣) 或 4 (售票中)
-	        predicateList.add(root.get("exhibitionStatusId").in(Arrays.asList(3, 4)));
+        CriteriaBuilder cb = em.getCriteriaBuilder();
+        CriteriaQuery<Object[]> cq = cb.createQuery(Object[].class);
 
-	        if (map.containsKey("keyword")) {
-	            predicateList.add(get_aPredicate_ForKeyword(cb, root, map.get("keyword")[0])); // map.get("keyword")[0] = 取keyword陣列的第一個元素
-	        }
-	        if (map.containsKey("date_from") && map.containsKey("date_to")) {
-	            predicateList.add(get_aPredicate_ForDateRange(cb, root,
-	                map.get("date_from")[0], map.get("date_to")[0]));
-	        }
-	        if (map.containsKey("regions")) {
-	            predicateList.add(get_aPredicate_ForRegions(cb, root, map.get("regions")));
-	        }
+        Root<ExhibitionVO> root = cq.from(ExhibitionVO.class);
+        Join<ExhibitionVO, ExhibitionTicketTypeVO> ticket = root.join("exhibitionTicketTypes", JoinType.LEFT);
 
-	        cq.multiselect(
-	                root.get("exhibitionId"),
-	                root.get("exhibitionName"),
-	                root.get("photoLandscape"),
-	                cb.min(ticket.get("price")),
-	                cb.max(ticket.get("price")),
-	                root.get("startTime"),
-	                root.get("endTime"),
-	                root.get("location"),
-	                root.get("totalRatingCount")
-	            )
-	            .where(predicateList.toArray(new Predicate[0]))
-	            .groupBy(root.get("exhibitionId"), root.get("exhibitionName"),
-	                     root.get("photoLandscape"), root.get("startTime"),
-	                     root.get("endTime"), root.get("location"),
-	                     root.get("totalRatingCount"))
-	            .orderBy(cb.desc(root.get("exhibitionId")));
+        List<Predicate> predicateList = new ArrayList<>();
+        predicateList.add(root.get("exhibitionStatusId").in(Arrays.asList(3, 4)));
 
-	        // 執行查詢，回傳 Object[] 結果
-	        TypedQuery<Object[]> query = em.createQuery(cq);
-	        List<Object[]> list = query.getResultList();
+        if (map.containsKey("keyword")) {
+            predicateList.add(get_aPredicate_ForKeyword(cb, root, map.get("keyword")[0]));
+        }
+        if (map.containsKey("date_from") && map.containsKey("date_to")) {
+            predicateList.add(get_aPredicate_ForDateRange(cb, root,
+                    map.get("date_from")[0], map.get("date_to")[0]));
+        }
+        if (map.containsKey("regions")) {
+            predicateList.add(get_aPredicate_ForRegions(cb, root, map.get("regions")));
+        }
 
-	        // 手動 new DTO
-	        List<ExhibitionListDTO> result = new ArrayList<>();
-	        for (Object[] r : list) {
-	            ExhibitionListDTO dto = new ExhibitionListDTO();
-	            dto.setExhibitionId((Integer) r[0]);
-	            dto.setExhibitionName((String) r[1]);
-	            dto.setPhotoLandscape((String) r[2]);
-	            dto.setMinPrice(r[3] != null ? ((Number) r[3]).intValue() : null);
-	            dto.setMaxPrice(r[4] != null ? ((Number) r[4]).intValue() : null);
-	            dto.setStartTime((LocalDateTime) r[5]);
-	            dto.setEndTime((LocalDateTime) r[6]);
-	            dto.setLocation((String) r[7]);
-	            dto.setRatingCount(r[8] != null ? ((Number) r[8]).intValue() : null);
-	            result.add(dto);
-	        }
+        cq.multiselect(
+                root.get("exhibitionId"),
+                root.get("exhibitionName"),
+                root.get("photoLandscape"),
+                cb.min(ticket.get("price")),
+                cb.max(ticket.get("price")),
+                root.get("startTime"),
+                root.get("endTime"),
+                root.get("location"),
+                root.get("totalRatingScore"),
+                root.get("totalRatingCount")
+        )
+                .where(predicateList.toArray(new Predicate[0]))
+                .groupBy(root.get("exhibitionId"), root.get("exhibitionName"),
+                        root.get("photoLandscape"), root.get("startTime"),
+                        root.get("endTime"), root.get("location"),
+                        root.get("totalRatingScore"), root.get("totalRatingCount"))
+                .orderBy(cb.desc(root.get("exhibitionId")));
 
-	        return result;
-	    }
-	
+        TypedQuery<Object[]> query = em.createQuery(cq);
+        query.setFirstResult(offset);
+        query.setMaxResults(size);
+
+        return mapResult(query.getResultList());
+    }
+
+    /* ===== 複合條件 (計算總數) ===== */
+    public static int countAllC(Map<String, String[]> map, EntityManager em) {
+        CriteriaBuilder cb = em.getCriteriaBuilder();
+        CriteriaQuery<Long> cq = cb.createQuery(Long.class);
+
+        Root<ExhibitionVO> root = cq.from(ExhibitionVO.class);
+
+        cq.select(cb.countDistinct(root));
+
+        List<Predicate> predicateList = new ArrayList<>();
+        predicateList.add(root.get("exhibitionStatusId").in(Arrays.asList(3, 4)));
+
+        if (map.containsKey("keyword")) {
+            predicateList.add(get_aPredicate_ForKeyword(cb, root, map.get("keyword")[0]));
+        }
+        if (map.containsKey("date_from") && map.containsKey("date_to")) {
+            predicateList.add(get_aPredicate_ForDateRange(cb, root,
+                    map.get("date_from")[0], map.get("date_to")[0]));
+        }
+        if (map.containsKey("regions")) {
+            predicateList.add(get_aPredicate_ForRegions(cb, root, map.get("regions")));
+        }
+
+        cq.where(predicateList.toArray(new Predicate[0]));
+
+        return em.createQuery(cq).getSingleResult().intValue();
+    }
+
+    /* ===== 工具: Object[] 轉 DTO ===== */
+    private static List<ExhibitionListDTO> mapResult(List<Object[]> list) {
+        List<ExhibitionListDTO> result = new ArrayList<>();
+        for (Object[] r : list) {
+            ExhibitionListDTO dto = new ExhibitionListDTO();
+            dto.setExhibitionId((Integer) r[0]);
+            dto.setExhibitionName((String) r[1]);
+            dto.setPhotoLandscape((String) r[2]);
+            dto.setMinPrice(r[3] != null ? ((Number) r[3]).intValue() : null);
+            dto.setMaxPrice(r[4] != null ? ((Number) r[4]).intValue() : null);
+            dto.setStartTime((LocalDateTime) r[5]);
+            dto.setEndTime((LocalDateTime) r[6]);
+            dto.setLocation((String) r[7]);
+
+            // 評分邏輯
+            Integer totalScore = r[8] != null ? ((Number) r[8]).intValue() : 0;
+            Integer ratingCount = r[9] != null ? ((Number) r[9]).intValue() : 0;
+            dto.setRatingCount(ratingCount);
+            if (ratingCount > 0) {
+                dto.setAverageRatingScore(Math.round((totalScore * 10.0 / ratingCount)) / 10.0);
+            } else {
+                dto.setAverageRatingScore(0.0);
+            }
+
+            result.add(dto);
+        }
+        return result;
+    }
 }
