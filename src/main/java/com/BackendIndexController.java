@@ -5,6 +5,8 @@ import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -28,6 +30,8 @@ import com.eventra.tickettype.model.TicketTypeVO;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.eventra.exhibitor.model.ExhibitorRepository;
 import com.eventra.exhibitor.model.ExhibitorVO;
+import com.eventra.platform_announcement.model.PlatformAnnouncementRepository;
+import com.eventra.platform_announcement.model.PlatformAnnouncementVO;
 
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
@@ -41,16 +45,38 @@ public class BackendIndexController {
 	private final Integer TEST_EXHIBITOR = 3;
 	private final TicketTypeRepository ticketTypeRepository;
 	private final ExhibitorRepository exhibitorRepository;
+	private final PlatformAnnouncementRepository platformAnnouncementRepository;
 
-	public BackendIndexController(ExhibitionService exhibitionService, TicketTypeRepository ticketTypeRepository,
-									ExhibitorRepository exhibitorRepository) {
+	public BackendIndexController(ExhibitionService exhibitionService, 
+								  TicketTypeRepository ticketTypeRepository,
+								  ExhibitorRepository exhibitorRepository,
+								  PlatformAnnouncementRepository platformAnnouncementRepository) {
 		this.exhibitionService = exhibitionService;
 		this.ticketTypeRepository = ticketTypeRepository;
 		this.exhibitorRepository = exhibitorRepository;
+		this.platformAnnouncementRepository = platformAnnouncementRepository;
 	}
 	
     @GetMapping("exhibitor/back_end_homepage")
-    public String exhibitorBackendPage(){
+    public String exhibitorBackendPage(Model model,
+    								   @RequestParam(defaultValue = "0") int page,
+    								   @RequestParam(defaultValue = "10") int size,
+    								   @RequestParam(required = false) String q){
+    	
+    	PageRequest pr = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt"));
+    	
+    	Page<PlatformAnnouncementVO> p =
+    			(q == null || q.isBlank())
+    				? platformAnnouncementRepository.findAll(pr)
+    				: platformAnnouncementRepository
+    					.findByTitleContainingIgnoreCaseOrContentContainingIgnoreCase(q, q, pr);
+    	
+    	model.addAttribute("announcements", p.getContent());
+    	model.addAttribute("currentPage", page);
+    	model.addAttribute("totalPages", p.getTotalPages());
+    	model.addAttribute("tltalElements", p.getTotalElements());
+    	model.addAttribute("q", q == null ? "" : q);
+    	
         return "back-end/back_end_homepage";
     }
     
