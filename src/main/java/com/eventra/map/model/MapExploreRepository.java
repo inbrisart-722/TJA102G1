@@ -14,17 +14,18 @@ public interface MapExploreRepository extends JpaRepository<ExhibitionVO, Intege
      * */
 	
 	@Query(value = "SELECT e.exhibition_id, e.exhibition_name, " +
-				   "e.location, e.longitude, e.latitude, " +
-				   "COALESCE(e.photo_landscape, '/img/0_exhibition/default.png'), "+
-				   "e.start_time, e.end_time, " +
-				   "e.total_rating_count " +
-				   "FROM exhibition e " +
-//				   "WHERE e.exhibition_status_id IN (3,4) " +
-	               "WHERE e.end_time >= CURDATE() " +
-	               "AND e.longitude IS NOT NULL " +
-	               "AND e.latitude IS NOT NULL ",
-				   nativeQuery = true)
-		List<Object[]> findNearbyExhibitionsNative();
+		            "e.location, e.longitude, e.latitude, " +
+		            "COALESCE(e.photo_landscape, '/img/0_exhibition/default.png'), " +
+		            "e.start_time, e.end_time, " +
+		            "CASE WHEN e.total_rating_count > 0 " +
+		            "THEN ROUND(e.total_rating_score / e.total_rating_count, 1) ELSE 0 END AS averageRatingScore, " +
+		            "e.total_rating_count " +
+		            "FROM exhibition e " +
+		            "WHERE e.end_time >= CURDATE() " +
+		            "AND e.longitude IS NOT NULL " +
+		            "AND e.latitude IS NOT NULL",
+		            nativeQuery = true)
+	List<Object[]> findNearbyExhibitionsNative();
 	
 		
 		// 日期區間篩選(暫保留)

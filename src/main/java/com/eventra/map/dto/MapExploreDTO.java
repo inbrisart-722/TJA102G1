@@ -4,25 +4,27 @@ import java.time.LocalDateTime;
 
 public class MapExploreDTO {
 	/* 地圖探索頁 展覽資訊卡片用 */
-	
-	private Integer exhibitionId;		// 展覽ID
-	private String exhibitionName;		// 展覽名稱
-	private String location;			// 展覽地點
-	private Double longitude;			// 經度
-	private Double latitude;			// 緯度
-	private String photo;				// 展覽圖片
-	private LocalDateTime startTime;	// 開始時間
-	private LocalDateTime endTime;		// 結束時間
-	private Integer ratingCount;		// 評價總數
-	
+
+	private Integer exhibitionId; // 展覽ID
+	private String exhibitionName; // 展覽名稱
+	private String location; // 展覽地點
+	private Double longitude; // 經度
+	private Double latitude; // 緯度
+	private String photo; // 展覽圖片
+	private LocalDateTime startTime; // 開始時間
+	private LocalDateTime endTime; // 結束時間
+	private Integer ratingCount; // 評價總數
+	private Double averageRatingScore; // 平均分數
+
 	// 無參數建構子
 	public MapExploreDTO() {
 		super();
 	}
-	
+
 	// 有參數建構子
 	public MapExploreDTO(Integer exhibitionId, String exhibitionName, String location, Double longitude,
-			Double latitude, String photo, LocalDateTime startTime, LocalDateTime endTime, Integer ratingCount) {
+			Double latitude, String photo, LocalDateTime startTime, LocalDateTime endTime, Integer ratingCount,
+			Double averageRatingScore) {
 		super();
 		this.exhibitionId = exhibitionId;
 		this.exhibitionName = exhibitionName;
@@ -33,8 +35,9 @@ public class MapExploreDTO {
 		this.startTime = startTime;
 		this.endTime = endTime;
 		this.ratingCount = ratingCount;
+		this.averageRatingScore = averageRatingScore;
 	}
-
+	
 	// getter / setter
 	public Integer getExhibitionId() {
 		return exhibitionId;
@@ -107,5 +110,13 @@ public class MapExploreDTO {
 	public void setRatingCount(Integer ratingCount) {
 		this.ratingCount = ratingCount;
 	}
-	
+
+	public Double getAverageRatingScore() {
+		return averageRatingScore;
+	}
+
+	public void setAverageRatingScore(Double averageRatingScore) {
+		this.averageRatingScore = averageRatingScore;
+	}
+
 }

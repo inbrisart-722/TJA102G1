@@ -1,6 +1,35 @@
 // g1_6_map_explore.js
 // 展覽資料渲染到地圖 : Marker + InfoBox
 
+// 依平均分數顯示星星
+function renderStars(avg, count) {
+    let stars = "";
+    const fullStars = Math.floor(avg);             // 整星數
+    const hasHalf = avg - fullStars >= 0.1;       // 大於等於 0.1 算半星
+    const emptyStars = 5 - fullStars - (hasHalf ? 1 : 0);
+
+    // 整星
+    for (let i = 0; i < fullStars; i++) {
+        stars += `<i class="icon-star voted"></i>`;
+    }
+
+    // 半星
+    if (hasHalf) {
+        stars += `<i class="icon-star-half-alt voted"></i>`;
+    }
+
+    // 空星
+    for (let i = 0; i < emptyStars; i++) {
+        stars += `<i class="icon-star-empty"></i>`;
+    }
+	
+	// 平均分數顯示到 1 位小數
+	    const avgDisplay = avg ? avg.toFixed(1) : "0.0";
+
+    return `${stars} <span><small> ${avgDisplay}</small> &nbsp;(${count || 0})</span>`;
+}
+
+
 var activeInfoWindow; // 追蹤目前打開的 InfoWindow
 
 function loadNearbyExhibitions(lat, lng, radius) {
@@ -38,16 +67,11 @@ function loadNearbyExhibitions(lat, lng, radius) {
 					<span class="location">${item.location}</span>
 					<span class="start_time">${formatDate(item.startTime)} ~ ${formatDate(item.endTime)}</span>
 					<span class="rating">
-						<i class="icon-star voted "></i>
-						<i class="icon-star voted"></i>
-						<i class="icon-star-half-alt voted"></i>
-						<i class="icon-star-empty"></i>
-						<i class="icon-star-empty"></i>
-						(${item.ratingCount})
+						${renderStars(item.averageRatingScore, item.ratingCount)}
 					</span>
 					<div class="marker_tools">
 					</div>
-					<a href="/exhibitions/${item.exhibitionId}" class="btn_infobox">查看展覽</a>
+					<a href="/front-end/exhibitions/${item.exhibitionId}" class="btn_infobox">查看展覽</a>
 				</div>
 				`;
 
