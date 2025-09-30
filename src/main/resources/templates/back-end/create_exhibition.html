@@ -242,38 +242,54 @@
 						<div class="col-lg-8">
 							<div class="row g-3">
 								<div class="col-12">
-									<label class="form-label">展覽名稱</label> <input type="text"
-										th:field="*{exhibitionName}" class="form-control" id="evName"
-										name="name" placeholder="輸入展覽名稱" required>
+									<label class="form-label">展覽名稱</label>
+									<input type="text" th:field="*{exhibitionName}" class="form-control" id="evName"
+									       th:classappend="${#fields.hasErrors('exhibitionName')}? ' is-invalid' : ''"
+									       placeholder="輸入展覽名稱">
+									<div class="invalid-feedback" th:if="${#fields.hasErrors('exhibitionName')}"
+									     th:errors="*{exhibitionName}">展覽名稱錯誤</div>
 								</div>
 								<div class="col-md-6">
-									<label class="form-label">開始時間</label> <input
-										type="datetime-local" th:field="*{startTime}"
-										class="form-control" id="startAt" name="startAt" required>
+									<label class="form-label">開始時間</label>
+									<input type="datetime-local" th:field="*{startTime}" class="form-control" id="startAt"
+									       th:classappend="${#fields.hasErrors('startTime')}? ' is-invalid' : ''">
+									<div class="invalid-feedback" th:if="${#fields.hasErrors('startTime')}"
+									     th:errors="*{startTime}"></div>
 								</div>
 								<div class="col-md-6">
-									<label class="form-label">結束時間</label> <input
-										type="datetime-local" th:field="*{endTime}"
-										class="form-control" id="endAt" name="endAt" required>
+									<label class="form-label">結束時間</label>
+									<input type="datetime-local" th:field="*{endTime}" class="form-control" id="endAt"
+									       th:classappend="${#fields.hasErrors('endTime')}? ' is-invalid' : ''">
+									<div class="invalid-feedback" th:if="${#fields.hasErrors('endTime')}"
+									     th:errors="*{endTime}"></div>
+
 								</div>
 								<div class="col-md-6">
-									<label class="form-label">展覽地點</label> <input type="text"
-										th:field="*{location}" class="form-control" id="location"
-										name="location" placeholder="輸入展覽地點">
+									<label class="form-label">展覽地點</label>
+									<input type="text" th:field="*{location}" class="form-control" id="location"
+									       th:classappend="${#fields.hasErrors('location')}? ' is-invalid' : ''"
+									       placeholder="輸入展覽地點">
+									<div class="invalid-feedback" th:if="${#fields.hasErrors('location')}"
+									     th:errors="*{location}"></div>
 								</div>
 								<!-- <div class="col-md-6">
                                 <label class="form-label">主辦單位</label>
                                 <input type="text" class="form-control" id="organizer" name="organizer" placeholder="展覽主辦方">
                             </div> -->
 								<div class="col-md-6">
-									<label class="form-label">總票數</label> <input type="number"
-										th:field="*{totalTicketQuantity}" min="0" class="form-control"
-										name="totalTickets" id="totalTickets" placeholder="輸入總票數">
+									<label class="form-label">總票數</label>
+									<input type="number" min="0" th:field="*{totalTicketQuantity}" class="form-control" id="totalTickets"
+									       th:classappend="${#fields.hasErrors('totalTicketQuantity')}? ' is-invalid' : ''"
+									       placeholder="輸入總票數">
+									<div class="invalid-feedback" th:if="${#fields.hasErrors('totalTicketQuantity')}"
+									     th:errors="*{totalTicketQuantity}"></div>
 								</div>
 								<div class="col-md-6">
-									<label class="form-label">開賣日</label> <input
-										type="datetime-local" th:field="*{ticketStartTime}"
-										class="form-control" id="saleOpenAt" name="saleOpenAt">
+									<label class="form-label">開賣日</label>
+									<input type="datetime-local" th:field="*{ticketStartTime}" class="form-control" id="saleOpenAt"
+									       th:classappend="${#fields.hasErrors('ticketStartTime')}? ' is-invalid' : ''">
+									<div class="invalid-feedback" th:if="${#fields.hasErrors('ticketStartTime')}"
+									     th:errors="*{ticketStartTime}"></div>
 								</div>
 							</div>
 						</div>
@@ -314,7 +330,7 @@
 						</div>
 						<div id="ticketList" class="mt-2"></div>
 						<!-- 隱藏欄位 -->
-    					<input type="hidden" id="ticketJson" name="ticketJson">
+    					<input type="hidden" th:field="*{ticketJson}" id="ticketJson"/>
     					<input type="hidden" th:field="*{draft}" id="isDraft" value="false">
 					</div>
 				</div>
@@ -358,6 +374,8 @@
 					<div class="card-body">
 						
 						<textarea id="editor" th:field="*{description}"></textarea>
+						<div class="invalid-feedback d-block" th:if="${#fields.hasErrors('description')}"
+     					th:errors="*{description}"></div>
 					</div>
 				</div>
 
@@ -748,7 +766,7 @@
 	    ticketState = loadedTickets.map(t => ({
 	      name: t.name ?? '',
 	      price: (t.price === null || t.price === undefined) ? '' : String(t.price),
-	      active: !!t.enabled, // 用 enabled 還原是否啟用
+	      active: (t.enabled === undefined ? false : !!t.enabled), // 用 enabled 還原是否啟用
 	    }));
 	  } else {
 	    ticketState = DEFAULT_TICKETS;
@@ -786,26 +804,24 @@
 	  }
 	
 	  // 4) 送出時把啟用票種塞到 hidden input
-	  function collectTickets() {
-		  // 這個 ticketState 你已有（含 active / name / price）
-		  return ticketState
-		    .filter(t => t.active && t.price !== '' && t.price !== null && !Number.isNaN(Number(t.price)))
-		    .map(t => ({
-		      name: (t.name || '').trim() || '未命名',
-		      price: Number(t.price)
-		    }));
+	  function collectAllTickets() {
+		  return ticketState.map(t => ({
+		    name: (t.name || '').trim(),
+		    price: (t.price === '' || t.price === null) ? null : Number(t.price),
+		    enabled: !!t.active
+		  }));
 		}
 		
 		// 送出前寫入 hidden input
 		document.getElementById('eventForm')?.addEventListener('submit', () => {
-		  const payload = collectTickets();
+		  const payload = collectAllTickets();
 		  document.getElementById('ticketJson').value = JSON.stringify(payload);
 		});
 		
-		// 如果你有「儲存為草稿」按鈕是用 JS 觸發 submit，也要在那之前塞值
+		// 如果有「儲存為草稿」按鈕是用 JS 觸發 submit，也要在那之前塞值
 		document.getElementById('btnSaveDraft')?.addEventListener('click', (e) => {
 		  e.preventDefault();
-		  document.getElementById('ticketJson').value = JSON.stringify(collectTickets());
+		  document.getElementById('ticketJson').value = JSON.stringify(collectAllTickets());
 		  document.getElementById('isDraft').value = 'true';
 		  document.getElementById('eventForm').submit();
 		});
@@ -816,10 +832,63 @@
 // 	  window.addEventListener('load', renderTickets);
 	  renderTickets(); // 立即呼叫一次
 	
-	  document.getElementById('eventForm')?.addEventListener('submit', () => {
-	    document.getElementById('ticketJson').value = JSON.stringify(collectTickets());
-	  });
 	</script>
+	<script>
+	(function () {
+	  const form = document.getElementById('eventForm');
+	  if (!form) return;
+	
+	  // 幫所有有可能出錯的欄位綁 input/change 事件
+	  const inputs = form.querySelectorAll(
+	    'input.form-control, textarea.form-control, input[type="datetime-local"], input[type="number"], input[type="text"], input[type="email"]'
+	  );
+	
+	  function clearErrorState(el) {
+	    // 僅在通過原生 HTML5 驗證且非空時移除錯誤狀態
+	    const valueOk = (el.type === 'number')
+	      ? (el.value !== '' && el.checkValidity())
+	      : (el.value?.trim() !== '' && el.checkValidity());
+	
+	    if (valueOk) {
+	      el.classList.remove('is-invalid');
+	      // 找到鄰近的 invalid-feedback 並隱藏
+	      let fb = el.nextElementSibling;
+	      
+	      if (!fb || !fb.classList.contains('invalid-feedback')) {
+	        fb = el.parentElement?.querySelector('.invalid-feedback');
+	      }
+	      if (fb) fb.style.display = 'none';
+	    }
+	  }
+	
+	  inputs.forEach((el) => {
+	    el.addEventListener('input', () => clearErrorState(el));
+	    el.addEventListener('change', () => clearErrorState(el));
+	  });
+	
+	  // 如果 description 用 Summernote，打字時也即時清錯
+	  if (window.jQuery) {
+	    const $ed = jQuery('#editor');
+	    if ($ed.length && typeof $ed.on === 'function') {
+	      $ed.on('summernote.change', function (_, contents) {
+	        // 把內容同步回 textarea，並檢查是否有文字
+	        const plain = jQuery('<div>').html(contents || '').text().trim();
+	        const ta = this; // 原本的 textarea
+	        ta.value = contents || '';
+	        if (plain.length > 0) {
+	          ta.classList.remove('is-invalid');
+	          const fb = ta.parentElement?.querySelector('.invalid-feedback');
+	          if (fb) fb.style.display = 'none';
+	        }
+	      });
+	    }
+	  }
+	
+	  // 如果有在 submit 時加上 .was-validated，可在任何欄位變更時移除它（避免樣式干擾）
+	  form.addEventListener('input', () => form.classList.remove('was-validated'));
+	})();
+	</script>
+	
 
 	
 </body>

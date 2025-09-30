@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="zh-Hant">
+<html xmlns:th="http://www.thymeleaf.org" lang="zh-Hant">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
@@ -135,12 +135,12 @@
                 <h5 class="card-title mb-0">公告列表</h5>
                 <div class="d-flex gap-2 align-items-center">
                   <!-- <a class="btn btn-dark" id="btnCreate">新增公告</a> -->
-                  <div class="search-wrap">
-                    <div class="input-group input-group-sm">
-                      <input class="form-control" type="text" id="searchInput" placeholder="搜尋公告…"/>
-                      <button class="btn btn-outline-secondary" id="btnSearch"><i class="bi bi-search"></i></button>
-                    </div>
-                  </div>
+                  <form class="search-wrap" method="get" th:action="@{/back-end/exhibitor/back_end_homepage}">
+				    <div class="input-group input-group-sm">
+				      <input class="form-control" type="text" name="q" th:value="${q}" placeholder="搜尋公告…" />
+				      <button class="btn btn-outline-secondary" type="submit"><i class="bi bi-search"></i></button>
+				    </div>
+				  </form>
                 </div>
               </div>
               <div class="card-body p-0">
@@ -155,43 +155,46 @@
                       </tr>
                     </thead>
                     <tbody id="annTbody">
-                        <tr>
-                            <td>2025/00/00</td>
-                            <td><a href="#" class="ann-link">網站維護公告</a></td>
-                            <td><span class="ann-link text-truncate" style="max-width: 620px; display:inline-block;">本○○平台將於2025/07/18 04:00~06:00進行網站例行性維護，屆時服務可能短暫中斷，造成不便敬請見諒。</span></td>
-                            <td class="text-end">
-                            <!-- <button class="btn btn-outline-secondary btn-sm me-1" data-action="edit">修改</button>
-                            <button class="btn btn-outline-danger btn-sm" data-action="delete">刪除</button> -->
-                            </td>
-                         
-                            
-                        </tr>
-                      <tr>
-                        <td>2025/00/00</td>
-                        <td><a href="#" class="ann-link">○○平台邀請你共同抗黃牛</a></td>
-                        <td><span class="ann-link text-truncate" style="max-width: 620px; display:inline-block;">自112年6月2日起，《文創法》第10條之…（示意文字）。</span></td>
-                        <td class="text-end">
-                        <!-- <button class="btn btn-outline-secondary btn-sm me-1" data-action="edit">修改</button>
-                        <button class="btn btn-outline-danger btn-sm" data-action="delete">刪除</button> -->
-                        </td>
-                    </tr>
-                      <tr><td colspan="4" style="height:40px; background:var(--bs-tertiary-bg);"></td></tr>
-                      <tr><td colspan="4" style="height:40px; background:var(--bs-tertiary-bg);"></td></tr>
-                      <tr><td colspan="4" style="height:40px; background:var(--bs-tertiary-bg);"></td></tr>
-                      <tr><td colspan="4" style="height:40px; background:var(--bs-tertiary-bg);"></td></tr>
-                      <tr><td colspan="4" style="height:40px; background:var(--bs-tertiary-bg);"></td></tr>
-                    </tbody>
+					  <tr th:if="${#lists.isEmpty(announcements)}">
+					    <td colspan="4" class="text-center text-secondary py-4">目前沒有公告</td>
+					  </tr>
+					
+					  <tr th:each="a : ${announcements}">
+					    <td th:text="${#dates.format(a.createdAt, 'yyyy/MM/dd')}">2025/00/00</td>
+					    <td>
+					      <a href="#" class="ann-link"
+					         th:text="${a.title}"
+					         th:attr="data-title=${a.title},data-date=${#dates.format(a.createdAt,'yyyy/MM/dd')},data-content=${a.content}">
+					        公告標題
+					      </a>
+					    </td>
+					    <td>
+					      <span class="ann-link text-truncate" style="max-width: 620px; display:inline-block;"
+					            th:text="${a.content}"
+					            th:attr="data-title=${a.title},data-date=${#dates.format(a.createdAt,'yyyy/MM/dd')},data-content=${a.content}">
+					        公告內容
+					      </span>
+					    </td>
+					    <td class="text-end"><!-- 如需操作按鈕可放這 --></td>
+					  </tr>
+					</tbody>
                   </table>
                 </div>
                 <div class="pager">
-                  <div class="page">«</div>
-                  <div class="page active">1</div>
-                  <div class="page">2</div>
-                  <div class="page">3</div>
-                  <div class="page">4</div>
-                  <div class="page">5</div>
-                  <div class="page">»</div>
-                </div>
+				  <a class="page" th:classappend="${currentPage==0} ? ' disabled'"
+				     th:href="@{/back-end/exhibitor/back_end_homepage(page=${currentPage-1},size=${10},q=${q})}">«</a>
+				
+				  <a class="page"
+				     th:each="i : ${#numbers.sequence(0, totalPages-1)}"
+				     th:text="${i+1}"
+				     th:classappend="${i==currentPage} ? ' active'"
+				     th:href="@{/back-end/exhibitor/back_end_homepage(page=${i},size=${10},q=${q})}">
+				    1
+				  </a>
+				
+				  <a class="page" th:classappend="${currentPage>=totalPages-1} ? ' disabled'"
+				     th:href="@{/back-end/exhibitor/back_end_homepage(page=${currentPage+1},size=${10},q=${q})}">»</a>
+				</div>
               </div>
             </div>
 
@@ -347,7 +350,6 @@
 
         // 若 modal 沒有放到頁面，直接離開（避免 null 錯誤）
         if(!viewModalEl || !viewTitleEl || !viewDateEl || !viewContentEl){
-        console.warn('[公告詳情] Modal 未找到：請確認已加入 annViewModal / annViewTitle / annViewDate / annViewContent');
         return;
         }
 
@@ -359,17 +361,9 @@
 
         e.preventDefault();
 
-        const tr = link.closest('tr');
-        if(!tr || tr.children.length < 3) return;
-
-        const dateText = (tr.children[0].textContent || '').trim();
-        const titleText = (tr.children[1].textContent || '').trim();
-        const contentText = (tr.children[2].textContent || '').trim();
-
-        // 安全賦值（節點已在上方判空）
-        viewDateEl.textContent = dateText || '-';
-        viewTitleEl.textContent = titleText || '(未命名公告)';
-        viewContentEl.textContent = contentText || '';
+        viewTitleEl.textContent = link.dataset.title || '(未命名公告)';
+        viewDateEl.textContent = link.dataset.date || '-';
+        viewContentEl.textContent = link.dataset.content || '';
 
         viewModal.show();
         });

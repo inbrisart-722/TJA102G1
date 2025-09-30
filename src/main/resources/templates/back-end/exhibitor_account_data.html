@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="zh-Hant">
+<html xmlns:th="http://www.thymeleaf.org" lang="zh-Hant">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
@@ -70,6 +70,13 @@
 
       <!-- Main -->
       <main class="app-main">
+      <!-- 成功訊息 -->
+		<div class="container-fluid" th:if="${msg}">
+		  <div class="alert alert-success alert-dismissible fade show" role="alert">
+		    <span th:text="${msg}">更新成功！</span>
+		    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+		  </div>
+		</div>
         <div class="app-content-header">
           <div class="container-fluid">
             <div class="row align-items-center">
@@ -85,21 +92,39 @@
           <div class="container-fluid">
             <div class="card mb-4">
               <div class="card-body">
-                <div class="kv-line"><div class="k">帳號(統編)</div><div id="vTaxId">12345678</div></div>
-                <div class="kv-line"><div class="k">信箱</div><div id="vEmail">abc@gmail.com</div></div>
-                <div class="kv-line"><div class="k">聯絡人姓名</div><div id="vContact">王小明</div></div>
-                <div class="kv-line"><div class="k">聯絡電話</div><div id="vPhone">0912345678</div></div>
-                <div class="kv-line"><div class="k">公司/單位名稱</div><div id="vCompany">XXXXXX公司</div></div>
-                <div class="kv-line" style="border:none"><div class="k">平台註冊名稱</div><div id="vDisplay">OOOOOO</div></div>
+                <div class="kv-line"><div class="k">帳號(統編)</div>
+				  <div id="vTaxId"
+				       th:text="${exhibitor != null ? exhibitor.businessIdNumber : '-'}">-</div></div>
+				
+				<div class="kv-line"><div class="k">信箱</div>
+				  <div id="vEmail" th:text="${exhibitor != null ? exhibitor.email : '-'}">-</div></div>
+				
+				<div class="kv-line"><div class="k">聯絡人姓名</div>
+				  <div id="vContact" th:text="${exhibitor != null ? exhibitor.contactName : '-'}">-</div></div>
+				
+				<div class="kv-line"><div class="k">聯絡電話</div>
+				  <div id="vPhone" th:text="${exhibitor != null ? exhibitor.contactPhone : '-'}">-</div></div>
+				
+				<div class="kv-line"><div class="k">公司/單位名稱</div>
+				  <div id="vCompany" th:text="${exhibitor != null ? exhibitor.companyName : '-'}">-</div></div>
+				
+				<div class="kv-line" style="border:none"><div class="k">平台註冊名稱</div>
+				  <div id="vDisplay"
+				       th:text="${exhibitor != null ? exhibitor.exhibitorRegistrationName : '-'}">-</div></div>
               </div>
             </div>
 
             <div class="card">
               <div class="card-header"><span class="section-title">銀行帳戶資訊</span></div>
               <div class="card-body">
-                <div class="kv-line"><div class="k">戶名</div><div id="vBankOwner">王小明</div></div>
-                <div class="kv-line"><div class="k">銀行代碼</div><div id="vBankCode">013國泰世華</div></div>
-                <div class="kv-line" style="border:none"><div class="k">帳號</div><div id="vBankNo">012345678910</div></div>
+                <div class="kv-line"><div class="k">戶名</div>
+				  <div id="vBankOwner" th:text="${exhibitor != null ? exhibitor.bankAccountName : '-'}">-</div></div>
+				
+				<div class="kv-line"><div class="k">銀行代碼</div>
+				  <div id="vBankCode" th:text="${exhibitor != null ? exhibitor.bankCode : '-'}">-</div></div>
+				
+				<div class="kv-line" style="border:none"><div class="k">帳號</div>
+				  <div id="vBankNo" th:text="${exhibitor != null ? exhibitor.bankAccountNumber : '-'}">-</div></div>
               </div>
             </div>
           </div>
@@ -114,69 +139,107 @@
 
     <!-- 編輯 Modal -->
     <div class="modal fade" id="editModal" tabindex="-1" aria-hidden="true">
-      <div class="modal-dialog modal-lg modal-dialog-centered">
-        <div class="modal-content">
-          <div class="modal-header"><h5 class="modal-title">編輯帳戶資料</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
-          <div class="modal-body">
-            <form id="accountForm" class="row g-3 needs-validation" novalidate>
-                <div class="col-md-6">
-                    <label class="form-label">帳號(統編)</label>
-                    <input type="text" class="form-control" id="fTaxId" value="10000009" required pattern="^\d{8}$" />
-                    <div class="invalid-feedback">請輸入 8 碼數字統一編號。</div>
-                </div>
-                <div class="col-md-6">
-                    <label class="form-label">信箱</label>
-                    <input type="email" class="form-control" id="fEmail" value="abc@gmail.com" required />
-                    <div class="invalid-feedback">請輸入有效的 Email。</div>
-                </div>
-                <div class="col-md-6">
-                    <label class="form-label">聯絡人姓名</label>
-                    <input type="text" class="form-control" id="fContact" value="王小明" required />
-                    <div class="invalid-feedback">請填寫聯絡人姓名。</div>
-                </div>
-                <div class="col-md-6">
-                    <label class="form-label">聯絡電話</label>
-                    <input type="text" class="form-control" id="fPhone" value="0912345678" required pattern="^09\d{8}$" />
-                    <div class="invalid-feedback">請輸入正確手機號碼（09 開頭共 10 碼）。</div>
-                </div>
-                <div class="col-md-6">
-                    <label class="form-label">公司/單位名稱</label>
-                    <input type="text" class="form-control" id="fCompany" value="緯育股份有限公司" required />
-                    <div class="invalid-feedback">請填寫公司/單位名稱。</div>
-                </div>
-                <div class="col-md-6">
-                    <label class="form-label">平台註冊名稱</label>
-                    <input type="text" class="form-control" id="fDisplay" value="OOOOOO" required />
-                    <div class="invalid-feedback">請填寫平台註冊名稱。</div>
-                </div>
+	  <div class="modal-dialog modal-lg modal-dialog-centered">
+	    <div class="modal-content">
+	      <div class="modal-header"><h5 class="modal-title">編輯帳戶資料</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
+	      <form id="accountForm"
+		        th:action="@{/back-end/exhibitor/exhibitor_account_data/update}"
+		        th:object="${form}"
+		        method="post"
+		        class="row g-3 needs-validation"
+		        novalidate>
+		  <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+	
+	        <div class="modal-body">
+	          <div class="col-md-6">
+			  <label class="form-label">帳號(統編)</label>
+			  <input type="text" class="form-control"
+			         th:classappend="${#fields.hasErrors('businessIdNumber')}? ' is-invalid' : ''"
+			         th:field="*{businessIdNumber}" maxlength="8" pattern="^\d{8}$" required/>
+			  <div class="invalid-feedback" th:if="${#fields.hasErrors('businessIdNumber')}"
+			       th:errors="*{businessIdNumber}">統編錯誤</div>
+			</div>
+			
+			<div class="col-md-6">
+			  <label class="form-label">信箱</label>
+			  <input type="email" class="form-control"
+			         th:classappend="${#fields.hasErrors('email')}? ' is-invalid' : ''"
+			         th:field="*{email}" maxlength="100" required/>
+			  <div class="invalid-feedback" th:if="${#fields.hasErrors('email')}"
+			       th:errors="*{email}">Email 錯誤</div>
+			</div>
+	          <div class="col-md-6">
+			  <label class="form-label">聯絡人姓名</label>
+			  <input type="text" class="form-control"
+			         th:classappend="${#fields.hasErrors('contactName')}? ' is-invalid' : ''"
+			         th:field="*{contactName}" maxlength="100"/>
+			  <div class="invalid-feedback" th:if="${#fields.hasErrors('contactName')}"
+			       th:errors="*{contactName}"></div>
+			</div>
+			
+			<div class="col-md-6">
+			  <label class="form-label">聯絡電話</label>
+			  <input type="text" class="form-control"
+			         th:classappend="${#fields.hasErrors('contactPhone')}? ' is-invalid' : ''"
+			         th:field="*{contactPhone}" maxlength="50" required/>
+			  <div class="invalid-feedback" th:if="${#fields.hasErrors('contactPhone')}"
+			       th:errors="*{contactPhone}"></div>
+			</div>
+			
+			<div class="col-md-6">
+			  <label class="form-label">公司/單位名稱</label>
+			  <input type="text" class="form-control"
+			         th:classappend="${#fields.hasErrors('companyName')}? ' is-invalid' : ''"
+			         th:field="*{companyName}" maxlength="255" required/>
+			  <div class="invalid-feedback" th:if="${#fields.hasErrors('companyName')}"
+			       th:errors="*{companyName}"></div>
+			</div>
+			  <div class="col-md-6">
+			  <label class="form-label">平台註冊名稱</label>
+			  <input type="text" class="form-control"
+			         th:classappend="${#fields.hasErrors('exhibitorRegistrationName')}? ' is-invalid' : ''"
+			         th:field="*{exhibitorRegistrationName}" maxlength="100"/>
+			  <div class="invalid-feedback" th:if="${#fields.hasErrors('exhibitorRegistrationName')}"
+			       th:errors="*{exhibitorRegistrationName}"></div>
+			</div>
+	
+			<div class="col-md-4">
+			  <label class="form-label">戶名</label>
+			  <input type="text" class="form-control"
+			         th:classappend="${#fields.hasErrors('bankAccountName')}? ' is-invalid' : ''"
+			         th:field="*{bankAccountName}" maxlength="100" required/>
+			  <div class="invalid-feedback" th:if="${#fields.hasErrors('bankAccountName')}"
+			       th:errors="*{bankAccountName}"></div>
+			</div>
+			
+			<div class="col-md-4">
+			  <label class="form-label">銀行代碼</label>
+			  <input type="text" class="form-control"
+			         th:classappend="${#fields.hasErrors('bankCode')}? ' is-invalid' : ''"
+			         th:field="*{bankCode}" maxlength="3" pattern="^\d{3}$" required/>
+			  <div class="invalid-feedback" th:if="${#fields.hasErrors('bankCode')}"
+			       th:errors="*{bankCode}"></div>
+			</div>
+			
+			<div class="col-md-4">
+			  <label class="form-label">帳號</label>
+			  <input type="text" class="form-control"
+			         th:classappend="${#fields.hasErrors('bankAccountNumber')}? ' is-invalid' : ''"
+			         th:field="*{bankAccountNumber}" maxlength="30" pattern="^\d{7,30}$" required/>
+			  <div class="invalid-feedback" th:if="${#fields.hasErrors('bankAccountNumber')}"
+			       th:errors="*{bankAccountNumber}"></div>
+			</div>
 
-                <div class="col-12"><hr class="my-2"></div>
 
-                <div class="col-md-4">
-                    <label class="form-label">戶名</label>
-                    <input type="text" class="form-control" id="fBankOwner" value="王小明" required />
-                    <div class="invalid-feedback">請填寫戶名。</div>
-                </div>
-                <div class="col-md-4">
-                    <label class="form-label">銀行代碼</label>
-                    <input type="text" class="form-control" id="fBankCode" value="013國泰世華" required />
-                    <div class="invalid-feedback">請填寫銀行代碼（例如 013 國泰世華）。</div>
-                </div>
-                <div class="col-md-4">
-                    <label class="form-label">帳號</label>
-                    <input type="text" class="form-control" id="fBankNo" value="012345678910" required pattern="^\d{7,14}$" />
-                    <div class="invalid-feedback">請輸入 7–14 碼數字帳號。</div>
-                </div>
-            </form>
-
-          </div>
-          <div class="modal-footer">
-            <button  type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">取消</button>
-            <button  type="button" class="btn btn-primary" id="btnSave">儲存</button>
-          </div>
-        </div>
-      </div>
-    </div>
+	
+	        <div class="modal-footer">
+	          <button  type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">取消</button>
+	          <button  type="submit" class="btn btn-primary">儲存</button>
+	        </div>
+	      </form>
+	    </div>
+	  </div>
+	</div>
 
 	
     <script src="https://cdn.jsdelivr.net/npm/overlayscrollbars@2.11.0/browser/overlayscrollbars.browser.es6.min.js"></script>
@@ -185,162 +248,6 @@
     <script src="/back-end/js/adminlte.min.js"></script>
     <script src="/front-end/js/g1_10_custom_common_csrf.js"></script>
     <script>
-       (() => {
-  const modalEl = document.getElementById('editModal');
-  const modal   = new bootstrap.Modal(modalEl);
-  const form    = document.getElementById('accountForm');
-
-  const ids = ['fTaxId','fEmail','fContact','fPhone','fCompany','fDisplay','fBankOwner','fBankCode','fBankNo'];
-  const els = Object.fromEntries(ids.map(id => [id, document.getElementById(id)]));
-
-  // 統編檢查碼
-  function isValidVat(taxId) {
-    if (!/^\d{8}$/.test(taxId)) return false;
-    const w = [1,2,1,2,1,2,4,1];
-    let sum = 0;
-    for (let i=0;i<8;i++){
-      const p = (taxId.charCodeAt(i)-48)*w[i];
-      sum += Math.floor(p/10) + (p%10);
-    }
-    return (sum%10===0) || (taxId[6]==='7' && (sum+1)%10===0);
-  }
-
-  // 👉 開啟時先「重置」驗證狀態（關鍵）
-  function resetValidation() {
-    form.classList.remove('was-validated');
-    form.querySelectorAll('.is-valid, .is-invalid').forEach(el => {
-      el.classList.remove('is-valid','is-invalid');
-    });
-    // 清掉任何自訂錯誤
-    els.fTaxId?.setCustomValidity('');
-  }
-  modalEl.addEventListener('show.bs.modal', resetValidation);
-
-  // 開啟編輯
-  document.getElementById('btnEdit')?.addEventListener('click', () => modal.show());
-
-  // 即時驗證：輸入/失焦才顯示
-  function liveCheck(el, custom) {
-    el.addEventListener('input', () => {
-      custom && custom(el);                 // 讓自訂規則更新
-      if (form.classList.contains('was-validated')) {
-        el.classList.toggle('is-invalid', !el.checkValidity());
-        el.classList.toggle('is-valid',   el.checkValidity());
-      }
-    });
-    el.addEventListener('blur', () => {
-      custom && custom(el);
-      el.classList.toggle('is-invalid', !el.checkValidity());
-      el.classList.toggle('is-valid',   el.checkValidity());
-    });
-  }
-
-  // 統編：同時做 pattern 與檢查碼；正確時要把自訂錯誤清掉
-  liveCheck(els.fTaxId, (el) => {
-    el.setCustomValidity('');
-    if (el.value && !isValidVat(el.value)) el.setCustomValidity('帳號無效');
-  });
-  // 手機靠 pattern，其他必填靠瀏覽器原生
-  [els.fEmail, els.fContact, els.fPhone, els.fCompany, els.fDisplay, els.fBankOwner, els.fBankCode, els.fBankNo]
-    .forEach(el => el && liveCheck(el));
-
-  // 儲存
-  document.getElementById('btnSave')?.addEventListener('click', () => {
-    // 再跑一次統編自訂檢查
-    els.fTaxId?.setCustomValidity('');
-    if (els.fTaxId?.value && !isValidVat(els.fTaxId.value)) {
-      els.fTaxId.setCustomValidity('帳號無效');
-    }
-
-    // 只有「驗證不通過」才加 was-validated 讓紅字顯示
-    if (!form.checkValidity()) {
-      form.classList.add('was-validated');
-      form.querySelector(':invalid')?.focus();
-      return;
-    }
-
-    // 通過 → 更新畫面
-    const get = id => els[id].value.trim() || '-';
-    document.getElementById('vTaxId').textContent     = get('fTaxId');
-    document.getElementById('vEmail').textContent     = get('fEmail');
-    document.getElementById('vContact').textContent   = get('fContact');
-    document.getElementById('vPhone').textContent     = get('fPhone');
-    document.getElementById('vCompany').textContent   = get('fCompany');
-    document.getElementById('vDisplay').textContent   = get('fDisplay');
-    document.getElementById('vBankOwner').textContent = get('fBankOwner');
-    document.getElementById('vBankCode').textContent  = get('fBankCode');
-    document.getElementById('vBankNo').textContent    = get('fBankNo');
-
-    modal.hide();
-    resetValidation(); // 關閉前也順便清乾淨，下一次打開不會一開始就紅
-  });
-})();
-//   (function () {
-//     const modalEl   = document.getElementById('editModal');
-//     const editModal = bootstrap.Modal.getOrCreateInstance(modalEl);
-//     const form      = document.getElementById('accountForm');
-
-//     // 開啟編輯
-//     document.getElementById('btnEdit')?.addEventListener('click', () => editModal.show());
-
-//     // ROC 統編檢查碼
-//     function isValidVat(taxId) {
-//       if (!/^\d{8}$/.test(taxId)) return false;
-//       const w = [1,2,1,2,1,2,4,1];
-//       let sum = 0;
-//       for (let i=0;i<8;i++){
-//         const p = (taxId.charCodeAt(i)-48)*w[i];
-//         sum += Math.floor(p/10) + (p%10);
-//       }
-//       if (sum % 10 === 0) return true;
-//       if (taxId[6] === '7' && (sum+1) % 10 === 0) return true;
-//       return false;
-//     }
-
-//     // 你的簡化版驗證：原生 + 統編檢查
-//     function runValidate() {
-//       // 先清掉自訂錯誤
-//       document.getElementById('fTaxId').setCustomValidity('');
-//       // 原生驗證
-//       if (!form.checkValidity()) return false;
-//       // 統編檢查碼
-//       const tax = document.getElementById('fTaxId');
-//       if (tax.value && !isValidVat(tax.value)) {
-//         tax.setCustomValidity('invalid');
-//         form.reportValidity();
-//         return false;
-//       }
-//       return true;
-//     }
-
-//     // 儲存
-//     document.getElementById('btnSave')?.addEventListener('click', () => {
-//       form.classList.add('was-validated');
-//       if (!runValidate()) return;
-
-//       // 更新畫面
-//       const get = id => document.getElementById(id).value.trim() || '-';
-//       document.getElementById('vTaxId').textContent   = get('fTaxId');
-//       document.getElementById('vEmail').textContent   = get('fEmail');
-//       document.getElementById('vContact').textContent = get('fContact');
-//       document.getElementById('vPhone').textContent   = get('fPhone');
-//       document.getElementById('vCompany').textContent = get('fCompany');
-//       document.getElementById('vDisplay').textContent = get('fDisplay');
-//       document.getElementById('vBankOwner').textContent = get('fBankOwner');
-//       document.getElementById('vBankCode').textContent  = get('fBankCode');
-//       document.getElementById('vBankNo').textContent    = get('fBankNo');
-
-//       editModal.hide();
-
-//       // 保險：清掉殘留 backdrop（避免畫面灰掉）
-//       setTimeout(() => {
-//         document.body.classList.remove('modal-open');
-//         document.querySelectorAll('.modal-backdrop').forEach(el => el.remove());
-//       }, 150);
-//     });
-//   })();
-</script>
-      <script>
         document.getElementById('logoutLink')?.addEventListener('click', (e) => {
           e.preventDefault();
           // 清除登入紀錄
@@ -397,5 +304,26 @@
       }
     })();
     </script>
+    
+    <script>
+	  // 開 Modal（點「編輯」）
+	  const editModal = new bootstrap.Modal(document.getElementById('editModal'));
+	  document.getElementById('btnEdit')?.addEventListener('click', () => editModal.show());
+	
+	  // 前端驗證：阻擋 HTML5 驗證沒過的提交
+	  document.getElementById('accountForm')?.addEventListener('submit', function (e) {
+	    if (!this.checkValidity()) {
+	      e.preventDefault();
+	      e.stopPropagation();
+	    }
+	    this.classList.add('was-validated');
+	  });
+	
+	  // 成功訊息自動收合（flash: msg）
+	  document.addEventListener('DOMContentLoaded', () => {
+	    const alertEl = document.querySelector('.alert.alert-success');
+	    if (alertEl) setTimeout(() => new bootstrap.Alert(alertEl).close(), 2500);
+	  });
+	</script>
   </body>
 </html>

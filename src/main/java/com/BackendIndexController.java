@@ -5,9 +5,13 @@ import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -19,13 +23,18 @@ import com.eventra.exhibition.model.ExhibitionMapper;
 import com.eventra.exhibition.model.ExhibitionService;
 import com.eventra.exhibition.model.ExhibitionVO;
 import com.eventra.exhibitor.backend.controller.dto.ExhibitionCreateDTO;
+import com.eventra.exhibitor.backend.controller.dto.ExhibitorAccountUpdateDTO;
+import com.eventra.exhibitor.backend.controller.dto.ExhibitorInfoUpdateDTO;
 import com.eventra.tickettype.model.TicketTypeRepository;
 import com.eventra.tickettype.model.TicketTypeVO;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.eventra.exhibitor.model.ExhibitorRepository;
 import com.eventra.exhibitor.model.ExhibitorVO;
+import com.eventra.platform_announcement.model.PlatformAnnouncementRepository;
+import com.eventra.platform_announcement.model.PlatformAnnouncementVO;
 
 import jakarta.servlet.http.HttpSession;
+import jakarta.validation.Valid;
 
 @Controller
 @RequestMapping("/back-end")
@@ -36,16 +45,38 @@ public class BackendIndexController {
 	private final Integer TEST_EXHIBITOR = 3;
 	private final TicketTypeRepository ticketTypeRepository;
 	private final ExhibitorRepository exhibitorRepository;
+	private final PlatformAnnouncementRepository platformAnnouncementRepository;
 
-	public BackendIndexController(ExhibitionService exhibitionService, TicketTypeRepository ticketTypeRepository,
-									ExhibitorRepository exhibitorRepository) {
+	public BackendIndexController(ExhibitionService exhibitionService, 
+								  TicketTypeRepository ticketTypeRepository,
+								  ExhibitorRepository exhibitorRepository,
+								  PlatformAnnouncementRepository platformAnnouncementRepository) {
 		this.exhibitionService = exhibitionService;
 		this.ticketTypeRepository = ticketTypeRepository;
 		this.exhibitorRepository = exhibitorRepository;
+		this.platformAnnouncementRepository = platformAnnouncementRepository;
 	}
 	
     @GetMapping("exhibitor/back_end_homepage")
-    public String exhibitorBackendPage(){
+    public String exhibitorBackendPage(Model model,
+    								   @RequestParam(defaultValue = "0") int page,
+    								   @RequestParam(defaultValue = "10") int size,
+    								   @RequestParam(required = false) String q){
+    	
+    	PageRequest pr = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt"));
+    	
+    	Page<PlatformAnnouncementVO> p =
+    			(q == null || q.isBlank())
+    				? platformAnnouncementRepository.findAll(pr)
+    				: platformAnnouncementRepository
+    					.findByTitleContainingIgnoreCaseOrContentContainingIgnoreCase(q, q, pr);
+    	
+    	model.addAttribute("announcements", p.getContent());
+    	model.addAttribute("currentPage", page);
+    	model.addAttribute("totalPages", p.getTotalPages());
+    	model.addAttribute("tltalElements", p.getTotalElements());
+    	model.addAttribute("q", q == null ? "" : q);
+    	
         return "back-end/back_end_homepage";
     }
     
@@ -85,14 +116,20 @@ public class BackendIndexController {
      * 接收用戶新增資料請求
      */
     @PostMapping("exhibitor/insert_exhibition")
-    public String insertExhibition(ExhibitionCreateDTO dto, HttpSession session) {
-    	/*********** 錯誤處理(建議能成功新增後再做)************/
+    public String insertExhibition(@Valid @ModelAttribute("exhibitionCreateDTO") ExhibitionCreateDTO dto,
+    	    org.springframework.validation.BindingResult br,
+    	    Model model,
+    	    RedirectAttributes ra) {
+    	
+    	if (br.hasErrors()) {
+    	    // 失敗：把票種 JSON 回填給前端的 data-json
+    		model.addAttribute("ticketListJson", dto.getTicketJson() != null ? dto.getTicketJson() : "[]");
+    	    return "back-end/create_exhibition";
+    	  }
     	
     	/*********** 新增 ***********/
-    	// 取得登入展商id
-    	// eg. Integer exhibitorId = session.getAttribute("loginId")
     	exhibitionService.addExhibition(dto, TEST_EXHIBITOR); // 呼叫service進行新增 
-    	
+    	ra.addFlashAttribute("msg", "建立成功！");
     	return "redirect:/back-end/exhibitor/exhibition_list";
     }
     
@@ -142,8 +179,18 @@ public class BackendIndexController {
     }
     
     @PostMapping("exhibitor/update_exhibition")
-    public String updateExhibition(ExhibitionCreateDTO dto, HttpSession session) {
+    public String updateExhibition(
+    	    @Valid @ModelAttribute("exhibitionCreateDTO") ExhibitionCreateDTO dto,
+    	    org.springframework.validation.BindingResult br,
+    	    Model model,
+    	    RedirectAttributes ra) {
+
+    	  if (br.hasErrors()) {
+    		model.addAttribute("ticketListJson", dto.getTicketJson() != null ? dto.getTicketJson() : "[]");
+    	    return "back-end/create_exhibition";
+    	  }
     	exhibitionService.updateExhibition(dto, TEST_EXHIBITOR);
+    	ra.addFlashAttribute("msg", "更新成功！");
     	return "redirect:/back-end/exhibitor/exhibition_list";
     }
     
@@ -182,37 +229,108 @@ public class BackendIndexController {
     
     @GetMapping("exhibitor/exhibitor_info")
     public String exhibitorInfoPage(Model model) {
-    	Integer exhibitorId = TEST_EXHIBITOR;
-    	ExhibitorVO exhibitor = exhibitorRepository.findById(exhibitorId).orElse(null);
-    	
-    	model.addAttribute("exhibitor", exhibitor);
-    	return "back-end/exhibitor_info";
+        Integer exhibitorId = TEST_EXHIBITOR;
+        ExhibitorVO e = exhibitorRepository.findById(exhibitorId).orElse(null);
+
+        // 準備表單物件
+        ExhibitorInfoUpdateDTO dto = new ExhibitorInfoUpdateDTO();
+        if (e != null) {
+            dto.setExhibitorRegistrationName(e.getExhibitorRegistrationName());
+            dto.setContactPhone(e.getContactPhone());
+            dto.setEmail(e.getEmail());
+            dto.setAbout(e.getAbout());
+        }
+        model.addAttribute("exhibitor", e);
+        model.addAttribute("infoForm", dto);
+        return "back-end/exhibitor_info";
     }
     
     @PostMapping("exhibitor/exhibitor_info/update")
     public String updateExhibitorInfo(
-    		@RequestParam String exhibitorRegistrationName,
-    		@RequestParam(required = false) String contactPhone,
-    		@RequestParam(required = false) String email,
-    		@RequestParam(required = false) String about,
-    		RedirectAttributes ra) {
-    	
-    	ExhibitorVO e = exhibitorRepository.findById(TEST_EXHIBITOR)
-    					.orElseThrow(() -> new IllegalArgumentException("Exhibitor not found: " + TEST_EXHIBITOR)); 
-    	e.setExhibitorRegistrationName(exhibitorRegistrationName);
-    	e.setContactPhone(contactPhone);
-    	e.setEmail(email);
-    	e.setAbout(about);
-    	
-    	exhibitorRepository.save(e);
-    	
-    	ra.addFlashAttribute("msg", "更新成功!");
-    	return "redirect:/back-end/exhibitor/exhibitor_info";
+            @Valid @ModelAttribute("infoForm") ExhibitorInfoUpdateDTO form,
+            BindingResult br,
+            Model model,
+            RedirectAttributes ra) {
+
+        if (br.hasErrors()) {
+            ExhibitorVO e = exhibitorRepository.findById(TEST_EXHIBITOR).orElse(null);
+            model.addAttribute("exhibitor", e);
+            model.addAttribute("openModal", true);
+            return "back-end/exhibitor_info";
+        }
+
+        ExhibitorVO e = exhibitorRepository.findById(TEST_EXHIBITOR)
+                .orElseThrow(() -> new IllegalArgumentException("Exhibitor not found: " + TEST_EXHIBITOR));
+
+        e.setExhibitorRegistrationName(form.getExhibitorRegistrationName());
+        e.setContactPhone(form.getContactPhone());
+        e.setEmail(form.getEmail());
+        e.setAbout(form.getAbout());
+
+        exhibitorRepository.save(e);
+
+        ra.addFlashAttribute("msg", "更新成功！");
+        return "redirect:/back-end/exhibitor/exhibitor_info";
     }
     
     @GetMapping("exhibitor/exhibitor_account_data")
-    public String exhibitorAccountDataPage() {
+    public String exhibitorAccountDataPage(Model model) {
+    	Integer exhibitorId = TEST_EXHIBITOR;
+        ExhibitorVO e = exhibitorRepository.findById(exhibitorId).orElse(null);
+        
+     // 建 DTO 當表單物件
+        ExhibitorAccountUpdateDTO dto = new ExhibitorAccountUpdateDTO();
+        if (e != null) {
+            dto.setBusinessIdNumber(e.getBusinessIdNumber());
+            dto.setEmail(e.getEmail());
+            dto.setContactName(e.getContactName());
+            dto.setContactPhone(e.getContactPhone());
+            dto.setCompanyName(e.getCompanyName());
+            dto.setExhibitorRegistrationName(e.getExhibitorRegistrationName());
+            dto.setBankAccountName(e.getBankAccountName());
+            dto.setBankCode(e.getBankCode());
+            dto.setBankAccountNumber(e.getBankAccountNumber());
+        }
+        model.addAttribute("exhibitor", e);
+        model.addAttribute("form", dto);
     	return "back-end/exhibitor_account_data";
+    }
+    
+    @PostMapping("exhibitor/exhibitor_account_data/update")
+    public String updateExhibitorAccountData(
+    		@Valid @org.springframework.web.bind.annotation.
+    		ModelAttribute("form") ExhibitorAccountUpdateDTO form,
+            org.springframework.validation.BindingResult br,
+            Model model,
+            RedirectAttributes ra) {
+    	
+    	if (br.hasErrors()) {
+            // 回填顯示資料 + 表單 + 讓 modal 自動打開
+            ExhibitorVO e = exhibitorRepository.findById(TEST_EXHIBITOR).orElse(null);
+            model.addAttribute("exhibitor", e);
+            model.addAttribute("form", form);
+            model.addAttribute("openModal", true);
+            return "back-end/exhibitor_account_data";
+        }
+
+        ExhibitorVO e = exhibitorRepository.findById(TEST_EXHIBITOR)
+                .orElseThrow(() -> new IllegalArgumentException("Exhibitor not found: "));
+
+        // 依表單更新
+        e.setBusinessIdNumber(form.getBusinessIdNumber());
+        e.setEmail(form.getEmail());
+        e.setContactName(form.getContactName());
+        e.setContactPhone(form.getContactPhone());
+        e.setCompanyName(form.getCompanyName());
+        e.setExhibitorRegistrationName(form.getExhibitorRegistrationName());
+        e.setBankAccountName(form.getBankAccountName());
+        e.setBankCode(form.getBankCode());
+        e.setBankAccountNumber(form.getBankAccountNumber());
+
+        exhibitorRepository.save(e);
+
+        ra.addFlashAttribute("msg", "更新成功！");
+        return "redirect:/back-end/exhibitor/exhibitor_account_data";
     }
     
     @GetMapping("exhibitor/exhibitor_login")
