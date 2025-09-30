@@ -1,9 +1,40 @@
 // g1_6_search_results.js
 // 負責在 search_results.html 載入時，自動呼叫 API /api/exhibitions/search，再把結果渲染到頁面
 /* search_results.html搜尋 專用 */
+
+// 依平均分數顯示星星
+function renderStars(avg, count) {
+    let stars = "";
+    const fullStars = Math.floor(avg);             // 整星數
+    const hasHalf = avg - fullStars >= 0.1;       // 大於等於 0.1 算半星
+    const emptyStars = 5 - fullStars - (hasHalf ? 1 : 0);
+
+    // 整星
+    for (let i = 0; i < fullStars; i++) {
+        stars += `<i class="icon-star voted"></i>`;
+    }
+
+    // 半星
+    if (hasHalf) {
+        stars += `<i class="icon-star-half-alt voted"></i>`;
+    }
+
+    // 空星
+    for (let i = 0; i < emptyStars; i++) {
+        stars += `<i class="icon-star-empty"></i>`;
+    }
+	
+	// 平均分數顯示到 1 位小數
+	    const avgDisplay = avg ? avg.toFixed(1) : "0.0";
+
+    return `${stars} <span><small> ${avgDisplay}</small> &nbsp;(${count || 0})</span>`;
+}
+
+
+
 document.addEventListener("DOMContentLoaded", () => {
 	const filtersForm = document.getElementById("filtersForm");
-	const resultsContainer = document.getElementById("cardsContainer"); // 🔑 對應你的 list 容器
+	const resultsContainer = document.getElementById("cardsContainer"); // 對應你的 list 容器
 
 	const keywordInput = document.getElementById("keywordInput");
 	const regionGroup = document.getElementById("regionGroup");
@@ -50,7 +81,7 @@ document.addEventListener("DOMContentLoaded", () => {
 		data.forEach((exh) => {
 			resultsContainer.innerHTML += `
 		      <div class="strip_all_tour_list">
-		        <a href="single_tour.html?id=${exh.exhibitionId}">
+		        <a href="/front-end/exhibitions/${exh.exhibitionId}">
 		          <div class="row">
 		            <div class="col-lg-4 col-md-4">
 		              <div class="img_list">
@@ -67,12 +98,8 @@ document.addEventListener("DOMContentLoaded", () => {
 		                <p><span class="location">${exh.location}</span></p>
 						<p>
 							<span class="rating">
-								<i class="icon-star voted"></i>
-								<i class="icon-star voted"></i>
-								<i class="icon-star-half-alt voted"></i>
-								<i class="icon-star-empty"></i>
-								<i class="icon-star-empty"></i>
-							</span>(${exh.ratingCount ?? 0})
+								${renderStars(exh.averageRatingScore, exh.ratingCount)}
+							</span>
 						</p>
 		              </div>
 		            </div>
