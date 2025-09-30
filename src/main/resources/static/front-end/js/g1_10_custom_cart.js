@@ -262,8 +262,8 @@ document.addEventListener("DOMContentLoaded", function() {
 					tr.innerHTML = ` <td>
                     <div class="thumb_cart img_block">
                       <img
-                        src="img/0_exhibition/ChatGPT_exhibition_1.png"
-                        alt="推薦圖片"
+                        src="${item.photoPortrait}"
+                        alt="${item.exhibitionName}"
                       />
                     </div>
                     <span class="item_cart">${item.exhibitionName}</span>

@@ -87,7 +87,7 @@ public class CommentService {
         
         
         // resDTO 參數 3 (commentCount)
-        Integer commentCount = COMMENT_REPO.countByExhibitionId(CommentStatus.正常, req.getExhibitionId());
+        Integer commentCount = COMMENT_REPO.countByExhibitionId(CommentStatus.正常.toString(), req.getExhibitionId());
         // resDTO 參數 4 (replyCount)
         Integer replyCount = (parentCommentRef != null) ? COMMENT_REPO.findCountByParent(CommentStatus.正常, req.getExhibitionId(), req.getParentCommentId()) : null;
         

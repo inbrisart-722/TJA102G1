@@ -169,7 +169,7 @@
 						<hr class="main_hr" />
 						<div class="col-lg-12">
 							<h4>展覽時間</h4>
-							<span class="sec_info" th:text="${exhibition.startTime + ' ~ ' + exhibition.endTime}">2025/08/25~2025/08/31</span>
+							<span class="sec_info" th:text="${exhibition.startTime + ' - ' + exhibition.endTime}">2025/08/25~2025/08/31</span>
 
 							<h4>展覽地點</h4>
 							<span class="sec_info" th:text="${exhibition.location}">臺北市中山區南京東路三段219號5樓(緯育TibaMe台北職訓中心)</span>
@@ -258,7 +258,7 @@
 						<h3 class="inner">購票</h3>
 						<div class="row">
 							<div class="ticket_type">
-								<div class="numbers-row-parent">
+								<div class="numbers-row-parent" th:if="${exhibition.tickets.containsKey(1)}">
 									<label>全票</label>
 									<div class="numbers-row">
 										<input type="text" value="0" id="adults"
@@ -267,7 +267,7 @@
 									</div>
 									<span th:text="'$ ' + ${exhibition.tickets.get(1)}">$ 350</span>
 								</div>
-								<div class="numbers-row-parent">
+								<div class="numbers-row-parent" th:if="${exhibition.tickets.containsKey(2)}">
 									<label>學生票</label>
 									<div class="numbers-row">
 										<input type="text" value="0" id="students"
@@ -276,7 +276,7 @@
 									</div>
 									<span th:text="'$ ' + ${exhibition.tickets.get(2)}">$ 350</span>
 								</div>
-								<div class="numbers-row-parent">
+								<div class="numbers-row-parent" th:if="${exhibition.tickets.containsKey(3)}">
 									<label>敬老票</label>
 									<div class="numbers-row">
 										<input type="text" value="0" id="elderly"
@@ -285,7 +285,7 @@
 									</div>
 									<span th:text="'$ ' + ${exhibition.tickets.get(3)}">$ 350</span>
 								</div>
-								<div class="numbers-row-parent">
+								<div class="numbers-row-parent" th:if="${exhibition.tickets.containsKey(4)}">
 									<label>身心障礙者票</label>
 									<div class="numbers-row">
 										<input type="text" value="0" id="disabled"
@@ -294,7 +294,7 @@
 									</div>
 									<span th:text="'$ ' + ${exhibition.tickets.get(4)}">$ 350</span>
 								</div>
-								<div class="numbers-row-parent">
+								<div class="numbers-row-parent" th:if="${exhibition.tickets.containsKey(5)}">
 									<label>軍警票</label>
 									<div class="numbers-row">
 										<input type="text" value="0" id="mili_and_police"
@@ -333,67 +333,17 @@
 								</tr>
 							</tbody>
 						</table>
-						<a class="btn_full" href="cart.html" id="add_cart_and_go">立即訂票</a>
-						<a class="btn_full_outline" href="#" id="add_cart"><i
+						<span th:if="${!exhibition.isTicketStart}" class="ticket_not_selling">- 本展覽將於 <strong th:text="${exhibition.ticketStartTime + ''}">2025/12/10 上午 12:00</strong> 開始售票 -</span>
+						<span th:if="${exhibition.isExhibitionEnded}" class="ticket_not_selling">- 本展覽已於 <strong th:text="${exhibition.endTime + ''}">2025/12/10 上午 12:00</strong> 結束展期 -</span>
+						<a class="btn_full" th:classappend="${!exhibition.isTicketStart or exhibition.isExhibitionEnded ? ' disabled' : ''}" href="cart.html" id="add_cart_and_go">立即訂票</a>
+						<a class="btn_full_outline" th:classappend="${!exhibition.isTicketStart or exhibition.isExhibitionEnded ? ' disabled' : ''}" href="#" id="add_cart"><i
 							class="icon-heart"></i> 加入購物車</a>
 					</div>
 					<!--/box_style_1 -->
 
 					<div id="related_exhib">
 						<h3 class="inner">推薦展覽</h3>
-						<div>
-							<div class="sidebar_exhib_block">
-								<a href="">
-									<div class="sidebar_exhib_img">
-										<img src="img/0_exhibition/ChatGPT_exhibition_1.png"
-											alt="推薦圖片" />
-									</div> <span class="sidebar_exhib_title">當代藝術畫展 - TibaMe</span> <span
-									class="sidebar_exhib_loc"><i class="icon-location"></i>&nbsp;台北市立美術館</span>
-									<span class="sidebar_exhib_time"><i class="icon-clock"></i>&nbsp;08/12~08/25</span>
-									<div class="rating">
-										<i class="icon-star voted"></i><i class="icon-star voted"></i><i
-											class="icon-star voted"></i><i class="icon-star voted"></i><i
-											class="icon-star-half-alt voted"></i> <span><small>(75)</small></span>
-									</div>
-								</a>
-							</div>
-						</div>
-						<hr />
-						<div>
-							<div class="sidebar_exhib_block">
-								<a href="">
-									<div class="sidebar_exhib_img">
-										<img src="img/0_exhibition/ChatGPT_exhibition_1.png"
-											alt="推薦圖片" />
-									</div> <span class="sidebar_exhib_title">當代藝術畫展 - TibaMe</span> <span
-									class="sidebar_exhib_loc"><i class="icon-location"></i>&nbsp;台北市立美術館</span>
-									<span class="sidebar_exhib_time"><i class="icon-clock"></i>&nbsp;08/12~08/25</span>
-									<div class="rating">
-										<i class="icon-star voted"></i><i class="icon-star voted"></i><i
-											class="icon-star voted"></i><i class="icon-star voted"></i><i
-											class="icon-star-half-alt voted"></i> <span><small>(75)</small></span>
-									</div>
-								</a>
-							</div>
-						</div>
-						<hr />
-						<div>
-							<div class="sidebar_exhib_block">
-								<a href="">
-									<div class="sidebar_exhib_img">
-										<img src="img/0_exhibition/ChatGPT_exhibition_1.png"
-											alt="推薦圖片" />
-									</div> <span class="sidebar_exhib_title">當代藝術畫展 - TibaMe</span> <span
-									class="sidebar_exhib_loc"><i class="icon-location"></i>&nbsp;台北市立美術館</span>
-									<span class="sidebar_exhib_time"><i class="icon-clock"></i>&nbsp;08/12~08/25</span>
-									<div class="rating">
-										<i class="icon-star voted"></i><i class="icon-star voted"></i><i
-											class="icon-star voted"></i><i class="icon-star voted"></i><i
-											class="icon-star-half-alt voted"></i> <span><small>(75)</small></span>
-									</div>
-								</a>
-							</div>
-						</div>
+				
 
 						<div id="more_related_exhib">
 							<button class="btn_full btn_full_exhib">查看更多</button>

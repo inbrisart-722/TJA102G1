@@ -6,22 +6,121 @@ document.addEventListener("DOMContentLoaded", function() {
 	fetch("/api/front-end/protected/member/getMyProfilePic", {
 		method: "GET"
 	})
-	.then(res => {
-		if(!res.ok) throw new Error("getMyProfilePic: NOT 2XX");
-		else return res.text();
-	})
-	.then(pic => {
-		// 只有 default_pic 或 實際 member_pic 2種狀況
-		my_profile_pic = pic;
-		// 可以在此處理重新 refresh
-		const img = document.querySelector("section.top-reply > form.form_reply > img.replier_self");
-		img.src = my_profile_pic;
-	})
-	.catch(error => {
-		console.log(error);
-		my_profile_pic = "img/tourist_guide_pic.jpg";
+		.then(res => {
+			if (!res.ok) throw new Error("getMyProfilePic: NOT 2XX");
+			else return res.text();
+		})
+		.then(pic => {
+			// 只有 default_pic 或 實際 member_pic 2種狀況
+			my_profile_pic = pic;
+			// 可以在此處理重新 refresh
+			const img = document.querySelector("section.top-reply > form.form_reply > img.replier_self");
+			img.src = my_profile_pic;
+		})
+		.catch(error => {
+			console.log(error);
+			my_profile_pic = "img/tourist_guide_pic.jpg";
+		});
+
+	const div_related_exhib = document.querySelector("div#related_exhib");
+	// 準備取側欄所需的 2 個參數
+	const btn_more_related_exhib = document.querySelector("#more_related_exhib > .btn_full");
+
+	btn_more_related_exhib.addEventListener("click", function() {
+		// 1. 先取 URL exhibitionId  -> data-exhibition-id
+		let exhibitionId = btn_more_related_exhib.dataset.exhibitionId;
+		// 2. 再取 btn 上的 -> data-average-rating-score
+		let averageRatingScore = btn_more_related_exhib.dataset.averageRatingScore;
+
+		// /api/exhibitions/sidebar?exhibitionId=" + exhibitionId + "&averageRatingScore=" + averageRatingScore
+		let queryString = "/api/exhibitions/sidebar";
+		if (exhibitionId) queryString += "?exhibitionId=" + exhibitionId;
+		if (!exhibitionId && averageRatingScore) queryString += "?averageRatingScore=" + averageRatingScore;
+		if (exhibitionId && averageRatingScore) queryString += "&averageRatingScore=" + averageRatingScore;
+
+		// fetch
+		fetch(queryString, {
+			"method": "GET"
+		})
+			.then(res => {
+				if (!res.ok) console.log("sidebar: Not 2XX");
+				else return res.json();
+			})
+			.then(result => {
+				// ExhibitionSidebarResultDTO
+				// hasNextPage
+				// list (exhibitionId, photoPortrait, exhibitionName, location
+				// startTime, endTime, averageRatingScore, totalRatingCount;
+
+				let to_exhibitionId;
+				let to_averageRatingScore;
+				result.list.forEach(e => {
+					const wrapper = document.createElement("div");
+					// e.photoPortrait
+					wrapper.innerHTML =
+						`
+							<div class="sidebar_exhib_block">
+								<a href="/front-end/exhibitions?exhibitionId=${e.exhibitionId}">
+									<div class="sidebar_exhib_img">
+										<img src="${e.photoPortrait}"
+											alt="推薦圖片" />
+									</div> <span class="sidebar_exhib_title">${e.exhibitionName}</span> <span
+										class="sidebar_exhib_loc"><i class="icon-location"></i>&nbsp;${e.location}</span>
+									<span class="sidebar_exhib_time"><i class="icon-clock"></i>&nbsp;${(e.startTime.replace("T", " ") + " -</br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" + e.endTime).replace("T", " ")}</span>
+									<div class="rating">
+									</div>
+								</a>
+							</div>
+					`
+					// 動態設計星星數（評價）	
+					// 星星顯示
+					const div_stars = wrapper.querySelector("div.rating");
+					const score = Number(e.averageRatingScore) || 0;
+					const fullStars = Math.floor(score);
+					const hasHalf = (score - fullStars) >= 0.5;
+
+					for (let i = 0; i < fullStars; i++) {
+						div_stars.insertAdjacentHTML("beforeend", `<i class="icon-star voted"></i>`);
+					}
+					if (hasHalf) {
+						div_stars.insertAdjacentHTML("beforeend", `<i class="icon-star-half-alt voted"></i>`);
+					}
+					for (let i = fullStars + (hasHalf ? 1 : 0); i < 5; i++) {
+						div_stars.insertAdjacentHTML("beforeend", `<i class="icon-star-empty"></i>`);
+					}
+					div_stars.insertAdjacentHTML("beforeend", ` <span><small>(${e.totalRatingCount})</small></span>`);
+
+
+					// 插入 wrapper 和 hr
+					btn_more_related_exhib.insertAdjacentElement("beforebegin", wrapper);
+					const hr = document.createElement("hr");
+					btn_more_related_exhib.insertAdjacentElement("beforebegin", hr);
+					// 更新 sidebar 高度
+					// offsetHeight 是 JavaScript DOM 屬性，用來取得一個元素的視覺高度
+					// 包括了元素的內容、內邊距 (padding) 和邊框 (border)。
+					const currentHeight = div_related_exhib.offsetHeight;
+					const newMinHeight = (currentHeight + 125) + "px";
+					div_related_exhib.style.minHeight = newMinHeight;
+					// 最後一圈的值會覆蓋，後續拿去渲染 btn dataset 的值
+					to_exhibitionId = e.exhibitionId;
+					to_averageRatingScore = e.averageRatingScore;
+				})
+				// 要記得此次取完的全部渲染完以後，要更動 btn dataset 的值
+				btn_more_related_exhib.dataset.exhibitionId = to_exhibitionId;
+				btn_more_related_exhib.dataset.averageRatingScore = to_averageRatingScore;
+
+				if (!result.hasNextPage) {
+					btn_more_related_exhib.innerText = "已經到底了！";
+					btn_more_related_exhib.disabled = true;
+				}
+			})
+			.catch(error => console.log(error));
 	});
 	
+	btn_more_related_exhib.click();
+
+
+
 	// 父層留言 + 子層回覆 新增 start
 	document.addEventListener("click", function(e) {
 		const btn_send = e.target.closest("form.form_reply > button");
@@ -36,9 +135,9 @@ document.addEventListener("DOMContentLoaded", function() {
 
 			// 收集數據
 			// 收集數據 -> 1. exhibition_id;
-//			const path_name = window.location.pathname;
-//			const last_slash_index = path_name.lastIndexOf("/");
-//			const exhibition_id = path_name.substring(last_slash_index);
+			//			const path_name = window.location.pathname;
+			//			const last_slash_index = path_name.lastIndexOf("/");
+			//			const exhibition_id = path_name.substring(last_slash_index);
 			const params = new URLSearchParams(window.location.search);
 			const exhibitionId = params.get("exhibitionId");
 			// 收集數據 -> 2. parent_comment_id
@@ -351,9 +450,9 @@ document.addEventListener("DOMContentLoaded", function() {
 			btn_more_parent.innerText = "載入中...";
 			// 收集數據
 			// 收集數據 -> 1. exhibition_id;
-//			const path_name = window.location.pathname;
-//			const last_slash_index = path_name.lastIndexOf("/");
-//			const exhibition_id = path_name.substring(last_slash_index);
+			//			const path_name = window.location.pathname;
+			//			const last_slash_index = path_name.lastIndexOf("/");
+			//			const exhibition_id = path_name.substring(last_slash_index);
 			const params = new URLSearchParams(window.location.search);
 			const exhibitionId = params.get("exhibitionId");
 			// 收集數據 -> 2. created_at;
@@ -457,7 +556,7 @@ document.addEventListener("DOMContentLoaded", function() {
 						const icon_like = div.querySelector("i.icon-thumbs-up");
 						const icon_dislike = div.querySelector("i.icon-thumbs-down");
 
-						if(result.status === "member"){
+						if (result.status === "member") {
 							// undefined / LIKE / DISLIKE
 							const member_reaction = result.mapReaction[c.commentId];
 							if (member_reaction === "LIKE") icon_like.classList.add("-on");
@@ -488,9 +587,9 @@ document.addEventListener("DOMContentLoaded", function() {
 
 			// 收集數據
 			// 收集數據 -> 1. exhibition_id;
-//			const path_name = window.location.pathname;
-//			const last_slash_index = path_name.lastIndexOf("/");
-//			const exhibition_id = path_name.substring(last_slash_index);
+			//			const path_name = window.location.pathname;
+			//			const last_slash_index = path_name.lastIndexOf("/");
+			//			const exhibition_id = path_name.substring(last_slash_index);
 			const params = new URLSearchParams(window.location.search);
 			const exhibitionId = params.get("exhibitionId");
 			// 收集數據 -> 2. created_at;
@@ -569,8 +668,8 @@ document.addEventListener("DOMContentLoaded", function() {
 						const icon_like = div.querySelector("i.icon-thumbs-up");
 						const icon_dislike = div.querySelector("i.icon-thumbs-down");
 
-						if(result.status === "member"){
-						// undefined / LIKE / DISLIKE
+						if (result.status === "member") {
+							// undefined / LIKE / DISLIKE
 							const member_reaction = result.mapReaction[r.commentId];
 							if (member_reaction === "LIKE") icon_like.classList.add("-on");
 							else if (member_reaction === "DISLIKE")
@@ -621,54 +720,6 @@ document.addEventListener("DOMContentLoaded", function() {
 	});
 	// 頁面載入當下 -> （父層）模擬實際點了一次「查看更多留言」
 	document.querySelector(".btn_more_comments_parent").click();
-
-	// 側欄 查看更多
-	const sidebar_more_related_exhib_btn = document.querySelector(
-		"div#more_related_exhib > button.btn_full_exhib"
-	);
-	sidebar_more_related_exhib_btn.addEventListener("click", function() {
-		// fetch
-		const more_exhib_block_html = `              <hr />
-              <div>
-                <div class="sidebar_exhib_block">
-                  <a href="">
-                    <div class="sidebar_exhib_img">
-                      <img
-                        src="img/0_exhibition/ChatGPT_exhibition_1.png"
-                        alt="推薦圖片"
-                      />
-                    </div>
-                    <span class="sidebar_exhib_title"
-                      >當代藝術畫展 - TibaMe</span
-                    >
-                    <span class="sidebar_exhib_loc"
-                      ><i class="icon-location"></i>&nbsp;台北市立美術館</span
-                    >
-                    <span class="sidebar_exhib_time"
-                      ><i class="icon-clock"></i>&nbsp;08/12~08/25</span
-                    >
-                    <div class="rating">
-                      <i class="icon-star voted"></i
-                      ><i class="icon-star voted"></i
-                      ><i class="icon-star voted"></i
-                      ><i class="icon-star voted"></i
-                      ><i class="icon-star-half-alt voted"></i>
-                      <span><small>(75)</small></span>
-                    </div>
-                  </a>
-                </div>
-              </div>`;
-
-		// 只是模擬一次多個展覽（之後改成實際 fetch 到的筆數）
-		for (let i = 0; i < 3; i++) {
-			this.closest("div#more_related_exhib").insertAdjacentHTML(
-				"beforebegin",
-				more_exhib_block_html
-			);
-		}
-		this.innerText = "已經到底了！";
-		this.disabled = true;
-	});
 
 	/////////////////////////////////////////////////////////////////////
 	/////////////////////////////////////////////////////////////////////
@@ -797,7 +848,7 @@ document.addEventListener("DOMContentLoaded", function() {
 	}
 
 	let flag_btn_add_cart_and_go = false;
-	
+
 	const addCartItem = function(send_data) {
 		const adults_el = document.querySelector("input#adults");
 		const students_el = document.querySelector("input#students");
@@ -813,30 +864,30 @@ document.addEventListener("DOMContentLoaded", function() {
 			body: JSON.stringify(send_data),
 		})
 			.then((res) => {
-//				if (res.status === 401) {
-					// 存入localStorage
-//					sessionStorage.setItem("redirect", window.location.pathname);
-//					sessionStorage.setItem("send_data", JSON.stringify(send_data));
-					// 再轉導
-//					window.location.href = "/front-end/login";
-//				}
+				//				if (res.status === 401) {
+				// 存入localStorage
+				//					sessionStorage.setItem("redirect", window.location.pathname);
+				//					sessionStorage.setItem("send_data", JSON.stringify(send_data));
+				// 再轉導
+				//					window.location.href = "/front-end/login";
+				//				}
 				if (!res.ok) {
 					throw new Error("addCartItem: Not 2XX or 401");
 				}
 				return res.text();
 			})
 			.then((result) => {
-				adults_el.value =
-					students_el.value =
-					elderly_el.value =
-					disabled_el.value =
-					mili_and_police_el.value =
-					"0";
+				if(adults_el) adults_el.value = "0";
+				if(students_el) students_el.value = "0";
+				if(elderly_el) elderly_el.value = "0";
+				if(disabled_el) disabled_el.value = "0";
+				if(mili_and_police_el) mili_and_police_el.value = "0";
+				
 				recalcTotal();
 				clearTable();
 				if (result === "success") {
 					showToast("已加入購物車", "success");
-					if(flag_btn_add_cart_and_go){
+					if (flag_btn_add_cart_and_go) {
 						setTimeout(() => location.href = "/front-end/cart", 50)
 					}
 				} else if (result === "failure") {
@@ -861,15 +912,15 @@ document.addEventListener("DOMContentLoaded", function() {
 	//	}
 
 	const btn_add_cart = document.querySelector("a#add_cart");
-	
+
 	btn_add_cart.addEventListener("click", function(e) {
 		e.preventDefault();
 
 		// 收集數據
 		// 收集數據 -> 1. exhibition_id;
-//		const path_name = window.location.pathname;
-//		const last_slash_index = path_name.lastIndexOf("/");
-//		const exhibition_id = path_name.substring(last_slash_index + 1);
+		//		const path_name = window.location.pathname;
+		//		const last_slash_index = path_name.lastIndexOf("/");
+		//		const exhibition_id = path_name.substring(last_slash_index + 1);
 		const params = new URLSearchParams(window.location.search);
 		const exhibitionId = params.get("exhibitionId");
 		// 收集數據 -> 2. ticket_datas;
@@ -878,11 +929,11 @@ document.addEventListener("DOMContentLoaded", function() {
 		const elderly_el = document.querySelector("input#elderly");
 		const disabled_el = document.querySelector("input#disabled");
 		const mili_and_police_el = document.querySelector("input#mili_and_police");
-		const adults = Number(adults_el.value);
-		const students = Number(students_el.value);
-		const elderly = Number(elderly_el.value);
-		const disabled = Number(disabled_el.value);
-		const mili_and_police = Number(mili_and_police_el.value);
+		const adults = adults_el ? Number(adults_el.value) : 0;
+		const students = students_el ? Number(students_el.value) : 0;
+		const elderly = elderly_el ? Number(elderly_el.value) : 0;
+		const disabled = disabled_el ? Number(disabled_el.value) : 0;
+		const mili_and_police = mili_and_police_el ? Number(mili_and_police_el.value) : 0;
 		if (
 			adults === 0 &&
 			students === 0 &&
@@ -1124,9 +1175,9 @@ document.addEventListener("DOMContentLoaded", function() {
 		if (!btn_open_rate_modal) return;
 		// 收集數據
 		// 收集數據 -> 1. exhibition_id;
-//		const path_name = window.location.pathname;
-//		const last_slash_index = path_name.lastIndexOf("/");
-//		const exhibition_id = path_name.substring(last_slash_index);
+		//		const path_name = window.location.pathname;
+		//		const last_slash_index = path_name.lastIndexOf("/");
+		//		const exhibition_id = path_name.substring(last_slash_index);
 		const params = new URLSearchParams(window.location.search);
 		const exhibitionId = params.get("exhibitionId");
 
@@ -1206,7 +1257,7 @@ document.addEventListener("DOMContentLoaded", function() {
 		console.log(originalRatingScore);
 
 		if (ratingScore === originalRatingScore) return;
-		
+
 		const params = new URLSearchParams(window.location.search);
 		const exhibitionId = params.get("exhibitionId");
 
@@ -1286,7 +1337,7 @@ document.addEventListener("DOMContentLoaded", function() {
 	chatWindow.style.display = "none";
 
 	let myMemberId; // 核心! 定義我的 memberId !!
-	
+
 	let hasGottenMyMemberId = false;
 	let timestampCursor; // 每次拿這個時間去 fetch 更舊的 10 筆！
 	let isLoading = false; // 避免重複請求用！

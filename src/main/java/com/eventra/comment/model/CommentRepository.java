@@ -37,13 +37,12 @@ public interface CommentRepository extends JpaRepository<CommentVO, Integer>{
 	@Query(value = "update CommentVO c set c.dislikeCount = c.dislikeCount + :delta where c.commentId = :cid")
 	Integer updateDislikeCount(@Param("cid") Integer commentId, @Param("delta") Integer delta);
 	
-	@Query(value = "SELECT COUNT(*) "
-			+ "FROM comment c "
-			+ "LEFT JOIN comment p "
-			+ "       ON c.parent_comment_id = p.comment_id "
-			+ "WHERE c.exhibition_id = :eid "
-			+ "  AND c.comment_status = :cs "
-			+ "  AND (c.parent_comment_id IS NULL OR (p.comment_status IS NOT NULL AND p.comment_status = :cs))"
-			  , nativeQuery = true)
-	Integer countByExhibitionId(@Param("cs") CommentStatus commentStatus, @Param("eid") Integer exhibitionId);
+	@Query(value = "select count(*) from comment c "
+			+ "where c.exhibition_id = :eid "
+			+ "and ( ( c.comment_status = :cs and c.parent_comment_id is null ) or "
+			+ "	     ( c.comment_status = :cs and c.parent_comment_id is not null and exists (select 1 from comment p where p.comment_id = c.parent_comment_id and p.comment_status = '正常') ) "
+			+ "	   )"
+			, nativeQuery = true)
+	Integer countByExhibitionId(@Param("cs") String commentStatus, @Param("eid") Integer exhibitionId);
+	// nativeQuery 不能 Enum
 }

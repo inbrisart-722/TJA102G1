@@ -1,11 +1,12 @@
 package com.eventra.exhibitioncommon.controller;
 
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.connection.ReactiveSetCommands.SPopCommand;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -13,6 +14,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.eventra.exhibition.model.ExhibitionServiceImpl;
+import com.eventra.exhibition.model.ExhibitionSidebarResultDTO;
 import com.eventra.exhibitioncommon.dto.ExhibitionListDTO;
 import com.eventra.exhibitioncommon.model.ExhibitionListService;
 
@@ -22,11 +25,24 @@ public class ExhibitionListApiController {
 
 	@Autowired
 	private ExhibitionListService service;
-
+	@Autowired
+	private ExhibitionServiceImpl exhibitionService;
+	
 	static final int TOPN = 5;
 	static final int DAYS = 14;
 	static final int PAGE_SIZE = 5;
 
+	@GetMapping("/sidebar")
+	public ResponseEntity<ExhibitionSidebarResultDTO> getSidebar(
+			@RequestParam(value="exhibitionId", required=false) Integer exhibitionId,
+			@RequestParam(value="averageRatingScore", required=false) Double averageRatingScore){
+		// 雖然是側欄，但拉評價高到低的
+		if(exhibitionId == null) exhibitionId = 0;
+		if(averageRatingScore == null) averageRatingScore = 5.1;
+		
+		return ResponseEntity.ok(exhibitionService.findSidebarExhibitionsByRatingScore(exhibitionId, averageRatingScore));
+	}
+	
 	/* ===== 首頁 ===== */
 	@GetMapping("/popular/topN")
 	public List<ExhibitionListDTO> getTopNPopular() {
