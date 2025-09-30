@@ -411,7 +411,8 @@ public class ExhibitionServiceImpl implements ExhibitionService {
 			.setExhibitorDisplayName(exhibitorDisplayName);
 		
 		dto.setExhibitor(exhibitorDTO); 
-		Long totalCommentCount = commentRepository.countByExhibitionId(CommentStatus.正常, exhibitionId);
+		Integer totalCommentCount = commentRepository.countByExhibitionId(CommentStatus.正常, exhibitionId);
+		System.out.println("totalCommentCount: " + totalCommentCount);
 		dto.setTotalCommentCount(totalCommentCount);
 		
 		return dto;
@@ -447,7 +448,7 @@ public class ExhibitionServiceImpl implements ExhibitionService {
 	}
 
 	
-	public List<ExhibitionLineBotCarouselDTO> findHotExhibitionsForLineBot(){
+	public Slice<ExhibitionLineBotCarouselDTO> findHotExhibitionsForLineBot(){
 		return null;
 	}
 	
@@ -477,8 +478,32 @@ public class ExhibitionServiceImpl implements ExhibitionService {
 		return new SliceImpl<>(dtos, pageable, exhibitionsSlice.hasNext());
 	}
 	
-	public List<ExhibitionLineBotCarouselDTO> findNewExhibitionsForLineBot(){
+	public Slice<ExhibitionLineBotCarouselDTO> findNewExhibitionsForLineBot(){
 		return null;
 	}
 	
+	public Slice<ExhibitionLineBotCarouselDTO> findNearestExhibitionsForLineBot(Double lat, Double lng, int page, int size){
+		Pageable pageable = PageRequest.of(page, size);
+		Slice<ExhibitionVO> exhibitionsSlice =repository.findNearestExhibition(lat, lng, pageable);
+		List<ExhibitionVO> exhibitions = exhibitionsSlice.getContent();
+		
+		List<ExhibitionLineBotCarouselDTO> dtos =
+			exhibitions.stream().map(vo -> {
+			ExhibitionLineBotCarouselDTO dto = new ExhibitionLineBotCarouselDTO();
+			dto
+				.setExhibitionName(vo.getExhibitionName())
+//				.setPhotoPortrait(vo.getPhotoPortrait())
+				// 測試
+				.setPhotoPortrait("https://scdn.line-apps.com/n/channel_devcenter/img/fx/01_1_cafe.png")
+				.setAverageRatingScore(vo.getAverageRatingScore())
+				.setLocation(vo.getLocation())
+				.setStartTime(vo.getStartTime())
+				.setEndTime(vo.getEndTime())
+				// 測試
+				.setPageUrl("http://localhost:8088/front-end/exhibitions?exhibitionId=" + vo.getExhibitionId());
+			return dto;
+		}).collect(Collectors.toList());
+		
+		return new SliceImpl<>(dtos, pageable, exhibitionsSlice.hasNext());
+	}
 }

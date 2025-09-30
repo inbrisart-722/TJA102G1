@@ -12,8 +12,8 @@ import com.eventra.comment.controller.CommentStatus;
 public interface CommentRepository extends JpaRepository<CommentVO, Integer>{
 	
 	// 父留言 => 找該展覽 comments + replies 總數
-	@Query(value = "select count(c) from CommentVO c where c.commentStatus = :cs and c.exhibition.exhibitionId = :eid")
-	Integer findCountByExhibition(@Param("cs") CommentStatus commentStatus, @Param("eid") Integer exhibitionId);
+//	@Query(value = "select count(c) from CommentVO c where c.commentStatus = :cs and c.exhibition.exhibitionId = :eid")
+//	Integer findCountByExhibition(@Param("cs") CommentStatus commentStatus, @Param("eid") Integer exhibitionId);
 	
 	// 子留言 => 找該展覽 該留言 replies 總數
 	@Query(value = "select count(c) from CommentVO c where c.commentStatus = :cs and c.exhibition.exhibitionId = :eid and c.parentComment.commentId = :pcid")
@@ -37,9 +37,13 @@ public interface CommentRepository extends JpaRepository<CommentVO, Integer>{
 	@Query(value = "update CommentVO c set c.dislikeCount = c.dislikeCount + :delta where c.commentId = :cid")
 	Integer updateDislikeCount(@Param("cid") Integer commentId, @Param("delta") Integer delta);
 	
-	@Query("select count(c) from CommentVO c " +
-		       "where c.exhibition.exhibitionId = :eid " +
-		       "and ( (c.parentComment is null and c.commentStatus = :cs) " +
-		       "   or (c.parentComment is not null and c.commentStatus = :cs and c.parentComment.commentStatus = :cs) )")
-	Long countByExhibitionId(@Param("cs") CommentStatus commentStatus, @Param("eid") Integer exhibitionId);
+	@Query(value = "SELECT COUNT(*) "
+			+ "FROM comment c "
+			+ "LEFT JOIN comment p "
+			+ "       ON c.parent_comment_id = p.comment_id "
+			+ "WHERE c.exhibition_id = :eid "
+			+ "  AND c.comment_status = :cs "
+			+ "  AND (c.parent_comment_id IS NULL OR (p.comment_status IS NOT NULL AND p.comment_status = :cs))"
+			  , nativeQuery = true)
+	Integer countByExhibitionId(@Param("cs") CommentStatus commentStatus, @Param("eid") Integer exhibitionId);
 }

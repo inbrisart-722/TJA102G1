@@ -597,7 +597,7 @@ document.addEventListener("DOMContentLoaded", function() {
 				});
 		}
 
-		// 點擊回覆 也要相當於點了一次 查看更多回復
+		// 點擊回覆 也要相當於點了一次 查看更多回覆
 		if (e.target.closest(".btn_reply")) {
 			const btn_reply = e.target.closest(".btn_reply");
 			const section_reply = btn_reply

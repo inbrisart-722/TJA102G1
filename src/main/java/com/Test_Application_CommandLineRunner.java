@@ -2,6 +2,7 @@ package com;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
@@ -9,12 +10,14 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 import com.eventra.linebot.util.RichMenuInitializer;
+import com.eventra.order.linepay.model.LinePayPaymentRequestCheckResDTO;
+import com.eventra.order.linepay.model.LinePayService;
 
 @SpringBootApplication
 public class Test_Application_CommandLineRunner implements CommandLineRunner {
 
-//	@Autowired
-//	private LinePayService LINE_PAY_SVC; 
+	@Autowired
+	private LinePayService LINE_PAY_SVC; 
 	
 //	@Autowired
 //	private LineBotPushService LINE_BOT_PUSH_SERVICE;
@@ -40,33 +43,11 @@ public class Test_Application_CommandLineRunner implements CommandLineRunner {
 //    	Path img = Paths.get("/Users/inbrisart/Desktop/img/S__34857062.jpg");
 //    	RICH_MENU_INITIALIZER.initRichMenu(img);
     	
-//    	System.out.println(channelId);
-//    	System.out.println(channelSecret);
-//    	System.out.println(baseUrl);
-//    	System.out.println(confirmUrl);
-//    	System.out.println(cancelUrl);
     	
-//    	product.setName("product1")
-//    			.setQuantity(1)
-//    			.setPrice(1000);
-//    	
-//    	LinePayPaymentRequestReqDTO.Package pkg = new LinePayPaymentRequestReqDTO.Package();
-//    	pkg.setId("package1")
-//    		.setAmount(1000)
-//    		.setProducts(List.of(product));
-//    	
-//    	LinePayPaymentRequestReqDTO req = new LinePayPaymentRequestReqDTO();
-//    	req.setAmount(1000)
-//    		.setCurrency("TWD")
-//    		.setOrderId("order_testing_123")
-//    		.setPackages(List.of(pkg))
-//    		.setRedirectUrls(Map.of(
-//    				"confirmUrl", "http://localhost:8088/api/linepay/payment-request/confirm",
-//    				"cancelUrl", "http://localhost:8088/api/linepay/payment-request/cancel"
-//    				));
-//    	
-//    	String res = LINE_PAY_SVC.paymentRequest(req);
-//    	System.out.println(res);
+//    	LinePayPaymentRequestCheckResDTO res = LINE_PAY_SVC.paymentRequestCheck("2025093002306815010");
+//    	System.out.println(res.getReturnCode());
+//    	System.out.println(res.getReturnMessage());
     	
+//    	LINE_PAY_SVC.paymentAuthorizationsVoid("LPMG604DGA7957");
     }
 }

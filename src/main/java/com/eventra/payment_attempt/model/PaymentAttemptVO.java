@@ -32,6 +32,9 @@ public class PaymentAttemptVO implements Serializable{
 	@Column(name = "is_duplicate", insertable = false)
 	private Boolean isDuplicate;
 	
+	@Column(name = "is_duplicate_resolved")
+	private Boolean isDuplicateResolved;
+	
 	@Enumerated(EnumType.STRING)
 	@Column(name = "payment_attempt_status")
 	private PaymentAttemptStatus paymentAttemptStatus; // PENDING, EXPIRED, SUCCESS, FAILURE
@@ -117,12 +120,17 @@ public class PaymentAttemptVO implements Serializable{
 	public void setPaymentAttemptId(Integer paymentAttemptId) {
 		this.paymentAttemptId = paymentAttemptId;
 	}
-	
 	public Boolean getIsDuplicate() {
 		return isDuplicate;
 	}
 	public void setIsDuplicate(Boolean isDuplicate) {
 		this.isDuplicate = isDuplicate;
+	}
+	public Boolean getIsDuplicateResolved() {
+		return isDuplicateResolved;
+	}
+	public void setIsDuplicateResolved(Boolean isDuplicateResolved) {
+		this.isDuplicateResolved = isDuplicateResolved;
 	}
 	public PaymentAttemptStatus getPaymentAttemptStatus() {
 		return paymentAttemptStatus;

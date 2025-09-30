@@ -97,4 +97,21 @@ public interface ExhibitionRepository extends JpaRepository<ExhibitionVO, Intege
 	 
 	 Slice<ExhibitionVO> findByStartTimeAfter(LocalDateTime now, Pageable pageable);
 
+	  // 找最近一個展覽
+	    @Query(value = """
+	        SELECT e.*, (
+	            6371000 * acos(
+	                cos(radians(:lat)) * cos(radians(e.latitude)) * cos(radians(e.longitude) - radians(:lng))
+	              + sin(radians(:lat)) * sin(radians(e.latitude))
+	            )
+	        ) AS distance,
+	        (SELECT AVG(r.rating_score) 
+	    		 FROM rating r 
+	    		 WHERE r.exhibition_id = e.exhibition_id)
+	    	  AS averageRatingScore
+	        FROM exhibition e
+	        WHERE e.latitude is not null and e.longitude is not null
+	        ORDER BY distance
+	        """, nativeQuery = true)
+	    Slice<ExhibitionVO> findNearestExhibition(@Param("lat") Double lat, @Param("lng") Double lng, Pageable pageable);
 }

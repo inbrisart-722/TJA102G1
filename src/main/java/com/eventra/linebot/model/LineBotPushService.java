@@ -8,15 +8,29 @@ import java.net.http.HttpResponse;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import com.eventra.linebot.util.LineBotFlexBuilder;
+import com.eventra.order.model.OrderLineBotCarouselDTO;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+
 @Service
 public class LineBotPushService {
 
     private final HttpClient http = HttpClient.newHttpClient();
 
-    @Value("${line.channel.access-token}")
+    
     private String CHANNEL_ACCESS_TOKEN;
-
+    private final LineBotFlexBuilder FLEX_BUILDER = new LineBotFlexBuilder();
     private static final String PUSH_API = "https://api.line.me/v2/bot/message/push";
+    
+    public LineBotPushService(@Value("${line.channel.access-token}") String channelAccessToken) {
+    	this.CHANNEL_ACCESS_TOKEN = channelAccessToken;
+    }
+
+    public void pushOrder(String lineUserId, OrderLineBotCarouselDTO dto) throws Exception{
+    	ObjectNode bubble = FLEX_BUILDER.buildOrderBubble(dto);
+    	String json = FLEX_BUILDER.wrapFlexPush(lineUserId, bubble);
+    	send(json);
+    }
 
     /**
      * ✅ 單純推播文字

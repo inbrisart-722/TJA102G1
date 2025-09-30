@@ -15,10 +15,14 @@ public interface PaymentAttemptRepository extends JpaRepository<PaymentAttemptVO
 
 	Optional<PaymentAttemptVO> findByProviderOrderId(String providerOrderId);
 	
+//	Optional<PaymentAttemptVO> findByProviderTransactionId(String providerTransactionId);
+	
 	// scheduler -> 且有建立索引了
 	@Query(value="select pa from PaymentAttemptVO pa where pa.createdAt < :threshold and "
 			+ "pa.paymentAttemptStatus = 'pending'")
 	List<PaymentAttemptVO> findExpiredPaymentAttempts(@Param("threshold") Timestamp threshold);
 	
 	Optional<PaymentAttemptVO> findTopByOrderIdOrderByCreatedAtDesc(Integer orderId);
+	
+//	Optional<PaymentAttemptVO> findByOrderIdAndPaymentAttemptStatus(Integer orderId, PaymentAttemptStatus status);
 }

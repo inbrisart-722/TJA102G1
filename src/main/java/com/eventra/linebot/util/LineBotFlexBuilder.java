@@ -20,6 +20,28 @@ public class LineBotFlexBuilder {
 	// ---------------------------
 	// 共用：把 contents 包成 reply JSON
 	// ---------------------------
+	
+	// 不需要 reply token -> 改 lineUserId
+	public String wrapFlexPush(String lineUserId, ObjectNode contents) {
+		ObjectNode root = mapper.createObjectNode();
+		root.put("to", lineUserId); // push api 必填
+
+		ObjectNode flex = mapper.createObjectNode();
+		flex.put("type", "flex");
+		flex.put("altText", "Eventra");
+		flex.set("contents", contents);
+
+		ArrayNode messages = mapper.createArrayNode();
+		messages.add(flex);
+		root.set("messages", messages);
+
+		try {
+			return mapper.writeValueAsString(root);
+		} catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
+	
 	public String wrapFlexReply(String replyToken, ObjectNode contents) {
 		ObjectNode root = mapper.createObjectNode();
 		root.put("replyToken", replyToken);
@@ -44,6 +66,19 @@ public class LineBotFlexBuilder {
 	// 展覽用：Carousel / Bubble
 	// =========================================================
 
+	// 沒有查看更多按鈕的 overloading
+	public ObjectNode buildExhibitionCarousel(List<ExhibitionLineBotCarouselDTO> list) {
+		ObjectNode carousel = mapper.createObjectNode();
+		carousel.put("type", "carousel");
+		ArrayNode contents = mapper.createArrayNode();
+
+		for (ExhibitionLineBotCarouselDTO ex : list) {
+			contents.add(buildExhibitionBubble(ex));
+		}
+		carousel.set("contents", contents);
+		return carousel;
+	}
+	
 	public ObjectNode buildExhibitionCarousel(List<ExhibitionLineBotCarouselDTO> list, boolean hasNextPage,
 			String action, String type, int nextPage) {
 		ObjectNode carousel = mapper.createObjectNode();
@@ -225,7 +260,8 @@ public class LineBotFlexBuilder {
 		return carousel;
 	}
 
-	private ObjectNode buildOrderBubble(OrderLineBotCarouselDTO o) {
+	// 有人單獨使用它（push），設定 public
+	public ObjectNode buildOrderBubble(OrderLineBotCarouselDTO o) {
 		ObjectNode bubble = mapper.createObjectNode();
 		bubble.put("type", "bubble");
 
@@ -323,7 +359,7 @@ public class LineBotFlexBuilder {
 
 		if (hasNextPage) {
 			contents.add(
-					buildSeeMoreBubbleWithQuery("action=" + action + "&orderId=" + orderUlid + "&page=" + nextPage));
+					buildSeeMoreBubbleWithQuery("action=" + action + "&orderUlid=" + orderUlid + "&page=" + nextPage));
 		}
 
 		carousel.set("contents", contents);

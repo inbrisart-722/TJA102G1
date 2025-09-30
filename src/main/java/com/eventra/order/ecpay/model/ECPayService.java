@@ -24,7 +24,9 @@ import com.eventra.cart_item.model.CartItemRedisRepository;
 import com.eventra.cart_item.model.CartItemRedisVO;
 import com.eventra.exhibition.model.ExhibitionRepository;
 import com.eventra.exhibitiontickettype.model.ExhibitionTicketTypeVO;
+import com.eventra.linebot.model.LineBotPushService;
 import com.eventra.member.model.MemberVO;
+import com.eventra.order.model.OrderLineBotCarouselDTO;
 import com.eventra.order.model.OrderProvider;
 import com.eventra.order.model.OrderRepository;
 import com.eventra.order.model.OrderStatus;
@@ -59,11 +61,15 @@ public class ECPayService {
 	private final OrderItemRepository ORDER_ITEM_REPO;
 	private final PaymentAttemptRepository PAYMENT_ATTEMPT_REPO;
 	private final RestClient REST_CLIENT;
+	
+	// line bot push 推播使用
+	private final LineBotPushService LINE_BOT_PUSH_SERVICE;
 
 	public ECPayService(ECPayProperties ECPayProps, ECPayUtils ECPayUtils, ExhibitionRepository exhibitionRepository,
 			CartItemRedisRepository cartItemRedisRepository, OrderRepository orderRepository,
 			OrderItemRepository orderItemRepository, PaymentAttemptRepository paymentAttemptRepository,
-			RestClient.Builder restClientBuilder, @Value("${order.expiration-millis}") Long orderExpirationMillis) {
+			RestClient.Builder restClientBuilder, @Value("${order.expiration-millis}") Long orderExpirationMillis,
+			LineBotPushService lineBotPushService) {
 		this.ECPAY_PROPS = ECPayProps;
 		this.ECPAY_UTILS = ECPayUtils;
 		this.EXHIBITION_REPO = exhibitionRepository;
@@ -73,6 +79,7 @@ public class ECPayService {
 		this.PAYMENT_ATTEMPT_REPO = paymentAttemptRepository;
 		this.REST_CLIENT = restClientBuilder.baseUrl(ECPAY_PROPS.queryUrl()).build();
 		this.ORDER_EXPIRATION_MILLIS = orderExpirationMillis;
+		this.LINE_BOT_PUSH_SERVICE = lineBotPushService;
 	}
 
 
@@ -113,6 +120,7 @@ public class ECPayService {
 
 			/* ********* 6th part : 基於核心 status 開始更新 payment attempt & order 狀態 ********* */
 			OrderVO orderVO = vo.getOrder();
+			String lineUserId = orderVO.getMember().getLineUserId();
 			switch (res.get("TradeStatus")) {
 			case "1":
 				vo.setPaymentAttemptStatus(PaymentAttemptStatus.SUCCESS);
@@ -121,7 +129,6 @@ public class ECPayService {
 				Set<OrderItemVO> orderItemVOs = orderVO.getOrderItems();
 				for (OrderItemVO item : orderItemVOs)
 					item.setTicketCode(genTicketCode(item.getOrderItemUlid()));
-//			ORDER_ITEM_REPO.saveAll(orderItemVOs);
 				break;
 			case "0":
 				vo.setPaymentAttemptStatus(PaymentAttemptStatus.EXPIRED);
@@ -138,6 +145,7 @@ public class ECPayService {
 				// 釋出票出口 1
 				releaseTickets(orderVO);
 			}
+			if (lineUserId != null) lineBotPush(lineUserId, orderVO);
 	}
 	
 	public String ECPayReturnURL(ECPayCallbackReqDTO req) {
@@ -193,6 +201,7 @@ public class ECPayService {
 		paVO.setPaymentDate(req.getPaymentDate());
 		paVO.setCheckMacValue(req.getCheckMacValue());
 		/* ********* 5th part : 處理付款成功情況 ********* */
+		String lineUserId = orderVO.getMember().getLineUserId();
 		if ("1".equals(req.getRtnCode())) {
 			System.out.println("payment succeeded");
 			/* ********* 5-1 part : 更新 PaymentAttempt 填入多項明細 ********* */
@@ -228,6 +237,8 @@ public class ECPayService {
 				}
 			}
 		}
+		/* ********* *th part : line bot push message ********* */
+		if(lineUserId != null) lineBotPush(lineUserId, orderVO); // doublePay 就送兩次（用戶那邊也有通知可以拿來 argue）
 		/* ********* 7th part : 統一回傳 ECPay 1|OK ********* */
 		return "1|OK";
 	}
@@ -437,4 +448,15 @@ public class ECPayService {
 		return fields;
 	}
 
+	private void lineBotPush(String lineUserId, OrderVO order) { 
+		OrderLineBotCarouselDTO dto = new OrderLineBotCarouselDTO();
+		dto.setOrderStatus(order.getOrderStatus())
+			.setOrderUlid(order.getOrderUlid())
+			.setTotalAmount(order.getTotalAmount())
+			.setTotalQuantity(order.getTotalQuantity());
+		
+		// 如果有 lineUserId 才推播
+		try { LINE_BOT_PUSH_SERVICE.pushOrder(lineUserId, dto); }
+		catch (Exception e) {System.out.println(e.toString());}
+	}
 }
