@@ -49,7 +49,7 @@ document.addEventListener("DOMContentLoaded", function() {
 		})
 
 		// 1. 先判斷走 綠界 還是 LINE PAY
-		const pay_method = document.querySelector('input[name="pay_method"]:checked + label').innerText;
+		const pay_method = document.querySelector('input[name="pay_method"]:checked + img + label').innerText;
 		console.log(pay_method);
 
 		// 2-1. 走 Line Pay
@@ -70,6 +70,8 @@ document.addEventListener("DOMContentLoaded", function() {
 				else window.location.href = data.message; // 只有成功的 message 才是拿來轉導
 			}).catch(error => {
 				console.log(error);
+				alert("由於購物車明細過期等狀況，本次 LINE Pay 訂單發送失敗！請重新選擇結帳明細！");
+				window.location.href = "/front-end/cart";
 			})
 		}
 
@@ -121,6 +123,8 @@ document.addEventListener("DOMContentLoaded", function() {
 				.catch((error) => {
 					console.log("error");
 					console.log(error);
+					alert("由於購物車明細過期等狀況，本次 綠界金流 訂單發送失敗！請重新選擇結帳明細！");
+					window.location.href = "/front-end/cart";
 				});
 		}
 		// eventListener 內部		

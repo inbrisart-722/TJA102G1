@@ -94,3 +94,19 @@ input[type="radio"]:checked::before {
   border-radius: 50%;
   background: #d33; /* 中間紅點 */
 }
+img.orderProvider {
+	height: 24px;
+/* 	margin-left: 10px; */
+	margin-left: 10px;
+	margin-bottom: 4px;
+	margin-right: 10px;
+/* 	margin: 20px 0px 4px 10px; */
+/* 	position: absolute; */
+}
+img.orderProvider.linepay {
+	margin-right: 16px;
+	filter: saturate(0.8);
+/* 	top: 15px; */
+/* 	left: 10px; */
+}
+

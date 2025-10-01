@@ -14,6 +14,7 @@ import com.eventra.exhibition.model.ExhibitionVO;
 import com.eventra.exhibitiontickettype.model.ExhibitionTicketTypeRepository;
 import com.eventra.exhibitiontickettype.model.ExhibitionTicketTypeVO;
 import com.eventra.member.model.MemberRepository;
+import com.eventra.member.model.MemberVO;
 import com.sse.ticket.TicketSseEmitterService;
 import com.util.MillisToMinutesSecondsUtil;
 
@@ -41,7 +42,13 @@ public class CartItemService {
 		this.TICKET_SSE_SERVICE = ticketSseService;
 	}
 
-	private void cleanupExpired(Integer memberId, Long now) {
+//	public List<CartItemRedisVO> checkFiveMinutesLeft(long now){
+//		List<MemberVO> members = MEMBER_REPO.findAll();
+//		
+//		
+//	}
+	
+	public void cleanupExpired(Integer memberId, Long now) {
 		/* ********* 1st part : 清理過期購物車 ********* */
 		List<CartItemRedisVO> listOfVOs = CART_ITEM_REDIS_REPO.cleanupExpired(memberId, now);
 		if (listOfVOs == null || listOfVOs.isEmpty())

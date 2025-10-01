@@ -1,7 +1,9 @@
 package com.eventra.order.model;
 
 import java.sql.Timestamp;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -24,7 +26,6 @@ import com.eventra.member.model.MemberRepository;
 import com.eventra.member.model.MemberVO;
 import com.eventra.order.ecpay.model.ECPayService;
 import com.eventra.order.linepay.model.LinePayService;
-import com.eventra.order_item.model.OrderItemLineBotCarouselDTO;
 import com.eventra.order_item.model.OrderItemRepository;
 import com.eventra.order_item.model.OrderItemVO;
 import com.eventra.payment_attempt.model.PaymentAttemptRepository;
@@ -116,6 +117,7 @@ public class OrderService {
 				 */
 				ExhibitionVO key = entry.getKey();
 				GetAllOrderResExhibitionDTO eDTO = new GetAllOrderResExhibitionDTO()
+						.setPhotoPortrait(key.getPhotoPortrait())
 						.setExhibitionName(key.getExhibitionName()).setLocation(key.getLocation())
 						.setStartTime(key.getStartTime()).setEndTime(key.getEndTime());
 				/*
@@ -126,6 +128,7 @@ public class OrderService {
 				List<GetAllOrderResOrderItemDTO> oiDTOs = new ArrayList<>();
 				for (OrderItemVO el : value) {
 					GetAllOrderResOrderItemDTO oiDTO = new GetAllOrderResOrderItemDTO()
+							.setUnitPrice(el.getUnitPrice())
 							.setOrderItemUlid(el.getOrderItemUlid()).setTicketCode(el.getTicketCode())
 							.setTicketTypeName(el.getExhibitionTicketType().getTicketType().getTicketTypeName());
 					oiDTOs.add(oiDTO);
@@ -142,9 +145,12 @@ public class OrderService {
 			 * ********* 4st part : GetAllOrderResDTO -> orderUlid, orderStatus,
 			 * totalAmount, totalQuantity, groups *********
 			 */
+			String creationTime = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date(oVO.getCreatedAt().getTime()));
+			
 			GetAllOrderResDTO resDTO = new GetAllOrderResDTO().setGroups(groupedDTOs)
 					.setOrderStatus(oVO.getOrderStatus()).setOrderUlid(oVO.getOrderUlid())
-					.setTotalAmount(oVO.getTotalAmount()).setTotalQuantity(oVO.getTotalQuantity());
+					.setTotalAmount(oVO.getTotalAmount()).setTotalQuantity(oVO.getTotalQuantity())
+					.setCreationTime(creationTime).setOrderProvider(oVO.getOrderProvider());
 			resDTOs.add(resDTO);
 			/* ********* 5nd part : ********* */
 		}

@@ -13,6 +13,7 @@ document.addEventListener("DOMContentLoaded", function() {
 		window.history.replaceState({}, document.title, newUrl);
 	}
 	else document.querySelector("a.icon-profile").click();
+
 //	if(lineUserIdBoundAlready){
 //		// true -> 失敗
 //		if(lineUserIdBoundAlready === "true"){
@@ -120,7 +121,7 @@ document.addEventListener("DOMContentLoaded", function() {
 		section1.innerHTML = `		<nav id="tablist_order" class="col-12">
 		  <button class="tab_order tab1">全部</button>
 		  <button class="tab_order tab2">付款中</button>
-		  <button class="tab_order tab3" style="background-color: #CE0000; color:white">付款失敗</button>
+		  <button class="tab_order tab3">付款失敗</button>
 		  <button class="tab_order tab4">付款逾時</button>
 		  <button class="tab_order tab5">已付款</button>
 		  <button class="tab_order tab6">已退款</button>
@@ -139,10 +140,12 @@ document.addEventListener("DOMContentLoaded", function() {
 			order_head_el.className = "order_head";
 			order_head_el.innerHTML = `
 				  <span class="order_id">訂單編號：<span>${order.orderUlid}</span></span>
-				  <span class="order_qty">數量：<span>${order.totalQuantity}</span></span>
-				  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+				  <span class="order_qty">總數量：<span>${order.totalQuantity}</span></span>
 				  <span class="order_amount">總金額：<span>${order.totalAmount}</span></span>
-				  <span class="order_status">${order.orderStatus}</span>
+				  <img class="order_provider_img" src="${order.orderProvider !== "LINEPay" ? "https://support.ecpay.com.tw/wp-content/uploads/2023/08/logo200x120-e1692354870320.png" : "https://upload.wikimedia.org/wikipedia/commons/thumb/4/42/Line_pay_logo.svg/1024px-Line_pay_logo.svg.png"}"/>
+				  
+				  <span class="order_provider">${order.orderProvider === "LINEPay" ? "Line Pay" : "綠界支付"}&nbsp;-&nbsp;<span class="order_status">${order.orderStatus}</span></span>
+				  <span class="order_creationTime">時間：<span>${order.creationTime}</span></span>
 				  <button class="expand">
 				    展開<i class="icon-angle-double-down"></i>
 				  </button>
@@ -164,14 +167,15 @@ document.addEventListener("DOMContentLoaded", function() {
 				order_item_head_el.className = "order_item_head";
 				order_item_head_el.innerHTML = ` 
 				<img
-				  src="img/0_exhibition/ChatGPT_exhibition_1.png"
-				  alt="推薦圖片"
+					class="exhibition_img"
+				  src="${group.exhibitionDTO.photoPortrait}"
+				  alt="${group.exhibitionDTO.exhibitionName}"
 				/>
 				<div>
 				  <span><strong>${group.exhibitionDTO.exhibitionName}</strong></span>
 				  <span>
 				    ${group.exhibitionDTO.location}<span
-				      >${group.exhibitionDTO.startTime.substring(0, 10) + " ~ " + group.exhibitionDTO.endTime.substring(0, 10)}</span
+				      >${(group.exhibitionDTO.startTime + " - " + group.exhibitionDTO.endTime).replaceAll("T", " ")}</span
 				    ></span
 				  >
 				</div>
@@ -184,7 +188,8 @@ document.addEventListener("DOMContentLoaded", function() {
 					order_item_body_el.innerHTML = `
 					<div class="order_item_ticket">
 					  <span>訂單明細編號：<span>${item.orderItemUlid}</span></span>
-					  <span>${item.ticketTypeName}</span>
+					  <span>票價：${item.unitPrice}</span>
+					  <span class="${order.orderStatus === '已付款' ? "paid" : ""}">${item.ticketTypeName}</span>
 					  ${order.orderStatus === '已付款' ? `<span class="qrcode_id">${item.ticketCode}
 					  </span><button class="qrcode">取得入場 QR Code</button>` : ''}
 					</div>

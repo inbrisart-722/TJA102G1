@@ -62,15 +62,10 @@ public class FrontendIndexController {
 	public String exhibitionsPage(@RequestParam("exhibitionId") Integer exhibitionId, Model model) {
 		ExhibitionPageDTO dto = exhibitionSvc.getExhibitionInfoForPage(exhibitionId);
 		// fallback -> exhibitionId 查不到對應展覽
-		if(dto == null) return "redirect:/front-end/404";
+//		if(dto == null) return "redirect:/front-end/404"; // 給 BasicErrorController 全專案去調用 !
 		// success -> 塞 dto 並轉交 template-resolver
 		model.addAttribute("exhibition", dto);
 		return "front-end/exhibitions";
-	}
-	
-	@GetMapping("/404")
-	public String Page404() {
-		return "front-end/404";
 	}
 	
 	// 0. 靜態測試（之後得刪）
@@ -88,17 +83,12 @@ public class FrontendIndexController {
 		return "front-end/cart";
 	}
 
-// 開發 line pay 改 get 測試時使用
-//	@GetMapping("/payment")
-//	public String paymentPage() {
-//		return "front-end/payment";
-//	}
-	
 	@PostMapping("/payment")
 	public String paymentPage(@RequestParam List<Integer> cartItemIds, Model model, Principal principal) {
 		// 找到指定 cartItemDTOs
 		Integer memberId = principal != null ? Integer.valueOf(principal.getName()) : null;
 		List<GetCartItemResDTO> listOfDTOs = cartItemSvc.getCartItem(memberId, cartItemIds);
+//		if(listOfDTOs == null || listOfDTOs.isEmpty()) return "front-end/payment?expired=true";
 		model.addAttribute("listOfDTOs", listOfDTOs);
 		return "front-end/payment";
 	}
