@@ -29,6 +29,10 @@ public class CartItemRedisRepository {
 	private String hKey(Integer memberId) {return "cart:items:" + memberId;}
 	private String zKey(Integer memberId) {return "cart:items:exp:" + memberId;}
 	
+//	public List<CartItemRedisVO> checkFiveMinutesLeft(long now){
+//		
+//	}
+	
 	/* 主動清理：刪掉已過期的 cartItem（讀/寫前都先呼叫一次） */
 	public List<CartItemRedisVO> cleanupExpired(Integer memberId, long now) {
 		String hKey = hKey(memberId);

@@ -40,32 +40,70 @@ div.order_row {
 
 div.order_row>div.order_head {
 	/* border: 1px solid blue; */
-	background: rgb(255, 255, 255);
-	background: rgba(0, 139, 139, 0.5);
+	background: rgb(244, 244, 244);
+/* 	background: rgba(0, 139, 139, 0.66); */
 	color: black;
 	font-weight: 400;
 	padding: 2% 2.5%;
 	border-radius: 5px;
-	border: 1px solid rgb(74, 161, 161);
-	display: flex;
+	border: 1px solid rgb(155, 155, 155);
+	box-shadow: 0px 1px 3px gray;
+	/* 	display: flex; */
+	position: relative;
 	justify-content: center;
 }
 
 div.order_row>div.order_head>span.order_id {
-	flex-grow: 20;
+	/* 	flex-grow: 10; */
+	/* 	text-align: center; */
+	/* 	width: 25%; */
+	position: absolute;
+}
+
+div.order_row>div.order_head>span.order_qty {
+	/* 	flex-grow: 1; */
+	/* 	text-align: center; */
+	/* 	width: 6%; */
+	position: absolute;
+	left: 385px;
 }
 
 div.order_row>div.order_head>span.order_amount {
-	flex-grow: 1.5;
+	position: absolute;
+	/* 	flex-grow: 1; */
+	/* 	margin-right: 30px; */
+	/* 	text-align: center; */
+	left: 465px;
 }
 
-div.order_row>div.order_head>span.order_status {
-	flex-grow: 2;
+img.order_provider_img {
+	position: absolute;
+	height: 20px;
+	left: 585px;
+}
+
+div.order_row>div.order_head>span.order_provider {
+	position: absolute;
+	left: 653px;
+	/* 	flex-grow: 1; */
+	/* 	margin-right: 0px; */
+	/* 	text-align: right; */
+	/* 	border: 1px solid black; */
+}
+
+div.order_row>div.order_head>span.order_creationTime {
+	position: absolute;
+	left: 805px;
+	/* 	flex-grow: 2; */
+	/* 	text-align: right; */
 }
 
 div.order_row>div.order_head>button {
-	flex-grow: 0.5;
-	margin: 0 1%;
+	/* 	left: 900px; */
+	/* 	position: absolute; */
+	/* 	text-align: right; */
+	/* 	flex-grow: 0.5; */
+	margin-left: 92.5%;
 	background: rgb(122, 122, 122);
 	border: 0;
 	border-radius: 15px;
@@ -155,8 +193,27 @@ div.order_row>div.order_body>div.order_item_body>div.order_item_ticket>span:nth-
 
 div.order_row>div.order_body>div.order_item_body>div.order_item_ticket>span:nth-child(2)
 	{
-	/*   flex-grow: 1; */
-	margin-right: 1%;
+	margin: 0 25px;
+	flex-grow: 0.5;
+}
+
+div.order_row>div.order_body>div.order_item_body>div.order_item_ticket>span:nth-child(3)
+	{
+	flex-grow: 1;
+}
+
+div.order_row>div.order_body>div.order_item_body>div.order_item_ticket>span:nth-child(3).paid
+	{
+	flex-grow: 5;
+}
+
+div.order_row>div.order_body>div.order_item_body>div.order_item_ticket>span:nth-child(4)
+	{
+	flex-grow: 1;
+}
+div.order_row>div.order_body>div.order_item_body>div.order_item_ticket>span:nth-child(5)
+	{
+	flex-grow: 0.5;
 }
 
 div.order_row>div.order_body>div.order_item_body>div.order_item_ticket>button
@@ -216,6 +273,10 @@ div.order_body>button:first-child {
 	padding: 0.5% 1%;
 	/* 	transform: tranlateX(-100%); */
 	margin: 20px 0 28px 0;
+}
+
+div.order_item_head>img.exhibition_img {
+	border-radius: 5px;
 }
 
 /* =============================================================== */
@@ -309,8 +370,9 @@ a#logout::before {
 }
 
 a#logout {
-	background-color: rgba(255, 153, 0, 0.8);
-/* 	background-color: lightgrey; */
+	background-color: rgba(245, 153, 0, 0.9);
+/* 	filter: saturate(0.9); */
+	/* 	background-color: lightgrey; */
 }
 
 a#logout>span {
@@ -335,7 +397,6 @@ select#gender {
 /* div#if_not_oauth2 { */
 /* 	position: relative; */
 /* } */
-
 #line-oauth2.disabled {
 	background-color: lightgray;
 	pointer-events: none;
@@ -344,21 +405,27 @@ select#gender {
 
 #line-oauth2 {
 	display: inline-block;
-/* 	position: absolute; */
-/* 	right: 64px; */
-/* 	top: 6px; */
+	/* 	position: absolute; */
+	/* 	right: 64px; */
+	/* 	top: 6px; */
 	background-color: #00C300;
-/* 	background-color: darkcyan; */
-/* 	background-color: lightgray; */
+	filter: saturate(0.85); 
+	/* 	background-color: darkcyan; */
+	/* 	background-color: lightgray; */
 	color: white;
 	padding: 10px 20px;
 	border-radius: 4px;
 	text-decoration: none;
 	font-weight: bold;
 }
-#line-oauth2.oauth2-user{
+
+#line-oauth2.oauth2-user {
 	margin-left: 340px;
 }
+
 #line-oauth2.oauth2-user.disabled {
 	margin-left: 290px;
+}
+button.order_repay {
+	font-weight: 500;
 }

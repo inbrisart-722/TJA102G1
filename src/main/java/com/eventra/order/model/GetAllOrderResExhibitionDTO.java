@@ -4,12 +4,20 @@ import java.sql.Timestamp;
 import java.time.LocalDateTime;
 
 public class GetAllOrderResExhibitionDTO {
-//	private String photoPortrait;
+	private String photoPortrait;
 	private String exhibitionName;
 	private String location;
 	private LocalDateTime startTime;
 	private LocalDateTime endTime;
 	
+	
+	public String getPhotoPortrait() {
+		return photoPortrait;
+	}
+	public GetAllOrderResExhibitionDTO setPhotoPortrait(String photoPortrait) {
+		this.photoPortrait = photoPortrait;
+		return this;
+	}
 	public String getExhibitionName() {
 		return exhibitionName;
 	}

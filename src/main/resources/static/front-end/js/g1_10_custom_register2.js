@@ -149,7 +149,8 @@ document.addEventListener("DOMContentLoaded", () => {
 //					}, 3000);
 
 					// ver2. 註冊成功，協助打 login api 取得 member token 登入身份
-					alert("恭喜註冊成功！將為您於3秒後導至首頁！");
+//					alert("恭喜註冊成功！將為您於3秒後導至首頁！");
+					alert("恭喜註冊成功！將為您轉導至首頁！");
 					
 					fetch("/api/auth/login/member", {
 						method: "POST",
@@ -166,7 +167,7 @@ document.addEventListener("DOMContentLoaded", () => {
 							console.log(result);
 							setTimeout(() => {
 								location.href = "/front-end/index";
-							}, 3000);
+							}, 500);
 						})
 						.catch(error => console.log(error));
 

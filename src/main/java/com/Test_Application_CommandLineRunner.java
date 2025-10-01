@@ -16,8 +16,8 @@ import com.eventra.order.linepay.model.LinePayService;
 @SpringBootApplication
 public class Test_Application_CommandLineRunner implements CommandLineRunner {
 
-	@Autowired
-	private LinePayService LINE_PAY_SVC; 
+//	@Autowired
+//	private LinePayService LINE_PAY_SVC; 
 	
 //	@Autowired
 //	private LineBotPushService LINE_BOT_PUSH_SERVICE;

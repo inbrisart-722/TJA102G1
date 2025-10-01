@@ -121,8 +121,10 @@ document.addEventListener("DOMContentLoaded", () => {
 						return;
 					}
 
-					alert("成功更換密碼！將為您於3秒後導至登入頁！");
-					setTimeout(() => window.location.href = "/front-end/login", 3000);
+					alert("成功更換密碼！將為您導至登入頁！");
+					window.location.href = "/front-end/login";
+//					alert("成功更換密碼！將為您於3秒後導至登入頁！");
+//					setTimeout(() => window.location.href = "/front-end/login", 3000);
 				})
 				.catch((error) => {
 					console.log("error");
