@@ -454,11 +454,6 @@
 							<aside class="col-lg-3">
 								<div class="box_style_cat">
 									<ul id="cat_nav">
-										<li><a href="#" class="active"
-											data-target="#order-notifications"> <i
-												class="icon_set_1_icon-95"></i>訂單通知 <span id="badge-order"
-												class="notif-badge d-none">0</span>
-										</a></li>
 										<li><a href="#" data-target="#favorite-notifications">
 												<i class="icon_set_1_icon-95"></i>收藏展覽通知 <span
 												id="badge-fav" class="notif-badge d-none">0</span>
@@ -476,54 +471,17 @@
 								<!-- 工具列（標題+全部已讀） -->
 								<div
 									class="d-flex justify-content-between align-items-center mb-3">
-									<h3 class="nomargin_top mb-0" id="notifTitle">訂單通知</h3>
+									<h3 class="nomargin_top mb-0" id="notifTitle">通知/公告一覽</h3>
 									<button id="markAllRead"
 										class="btn btn-sm btn-outline-secondary">全部標示為已讀</button>
-								</div>
+								</div>								
 
-								<!-- 面板1：訂單通知（預設顯示） 展示4個 -->
-								<div id="order-notifications" class="notification-section">
-									<!-- 1 -->
-									<div class="card mb-3 shadow-sm border-0 notification-unread">
-										<div class="card-body border-0">
-											<h5 class="card-title mb-1 fw-bold">退票申請通知</h5>
-											<p class="card-text mb-2 text-muted" style="font-size: 16px">
-												您的訂單「2」的退票申請已收到，退款將於 7–14 個工作天內完成，敬請耐心等候。</p>
-										</div>
-									</div>
-
-									<!-- 2 -->
-									<div class="card mb-3 shadow-sm border-0 notification-unread">
-										<div class="card-body border-0">
-											<h5 class="card-title mb-1 fw-bold">退票申請通知</h5>
-											<p class="card-text mb-2 text-muted" style="font-size: 16px">
-												您的訂單「2」的退票申請已收到，退款將於 7–14 個工作天內完成，敬請耐心等候。</p>
-										</div>
-									</div>
-
-									<!-- 3 -->
-									<div class="card mb-3 shadow-sm border-0 notification-read">
-										<div class="card-body border-0">
-											<h5 class="card-title mb-1 fw-bold">訂單成立通知</h5>
-											<p class="card-text mb-2 text-muted" style="font-size: 16px">
-												您的訂單「1」已成立，電子票券已存入票夾，請隨時查看使用資訊！</p>
-										</div>
-									</div>
-
-									<!-- 4 -->
-									<div class="card mb-3 shadow-sm border-0 notification-read">
-										<div class="card-body border-0">
-											<h5 class="card-title mb-1 fw-bold">退票申請通知</h5>
-											<p class="card-text mb-2 text-muted" style="font-size: 16px">
-												您的訂單「2」的退票申請已收到，退款將於 7–14 個工作天內完成，敬請耐心等候。</p>
-										</div>
-									</div>
-								</div>
-
-								<!-- 面板2：收藏展覽通知（預設隱藏）展示3個 -->
-								<div id="favorite-notifications"
-									class="notification-section d-none">
+								<!-- 面板2：收藏展覽通知 -->
+								<div id="favorite-notifications" class="notification-section">
 									<!-- 由 g1_6_event_notification.js 帶入 -->
+								</div>
+								<div class="text-center my-3">
+								  <button id="loadMoreFav" class="btn btn-outline-primary btn-sm d-none btn_full">載入更多</button>
 								</div>
 
 								<!-- 面板3：平台公告（預設隱藏） -->

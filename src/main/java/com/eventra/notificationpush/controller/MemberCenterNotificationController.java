@@ -4,6 +4,10 @@ import com.eventra.eventnotification.dto.EventNotificationDTO;
 import com.eventra.eventnotification.model.EventNotificationService;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
@@ -31,28 +35,44 @@ public class MemberCenterNotificationController {
 
 	// 撈出當前登入會員的通知
 	@GetMapping("/my")
-	public List<EventNotificationDTO> getMyNotifications(@AuthenticationPrincipal UserDetails user) {
-		// 1. 確認登入帳號是會員角色
-		boolean isMember = false;
-		for (var auth : user.getAuthorities()) {
-			if ("ROLE_MEMBER".equals(auth.getAuthority())) {
-				isMember = true;
-				break;
-			}
-		}
+	public Page<EventNotificationDTO> getMyNotifications(
+            @AuthenticationPrincipal UserDetails user,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "5") int size) {
 
-		if (!isMember) {
-			throw new RuntimeException("不是會員帳號");
-		}
+        boolean isMember = user.getAuthorities().stream()
+                .anyMatch(auth -> "ROLE_MEMBER".equals(auth.getAuthority()));
+        if (!isMember) {
+            throw new RuntimeException("不是會員帳號");
+        }
 
-		// 2. 轉成會員 ID
-		Integer memId = Integer.valueOf(user.getUsername());
-
-//	    System.out.println("member_id = " + memId);
-
-		// 3. 繼續查詢通知
-		return notificationService.getMemberNotifications(memId);
-	}
+        Integer memId = Integer.valueOf(user.getUsername());
+        Pageable pageable = PageRequest.of(page, size, Sort.by("createdAt").descending());
+        return notificationService.getMemberNotifications(memId, pageable);
+    }
+	
+//	public List<EventNotificationDTO> getMyNotifications(@AuthenticationPrincipal UserDetails user) {
+//		// 1. 確認登入帳號是會員角色
+//		boolean isMember = false;
+//		for (var auth : user.getAuthorities()) {
+//			if ("ROLE_MEMBER".equals(auth.getAuthority())) {
+//				isMember = true;
+//				break;
+//			}
+//		}
+//
+//		if (!isMember) {
+//			throw new RuntimeException("不是會員帳號");
+//		}
+//
+//		// 2. 轉成會員 ID
+//		Integer memId = Integer.valueOf(user.getUsername());
+//
+////	    System.out.println("member_id = " + memId);
+//
+//		// 3. 繼續查詢通知
+//		return notificationService.getMemberNotifications(memId);
+//	}
 
 	// 單筆設為已讀
 	@PostMapping("/{annId}/read")

@@ -58,93 +58,54 @@ public class ExhibitionListApiController {
 //		return service.getLatestExhibitions();
 //	}
 
-	/* ===== 搜尋展覽清單頁 ===== */
+	/* ===== 搜尋展覽清單頁 (分頁版) ===== */
 	@PostMapping("/search")
 	public Map<String, Object> searchExhibitionsPaged(
-            @RequestBody Map<String, Object> criteria,
-            @RequestParam(defaultValue = "1") int page) {
+	        @RequestBody Map<String, Object> criteria,
+	        @RequestParam(defaultValue = "1") int page) {
 
-        if (criteria == null || criteria.isEmpty()) {
-            return Collections.emptyMap();
-        }
+		if (criteria == null || criteria.isEmpty()) {
+	        // 原本是 return Collections.emptyMap();
+	        // 改成回傳正確的分頁物件
+	        Map<String, Object> emptyResult = new HashMap<>();
+	        emptyResult.put("content", Collections.emptyList());
+	        emptyResult.put("page", page);
+	        emptyResult.put("size", PAGE_SIZE);
+	        emptyResult.put("totalElements", 0L);
+	        emptyResult.put("totalPages", 0);
+	        return emptyResult;
+	    }
 
-        // 將 Object 轉成 Map<String, String[]>
-        Map<String, String[]> converted = new java.util.HashMap<>();
-        for (Map.Entry<String, Object> entry : criteria.entrySet()) {
-            String key = entry.getKey();
-            Object value = entry.getValue();
+	    // 將 Object 轉成 Map<String, String[]>, 方便給 ExhibitionUtilCompositeQuery 使用
+	    Map<String, String[]> converted = new HashMap<>();
 
-            if (value instanceof List) {
-                List<?> list = (List<?>) value;
-                String[] arr = new String[list.size()];
-                for (int i = 0; i < list.size(); i++) {
-                    arr[i] = String.valueOf(list.get(i));
-                }
-                converted.put(key, arr);
-            } else if (value != null) {
-                converted.put(key, new String[]{String.valueOf(value)});
-            }
-        }
+	    for (Map.Entry<String, Object> entry : criteria.entrySet()) {
+	        String key = entry.getKey();
+	        Object value = entry.getValue();
 
-        return service.searchExhibitionsPaged(converted, page, PAGE_SIZE);
-    }
+	        if (value instanceof List) {
+	            List<?> list = (List<?>) value;
+	            String[] arr = new String[list.size()];
+	            for (int i = 0; i < list.size(); i++) {
+	                arr[i] = String.valueOf(list.get(i));
+	            }
+	            converted.put(key, arr);
+	        } else if (value != null) {
+	            String val = String.valueOf(value);
+	            // 特別處理 regions：如果是逗號分隔字串，就拆成陣列
+	            if ("regions".equals(key) && val.contains(",")) {
+	                converted.put(key, val.split(","));
+	            } else {
+	                converted.put(key, new String[]{val});
+	            }
+	        }
+	    }
+
+	    // 呼叫 Service，做 CriteriaQuery + 分頁
+	    return service.searchExhibitionsPaged(converted, page, PAGE_SIZE);
+	}
+
 	
-//	public List<ExhibitionListDTO> searchExhibitions(@RequestBody Map<String, Object> criteria) {
-////		System.out.println("criteria raw: " + criteria);
-//
-//		// 將 Object 轉成 Map<String, String[]>, 方便給 ExhibitionUtilCompositeQuery 使用
-//		Map<String, String[]> converted = new HashMap<>();
-//
-//		for (Map.Entry<String, Object> entry : criteria.entrySet()) {
-//			String key = entry.getKey();
-//			Object value = entry.getValue();
-//
-//			if (value instanceof List) {
-//				List<?> list = (List<?>) value;
-//				String[] arr = new String[list.size()];
-//				for (int i = 0; i < list.size(); i++) {
-//					arr[i] = String.valueOf(list.get(i));
-//				}
-//				converted.put(key, arr);
-//			} else if (value != null) {
-//				converted.put(key, new String[] { String.valueOf(value) });
-//			}
-//		}
-//
-////		System.out.println("criteria converted: " + converted);
-//
-//		// 直接走 ExhibitionUtilCompositeQuery (透過 Service)
-//		List<ExhibitionListDTO> result = service.searchExhibitions(converted);
-//		return result != null ? result : Collections.emptyList();
-//	}
-
-	// 測試用
-//	@PostMapping("/search/simple")
-//	public List<ExhibitionListDTO> searchExhibitionsSimple(@RequestBody Map<String, Object> criteria) {
-//		String keyword = criteria.get("keyword") != null ? "%" + criteria.get("keyword").toString() + "%" : null;
-//
-//		String startDate = criteria.get("date_from") != null ? criteria.get("date_from").toString() + " 00:00:00"
-//				: "1970-01-01 00:00:00";
-//
-//		String endDate = criteria.get("date_to") != null ? criteria.get("date_to").toString() + " 23:59:59"
-//				: "2999-12-31 23:59:59";
-//
-//		// 支援多地區
-//		List<String> regions = new ArrayList<>();
-//		Object regionObj = criteria.get("regions");
-//		if (regionObj instanceof List) {
-//			for (Object o : (List<?>) regionObj) {
-//				regions.add("%" + o.toString() + "%"); // LIKE 用
-//			}
-//		} else if (regionObj instanceof String) {
-//			for (String s : regionObj.toString().split(",")) {
-//				regions.add("%" + s.trim() + "%");
-//			}
-//		}
-//
-//		return service.searchExhibitionsByNameAndDateRange(keyword, startDate, endDate, regions);
-//	}
-
 	/* ===== 展商主頁 ===== */
 	// 取得某展商的所有展覽清單
 	@GetMapping("/by-exhibitor")
