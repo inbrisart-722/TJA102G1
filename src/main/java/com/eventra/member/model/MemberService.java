@@ -241,6 +241,7 @@ public class MemberService {
 				.birthDate(member.getBirthDate())
 				.address(member.getAddress())
 				.profilePic(member.getProfilePic())
+				.lineUserId(member.getLineUserId())
 				.githubId(member.getGithubId())
 				.googleId(member.getGoogleId())
 				.facebookId(member.getFacebookId())

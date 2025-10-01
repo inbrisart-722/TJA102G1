@@ -11,10 +11,18 @@ public class GetMemberInfoResDTO {
 	private LocalDate birthDate;
 	private String address;
 	private String profilePic;
+	private String lineUserId;
 	private String githubId;
 	private String googleId;
 	private String facebookId;
 	
+	
+	public String getLineUserId() {
+		return lineUserId;
+	}
+	public void setLineUserId(String lineUserId) {
+		this.lineUserId = lineUserId;
+	}
 	public String getEmail() {
 		return email;
 	}
@@ -92,6 +100,7 @@ public class GetMemberInfoResDTO {
         private LocalDate birthDate;
         private String address;
         private String profilePic;
+        private String lineUserId;
         private String githubId;
         private String googleId;
         private String facebookId;
@@ -104,6 +113,7 @@ public class GetMemberInfoResDTO {
         public Builder birthDate(LocalDate birthDate) { this.birthDate = birthDate; return this; }
         public Builder address(String address) { this.address = address; return this; }
         public Builder profilePic(String profilePic) { this.profilePic = profilePic; return this; }
+        public Builder lineUserId(String lineUserId) { this.lineUserId = lineUserId; return this; }
         public Builder githubId(String githubId) { this.githubId = githubId; return this; }
         public Builder googleId(String googleId) { this.googleId = googleId; return this; }
         public Builder facebookId(String facebookId) { this.facebookId = facebookId; return this; }
@@ -118,6 +128,7 @@ public class GetMemberInfoResDTO {
             dto.setBirthDate(birthDate);
             dto.setAddress(address);
             dto.setProfilePic(profilePic);
+            dto.setLineUserId(lineUserId);
             dto.setGithubId(githubId);
             dto.setGoogleId(googleId);
             dto.setFacebookId(facebookId);

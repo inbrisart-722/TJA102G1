@@ -336,6 +336,12 @@ select#gender {
 /* 	position: relative; */
 /* } */
 
+#line-oauth2.disabled {
+	background-color: lightgray;
+	pointer-events: none;
+	cursor: normal;
+}
+
 #line-oauth2 {
 	display: inline-block;
 /* 	position: absolute; */
@@ -351,5 +357,8 @@ select#gender {
 	font-weight: bold;
 }
 #line-oauth2.oauth2-user{
-	margin-left: 330px;
+	margin-left: 340px;
+}
+#line-oauth2.oauth2-user.disabled {
+	margin-left: 290px;
 }

@@ -28,6 +28,11 @@
 
 <!-- CUSTOM CSS -->
 <link href="css/g1_6_custom.css" rel="stylesheet" />
+<style>
+	a.cart_bt strong {
+ 	 display: none;
+	}
+</style>
 </head>
 
 <body>
@@ -88,8 +93,8 @@
 					<!-- 搜尋專用 end -->
 					<ul id="top_tools">
 						<li id="nav_icon_2"><a href="/front-end/cart" class="cart_bt"><i
-								class="icon-cart"></i><strong>29:52</strong></a></li>
-						<li id="nav_icon_3"><a href="/front-end/admin"><i
+								class="icon-cart"></i><strong id="cart_timer"></strong></a></li>
+						<li id="nav_icon_3"><a href="/front-end/admin?go=ticket"><i
 								class="icon-ticket-2"></i></a></li>
 						<li id="nav_icon_4">
 							<!-- 不知怎麼引入那個登入彈窗 --> <a href="/front-end/admin"><i
@@ -188,6 +193,57 @@
 	<script src="js/g1_10_map_only_search_enabled.js"></script>
 	<script src="js/g1_6_search_history.js"></script> <!-- 存搜尋紀錄用 -->
 	<script src="js/g1_6_search_modal.js"></script> <!-- 導頁至搜尋結果頁用 -->
+	<script>
+	 // MM:SS => seconds
+	  function parseTime(str) {
+	    const [mm, ss] = str.split(":").map(Number);
+	    return mm * 60 + ss;
+	  }
 
+	  // seconds 轉回 MM:SS 格式
+	  function formatTime(seconds) {
+	    if (seconds < 0) seconds = 0;
+	    const mm = String(Math.floor(seconds / 60)).padStart(2, "0");
+	    const ss = String(seconds % 60).padStart(2, "0");
+	    return `${mm}:${ss}`;
+	  }
+	  // 右上角背景購物車時間
+	  csrfFetch("/api/front-end/protected/cartItem/getMyExpiration", {
+	    method: "GET",
+	  })
+	    .then((res) => {
+		// if(res.status === "401") throw new Error("getMyExpiration: Authorization failed"); // 不轉導
+	      if (!res.ok) throw new Error("getMyExpiration: Not 2XX or 401");
+	      return res.json();
+	    })
+	    .then((result) => {
+	      // result.status => success / failed
+	      // result.message => 最小背景時間已成功取得 / 最小背景時間取得失敗
+	      // result.backgroundExpireTime => MM:SS / undefiend
+	      console.log(result);
+
+	      if (result.status === "success") {
+	        let remaining = parseTime(result.backgroundExpireTime);
+	        const cart_timer_el = document.querySelector("#cart_timer");
+	        // 每秒更新
+	        const intervalId = setInterval(() => {
+	          remaining--;
+
+	          cart_timer_el.innerText = formatTime(remaining);
+
+	          if (remaining <= 0) {
+	            clearInterval(intervalId);
+	            // 這裡可以觸發 "倒數結束" 的事件，例如 disable 按鈕 / 自動清空
+	            alert("您的部分購物車明細已過期！");
+	            cart_timer_el.style.display = "none";
+	          }
+	        }, 1000);
+	        cart_timer_el.style.display = "block";
+	      }
+	    })
+	    .catch((error) => {
+	      console.log(error);
+	    });
+	</script>
 </body>
 </html>

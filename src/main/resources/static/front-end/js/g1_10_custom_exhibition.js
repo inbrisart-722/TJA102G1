@@ -94,12 +94,14 @@ document.addEventListener("DOMContentLoaded", function() {
 					// 插入 wrapper 和 hr
 					btn_more_related_exhib.insertAdjacentElement("beforebegin", wrapper);
 					const hr = document.createElement("hr");
+					const hr2 = document.createElement("hr");
 					btn_more_related_exhib.insertAdjacentElement("beforebegin", hr);
+					btn_more_related_exhib.insertAdjacentElement("beforebegin", hr2);
 					// 更新 sidebar 高度
 					// offsetHeight 是 JavaScript DOM 屬性，用來取得一個元素的視覺高度
 					// 包括了元素的內容、內邊距 (padding) 和邊框 (border)。
 					const currentHeight = div_related_exhib.offsetHeight;
-					const newMinHeight = (currentHeight + 125) + "px";
+					const newMinHeight = (currentHeight + 145) + "px";
 					div_related_exhib.style.minHeight = newMinHeight;
 					// 最後一圈的值會覆蓋，後續拿去渲染 btn dataset 的值
 					to_exhibitionId = e.exhibitionId;
@@ -1483,9 +1485,9 @@ document.addEventListener("DOMContentLoaded", function() {
 
 	/* ================= api: 確認自己是誰 ================= */
 	function getMyMemberId() {
-		return fetch("/api/front-end/protected/member/getMyMemberId", { method: "GET" })
+		return csrfFetch("/api/front-end/protected/member/getMyMemberId", { method: "GET" })
 			.then((res) => {
-				if (!res.ok) throw new Error("getMyMemberId: Not 2XX");
+				if (!res.ok) return res.text().then(text => {throw new Error("getMyMemberId: " + text);})
 				return res.text();
 			})
 			.then((result) => {
@@ -1523,7 +1525,7 @@ document.addEventListener("DOMContentLoaded", function() {
 	let stompClient = null;
 
 	function connect() {
-		const socket = new SockJS("/ws-chat");
+		const socket = new SockJS("/api/front-end/ws-chat");
 		// 後端設定的 endpoint -> WebSocketConfig 裡 registry.addEndpoint("/ws-chat")
 		// SockJs 為 WebSocket 兼容層 ->「使用 WebSocket，但失敗就自動降級」的連線
 		stompClient = Stomp.over(socket);
