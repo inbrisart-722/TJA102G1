@@ -196,7 +196,7 @@ document.addEventListener("DOMContentLoaded", function() {
 			section1.appendChild(order_row_el);
 		})
 		// 把第一個預設展開！
-		section1.querySelector("div.order_row > div.order_head > button.expand").click();
+		section1.querySelector("div.order_row > div.order_head > button.expand")?.click();
 	}
 
 	// 改事件委派
