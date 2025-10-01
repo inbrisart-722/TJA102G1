@@ -50,16 +50,9 @@ public class ChatWSController {
 		// 在 Spring WebSocket + STOMP + Spring Security
 		// 握手時會自動把目前登入、送出訊息的使用者（Authentication）包裝成一個 Principal，傳給 @MessageMapping 方法
 		
-		 boolean isMember = false;
-		 for (var au : auth.getAuthorities()) {
-			 if ("ROLE_MEMBER".equals(au.getAuthority())) {
-				 isMember = true;
-				 break;
-			 }
-		 }
 		 
 		Integer memberId = null; 
-		if(principal != null && principal.getName() != null && isMember == true) memberId = Integer.valueOf(principal.getName());
+		if(principal != null && principal.getName() != null) memberId = Integer.valueOf(principal.getName());
 		System.out.println("這次送訊息來的人的 memberId:" + memberId);
 		System.out.println(auth != null ? auth.getName() : null);
 			

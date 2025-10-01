@@ -41,7 +41,7 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 	@Override
 	// 這裡是「前端如何接進來」的設定
 	public void registerStompEndpoints(StompEndpointRegistry registry) {
-		registry.addEndpoint("/api/front-end/ws-chat")
+		registry.addEndpoint("/front-end/ws-chat")
 		// 前端連線用的 WebSocket endpoint
 		// 定義一個 WebSocket 連線入口 URL
 		// 前端就會用 new SockJS("/ws-chat") 去連這個 endpoint

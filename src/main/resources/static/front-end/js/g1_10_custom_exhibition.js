@@ -1525,7 +1525,7 @@ document.addEventListener("DOMContentLoaded", function() {
 	let stompClient = null;
 
 	function connect() {
-		const socket = new SockJS("/api/front-end/ws-chat");
+		const socket = new SockJS("/front-end/ws-chat");
 		// 後端設定的 endpoint -> WebSocketConfig 裡 registry.addEndpoint("/ws-chat")
 		// SockJs 為 WebSocket 兼容層 ->「使用 WebSocket，但失敗就自動降級」的連線
 		stompClient = Stomp.over(socket);
