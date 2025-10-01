@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="zh-Hant">
+<html lang="zh-Hant" xmlns:th="http://www.thymeleaf.org">
 <head>
   <meta charset="utf-8" />
   <title>Eventra 管理者平台 — 活動申請審核</title>
@@ -77,17 +77,17 @@
             <!-- 活動名稱 -->
             <div class="row g-3 align-items-center mb-2">
               <div class="col-12 col-sm-2 label-col"><label for="activityName" class="col-form-label">活動名稱</label></div>
-              <div class="col-12 col-sm-10"><input id="activityName" type="text" class="form-control" value="abc"/></div>
+              <div class="col-12 col-sm-10"><input id="activityName" type="text" class="form-control" th:value=${exhibitionVO.exhibitionName}></div>
             </div>
             <!-- 展覽簡介 -->
             <div class="row g-3 align-items-start mb-2">
               <div class="col-12 col-sm-2 label-col"><label for="desc" class="col-form-label">展覽簡介</label></div>
-              <div class="col-12 col-sm-10"><textarea id="desc" class="form-control" rows="4">XXXXXXXXXXXXX</textarea></div>
+              <div class="col-12 col-sm-10"><textarea id="desc" class="form-control" rows="4" th:value=${exhibitionVO.description}></textarea></div>
             </div>
             <!-- 公司名稱 -->
             <div class="row g-3 align-items-center mb-2">
               <div class="col-12 col-sm-2 label-col"><label for="company" class="col-form-label">公司名稱</label></div>
-              <div class="col-12 col-sm-10"><input id="company" type="text" class="form-control" value="abc"/></div>
+              <div class="col-12 col-sm-10"><input id="company" type="text" class="form-control" th:value=${exhibitionVO.exhibitionId}></div>
             </div>
             <!-- 統編 + 代表人 -->
             <div class="row g-3 align-items-center mb-2">
@@ -129,9 +129,9 @@
           </form>
         </div>
       </div>
-    </div>
+    </div> 
   </main>
-
+ 
   <footer class="app-footer">
     <strong>Copyright &copy; 2025&nbsp;&nbsp;<span class="text-decoration-none">Eventra Inc.</span></strong>
     ｜ Tibame TJA102 G1 專題製作
