@@ -346,10 +346,6 @@ public class SecurityConfig {
 		// 概念上來說，AuthenticationEntryPoint 處理「未認證」，AccessDeniedHandler 處理「權限不足」，兩者都是
 		// handler !!
 		http.exceptionHandling(ex -> ex
-				// authentication
-				.defaultAuthenticationEntryPointFor( // 對 /api/** 的請求
-						restEntryPoint, // 使用自訂 entry point → 回 401 + JSON
-						new AntPathRequestMatcher("/api/**"))
 				// 對其他（視為頁面）請求
 				// 1. 前台
 				.defaultAuthenticationEntryPointFor(((req, res, authEx) -> {
@@ -357,22 +353,35 @@ public class SecurityConfig {
 					if (req.getQueryString() != null)
 						target += "&" + req.getQueryString();
 					res.sendRedirect(target);
-				}), new AntPathRequestMatcher("/front-end/**"))
+				}), new AntPathRequestMatcher("/front-end/**", null, true))
 				// 2. 後台
 				.defaultAuthenticationEntryPointFor(((req, res, authEx) -> {
 					String target = "/back-end/exhibitor/exhibitor_login?redirect=" + req.getRequestURI();
 					if (req.getQueryString() != null)
 						target += "&" + req.getQueryString();
 					res.sendRedirect(target);
-				}), new AntPathRequestMatcher("/back-end/**"))
+				}), new AntPathRequestMatcher("/back-end/**", null, true))
 				.defaultAuthenticationEntryPointFor(new LoginUrlAuthenticationEntryPoint("/platform/login"),
-						new AntPathRequestMatcher("/platform/**"))
+						new AntPathRequestMatcher("/platform/**", null, true))
+				// AntPathRequestMatcher 的邏輯是：
+				// 檢查 路徑開頭 是否匹配。
+				// /front-end/** 意思就是「以 /front-end/ 開頭」。
+				// 但它不會要求「URL 必須是從根就開始匹配」。
+				// authentication
+				.defaultAuthenticationEntryPointFor( // 對 /api/** 的請求
+						restEntryPoint, // 使用自訂 entry point → 回 401 + JSON
+						new AntPathRequestMatcher("/api/**"))
 				// authorization
 				.accessDeniedHandler((req, res, exception) -> {
 					String uri = req.getRequestURI();
-					if (uri.startsWith("/back-end") || uri.startsWith("/api/back-end")) {
+					if (uri.startsWith("/api/")) {
+						res.setStatus(HttpServletResponse.SC_FORBIDDEN);
+						res.setContentType("acpplicaiton/json;charset=UTF-8");
+						res.getWriter().write("{\"error\":\"forbidden\"}");
+					}
+					if (uri.startsWith("/back-end")) {
 						res.sendRedirect("/back-end/exhibitor/exhibitor_login?redirect=" + req.getRequestURI());
-					} else if (uri.startsWith("/front-end") || uri.startsWith("/api/front-end")) {
+					} else if (uri.startsWith("/front-end")) {
 						res.sendRedirect("/front-end/login?redirect=" + req.getRequestURI());
 					}
 				})
@@ -419,8 +428,8 @@ public class SecurityConfig {
 				.permitAll()
 				// 就算你改成 DSL 寫法 (Spring Security 6.2 的新方式)，只要你想要對 STOMP 訊息 (@MessageMapping →
 				// /app/**，@SendTo → /topic/**) 做授權，就還是要引入 spring-security-messaging。
-				.requestMatchers("/app/chat") // 顯式放行 websocket
-				.hasRole("MEMBER").requestMatchers("/topic/messages").permitAll()
+//				.requestMatchers("/api/front-end/ws-chat") // 顯式放行 websocket
+//				.hasRole("MEMBER")
 				// 這兩行完全沒用，還沒走到 FilterSecurityInterceptor 就會被
 				// OAuth2AuthorizationRequestRedirectFilter 攔截並且處理 redirect
 //				.requestMatchers("/oauth2/authorization/line")
@@ -543,7 +552,7 @@ public class SecurityConfig {
 					response.sendRedirect("/front-end/admin?lineUserIdBoundAlready=true");
 					return;
 				}
-				
+
 				// 找出目前登入的會員（利用 cookie 提取）
 				Cookie[] cookies = request.getCookies();
 				String token = null;

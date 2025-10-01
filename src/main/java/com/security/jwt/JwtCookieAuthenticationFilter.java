@@ -244,18 +244,24 @@ public class JwtCookieAuthenticationFilter extends OncePerRequestFilter {
 
 		// 設計成 路徑進去哪裡，我們就塞哪個 token -> uds 中 必定有一身份為 null 回傳的 authentication(token) 也就是我們希望的身份
 		String path = req.getRequestURI();
+//		System.out.println("JWT filter目前攔截路徑為: " + path);
 		// 1) 嘗試處理會員 Token
 		if (path.startsWith("/front-end") || path.startsWith("/api/front-end")) {
+			System.out.println(path + ": JWT filter 目前攔截 front-end 路徑，即將處理 MEM token");
 			handleTokenFlow(req, res, SecurityConfig.MEM_ACCESS_COOKIE, SecurityConfig.MEM_REFRESH_COOKIE,
 					MEM_ACCESS_TTL);
 			chain.doFilter(req, res);
+			return;
 		}
 		// 2) 嘗試處理展商 Token
-		else {
+		else if (path.startsWith("/back-end") || path.startsWith("/api/back-end")){
+			System.out.println(path + ": JWT filter 目前攔截 back-end 路徑，即將處理 EXHIB token");
 			handleTokenFlow(req, res, SecurityConfig.EXHIB_ACCESS_COOKIE, SecurityConfig.EXHIB_REFRESH_COOKIE,
 					EXHIB_ACCESS_TTL);
 			chain.doFilter(req, res);
+			return;
 		}
+		else chain.doFilter(req, res);
 	}
 
 	// =================== 處理 Token 流程 ===================

@@ -1,6 +1,39 @@
 document.addEventListener("DOMContentLoaded", function() {
 
-	document.querySelector("a.icon-profile").click();
+	// 先處理 lineUserIdBoundAlready 參數
+	const params = new URLSearchParams(window.location.search);
+	const go = params.get("go");
+	
+	if(go === "ticket") {
+		document.querySelector("a.icon-ticket-2").click();
+		params.delete("go");
+		let newUrl;
+		if(params.size !== 0) newUrl = window.location.pathname + '?' + params.toString();
+		else newUrl = window.location.pathname;
+		window.history.replaceState({}, document.title, newUrl);
+	}
+	else document.querySelector("a.icon-profile").click();
+//	if(lineUserIdBoundAlready){
+//		// true -> 失敗
+//		if(lineUserIdBoundAlready === "true"){
+//			alert("由於此 LINE 帳號已經與其他會員帳號進行綁定，因此綁定失敗！")
+//		}
+//		// false -> 恭喜成功 
+//		else if(lineUserIdBoundAlready === "false"){
+//			alert("LINE 帳號成功綁定，後續可以使用 LINE 官方帳號來進行會員專屬查詢囉！");
+//		}
+//		// 彈窗顯示後，從 URL 中移除這個參數
+//		// 1. 移除特定的參數
+//		params.delete('lineUserIdBoundAlready');
+//		        
+//		// 2. 建立新的 URL
+//		const newUrl = window.location.pathname + '?' + params.toString();
+//		        
+//		// 3. 使用 history.replaceState() 更新 URL
+//		// 這樣就不會留下瀏覽歷史記錄，也不會重新載入頁面
+//		window.history.replaceState({}, document.title, newUrl);
+//	}
+	
 
 	// 登出 這個特別用把事件冒泡改 capturing 套用同架構但避免 tabs.js 先取並且丟錯誤（沒section-5 等等）
 
@@ -361,14 +394,14 @@ document.addEventListener("DOMContentLoaded", function() {
 		params.delete('lineUserIdBoundAlready');
 		        
 		// 2. 建立新的 URL
-		const newUrl = window.location.pathname + '?' + params.toString();
+		let newUrl;
+		if(params.size !== 0) newUrl = window.location.pathname + '?' + params.toString();
+		else newUrl = window.location.pathname;
 		        
 		// 3. 使用 history.replaceState() 更新 URL
 		// 這樣就不會留下瀏覽歷史記錄，也不會重新載入頁面
 		window.history.replaceState({}, document.title, newUrl);
 	}
-	
-	
 	
 	const user_img = document.querySelector("#user_img");
 	const file_input = document.querySelector("#js-upload-files");
@@ -622,6 +655,11 @@ document.addEventListener("DOMContentLoaded", function() {
 		.then(result => {
 			console.log(result);
 
+			if (result.lineUserId) {
+				btn_line_oauth2.classList.add("disabled");
+				btn_line_oauth2.innerText = "已完成 LINE 帳號綁定";
+			}
+			
 			// 如果非使用 OAuth2 登入 -> 才渲染更新框的 (1)信箱 (2)密碼 部分
 			if (!result.githubId && !result.facebookId && !result.googleId) {
 				insert_if_not_oauth2();

@@ -88,7 +88,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 >
               </li>
               <li id="nav_icon_3">
-                <a href="/front-end/admin"><i class="icon-ticket-2"></i></a>
+                <a href="/front-end/admin?go=ticket"><i class="icon-ticket-2"></i></a>
               </li>
               <li id="nav_icon_4">
                 <a href="/front-end/admin"><i class="icon-user"></i></a>
