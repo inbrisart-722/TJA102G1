@@ -1,5 +1,6 @@
 package com;
 
+import java.sql.Timestamp;
 import java.util.List;
 import java.util.Map;
 
@@ -30,6 +31,8 @@ import com.eventra.tickettype.model.TicketTypeVO;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.eventra.exhibitor.model.ExhibitorRepository;
 import com.eventra.exhibitor.model.ExhibitorVO;
+import com.eventra.order.model.OrderRepository;
+import com.eventra.order.model.OrderSummaryDTO;
 import com.eventra.platform_announcement.model.PlatformAnnouncementRepository;
 import com.eventra.platform_announcement.model.PlatformAnnouncementVO;
 
@@ -42,19 +45,22 @@ public class BackendIndexController {
 	
 	private static final Integer DRAFT_STATUS_ID = 6;
 	private final ExhibitionService exhibitionService;
-	private final Integer TEST_EXHIBITOR = 3;
+	private final Integer TEST_EXHIBITOR = 6;
 	private final TicketTypeRepository ticketTypeRepository;
 	private final ExhibitorRepository exhibitorRepository;
 	private final PlatformAnnouncementRepository platformAnnouncementRepository;
+	private final OrderRepository orderRepository;
 
 	public BackendIndexController(ExhibitionService exhibitionService, 
 								  TicketTypeRepository ticketTypeRepository,
 								  ExhibitorRepository exhibitorRepository,
-								  PlatformAnnouncementRepository platformAnnouncementRepository) {
+								  PlatformAnnouncementRepository platformAnnouncementRepository,
+								  OrderRepository orderRepository) {
 		this.exhibitionService = exhibitionService;
 		this.ticketTypeRepository = ticketTypeRepository;
 		this.exhibitorRepository = exhibitorRepository;
 		this.platformAnnouncementRepository = platformAnnouncementRepository;
+		this.orderRepository = orderRepository;
 	}
 	
     @GetMapping("exhibitor/back_end_homepage")
@@ -63,6 +69,7 @@ public class BackendIndexController {
     								   @RequestParam(defaultValue = "10") int size,
     								   @RequestParam(required = false) String q){
     	
+    	// 公告列表
     	PageRequest pr = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt"));
     	
     	Page<PlatformAnnouncementVO> p =
@@ -71,11 +78,24 @@ public class BackendIndexController {
     				: platformAnnouncementRepository
     					.findByTitleContainingIgnoreCaseOrContentContainingIgnoreCase(q, q, pr);
     	
+    	// 取得每日新訂單數量及總額
+    	Integer exhibitorId = TEST_EXHIBITOR;
+    	
+    	var zone = java.time.ZoneId.of("Asia/Taipei");
+    	var today = java.time.LocalDate.now(zone);
+    	var start = Timestamp.valueOf(today.atStartOfDay());
+    	var end = Timestamp.valueOf(today.plusDays(1).atStartOfDay());
+    	
+    	long newOrdersToday = orderRepository.countNewOrdersToday(exhibitorId, start, end);
+    	long newOrdersAmountToday = orderRepository.sumNewOrdersAmountToday(exhibitorId, start, end);
+    	
     	model.addAttribute("announcements", p.getContent());
     	model.addAttribute("currentPage", page);
     	model.addAttribute("totalPages", p.getTotalPages());
     	model.addAttribute("tltalElements", p.getTotalElements());
     	model.addAttribute("q", q == null ? "" : q);
+    	model.addAttribute("newOrdersToday", newOrdersToday);
+    	model.addAttribute("newOrdersAmountToday", newOrdersAmountToday);
     	
         return "back-end/back_end_homepage";
     }
@@ -221,9 +241,32 @@ public class BackendIndexController {
     }
     
     @GetMapping("exhibitor/order_list")
-    public String orderListPage() {
-//    	List<OrderVO> orderVOs = ORDER_REPOSITORY.findAll();
-//    	model.addAttribute("orderVOs", orderVOs);
+    public String orderListPage(Model model,
+					    		@RequestParam(required = false) String status,
+					    	    @RequestParam(required = false) String q,
+    							@RequestParam(defaultValue = "0") int page,
+    							@RequestParam(defaultValue = "10") int size) {
+    	
+    	// 將字串轉為 Enum；無效或空就給 null
+        com.eventra.order.model.OrderStatus statusEnum = null;
+        if(status != null && !status.isBlank()) {
+        	try {
+        		statusEnum = com.eventra.order.model.OrderStatus.valueOf(status);
+        	}catch(IllegalArgumentException ignore) {
+        		
+        	}
+        }
+    	
+    	Page<OrderSummaryDTO> p = orderRepository.findOrderSummaries(statusEnum, q, PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt")));
+    	
+    	
+    	model.addAttribute("orders", p.getContent());
+    	model.addAttribute("currentPage", page);
+    	model.addAttribute("totalPage", p.getTotalPages());
+    	model.addAttribute("totalElements", p.getTotalElements());
+    	model.addAttribute("q", q == null ? "" : q);
+        model.addAttribute("status", status == null ? "" : status);
+        model.addAttribute("size", size);
     	return "back-end/order_list";
     }
     
@@ -235,6 +278,7 @@ public class BackendIndexController {
         // 準備表單物件
         ExhibitorInfoUpdateDTO dto = new ExhibitorInfoUpdateDTO();
         if (e != null) {
+        	dto.setCompanyName(e.getCompanyName());
             dto.setExhibitorRegistrationName(e.getExhibitorRegistrationName());
             dto.setContactPhone(e.getContactPhone());
             dto.setEmail(e.getEmail());
@@ -262,6 +306,7 @@ public class BackendIndexController {
         ExhibitorVO e = exhibitorRepository.findById(TEST_EXHIBITOR)
                 .orElseThrow(() -> new IllegalArgumentException("Exhibitor not found: " + TEST_EXHIBITOR));
 
+        e.setCompanyName(form.getCompanyName());
         e.setExhibitorRegistrationName(form.getExhibitorRegistrationName());
         e.setContactPhone(form.getContactPhone());
         e.setEmail(form.getEmail());

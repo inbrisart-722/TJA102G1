@@ -7,6 +7,10 @@ import jakarta.validation.constraints.Size;
 
 public class ExhibitorInfoUpdateDTO {
 
+	@NotBlank
+	@Size(max = 255, message = "名稱最多 255 字")
+    private String companyName;
+	
 	@NotBlank(message = "名稱必填")
 	@Size(max = 100, message = "名稱最多 100 字")
 	private String exhibitorRegistrationName;
@@ -24,6 +28,14 @@ public class ExhibitorInfoUpdateDTO {
 
 	@Size(max = 255, message = "介紹最多 255 字")
 	private String about;
+
+	public String getCompanyName() {
+		return companyName;
+	}
+
+	public void setCompanyName(String companyName) {
+		this.companyName = companyName;
+	}
 
 	public String getExhibitorRegistrationName() {
 		return exhibitorRegistrationName;

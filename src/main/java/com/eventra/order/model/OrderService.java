@@ -8,6 +8,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
@@ -190,5 +191,11 @@ public class OrderService {
 		OrderStatus orderStatus = PAYMENT_ATTEMPT_REPO.findByProviderOrderId(providerOrderId).orElseThrow().getOrder()
 				.getOrderStatus();
 		return orderStatus;
+	}
+	
+	// 給 order_list 頁面用
+	public Page<OrderSummaryDTO> list(OrderStatus statusEnum, String q, int page, int size){
+		PageRequest pageable = PageRequest.of(page, size);
+		return ORDER_REPO.findOrderSummaries(statusEnum, q, pageable);
 	}
 }

@@ -97,19 +97,19 @@
             <!-- 指標卡片 -->
             <div class="row">
               <div class="col-12 col-sm-6 col-md-3">
-                <a href="../../../../../../../後台展商前端/dist/order_list.html" class="text-decoration-none text-dark">
+                <a href="/back-end/exhibitor/order_list" class="text-decoration-none text-dark">
                   <div class="info-box metric">
                     <span class="info-box-icon text-bg-primary shadow-sm">
                       <i class="bi bi-bag-check-fill"></i>
                     </span>
                     <div class="info-box-content">
                       <span class="info-box-text">新訂單</span>
-                      <span class="info-box-number">1</span>
+                      <span class="info-box-number" th:text="${newOrdersToday}">0</span>
                     </div>
                   </div>
                 </a>
               </div>
-              <div class="col-12 col-sm-6 col-md-3">
+              <!-- <div class="col-12 col-sm-6 col-md-3">
                 <div class="info-box metric">
                   <span class="info-box-icon text-bg-success shadow-sm"><i class="bi bi-people-fill"></i></span>
                   <div class="info-box-content">
@@ -117,13 +117,13 @@
                     <span class="info-box-number">2</span>
                   </div>
                 </div>
-              </div>
+              </div> -->
               <div class="col-12 col-sm-6 col-md-3">
                 <div class="info-box metric">
                   <span class="info-box-icon text-bg-warning shadow-sm"><i class="bi bi-cash-coin"></i></span>
                   <div class="info-box-content">
                     <span class="info-box-text">新訂單總額</span>
-                    <span class="info-box-number">1,000</span>
+                    <span class="info-box-number" th:text="${#numbers.formatInteger(newOrdersAmountToday, 0, 'POINT')}">0</span>
                   </div>
                 </div>
               </div>

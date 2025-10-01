@@ -95,6 +95,15 @@
             <div class="card mb-4">
               <div class="card-header"><span class="section-title">展商資訊</span></div>
               <div class="card-body">
+              <div class="kv mb-2"><div class="k">公司名稱</div><div id="vCompanyName"
+				     th:text="${exhibitor != null 
+				                 ? (!#strings.isEmpty(exhibitor.companyName) 
+				                      ? exhibitor.companyName 
+				                      : (!#strings.isEmpty(exhibitor.companyName) 
+				                           ? exhibitor.companyName 
+				                           : '-'))
+				                 : '-'}">-</div>
+				 </div>
                 <div class="kv mb-2"><div class="k">名稱</div><div id="vName"
 				     th:text="${exhibitor != null 
 				                 ? (!#strings.isEmpty(exhibitor.exhibitorRegistrationName) 
@@ -139,6 +148,14 @@
 				
 				  <div class="modal-body">
 				    <div class="row g-3">
+				    <div class="col-md-6">
+				        <label class="form-label">公司名稱</label>
+				        <input type="text" class="form-control"
+				               th:classappend="${#fields.hasErrors('companyName')}? ' is-invalid' : ''"
+				               th:field="*{companyName}" maxlength="255" required />
+				        <div class="invalid-feedback" th:if="${#fields.hasErrors('companyName')}"
+				             th:errors="*{companyName}">請填寫公司名稱</div>
+				      </div>
 				      <div class="col-md-6">
 				        <label class="form-label">名稱</label>
 				        <input type="text" class="form-control"
@@ -214,32 +231,28 @@
 	  </script>
 
 	<!-- 更新成功後訊息自動收合 -->
-	<script>
+	<script th:inline="javascript">
 	  document.addEventListener('DOMContentLoaded', () => {
-	    const alertEl = document.querySelector('.alert.alert-success');
-	    if (alertEl) setTimeout(() => new bootstrap.Alert(alertEl).close(), 2500);
-	    
-	 // 後端驗證錯誤 -> 自動開 Modal
+	    const modalEl = document.getElementById('editModal');
+	    const modal = bootstrap.Modal.getOrCreateInstance(modalEl);
+	
+	    // 後端驗證錯誤 -> 自動開窗
 	    const openModal = /*[[${openModal}]]*/ false;
-	    if (openModal) {
-	      const m = new bootstrap.Modal(document.getElementById('editModal'));
-	      m.show();
+	    if (openModal) modal.show();
+	
+	    // 前端驗證（只留一份）
+	    document.getElementById('vendorForm')?.addEventListener('submit', function (e) {
+	      if (!this.checkValidity()) {
+	        e.preventDefault();
+	        e.stopPropagation();
+	      }
+	      this.classList.add('was-validated');
+	    });
+	 // 5) 成功訊息自動收合（2.5 秒）
+	    const alertEl = document.querySelector('.alert.alert-success');
+	    if (alertEl) {
+	      setTimeout(() => new bootstrap.Alert(alertEl).close(), 2500);
 	    }
-	  });
-
-	  // 仍保留前端 HTML5 驗證阻擋提交（可選）
-	  document.getElementById('vendorForm')?.addEventListener('submit', function (e) {
-	    if (!this.checkValidity()) {
-	      e.preventDefault();
-	      e.stopPropagation();
-	    }
-	    this.classList.add('was-validated');
-	  });
-
-	  // 點「編輯」開窗
-	  document.getElementById('btnEdit')?.addEventListener('click', () => {
-	    const m = new bootstrap.Modal(document.getElementById('editModal'));
-	    m.show();
 	  });
 	</script>
 
