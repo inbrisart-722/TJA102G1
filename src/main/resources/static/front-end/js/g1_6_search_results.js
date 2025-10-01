@@ -34,7 +34,8 @@ function renderStars(avg, count) {
 
 document.addEventListener("DOMContentLoaded", () => {
 	const filtersForm = document.getElementById("filtersForm");
-	const resultsContainer = document.getElementById("cardsContainer"); // 對應你的 list 容器
+	const resultsContainer = document.getElementById("cardsContainer"); // 結果容器
+	const pagination = document.querySelector(".pagination");
 
 	const keywordInput = document.getElementById("keywordInput");
 	const regionGroup = document.getElementById("regionGroup");
@@ -78,6 +79,13 @@ document.addEventListener("DOMContentLoaded", () => {
 
 	// ========== 渲染結果 ========== //
 	function renderResults(data) {
+		resultsContainer.innerHTML = "";
+		if (!data || data.length === 0) {
+		    resultsContainer.innerHTML = "<p>查無結果</p>";
+		    pagination.innerHTML = "";   // 清空分頁
+		    return;
+		}
+				
 		data.forEach((exh) => {
 			resultsContainer.innerHTML += `
 		      <div class="strip_all_tour_list">
@@ -114,60 +122,76 @@ document.addEventListener("DOMContentLoaded", () => {
 		    `;
 		});
 	}
+	
+	// ========== 渲染分頁 ========== //
+	function renderPagination(current, totalPages) {
+	        pagination.innerHTML = "";
+
+	        // 上一頁
+	        pagination.innerHTML += `
+	            <li class="page-item ${current === 1 ? "disabled" : ""}">
+	                <a class="page-link" href="#" aria-label="Previous"
+	                   onclick="event.preventDefault(); if(${current}>1) fetchResults(${current}-1)">
+	                   &laquo;
+	                </a>
+	            </li>`;
+
+	        // 頁碼
+	        for (let i = 1; i <= totalPages; i++) {
+	            pagination.innerHTML += `
+	                <li class="page-item ${i === current ? "active" : ""}">
+	                    <a class="page-link" href="#"
+	                       onclick="event.preventDefault(); fetchResults(${i})">${i}</a>
+	                </li>`;
+	        }
+
+	        // 下一頁
+	        pagination.innerHTML += `
+	            <li class="page-item ${current === totalPages ? "disabled" : ""}">
+	                <a class="page-link" href="#" aria-label="Next"
+	                   onclick="event.preventDefault(); if(${current}<${totalPages}) fetchResults(${current}+1)">
+	                   &raquo;
+	                </a>
+	            </li>`;
+	    }
 
 	// ========== 呼叫 API（統一跟 modal.js 一樣 criteria 格式） ========== //
-	function fetchResults() {
-		const keyword = keywordInput.value.trim();
-		const regions = selectedRegions();
-		const date_from = fbStart ? fmt(fbStart) : null;
-		const date_to = fbEnd ? fmt(fbEnd) : null;
+	window.fetchResults = function(page = 1) {
+	        const keyword = keywordInput.value.trim();
+	        const regions = selectedRegions();
+	        const date_from = fbStart ? fmt(fbStart) : null;
+	        const date_to = fbEnd ? fmt(fbEnd) : null;
 
-		const criteria = {};
-		if (keyword) criteria.keyword = keyword;
-		if (regions.length) criteria.regions = regions.join(",");
-		if (date_from) criteria.date_from = date_from;
-		if (date_to) criteria.date_to = date_to;
+	        const criteria = {};
+	        if (keyword) criteria.keyword = keyword;
+			if (regions.length) criteria.regions = regions;
+	        if (date_from) criteria.date_from = date_from;
+	        if (date_to) criteria.date_to = date_to;
 
-		console.log("送出 criteria:", criteria);
-		console.log(regions);
+	        resultsContainer.innerHTML = "<p>載入中...</p>";
 
-		csrfFetch("/api/exhibitions/search", {
-			method: "POST",
-			headers: { "Content-Type": "application/json" },
-			body: JSON.stringify(criteria)
-		})
-			.then((res) => {
-				console.log("API 狀態碼:", res.status);
-				return res.text();  // 先拿原始字串
-			})
-			.then((txt) => {
-				if (!txt) {
-					console.warn("API 回傳空字串，改用 []");
-					return [];  // 回傳空陣列，避免 JSON.parse 爆掉
-				}
-				try {
-					return JSON.parse(txt); // 嘗試轉成 JSON
-				} catch (e) {
-					console.error("JSON 解析錯誤:", e, "原始內容:", txt);
-					throw e; // 交給 catch 處理
-				}
-			})
-			.then((data) => {
-				console.log("API 回傳:", data);
-				renderResults(data);
-			})
-			.catch((err) => {
-				console.error("❌ 搜尋 API 失敗:", err);
-				resultsContainer.innerHTML = "<p>搜尋失敗，請稍後再試。</p>";
-			});
-	}
+	        csrfFetch(`/api/exhibitions/search?page=${page}`, {
+	            method: "POST",
+	            headers: { "Content-Type": "application/json" },
+	            body: JSON.stringify(criteria)
+	        })
+	            .then((res) => res.json())
+	            .then((data) => {
+	                renderResults(data.content);
+	                renderPagination(data.page, data.totalPages);
+	            })
+	            .catch((err) => {
+	                console.error("❌ 搜尋 API 失敗:", err);
+	                resultsContainer.innerHTML = "<p>搜尋失敗，請稍後再試。</p>";
+	            });
+	    };
 
 	// ========== 表單送出（即時 fetch） ========== //
 	filtersForm.addEventListener("submit", (e) => {
 		e.preventDefault();
 		if (window.addSearchRecord) {
 			const keyword = keywordInput.value.trim();
-			const regions = selectedRegions.value.trim();
+			const regions = selectedRegions().join(",");
 			const date_from = fbStart ? fmt(fbStart) : null;
 			const date_to = fbEnd ? fmt(fbEnd) : null;
 			window.addSearchRecord(keyword, regions, date_from, date_to);

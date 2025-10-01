@@ -5,6 +5,8 @@ import com.eventra.eventnotification.util.EventNotificationMessageBuilder;
 import com.eventra.exhibition.model.ExhibitionRepository;
 import com.eventra.exhibition.model.ExhibitionVO;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -141,51 +143,76 @@ public class EventNotificationService {
 	}
 
 	// 6. 查詢會員通知列表
-	public List<EventNotificationDTO> getMemberNotifications(Integer memberId) {
-		List<EventNotificationVO> list = eventNotificationRepo.findNotificationsWithExhibition(memberId);
+	// 分頁查詢會員通知列表
+    public Page<EventNotificationDTO> getMemberNotifications(Integer memberId, Pageable pageable) {
+        return eventNotificationRepo.findByMemberIdOrderByCreatedAtDesc(memberId, pageable)
+                .map(vo -> {
+                    ExhibitionVO exhibition = vo.getExhibition();
+                    String exhName = exhibition != null ? exhibition.getExhibitionName() : null;
+                    String location = exhibition != null ? exhibition.getLocation() : null;
+                    String period = exhibition != null ? exhibition.getStartTime() + " ~ " + exhibition.getEndTime() : null;
 
-//		System.out.println("[EventNotificationService] memberId = " + memberId);
-//		System.out.println("[EventNotificationService] DB筆數 = " + list.size());
-
-		List<EventNotificationDTO> dtoList = new java.util.ArrayList<>();
-
-		for (EventNotificationVO vo : list) {
-			ExhibitionVO exhibition = vo.getExhibition();
-
-//	        System.out.println("[EventNotificationService] notifId=" + vo.getFavoriteAnnouncementId()
-//	                + ", exhibitionId=" + exhId + ", title=" + vo.getTitle());
-
-			// 預設展覽資訊, 避免 NullPointerException
-			String exhName = null, location = null, period = null;
-			if (exhibition != null) {
-				exhName = exhibition.getExhibitionName(); // 展覽名稱
-				location = exhibition.getLocation(); // 展覽地點
-				period = exhibition.getStartTime() + " ~ " + exhibition.getEndTime(); // 展覽期間
-			}
-
-			// exhibitionId 改成保護式取值
-			Integer exhId = vo.getExhibitionId();
-			if (exhId == null && exhibition != null) {
-				exhId = exhibition.getExhibitionId();
-			}
-
-			// VO 轉成 DTO, 只保留要回傳前端的欄位
-			EventNotificationDTO dto = new EventNotificationDTO(vo.getFavoriteAnnouncementId(), // 通知ID
-					vo.getExhibitionId(), // 展覽ID
-					vo.getTitle(), // 標題
-					vo.getContent(), // 內容
-					vo.getReadStatus(), // 是否已讀
-					vo.getCreatedAt(), // 建立時間
-					exhName, // 展覽名稱
-					location, // 展覽地點
-					period // 展覽期間
-			);
-
-			dtoList.add(dto);
-		}
-
-		return dtoList;
-	}
+                    return new EventNotificationDTO(
+                            vo.getFavoriteAnnouncementId(),
+                            vo.getExhibitionId(),
+                            vo.getTitle(),
+                            vo.getContent(),
+                            vo.getReadStatus(),
+                            vo.getCreatedAt(),
+                            exhName,
+                            location,
+                            period
+                    );
+                });
+    }
+	
+	
+	
+//	public List<EventNotificationDTO> getMemberNotifications(Integer memberId) {
+//		List<EventNotificationVO> list = eventNotificationRepo.findNotificationsWithExhibition(memberId);
+//
+////		System.out.println("[EventNotificationService] memberId = " + memberId);
+////		System.out.println("[EventNotificationService] DB筆數 = " + list.size());
+//
+//		List<EventNotificationDTO> dtoList = new java.util.ArrayList<>();
+//
+//		for (EventNotificationVO vo : list) {
+//			ExhibitionVO exhibition = vo.getExhibition();
+//
+////	        System.out.println("[EventNotificationService] notifId=" + vo.getFavoriteAnnouncementId()
+////	                + ", exhibitionId=" + exhId + ", title=" + vo.getTitle());
+//
+//			// 預設展覽資訊, 避免 NullPointerException
+//			String exhName = null, location = null, period = null;
+//			if (exhibition != null) {
+//				exhName = exhibition.getExhibitionName(); // 展覽名稱
+//				location = exhibition.getLocation(); // 展覽地點
+//				period = exhibition.getStartTime() + " ~ " + exhibition.getEndTime(); // 展覽期間
+//			}
+//
+//			// exhibitionId 改成保護式取值
+//			Integer exhId = vo.getExhibitionId();
+//			if (exhId == null && exhibition != null) {
+//				exhId = exhibition.getExhibitionId();
+//			}
+//
+//			// VO 轉成 DTO, 只保留要回傳前端的欄位
+//			EventNotificationDTO dto = new EventNotificationDTO(vo.getFavoriteAnnouncementId(), // 通知ID
+//					vo.getExhibitionId(), // 展覽ID
+//					vo.getTitle(), // 標題
+//					vo.getContent(), // 內容
+//					vo.getReadStatus(), // 是否已讀
+//					vo.getCreatedAt(), // 建立時間
+//					exhName, // 展覽名稱
+//					location, // 展覽地點
+//					period // 展覽期間
+//			);
+//
+//			dtoList.add(dto);
+//		}
+//
+//		return dtoList;
+//	}
 
 	// 7. 單筆已讀
 	public void markAsRead(Integer notifId) {

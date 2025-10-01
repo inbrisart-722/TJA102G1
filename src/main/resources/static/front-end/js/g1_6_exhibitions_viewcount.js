@@ -15,7 +15,7 @@ document.addEventListener("DOMContentLoaded", () => {
 	const exhibitionId = params.get("exhibitionId");
 
 	// 把請求傳給後端
-	csrfFetch(`/api/front-end/protected/exhibitionPagePopularityStats/count/${exhibitionId}`, {
+	csrfFetch(`/api/exhibitionPagePopularityStats/count/${exhibitionId}`, {
 		method: "POST"
 	})
 //		.then(res => res.text())

@@ -1,6 +1,9 @@
 package com.eventra.eventnotification.model;
 
 import java.util.List;
+
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -17,6 +20,9 @@ public interface EventNotificationRepository extends JpaRepository<EventNotifica
 			"ORDER BY n.createdAt DESC")
 	List<EventNotificationVO> findNotificationsWithExhibition(@Param("memId") Integer memberId);
 
+	// 分頁查詢會員通知 (依建立時間由新到舊排序)
+	Page<EventNotificationVO> findByMemberIdOrderByCreatedAtDesc(Integer memberId, Pageable pageable);
+	
 	// 更新 [單一]通知為已讀狀態
 	@Transactional 
 	@Modifying 

@@ -16,7 +16,7 @@ public class PlatformAnnouncementVO implements Serializable {
 	private static final long serialVersionUID = 1L;
 	
 	@Id
-	@Column(name = "announcement_id", insertable = false)
+	@Column(name = "announcement_id")
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Integer platformAnnouncementId;
 	
@@ -47,12 +47,12 @@ public class PlatformAnnouncementVO implements Serializable {
 		this.updatedAt = updatedAt;
 	}
 	
-	//	新增用
-	public PlatformAnnouncementVO(String title, String content) {
-		super();
-		this.title = title;
-		this.content = content;
-	}
+//	//	新增用
+//	public PlatformAnnouncementVO(String title, String content) {
+//		super();
+//		this.title = title;
+//		this.content = content;
+//	}
 
 	// getter/setter
 	public Integer getPlatformAnnouncementId() {

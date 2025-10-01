@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.eventra.exhibitionpagepopularitystats.model.ExhibitionPagePopularityStatsService;
 
 @RestController
-@RequestMapping("/api/front-end/protected/exhibitionPagePopularityStats")
+@RequestMapping("/api/exhibitionPagePopularityStats")
 
 public class ExhibitionPagePopularityStatsApiController {
 
