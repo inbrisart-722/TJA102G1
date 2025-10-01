@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="zh-Hant">
+<html xmlns:th="http://www.thymeleaf.org" lang="zh-Hant">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
@@ -82,19 +82,49 @@
               <div class="col-md-6"><h3 class="mb-0">訂單列表</h3></div>
               <div class="col-md-6 text-md-end">
                 <div class="chip-group btn-group" role="group" aria-label="filter">
-                  <button class="btn btn-outline-secondary active" data-status="all">全部</button>
-                  <button class="btn btn-outline-secondary" data-status="unpaid">未付款</button>
-                  <button class="btn btn-outline-secondary" data-status="paid">已付款</button>
-                  <button class="btn btn-outline-secondary" data-status="failed">未成立</button>
-                  <button class="btn btn-outline-secondary" data-status="cancelled">已取消</button>
-                </div>
-                <div class="search-wrap d-inline-flex ms-2 align-middle">
-                  <div class="input-group input-group-sm">
-                    <span class="input-group-text"><i class="bi bi-search"></i></span>
-                    <input class="form-control" id="q" placeholder="搜尋 訂單/活動/訂購人" />
-                    <button class="btn btn-outline-secondary" id="btnSearch">搜尋</button>
-                  </div>
-                </div>
+				  <!-- 全部 -->
+					<a class="btn btn-outline-secondary"
+					   th:classappend="${status} == '' ? ' active'"
+					   th:href="@{/back-end/exhibitor/order_list(page=0, size=${size}, q=${q})}">全部</a>
+					
+					<!-- 未付款 -->
+					<a class="btn btn-outline-secondary"
+					   th:classappend="${status} == '付款中' ? ' active'"
+					   th:href="@{/back-end/exhibitor/order_list(status='付款中', page=0, size=${size}, q=${q})}">未付款</a>
+					
+					<!-- 已付款 -->
+					<a class="btn btn-outline-secondary"
+					   th:classappend="${status} == '已付款' ? ' active'"
+					   th:href="@{/back-end/exhibitor/order_list(status='已付款', page=0, size=${size}, q=${q})}">已付款</a>
+					
+					<!-- 未成立 -->
+					<a class="btn btn-outline-secondary"
+					   th:classappend="${status} == '付款失敗' ? ' active'"
+					   th:href="@{/back-end/exhibitor/order_list(status='付款失敗', page=0, size=${size}, q=${q})}">未成立</a>
+					
+					<!-- 逾時 -->
+					<a class="btn btn-outline-secondary"
+					   th:classappend="${status} == '付款逾時' ? ' active'"
+					   th:href="@{/back-end/exhibitor/order_list(status='付款逾時', page=0, size=${size}, q=${q})}">逾時</a>
+					
+					<!-- 已退款 -->
+					<a class="btn btn-outline-secondary"
+					   th:classappend="${status} == '已退款' ? ' active'"
+					   th:href="@{/back-end/exhibitor/order_list(status='已退款', page=0, size=${size}, q=${q})}">已退款</a>
+
+				</div>
+
+                <form th:action="@{/back-end/exhibitor/order_list}" method="get" class="search-wrap d-inline-flex ms-2 align-middle">
+				  <input type="hidden" name="status" th:value="${param.status}">
+				  <input type="hidden" name="size"   th:value="${param.size}?:10">
+				  <input type="hidden" name="page"   value="0"><!-- 搜尋時回到第一頁 -->
+				  <div class="input-group input-group-sm">
+				    <span class="input-group-text"><i class="bi bi-search"></i></span>
+				    <input class="form-control" id="q" name="q" placeholder="搜尋 訂單/活動/訂購人" th:value="${param.q}">
+				    <button class="btn btn-outline-secondary" type="submit">搜尋</button>
+				  </div>
+				</form>
+
               </div>
             </div>
           </div>
@@ -121,7 +151,7 @@
                       <tr>
                         <th style="width:40px;"><input class="form-check-input" type="checkbox" id="checkAll"></th>
                         <th>訂單編號</th>
-                        <th>活動名稱</th>
+                        <th>展覽名稱</th>
                         <th>訂購人</th>
                         <th>票種</th>
                         <th class="text-end" style="width:90px;">數量</th>
@@ -131,14 +161,78 @@
                         <!-- <th style="width:140px;" class="text-end">操作</th> -->
                       </tr>
                     </thead>
-                    <tbody id="tbody"></tbody>
+                    <tbody>
+					  <tr th:each="o : ${orders}">
+					    <td>
+					      <input class="form-check-input row-check" type="checkbox"
+					             th:attr="data-id=${o.orderUlid}">
+					    </td>
+					
+					    <td th:text="${o.orderUlid}">ULID</td>
+					
+					    <!-- 若要顯示活動名稱，DTO 要多帶；先留空或用 '-' -->
+					    <td>-</td>
+					
+					    <td th:text="${o.fullName}">訂購人</td>
+					
+					    <!-- 票種/數量（DTO 目前只有 itemCount，票種名稱若要顯示需擴充 DTO） -->
+					    <td>-</td>
+					
+					    <td class="text-end" th:text="${o.itemCount}">0</td>
+					
+					    <td class="text-end" th:text="${#numbers.formatInteger(o.totalAmount, 0)}">0</td>
+					
+					    <td>
+						  <th:block th:switch="${o.orderStatus.name()}">
+						    <span th:case="'已付款'"   class="badge text-bg-success">已付款</span>
+						    <span th:case="'付款中'"   class="badge text-bg-secondary">未付款</span>
+						    <span th:case="'付款失敗'" class="badge text-bg-warning">未成立</span>
+						    <span th:case="'付款逾時'" class="badge text-bg-dark">逾時</span>
+						    <span th:case="'已退款'"   class="badge text-bg-info">已退款</span>
+						    <span th:case="*" class="badge text-bg-secondary" th:text="${o.orderStatus}">狀態</span>
+						  </th:block>
+						</td>
+
+					    <td th:text="${#dates.format(o.createdAt, 'yyyy/MM/dd HH:mm')}">2025/07/18 12:00</td>
+					  </tr>
+					
+					  <!-- 空狀態 -->
+					  <tr th:if="${#lists.isEmpty(orders)}">
+					    <td colspan="9" class="text-center text-secondary py-4">目前沒有資料</td>
+					  </tr>
+					</tbody>
+
                   </table>
                 </div>
               </div>
               <div class="card-footer d-flex justify-content-between align-items-center flex-wrap gap-2">
-                <div class="text-secondary small">共 <span id="totalCount">0</span> 筆</div>
+                <div class="text-secondary small">共 <span th:text="${totalElements}">0</span> 筆</div>
                 <nav>
-                  <ul class="pagination pagination-sm mb-0" id="pager"></ul>
+                  <ul class="pagination pagination-sm mb-0">
+					<!-- 上一頁 -->
+					<li class="page-item" th:classappend="${currentPage == 0} ? ' disabled'">
+					  <a class="page-link"
+					     th:href="@{/back-end/exhibitor/order_list(page=${currentPage-1}, size=${size}, status=${status}, q=${q})}">«</a>
+					</li>
+					
+					<!-- 頁碼 -->
+					<li class="page-item"
+					    th:each="i : ${#numbers.sequence(0, totalPage-1)}"
+					    th:classappend="${i == currentPage} ? ' active'">
+					  <a class="page-link"
+					     th:text="${i+1}"
+					     th:href="@{/back-end/exhibitor/order_list(page=${i}, size=${size}, status=${status}, q=${q})}">1</a>
+					</li>
+					
+					<!-- 下一頁 -->
+					<li class="page-item" th:classappend="${currentPage+1 == totalPage} ? ' disabled'">
+					  <a class="page-link"
+					     th:href="@{/back-end/exhibitor/order_list(page=${currentPage+1}, size=${size}, status=${status}, q=${q})}">»</a>
+					</li>
+
+
+					</ul>
+
                 </nav>
               </div>
             </div>
@@ -160,138 +254,68 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.min.js"></script>
     <script src="/back-end/js/adminlte.min.js"></script>
     <script src="/front-end/js/g1_10_custom_common_csrf.js"></script>
+    
     <script>
-      // ---- Mock data ----
-      const ORDERS = [
-        {id:'12345', event:'xxx', buyer:'ooo', ticket:'全票', qty:1, amount:1000, status:'paid',  time:'2025/07/18'},
-        {id:'13254', event:'aaa', buyer:'oxo', ticket:'全票', qty:2, amount:3000, status:'unpaid',time:'2025/07/11'},
-        {id:'88881', event:'未來展', buyer:'王小明', ticket:'學生票', qty:3, amount:1500, status:'cancelled', time:'2025/06/30'},
-        {id:'88882', event:'攝影展', buyer:'陳小美', ticket:'全票', qty:1, amount:500, status:'failed', time:'2025/06/22'}
-      ];
-
-      // ---- State ----
-      let state = { q:'', status:'all', page:1, size:10, selected:new Set() };
-
-      const tbody = document.getElementById('tbody');
-      const pager = document.getElementById('pager');
-      const totalCountEl = document.getElementById('totalCount');
-      const bulkbar = document.getElementById('bulkbar');
-      const selCount = document.getElementById('selCount');
-
-      // ---- Render ----
-      function render(){
-        // filter
-        let rows = ORDERS.filter(o=>{
-          const matchStatus = state.status==='all' || o.status===state.status;
-          const q = state.q.trim().toLowerCase();
-          const matchQ = !q || (o.id+o.event+o.buyer+o.ticket).toLowerCase().includes(q);
-          return matchStatus && matchQ;
-        });
-        totalCountEl.textContent = rows.length;
-
-        // pagination
-        const totalPages = Math.max(1, Math.ceil(rows.length / state.size));
-        if(state.page>totalPages) state.page = totalPages;
-        const start = (state.page-1)*state.size;
-        const pageRows = rows.slice(start, start+state.size);
-
-        // tbody
-        tbody.innerHTML = pageRows.map(o=>{
-          const checked = state.selected.has(o.id) ? 'checked' : '';
-          const badge = o.status==='paid'?'success': o.status==='unpaid'?'secondary': o.status==='cancelled'?'danger':'warning';
-          const label = o.status==='paid'?'已付款': o.status==='unpaid'?'未付款': o.status==='cancelled'?'已取消':'未成立';
-          return `<tr>
-            <td><input class="form-check-input row-check" type="checkbox" data-id="${o.id}" ${checked}></td>
-            <td>${o.id}</td>
-            <td>${o.event}</td>
-            <td>${o.buyer}</td>
-            <td>${o.ticket}</td>
-            <td class="text-end">${o.qty}</td>
-            <td class="text-end">${o.amount.toLocaleString()}</td>
-            <td><span class="badge text-bg-${badge}">${label}</span></td>
-            <td>${o.time}</td>
-          </tr>`;
-        }).join('');
-
-        // pager
-        pager.innerHTML = '';
-        const createItem = (txt, page, disabled=false, active=false)=>{
-          const li = document.createElement('li'); li.className = `page-item ${disabled?'disabled':''} ${active?'active':''}`;
-          li.innerHTML = `<a class="page-link" href="#">${txt}</a>`;
-          li.addEventListener('click', (e)=>{e.preventDefault(); if(disabled) return; state.page=page; render();});
-          return li;
-        };
-        pager.appendChild(createItem('«', Math.max(1,state.page-1), state.page===1));
-        for(let i=1;i<=totalPages;i++) pager.appendChild(createItem(i, i, false, i===state.page));
-        pager.appendChild(createItem('»', Math.min(totalPages,state.page+1), state.page===totalPages));
-
-        // header checkbox state
-        const checkAll = document.getElementById('checkAll');
-        const visibleIds = new Set(pageRows.map(o=>o.id));
-        const selectedOnPage = [...state.selected].filter(id=>visibleIds.has(id));
-        checkAll.checked = selectedOnPage.length && selectedOnPage.length===pageRows.length;
-        checkAll.indeterminate = selectedOnPage.length>0 && selectedOnPage.length<pageRows.length;
-
-        // bulkbar
-        selCount.textContent = state.selected.size;
-        bulkbar.classList.toggle('show', state.selected.size>0);
-      }
-
-      // ---- Events ----
-      document.querySelectorAll('.chip-group .btn').forEach(btn=>{
-        btn.addEventListener('click', ()=>{
-          document.querySelectorAll('.chip-group .btn').forEach(b=>b.classList.remove('active'));
-          btn.classList.add('active');
-          state.status = btn.dataset.status; state.page=1; render();
-        });
-      });
-
-      document.getElementById('btnSearch').addEventListener('click', ()=>{
-        state.q = document.getElementById('q').value; state.page=1; render();
-      });
-      document.getElementById('q').addEventListener('keydown', (e)=>{ if(e.key==='Enter'){ e.preventDefault(); document.getElementById('btnSearch').click(); }});
-
-      document.getElementById('checkAll').addEventListener('change', (e)=>{
-        const checked = e.target.checked;
-        const idsOnPage = [...tbody.querySelectorAll('.row-check')].map(i=>i.dataset.id);
-        idsOnPage.forEach(id=>{ if(checked) state.selected.add(id); else state.selected.delete(id); });
-        render();
-      });
-
-      tbody.addEventListener('change', (e)=>{
-        const box = e.target.closest('.row-check'); if(!box) return;
-        const id = box.dataset.id; if(box.checked) state.selected.add(id); else state.selected.delete(id);
-        render();
-      });
-
-      document.getElementById('btnClearSel').addEventListener('click', ()=>{ state.selected.clear(); render(); });
-      document.getElementById('btnExport').addEventListener('click', ()=>{
-        const header = ['訂單編號','活動名稱','訂購人','票種','數量','金額','付款狀態','訂單時間'];
-        const rows = ORDERS.filter(o=>state.selected.has(o.id)).map(o=>[
-          o.id,o.event,o.buyer,o.ticket,o.qty,o.amount,
-          o.status==='paid'?'已付款':o.status==='unpaid'?'未付款':o.status==='cancelled'?'已取消':'未成立',
-          o.time
-        ]);
-        if(!rows.length){ alert('請先選取要匯出的訂單'); return; }
-        const csv = [header.join(','), ...rows.map(r=>r.join(','))].join('\n');
-        const blob = new Blob([csv], {type:'text/csv;charset=utf-8;'});
-        const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'orders.csv'; a.click();
-      });
-
-      tbody.addEventListener('click', (e)=>{
-        const btn = e.target.closest('button[data-act]'); if(!btn) return;
-        const id = btn.dataset.id;
-        if(btn.dataset.act==='view'){
-          alert('檢視訂單 '+id+'（示意）');
-        }else if(btn.dataset.act==='manage'){
-          alert('管理訂單 '+id+'（示意）');
-        }
-      });
-
-      // init
-      render();
-    </script>
-          <script>
+	  // 全選
+	  document.getElementById('checkAll')?.addEventListener('change', (e)=>{
+	    const checked = e.target.checked;
+	    document.querySelectorAll('.row-check').forEach(i=> i.checked = checked);
+	    toggleBulkbar();
+	  });
+	
+	  // 單列勾選
+	  document.addEventListener('change', (e)=>{
+	    if(!e.target.classList.contains('row-check')) return;
+	    toggleBulkbar();
+	  });
+	
+	  // 匯出 CSV：把目前表格中「有勾選」的列抓出來
+	  document.getElementById('btnExport')?.addEventListener('click', ()=>{
+	    const rows = [...document.querySelectorAll('tbody tr')].filter(tr=> tr.querySelector('.row-check')?.checked);
+	    if(!rows.length){ alert('請先選取要匯出的訂單'); return; }
+	
+	    const header = ['訂單編號','活動名稱','訂購人','票種','數量','金額','付款狀態','訂單時間'];
+	    const data = rows.map(tr=>{
+	      const tds = tr.querySelectorAll('td');
+	      return [
+	        tds[1]?.innerText.trim(), // 訂單編號
+	        tds[2]?.innerText.trim(), // 活動名稱（目前是 '-'）
+	        tds[3]?.innerText.trim(), // 訂購人
+	        tds[4]?.innerText.trim(), // 票種（目前是 '-'）
+	        tds[5]?.innerText.trim(), // 數量
+	        tds[6]?.innerText.trim(), // 金額
+	        tds[7]?.innerText.trim(), // 付款狀態
+	        tds[8]?.innerText.trim(), // 訂單時間
+	      ];
+	    });
+	
+	    const csv = [header, ...data]
+	      .map(r=> r.map(v => /[",\n]/.test(v) ? `"${v.replace(/"/g,'""')}"` : v).join(','))
+	      .join('\n');
+	
+	    const blob = new Blob([csv], {type:'text/csv;charset=utf-8;'});
+	    const a = document.createElement('a');
+	    a.href = URL.createObjectURL(blob);
+	    a.download = 'orders.csv';
+	    a.click();
+	  });
+	
+	  // 清除選取
+	  document.getElementById('btnClearSel')?.addEventListener('click', ()=>{
+	    document.querySelectorAll('.row-check').forEach(i=> i.checked = false);
+	    const checkAll = document.getElementById('checkAll'); if (checkAll) checkAll.checked = false;
+	    toggleBulkbar();
+	  });
+	
+	  function toggleBulkbar(){
+	    const count = document.querySelectorAll('.row-check:checked').length;
+	    document.getElementById('selCount').textContent = count;
+	    document.getElementById('bulkbar')?.classList.toggle('show', count>0);
+	  }
+	</script>
+    
+    
+    <script>
         document.getElementById('logoutLink')?.addEventListener('click', (e) => {
           e.preventDefault();
           // 清除登入紀錄

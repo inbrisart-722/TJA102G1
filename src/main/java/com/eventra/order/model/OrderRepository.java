@@ -4,6 +4,7 @@ import java.sql.Timestamp;
 import java.util.List;
 import java.util.Set;
 
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -24,4 +25,71 @@ public interface OrderRepository extends JpaRepository<OrderVO, Integer> {
 	OrderVO findByOrderUlid(String orderUlid);
 	
 	Slice<OrderVO> findByMemberAndOrderStatus(MemberVO member, OrderStatus orderStatus, Pageable pageable);
+	
+	// 後台展商今日新訂單數
+	@Query("""
+			select count(distinct o.orderId)
+			from OrderVO o
+				join o.orderItems oi
+				join oi.exhibitionTicketType ett
+				join ett.exhibition e
+				join e.exhibitorVO ex
+			where ex.exhibitorId = :exhibitorId
+			and o.createdAt >= :start
+			and o.createdAt < :end
+			""")
+	long countNewOrdersToday(@Param("exhibitorId") Integer exhibitorId,
+		    				 @Param("start")       Timestamp start,
+		    				 @Param("end") 	       Timestamp end);
+	
+	// 後台展商今日新訂單總額（找出屬於該展商的訂單後加總）
+	@Query("""
+			select coalesce(sum(o.totalAmount), 0)
+			from OrderVO o
+			where o.createdAt >= :start
+			and o.createdAt < :end
+			and exists(
+			select 1
+			from OrderItemVO oi
+				join oi.exhibitionTicketType ett
+				join ett.exhibition e
+				join e.exhibitorVO ex
+			where oi.order = o
+				and ex.exhibitorId = :exhibitorId
+				)
+			""")
+
+	long sumNewOrdersAmountToday(@Param("exhibitorId") Integer exhibitorId,
+								 @Param("start") 	   Timestamp start,
+								 @Param("end") 		   Timestamp end);
+	
+	// 訂單列表查詢
+	@Query("""
+			select new com.eventra.order.model.OrderSummaryDTO(
+				o.orderId,
+				o.orderUlid,
+				coalesce(m.fullName, '-'),
+				o.orderStatus,
+				size(o.orderItems),
+				o.totalAmount,
+				o.createdAt
+			)
+			from OrderVO o
+			left join o.member m
+			left join o.orderItems oi
+			left join oi.exhibitionTicketType ett
+			left join ett.exhibition e
+			where (:status is null or o.orderStatus = :status)
+		    and (
+		      :q is null or :q = '' or
+		      lower(o.orderUlid) like lower(concat('%', :q, '%')) or
+		      lower(coalesce(m.fullName,'')) like lower(concat('%', :q, '%')) or
+		      lower(coalesce(e.exhibitionName,'')) like lower(concat('%', :q, '%'))
+		    )
+			order by o.createdAt desc
+		  """)
+	Page<OrderSummaryDTO> findOrderSummaries(
+			@Param("status") com.eventra.order.model.OrderStatus status,
+			@Param("q") String q,
+			Pageable pageable);
 }

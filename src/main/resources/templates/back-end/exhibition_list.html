@@ -251,7 +251,7 @@
 									<li class="page-item"
 										th:classappend="${currentPage == 0} ? 'disabled'"><a
 										class="page-link"
-										th:href="@{/back-end/exhibitor/exhibition_list(tab=${tab}, q=${q},page=${currentPage - 1}, size=${10}, q=${q})}">«</a>
+										th:href="@{/back-end/exhibitor/exhibition_list(tab=${tab}, q=${q},page=${currentPage - 1}, size=${10})}">«</a>
 									</li>
 
 									<!-- 頁碼 -->
@@ -259,14 +259,14 @@
 										th:each="i : ${#numbers.sequence(0, totalPages - 1)}"
 										th:classappend="${i == currentPage} ? 'active'"><a
 										class="page-link"
-										th:href="@{/back-end/exhibitor/exhibition_list(tab=${tab}, q=${q},page=${i}, size=${10}, q=${q})}"
+										th:href="@{/back-end/exhibitor/exhibition_list(tab=${tab}, q=${q},page=${i}, size=${10})}"
 										th:text="${i + 1}"></a></li>
 
 									<!-- 下一頁 -->
 									<li class="page-item"
 										th:classappend="${currentPage == totalPages - 1} ? 'disabled'">
 										<a class="page-link"
-										th:href="@{/back-end/exhibitor/exhibition_list(tab=${tab}, q=${q},page=${currentPage + 1}, size=${10}, q=${q})}">»</a>
+										th:href="@{/back-end/exhibitor/exhibition_list(tab=${tab}, q=${q},page=${currentPage + 1}, size=${10})}">»</a>
 									</li>
 								</ul>
 							</nav>
@@ -288,194 +288,7 @@
 	<script src="/back-end/js/adminlte.min.js"></script>
 	<script src="/front-end/js/g1_10_custom_common_csrf.js"></script>
 
-	<script>
-  // ===================== 1) 讀資料（demo + localStorage 合併） =====================
-  const demoEvents = [
-    {id:1,name:'活動1', startAt:'2025-07-18T10:00', endAt:'2025-07-20T18:00', saleOpenAt:'2025-07-01', status:'售票中',  remain:98, total:100, audit:'已通過'},
-    {id:2,name:'活動2', startAt:'2025-07-25T09:00', endAt:'2025-07-25T17:00', saleOpenAt:'',           status:'籌備中',  remain:null, total:null, audit:'已通過'},
-    {id:3,name:'活動3', startAt:'2025-07-01T09:00', endAt:'2025-07-05T17:00', saleOpenAt:'2025-06-01', status:'已結束',  remain:0,   total:200, audit:'已通過'},
-    {id:4,name:'活動4', startAt:'',                 endAt:'',                 saleOpenAt:'',           status:'草稿',    remain:null, total:null, audit:''},
-    {id:5,name:'活動5', startAt:'2025-08-10T10:00', endAt:'2025-08-12T18:00', saleOpenAt:'2025-08-05', status:'尚未開賣', remain:null, total:null, audit:'待審核'},
-    {id:6,name:'活動6', startAt:'2024-06-04T10:00', endAt:'2024-06-06T18:00', saleOpenAt:'2024-05-20', status:'草稿',    remain:null, total:null, audit:'未通過'},
-  ]; 
-  
-/* 
-  const stored = JSON.parse(localStorage.getItem('events') || '[]');
-  const byId = new Map();
-  demoEvents.forEach(ev => byId.set(ev.id, {...ev}));
-  stored.forEach(ev => byId.set(ev.id, {...ev}));
-  let events = Array.from(byId.values()); */
-
-  // ===================== 2) 狀態 / DOM =====================
-  let page = 1, pageSize = 8;
-  let filter = { tab: 'all', status: '', audit: '', q: '' };
-
-  const tbody     = document.getElementById('eventTbody');
-  const pager     = document.getElementById('pager');
-  const countInfo = document.getElementById('countInfo');
-
-  // ===================== 3) 小工具 =====================
-  function pad(n){ return String(n).padStart(2,'0'); }
-  function fmtDateTime(iso){
-    if (!iso) return '';
-    const d = new Date(iso);
-    if (isNaN(d)) return '';
-    return `${d.getFullYear()}/${pad(d.getMonth()+1)}/${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}`;
-  }
-  function fmtRange(startISO, endISO){
-    const s = fmtDateTime(startISO);
-    const e = fmtDateTime(endISO);
-    if (!s && !e) return '';
-    if (s && !e)  return s;
-    if (!s && e)  return e;
-    const [sd, st] = s.split(' ');
-    const [ed, et] = e.split(' ');
-    return sd === ed ? `${sd} ${st}–${et}` : `${s} ~ ${e}`;
-  }
-  function fmtQty(remain, total){
-    return (remain==null || total==null) ? '-' : `${remain}/${total}`;
-  }
-
-  // 以「開賣日 → 結束時間」判斷
-  function computeStatusBySaleOpen(saleOpenISO, endISO){
-    if (!saleOpenISO || !endISO) return '尚未開賣';
-    const s = new Date(saleOpenISO.length === 10 ? (saleOpenISO + 'T00:00') : saleOpenISO);
-    const e = new Date(endISO);
-    const now = new Date();
-    if (now < s) return '尚未開賣';
-    if (now > e) return '已結束';
-    return '售票中';
-  }
-
-  // ===================== 4) 渲染 =====================
-  function render(){
-    // 先以 saleOpenAt/endAt 更新非草稿活動的狀態
-    events = events.map(ev => {
-      if (ev.status !== '草稿' && (ev.saleOpenAt || ev.endAt)) {
-        return { ...ev, status: computeStatusBySaleOpen(ev.saleOpenAt || '', ev.endAt || '') };
-      }
-      return ev;
-    });
-
-    // 篩選
-    let rows = events.filter(ev => {
-      if (filter.tab === 'draft' && ev.status !== '草稿') return false;
-      if (filter.status && ev.status !== filter.status)  return false;
-      if (filter.audit  && ev.audit  !== filter.audit)   return false;
-      if (filter.q      && !ev.name.toLowerCase().includes(filter.q.toLowerCase())) return false;
-      return true;
-    });
-
-    // 分頁
-    const total = rows.length;
-    const pages = Math.max(1, Math.ceil(total / pageSize));
-    page = Math.min(page, pages);
-    const startIdx = (page - 1) * pageSize;
-    rows = rows.slice(startIdx, startIdx + pageSize);
-
-    // 寫表格
-    tbody.innerHTML = '';
-    rows.forEach(ev => {
-      const tr = document.createElement('tr');
-      tr.innerHTML = `
-        <td>${ev.name}</td>
-        <td>${fmtRange(ev.startAt, ev.endAt)}</td>
-        <td><span class="status-pill status-${ev.status}">${ev.status || ''}</span></td>
-        <td>${fmtQty(ev.remain, ev.total)}</td>
-        <td><span class="status-pill audit-${ev.audit}">${ev.audit || ''}</span></td>
-        <td class="text-end">
-          <button class="btn btn-outline-secondary btn-sm me-1" data-op="edit" data-id="${ev.id}">
-            <i class="bi bi-gear"></i> 管理
-          </button>
-          <button class="btn btn-outline-primary btn-sm" data-op="preview" data-id="${ev.id}">
-            <i class="bi bi-eye"></i> 預覽
-          </button>
-        </td>
-      `;
-      tbody.appendChild(tr);
-    });
-
-    // 頁碼
-    pager.innerHTML = '';
-    for (let i = 1; i <= pages; i++){
-      const li = document.createElement('li');
-      li.className = 'page-item' + (i === page ? ' active' : '');
-      li.innerHTML = `<a class="page-link" href="#">${i}</a>`;
-      li.addEventListener('click', e => { e.preventDefault(); page = i; render(); });
-      pager.appendChild(li);
-    }
-    countInfo.textContent = `共 ${total} 筆，顯示第 ${total ? startIdx + 1 : 0}-${Math.min(startIdx + rows.length, total)} 筆`;
-  }
-
-    // ===================== 5) 綁定 =====================
-  // 分類（All / 草稿 / 狀態 chips）
-  document.querySelectorAll('.filter-chips [data-tab], .filter-chips [data-status]').forEach(btn => {
-    btn.addEventListener('click', () => {
-      document.querySelectorAll('.filter-chips .btn').forEach(b => b.classList.remove('active'));
-      btn.classList.add('active');
-      filter.tab    = btn.dataset.tab    || 'all';
-      filter.status = btn.dataset.status || '';
-      page = 1;
-      render();
-    });
-  });
-
-  // 審核狀態下拉
-  document.getElementById('auditMenu')?.addEventListener('click', e => {
-    const a = e.target.closest('a[data-audit]');
-    if (!a) return;
-    filter.audit = a.dataset.audit || '';
-    page = 1;
-    render();
-  });
-
-  // 搜尋
-  const $q = document.getElementById('q');
-  $q?.addEventListener('keydown', e => {
-    if (e.key === 'Enter'){
-      filter.q = e.target.value.trim();
-      page = 1;
-      render();
-    }
-  });
-  $q?.addEventListener('input', e => {
-    if (e.target.value === ''){
-      filter.q = '';
-      render();
-    }
-  });
-
-  // 表格內操作（管理 / 預覽）
-  tbody.addEventListener('click', e => {
-    const btn = e.target.closest('button[data-op]');
-    if (!btn) return;
-    const id = +btn.dataset.id;
-    const ev = events.find(x => x.id === id);
-    if (!ev) return;
-
-    if (btn.dataset.op === 'edit'){
-      // 丟到 sessionStorage，帶 edit 參數，去建立頁
-      sessionStorage.setItem('editingEvent', JSON.stringify(ev));
-      location.href = `./create_event.html?edit=${ev.id}`;
-    } else if (btn.dataset.op === 'preview'){
-      alert(`預覽展覽：${ev.name}`);
-    }
-  });
-
-  // ===================== 6) 首次渲染 =====================
-  render();
-  document.addEventListener('click', (e) => {
-  const a = e.target.closest('a[href="./create_event.html"]');
-  if (a) sessionStorage.removeItem('editingEvent');
-});
-  </script>
-	<script>
-	document.getElementById("myLogout")?.addEventListener("click", (e) => {
-		  e.preventDefault();
-		  sessionStorage.clear();
-		  window.location.href = "/back-end/exhibitor/exhibitor_login";
-		});
-      </script>
+	
 
 	<script>
     (async () => {
