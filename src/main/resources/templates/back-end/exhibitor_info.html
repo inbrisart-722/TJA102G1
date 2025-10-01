@@ -231,32 +231,28 @@
 	  </script>
 
 	<!-- 更新成功後訊息自動收合 -->
-	<script>
+	<script th:inline="javascript">
 	  document.addEventListener('DOMContentLoaded', () => {
-	    const alertEl = document.querySelector('.alert.alert-success');
-	    if (alertEl) setTimeout(() => new bootstrap.Alert(alertEl).close(), 2500);
-	    
-	 // 後端驗證錯誤 -> 自動開 Modal
+	    const modalEl = document.getElementById('editModal');
+	    const modal = bootstrap.Modal.getOrCreateInstance(modalEl);
+	
+	    // 後端驗證錯誤 -> 自動開窗
 	    const openModal = /*[[${openModal}]]*/ false;
-	    if (openModal) {
-	      const m = new bootstrap.Modal(document.getElementById('editModal'));
-	      m.show();
+	    if (openModal) modal.show();
+	
+	    // 前端驗證（只留一份）
+	    document.getElementById('vendorForm')?.addEventListener('submit', function (e) {
+	      if (!this.checkValidity()) {
+	        e.preventDefault();
+	        e.stopPropagation();
+	      }
+	      this.classList.add('was-validated');
+	    });
+	 // 5) 成功訊息自動收合（2.5 秒）
+	    const alertEl = document.querySelector('.alert.alert-success');
+	    if (alertEl) {
+	      setTimeout(() => new bootstrap.Alert(alertEl).close(), 2500);
 	    }
-	  });
-
-	  // 仍保留前端 HTML5 驗證阻擋提交（可選）
-	  document.getElementById('vendorForm')?.addEventListener('submit', function (e) {
-	    if (!this.checkValidity()) {
-	      e.preventDefault();
-	      e.stopPropagation();
-	    }
-	    this.classList.add('was-validated');
-	  });
-
-	  // 點「編輯」開窗
-	  document.getElementById('btnEdit')?.addEventListener('click', () => {
-	    const m = new bootstrap.Modal(document.getElementById('editModal'));
-	    m.show();
 	  });
 	</script>
 

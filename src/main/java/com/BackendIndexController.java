@@ -278,6 +278,7 @@ public class BackendIndexController {
         // 準備表單物件
         ExhibitorInfoUpdateDTO dto = new ExhibitorInfoUpdateDTO();
         if (e != null) {
+        	dto.setCompanyName(e.getCompanyName());
             dto.setExhibitorRegistrationName(e.getExhibitorRegistrationName());
             dto.setContactPhone(e.getContactPhone());
             dto.setEmail(e.getEmail());
@@ -305,6 +306,7 @@ public class BackendIndexController {
         ExhibitorVO e = exhibitorRepository.findById(TEST_EXHIBITOR)
                 .orElseThrow(() -> new IllegalArgumentException("Exhibitor not found: " + TEST_EXHIBITOR));
 
+        e.setCompanyName(form.getCompanyName());
         e.setExhibitorRegistrationName(form.getExhibitorRegistrationName());
         e.setContactPhone(form.getContactPhone());
         e.setEmail(form.getEmail());
