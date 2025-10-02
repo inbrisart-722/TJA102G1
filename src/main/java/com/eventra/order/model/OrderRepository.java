@@ -70,15 +70,18 @@ public interface OrderRepository extends JpaRepository<OrderVO, Integer> {
 				o.orderUlid,
 				coalesce(m.fullName, '-'),
 				o.orderStatus,
-				size(o.orderItems),
+				count(distinct oi.orderItemId),
 				o.totalAmount,
-				o.createdAt
+				o.createdAt,
+				min(e.exhibitionName),
+				min(tt.ticketTypeName)
 			)
 			from OrderVO o
 			left join o.member m
-			left join o.orderItems oi
-			left join oi.exhibitionTicketType ett
-			left join ett.exhibition e
+			join o.orderItems oi
+			join oi.exhibitionTicketType ett
+			join ett.exhibition e
+			join ett.ticketType tt
 			where (:status is null or o.orderStatus = :status)
 		    and (
 		      :q is null or :q = '' or
@@ -86,6 +89,7 @@ public interface OrderRepository extends JpaRepository<OrderVO, Integer> {
 		      lower(coalesce(m.fullName,'')) like lower(concat('%', :q, '%')) or
 		      lower(coalesce(e.exhibitionName,'')) like lower(concat('%', :q, '%'))
 		    )
+		    group by o.orderId, o.orderUlid, m.fullName, o.orderStatus, o.totalAmount, o.createdAt
 			order by o.createdAt desc
 		  """)
 	Page<OrderSummaryDTO> findOrderSummaries(

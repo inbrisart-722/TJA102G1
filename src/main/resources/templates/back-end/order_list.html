@@ -171,12 +171,12 @@
 					    <td th:text="${o.orderUlid}">ULID</td>
 					
 					    <!-- 若要顯示活動名稱，DTO 要多帶；先留空或用 '-' -->
-					    <td>-</td>
+					    <td th:text="${o.exhibitionName} ?: '-'">-</td>
 					
 					    <td th:text="${o.fullName}">訂購人</td>
 					
 					    <!-- 票種/數量（DTO 目前只有 itemCount，票種名稱若要顯示需擴充 DTO） -->
-					    <td>-</td>
+					    <td th:text="${o.ticketTypeName} ?: '-'">-</td>
 					
 					    <td class="text-end" th:text="${o.itemCount}">0</td>
 					
