@@ -10,8 +10,12 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.eventra.exhibition.model.ExhibitionRepository;
+import com.eventra.exhibition.model.ExhibitionVO;
 import com.eventra.exhibitiontickettype.model.ExhibitionTicketTypeRepository;
 import com.eventra.exhibitiontickettype.model.ExhibitionTicketTypeVO;
+import com.eventra.member.model.MemberRepository;
+import com.eventra.member.model.MemberVO;
+import com.sse.ticket.TicketSseEmitterService;
 import com.util.MillisToMinutesSecondsUtil;
 
 @Service
@@ -20,18 +24,31 @@ public class CartItemService {
 
 	private static final long CART_EXPIRY_MILLIS = 30 * 60 * 1000L;
 
+	private final MemberRepository MEMBER_REPO;
 	private final CartItemRedisRepository CART_ITEM_REDIS_REPO;
 	private final ExhibitionRepository EXHIBITION_REPO;
 	private final ExhibitionTicketTypeRepository EXHIBITION_TICKET_TYPE_REPO;
+	
+	// SSE 推票數用
+	private final TicketSseEmitterService TICKET_SSE_SERVICE;
 
-	public CartItemService(CartItemRedisRepository cartItemRedisRepository, ExhibitionRepository exhibitionRepository,
-			ExhibitionTicketTypeRepository exhibitionTicketTypeRepository) {
+	public CartItemService(MemberRepository memberRepository, CartItemRedisRepository cartItemRedisRepository, ExhibitionRepository exhibitionRepository,
+			ExhibitionTicketTypeRepository exhibitionTicketTypeRepository, TicketSseEmitterService ticketSseService) {
+    
+		this.MEMBER_REPO = memberRepository;
 		this.CART_ITEM_REDIS_REPO = cartItemRedisRepository;
 		this.EXHIBITION_REPO = exhibitionRepository;
 		this.EXHIBITION_TICKET_TYPE_REPO = exhibitionTicketTypeRepository;
+		this.TICKET_SSE_SERVICE = ticketSseService;
 	}
 
-	private void cleanupExpired(Integer memberId, Long now) {
+//	public List<CartItemRedisVO> checkFiveMinutesLeft(long now){
+//		List<MemberVO> members = MEMBER_REPO.findAll();
+//		
+//		
+//	}
+	
+	public void cleanupExpired(Integer memberId, Long now) {
 		/* ********* 1st part : 清理過期購物車 ********* */
 		List<CartItemRedisVO> listOfVOs = CART_ITEM_REDIS_REPO.cleanupExpired(memberId, now);
 		if (listOfVOs == null || listOfVOs.isEmpty())
@@ -44,19 +61,31 @@ public class CartItemService {
 			EXHIBITION_REPO.updateSoldTicketQuantity(entry.getKey(), -entry.getValue());
 	}
 
-	public void addCartItem(AddCartItemReqDTO req, Integer memberId) {
+	public void addCartItem(AddCartItemReqDTO req, Integer memberId) throws IllegalStateException{
+//		Integer memberId = MEMBER_REPO.findByEmail(SecurityContextHolder.getContext().getAuthentication().getName()).orElse(null).getMemberId();
+		
 		cleanupExpired(memberId, System.currentTimeMillis());
 		// AddCartItemRequDTO -> exhibitionId, ticketDatas
 		Integer exhibitionId = req.getExhibitionId();
 		Map<String, Integer> ticketDatas = req.getTicketDatas();
 
+		// 先動 MySQL -> 票有不夠就整個 rollback
+		Integer totalQuantity = 0;
+		for (Map.Entry<String, Integer> entry : ticketDatas.entrySet()) {
+			Integer quantity = entry.getValue();
+			totalQuantity += quantity;
+		}
+		// 只會動一行（因為有帶 exhibitionId) -> 不是回傳 1 -> 沒 update 成功 -> 票數不足 -> throw Exception
+		Integer updatedRows = EXHIBITION_REPO.updateSoldTicketQuantity(exhibitionId, totalQuantity);
+		if(updatedRows != 1) throw new IllegalStateException("票數不足，無法加入購物車");
+		
+		// 沒問題才動 NoSQL(Redis)
 		for (Map.Entry<String, Integer> entry : ticketDatas.entrySet()) {
 			// 拼好 CartItemRedisVO ---> CartItemRedisRepository 去操作
 			Integer quantity = entry.getValue();
 			ExhibitionTicketTypeVO ettVO = EXHIBITION_TICKET_TYPE_REPO
 					.findByExhibitionIdAndTicketTypeId(exhibitionId, Integer.valueOf(entry.getKey())).orElseThrow();
-			/* ********* 1st part : 增加展覽售票量 ********* */
-			EXHIBITION_REPO.updateSoldTicketQuantity(exhibitionId, quantity);
+			/* ********* 1st part : 增加展覽售票量 -> 提前移到上面做 ********* */
 			/* ********* 2nd part : 新增會員購物車明細 ********* */
 			CartItemRedisVO cartItemRedisVO = new CartItemRedisVO.Builder()
 					.cartItemId(CART_ITEM_REDIS_REPO.getCartItemId()).memberId(memberId)
@@ -67,7 +96,10 @@ public class CartItemService {
 
 			CART_ITEM_REDIS_REPO.addCartItem(cartItemRedisVO);
 		}
-		// 後端回應 ... 還有沒有票！！！（這邊很重要）updateSoldTicketQuantity 就可能失敗
+		Integer totalTicketQuantity = EXHIBITION_REPO.findById(exhibitionId).orElseThrow().getTotalTicketQuantity();
+		Integer soldTicketQuantity = EXHIBITION_REPO.findById(exhibitionId).orElseThrow().getSoldTicketQuantity();
+
+		TICKET_SSE_SERVICE.broadcastTicketCount(exhibitionId, totalTicketQuantity - soldTicketQuantity);
 	}
 
 	public String removeOneCartItem(Integer cartItemId, Integer memberId) {
@@ -127,8 +159,12 @@ public class CartItemService {
 		listOfVOs.forEach(vo -> {
 			String expirationTime = MillisToMinutesSecondsUtil
 					.convert(CART_EXPIRY_MILLIS - (System.currentTimeMillis() - vo.getCreatedAt()));
+			
+			ExhibitionVO exhibition = EXHIBITION_REPO.findById(vo.getExhibitionId()).orElseThrow();
+			String photoPortrait = exhibition.getPhotoPortrait();
+			
 			GetCartItemResDTO dto = new GetCartItemResDTO.Builder().cartItemId(vo.getCartItemId())
-					.exhibitionName(vo.getExhibitionName()).ticketTypeName(vo.getTicketTypeName())
+					.photoPortrait(photoPortrait).exhibitionName(vo.getExhibitionName()).ticketTypeName(vo.getTicketTypeName())
 					.quantity(vo.getQuantity()).price(vo.getPrice()).expirationTime(expirationTime).build();
 			listOfDTOs.add(dto);
 		});
@@ -147,8 +183,10 @@ public class CartItemService {
 			String expirationTime = MillisToMinutesSecondsUtil
 					.convert(CART_EXPIRY_MILLIS - (System.currentTimeMillis() - el.getCreatedAt()));
 
+			ExhibitionVO exhibition = EXHIBITION_REPO.findById(el.getExhibitionId()).orElseThrow();
+			String photoPortrait = exhibition.getPhotoPortrait();
 			GetCartItemResDTO resDTO = new GetCartItemResDTO.Builder().cartItemId(el.getCartItemId())
-					.exhibitionName(el.getExhibitionName()).ticketTypeName(el.getTicketTypeName())
+					.photoPortrait(photoPortrait).exhibitionName(el.getExhibitionName()).ticketTypeName(el.getTicketTypeName())
 					.quantity(el.getQuantity()).price(el.getPrice()).expirationTime(expirationTime).build();
 
 			listOfResDTOs.add(resDTO);

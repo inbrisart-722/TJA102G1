@@ -9,113 +9,161 @@
 /* 訂單／票匣 */
 /* 1. 上方 tab */
 nav#tablist_order {
-  text-align: center;
-  margin-bottom: 3%;
-  display: flex;
-  justify-content: center;
-  gap: 12px;
-  /* border: 1px solid black; */
+	text-align: center;
+	margin-bottom: 3%;
+	display: flex;
+	justify-content: center;
+	gap: 12px;
+	/* border: 1px solid black; */
 }
-nav#tablist_order > button.tab_order {
-  background: 0;
-  border: 0;
-  border-radius: 15px;
-  width: 6%;
-  border-bottom: 1px solid gray;
-  /* border: 1px solid gray; */
+
+nav#tablist_order>button.tab_order {
+	background: 0;
+	border: 0;
+	border-radius: 15px;
+	width: 6%;
+	border-bottom: 1px solid gray;
+	/* border: 1px solid gray; */
 }
-nav#tablist_order > button.tab_order.-on {
-  color: white;
-  background: darkcyan;
-  font-weight: 600;
+
+nav#tablist_order>button.tab_order.-on {
+	color: white;
+	background: darkcyan;
+	font-weight: 600;
 }
 
 /* 2. 訂單本體架構 */
 /* 第 1 階層：訂單 */
 div.order_row {
-  padding: 1%;
+	padding: 1%;
 }
-div.order_row > div.order_head {
-  /* border: 1px solid blue; */
-  background: rgb(255, 255, 255);
-  background: rgba(0, 139, 139, 0.5);
-  color: black;
-  font-weight: 400;
-  padding: 2% 2.5%;
-  border-radius: 5px;
-  border: 1px solid rgb(74, 161, 161);
 
-  display: flex;
-  justify-content: center;
+div.order_row>div.order_head {
+	/* border: 1px solid blue; */
+	background: rgb(244, 244, 244);
+/* 	background: rgba(0, 139, 139, 0.66); */
+	color: black;
+	font-weight: 400;
+	padding: 2% 2.5%;
+	border-radius: 5px;
+	border: 1px solid rgb(155, 155, 155);
+	box-shadow: 0px 1px 3px gray;
+	/* 	display: flex; */
+	position: relative;
+	justify-content: center;
 }
-div.order_row > div.order_head > span.order_id {
-  flex-grow: 20;
-}
-div.order_row > div.order_head > span.order_amount {
-  flex-grow: 1.5;
-}
-div.order_row > div.order_head > span.order_status {
-  flex-grow: 2;
-}
-div.order_row > div.order_head > button {
-  flex-grow: 0.5;
-  margin: 0 1%;
 
-  background: rgb(122, 122, 122);
-  border: 0;
-  border-radius: 15px;
-  width: 6%;
-  height: 3%;
-  font-weight: 700;
-  color: white;
-  padding: 0 0.2%;
-  padding-left: 0.6%;
+div.order_row>div.order_head>span.order_id {
+	/* 	flex-grow: 10; */
+	/* 	text-align: center; */
+	/* 	width: 25%; */
+	position: absolute;
+}
+
+div.order_row>div.order_head>span.order_qty {
+	/* 	flex-grow: 1; */
+	/* 	text-align: center; */
+	/* 	width: 6%; */
+	position: absolute;
+	left: 385px;
+}
+
+div.order_row>div.order_head>span.order_amount {
+	position: absolute;
+	/* 	flex-grow: 1; */
+	/* 	margin-right: 30px; */
+	/* 	text-align: center; */
+	left: 465px;
+}
+
+img.order_provider_img {
+	position: absolute;
+	height: 20px;
+	left: 585px;
+}
+
+div.order_row>div.order_head>span.order_provider {
+	position: absolute;
+	left: 653px;
+	/* 	flex-grow: 1; */
+	/* 	margin-right: 0px; */
+	/* 	text-align: right; */
+	/* 	border: 1px solid black; */
+}
+
+div.order_row>div.order_head>span.order_creationTime {
+	position: absolute;
+	left: 805px;
+	/* 	flex-grow: 2; */
+	/* 	text-align: right; */
+}
+
+div.order_row>div.order_head>button {
+	/* 	left: 900px; */
+	/* 	position: absolute; */
+	/* 	text-align: right; */
+	/* 	flex-grow: 0.5; */
+	margin-left: 92.5%;
+	background: rgb(122, 122, 122);
+	border: 0;
+	border-radius: 15px;
+	width: 6%;
+	height: 3%;
+	font-weight: 700;
+	color: white;
+	padding: 0 0.2%;
+	padding-left: 0.6%;
 }
 
 /* 第 2 階層：訂單明細收納 by 展覽 */
-div.order_row > div.order_body {
-  margin: 1% 0;
-  /* display: none; */
-  overflow: hidden;
-  max-height: 0;
-  opacity: 0;
-  transition: max-height 800ms ease, opacity 400ms ease;
-}
-div.order_row > div.order_body.-expanded {
-  max-height: 1000px;
-  opacity: 1;
-  /* display: block; */
-}
-div.order_row > div.order_body > div.order_item_head {
-  border: 1px solid rgb(172, 172, 172);
-  padding: 1% 2%;
-  margin-left: 2%;
-  border-radius: 5px;
-  display: flex;
-  align-items: center;
-}
-div.order_row > div.order_body > div.order_item_head > img {
-  float: left;
-}
-div.order_row > div.order_body > div.order_item_head::after {
-  content: "";
-  display: block;
-  clear: both;
+div.order_row>div.order_body {
+	margin: 1% 0;
+	/* display: none; */
+	overflow: hidden;
+	max-height: 0;
+	opacity: 0;
+	transition: max-height 800ms ease, opacity 400ms ease;
 }
 
-div.order_row > div.order_body > div.order_item_head > div {
-  display: flex;
-  flex-wrap: wrap;
-  width: 100%;
+div.order_row>div.order_body.-expanded {
+	max-height: 1000px;
+	opacity: 1;
+	/* display: block; */
 }
 
-div.order_row > div.order_body > div.order_item_head > div > span {
-  width: 100%;
-  margin: 0.4% 1% 0.4% 2%;
+div.order_row>div.order_body>div.order_item_head {
+	border: 1px solid rgb(172, 172, 172);
+	padding: 1% 2%;
+	margin-left: 2%;
+	border-radius: 5px;
+	display: flex;
+	align-items: center;
 }
-div.order_row > div.order_body > div.order_item_head > div > span:nth-child(2) {
-  display: flex;
-  justify-content: space-between;
+
+div.order_row>div.order_body>div.order_item_head>img {
+	float: left;
+}
+
+div.order_row>div.order_body>div.order_item_head::after {
+	content: "";
+	display: block;
+	clear: both;
+}
+
+div.order_row>div.order_body>div.order_item_head>div {
+	display: flex;
+	flex-wrap: wrap;
+	width: 100%;
+}
+
+div.order_row>div.order_body>div.order_item_head>div>span {
+	width: 100%;
+	margin: 0.4% 1% 0.4% 2%;
+}
+
+div.order_row>div.order_body>div.order_item_head>div>span:nth-child(2) {
+	display: flex;
+	justify-content: space-between;
 }
 
 /* div.order_row > div.order_body > div.order_item_head > div > button {
@@ -125,167 +173,259 @@ div.order_row > div.order_body > div.order_item_head > div > span:nth-child(2) {
   font-weight: 700;
   background: 0;
 } */
-
-div.order_row > div.order_body > div.order_item_body {
-  border: 1px solid rgb(172, 172, 172);
-  padding: 2% 2%;
-  margin: 1% 0% 1% 4%;
-  border-radius: 5px;
-  /* background: rgb(203, 199, 9); */
+div.order_row>div.order_body>div.order_item_body {
+	border: 1px solid rgb(172, 172, 172);
+	padding: 2% 2%;
+	margin: 1% 0% 1% 4%;
+	border-radius: 5px;
+	/* background: rgb(203, 199, 9); */
 }
 
 /* 第 3 階層：訂單明細 */
-div.order_row > div.order_body > div.order_item_body > div.order_item_ticket {
-  display: flex;
-}
-div.order_row
-  > div.order_body
-  > div.order_item_body
-  > div.order_item_ticket
-  > span:nth-child(1) {
-  flex-grow: 25;
-}
-div.order_row
-  > div.order_body
-  > div.order_item_body
-  > div.order_item_ticket
-  > span:nth-child(2) {
-/*   flex-grow: 1; */
-	margin-right: 1%;
+div.order_row>div.order_body>div.order_item_body>div.order_item_ticket {
+	display: flex;
 }
 
-div.order_row
-  > div.order_body
-  > div.order_item_body
-  > div.order_item_ticket
-  > button {
-  background: darkcyan;
-  color: white;
-  font-weight: 600;
-  border: 1px solid gray;
-  border-radius: 15px;
-  margin-left: 5%;
+div.order_row>div.order_body>div.order_item_body>div.order_item_ticket>span:nth-child(1)
+	{
+	flex-grow: 25;
+}
+
+div.order_row>div.order_body>div.order_item_body>div.order_item_ticket>span:nth-child(2)
+	{
+	margin: 0 25px;
+	flex-grow: 0.5;
+}
+
+div.order_row>div.order_body>div.order_item_body>div.order_item_ticket>span:nth-child(3)
+	{
+	flex-grow: 1;
+}
+
+div.order_row>div.order_body>div.order_item_body>div.order_item_ticket>span:nth-child(3).paid
+	{
+	flex-grow: 5;
+}
+
+div.order_row>div.order_body>div.order_item_body>div.order_item_ticket>span:nth-child(4)
+	{
+	flex-grow: 1;
+}
+div.order_row>div.order_body>div.order_item_body>div.order_item_ticket>span:nth-child(5)
+	{
+	flex-grow: 0.5;
+}
+
+div.order_row>div.order_body>div.order_item_body>div.order_item_ticket>button
+	{
+	background: darkcyan;
+	color: white;
+	font-weight: 600;
+	border: 1px solid gray;
+	border-radius: 15px;
+	margin-left: 5%;
 }
 
 /* qrcode */
 #qrcode_model {
-  width: 50%;
-  margin-left: 0;
-  /* position: relative; */
-  /* right: 10%; */
+	width: 50%;
+	margin-left: 0;
+	/* position: relative; */
+	/* right: 10%; */
 }
+
 #modal-content {
-  margin-left: 0;
-  width: 60%;
-  display: none;
-}
-#modal-content > div {
-  text-align: right;
-  margin: 5% 5% 5% 0;
-}
-#modal-content > div > button {
-  font-size: 32px;
-  border: 0;
-  background: 0;
+	margin-left: 0;
+	width: 60%;
+	display: none;
 }
 
-#modal-content > canvas {
-  margin: 10%;
-  margin-top: 0;
-}
-/* =============================================================== */
-/* =============================================================== */
-/* =============================================================== */
-
-/* 基本資料 */
-
-ul#profile_summary > li > span > button {
-  border: 0;
-  border-bottom: 1px solid gray;
-  /* box-shadow:1px 1px 5px rgb(136, 134, 134) */
-  background: rgb(218, 218, 218);
+#modal-content>div {
+	text-align: right;
+	margin: 5% 5% 5% 0;
 }
 
-ul#profile_summary > li {
-  width: 90%;
-}
-#related_account {
-  margin: 6% 0 3% 0;
-}
-ul#profile_summary > li.third_party {
-  position: relative;
-  padding-right: 25px;
-}
-ul#profile_summary > li.third_party > button {
-  position: absolute;
-  right: 2%;
-  text-align: right;
-  border: 0;
-  background: 0;
-}
-/* ul#profile_summary > li.third_party  > button {
-} */
-div.form-group > input {
-  height: 32px;
-  margin-top: 8px;
-  width: 80%;
-}
-div.form-group > label > small {
-  font-size: 10px;
+#modal-content>div>button {
+	font-size: 32px;
+	border: 0;
+	background: 0;
 }
 
-#js-upload-files {
-  display: none;
-  width: 0;
-  height: 0;
+#modal-content>canvas {
+	margin: 10%;
+	margin-top: 0;
 }
-#img_block {
-  /* width: 30%; */
-  text-align: right;
-  position: relative;
+
+div.order_item_head>img {
+	height: 60px;
+	border: 1px solid lightgray;
 }
-#user_img {
-  border-radius: 50%;
-  width: 200px;
-  height: 200px;
-  position: absolute;
-  right: 25%;
-  bottom: 52.5%;
-  overflow: hidden;
-}
-#js-upload-submit {
-  position: absolute;
-  right: 45%;
-  bottom: 42.5%;
-}
-div.row > div#btn_block {
-  margin-top: 4%;
-  display: flex;
-  justify-content: end;
-}
-div.row > div > button.btn_updateinfo {
-  width: 10%;
-}
-#btn_recover {
-  border: 0;
-  background: 0;
-  color: darkgray;
-}
-div.order_item_head > img {
-  height: 60px;
-  border: 1px solid lightgray;
-}
-div.order_body > button:first-child {
+
+div.order_body>button:first-child {
 	background: darkcyan;
 	border: 1px solid gray;
-/* 	background-color: ;  */
-	color:white;
+	/* 	background-color: ;  */
+	color: white;
 	border-radius: 20px;
 	text-align: center;
 	position: relative;
 	left: 45%;
 	padding: 0.5% 1%;
-/* 	transform: tranlateX(-100%); */
+	/* 	transform: tranlateX(-100%); */
 	margin: 20px 0 28px 0;
 }
 
+div.order_item_head>img.exhibition_img {
+	border-radius: 5px;
+}
+
+/* =============================================================== */
+/* =============================================================== */
+/* =============================================================== */
+
+/* 基本資料 */
+ul#profile_summary>li {
+	width: 90%;
+	display: flex;
+}
+
+span#saved_password {
+	color: rgba(180, 180, 180, 1);
+}
+
+#related_account {
+	margin: 6% 0 3% 0;
+}
+
+ul#profile_summary>li.third_party {
+	position: relative;
+	padding-right: 25px;
+}
+
+ul#profile_summary>li.third_party>button {
+	position: absolute;
+	right: 2%;
+	text-align: right;
+	border: 0;
+	background: 0;
+}
+/* ul#profile_summary > li.third_party  > button {
+} */
+div.form-group>input {
+	height: 32px;
+	margin-top: 8px;
+	width: 80%;
+}
+
+div.form-group>label>small {
+	font-size: 10px;
+}
+
+#js-upload-files {
+	display: none;
+	width: 0;
+	height: 0;
+}
+
+#img_block {
+	/* width: 30%; */
+	text-align: right;
+	position: relative;
+}
+
+#user_img {
+	border-radius: 50%;
+	width: 200px;
+	height: 200px;
+	position: absolute;
+	right: 25%;
+	bottom: 32.5%;
+	overflow: hidden;
+}
+
+#js-upload-submit {
+	position: absolute;
+	right: 45%;
+	bottom: 22.5%;
+}
+
+div.row>div#btn_block {
+	margin-top: 4%;
+	display: flex;
+	justify-content: end;
+}
+
+div.row>div>button.btn_updateinfo {
+	width: 10%;
+}
+
+#btn_recover {
+	border: 0;
+	background: 0;
+	color: darkgray;
+}
+
+a#logout::before {
+	background-color: white;
+}
+
+a#logout {
+	background-color: rgba(245, 153, 0, 0.9);
+/* 	filter: saturate(0.9); */
+	/* 	background-color: lightgrey; */
+}
+
+a#logout>span {
+	color: white;
+	font-weight: 800;
+}
+
+div.btn_change_div>button {
+	margin: 10px 0 2px 0;
+	border: 1px solid gray;
+	border-radius: 15px;
+	padding: 3px 12px;
+}
+
+select#gender {
+	margin: 10px 0 2px 0;
+	border: 1px solid gray;
+	border-radius: 15px;
+	padding: 4px 8px;
+}
+
+/* div#if_not_oauth2 { */
+/* 	position: relative; */
+/* } */
+#line-oauth2.disabled {
+	background-color: lightgray;
+	pointer-events: none;
+	cursor: normal;
+}
+
+#line-oauth2 {
+	display: inline-block;
+	/* 	position: absolute; */
+	/* 	right: 64px; */
+	/* 	top: 6px; */
+	background-color: #00C300;
+	filter: saturate(0.85); 
+	/* 	background-color: darkcyan; */
+	/* 	background-color: lightgray; */
+	color: white;
+	padding: 10px 20px;
+	border-radius: 4px;
+	text-decoration: none;
+	font-weight: bold;
+}
+
+#line-oauth2.oauth2-user {
+	margin-left: 340px;
+}
+
+#line-oauth2.oauth2-user.disabled {
+	margin-left: 290px;
+}
+button.order_repay {
+	font-weight: 500;
+}

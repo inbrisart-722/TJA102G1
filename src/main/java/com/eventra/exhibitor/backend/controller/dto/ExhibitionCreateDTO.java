@@ -1,8 +1,6 @@
 package com.eventra.exhibitor.backend.controller.dto;
 
-import java.sql.Timestamp;
 import java.time.LocalDateTime;
-import java.util.List;
 import java.util.Set;
 
 import org.springframework.format.annotation.DateTimeFormat;
@@ -10,45 +8,106 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.eventra.exhibitiontickettype.model.ExhibitionTicketTypeVO;
 
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.PositiveOrZero;
+import jakarta.validation.constraints.Size;
+
 /**
  * 接收使用者新增展覽輸入資料
  */
 public class ExhibitionCreateDTO {
-
+	
+	private Integer exhibitionId;
+	
+	private Boolean draft;
+	
+	private String ticketJson;
+	
 	/**
 	 * 接收使用者上傳的檔案（此時尚未處理成路徑）
 	 */
-	private List<MultipartFile> photoPortrait;
+	private MultipartFile photoPortrait;
 
-	private List<MultipartFile> photoLandscape;
+	private MultipartFile photoLandscape;
+	
+	/**
+	 * 進入編輯頁面時給舊有圖片預覽用
+	 */
+	private String photoPortraitPath;
+	
+	private String photoLandscapePath;
 	
 //	@JsonIgnore
     private Set<ExhibitionTicketTypeVO> exhibitionTicketTypes;
 
-//	@NotBlank(message = "展覽名稱必填")
+	@NotBlank(message = "展覽名稱必填")
+    @Size(max = 100, message = "展覽名稱長度不可超過 100 字")
 	private String exhibitionName;
 	
-//	@NotNull(message = "請勿空白")
+	@DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm")
+	@NotNull(message = "請勿空白")
 	private LocalDateTime startTime;
 	
-//	@NotNull(message = "請勿空白")
+	@DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm")
+	@NotNull(message = "請勿空白")
 	private LocalDateTime endTime;
 
-//	@NotBlank(message = "展覽地點必填")
+	@NotBlank(message = "展覽地點必填")
+	@Size(max = 255, message = "展覽地點長度不可超過 255 字")
 	private String location;
 	
-//	@NotNull(message = "請勿空白")
+	@DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm")
+	@NotNull(message = "請勿空白")
 	private LocalDateTime ticketStartTime;
 
-//	@NotNull(message = "必須填入總販售票數")
-//	@PositiveOrZero
+	@NotNull(message = "必須填入總販售票數")
+	@PositiveOrZero(message = "總票數需為 0 或正整數")
 	private Integer totalTicketQuantity;
 
-//	@NotBlank(message = "展覽資訊必填")
+	@NotBlank(message = "展覽資訊必填")
 	private String description;
+	
+	public Integer getExhibitionId() {
+		return exhibitionId;
+	}
 
+	public void setExhibitionId(Integer exhibitionId) {
+		this.exhibitionId = exhibitionId;
+	}
 	
-	
+	public Boolean getDraft() {
+		return draft;
+	}
+
+	public void setDraft(Boolean draft) {
+		this.draft = draft;
+	}
+
+	public String getTicketJson() {
+		return ticketJson;
+	}
+
+	public void setTicketJson(String ticketJson) {
+		this.ticketJson = ticketJson;
+	}
+
+	public String getPhotoPortraitPath() {
+		return photoPortraitPath;
+	}
+
+	public void setPhotoPortraitPath(String photoPortraitPath) {
+		this.photoPortraitPath = photoPortraitPath;
+	}
+
+	public String getPhotoLandscapePath() {
+		return photoLandscapePath;
+	}
+
+	public void setPhotoLandscapePath(String photoLandscapePath) {
+		this.photoLandscapePath = photoLandscapePath;
+	}
+
 	public Set<ExhibitionTicketTypeVO> getExhibitionTicketTypes() {
 		return exhibitionTicketTypes;
 	}
@@ -65,19 +124,19 @@ public class ExhibitionCreateDTO {
 		this.startTime = startTime;
 	}
 
-	public List<MultipartFile> getPhotoPortrait() {
+	public MultipartFile getPhotoPortrait() {
 		return photoPortrait;
 	}
 
-	public void setPhotoPortrait(List<MultipartFile> photoPortrait) {
+	public void setPhotoPortrait(MultipartFile photoPortrait) {
 		this.photoPortrait = photoPortrait;
 	}
 
-	public List<MultipartFile> getPhotoLandscape() {
+	public MultipartFile getPhotoLandscape() {
 		return photoLandscape;
 	}
 
-	public void setPhotoLandscape(List<MultipartFile> photoLandscape) {
+	public void setPhotoLandscape(MultipartFile photoLandscape) {
 		this.photoLandscape = photoLandscape;
 	}
 

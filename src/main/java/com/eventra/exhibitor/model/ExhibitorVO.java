@@ -25,12 +25,12 @@ public class ExhibitorVO {
 
 	private String exhibitorRegistrationName;
 
-    @NotBlank(message = "統編欄位必填")
-    @Pattern(regexp="\\d{8}", message = "統編必須為8位數字")
+//    @NotBlank(message = "統編欄位必填")
+//    @Pattern(regexp="\\d{8}", message = "統編必須為8位數字")
 	@Column(name = "business_id_number", nullable = false, length = 8)
 	private String businessIdNumber;
 
-    @NotBlank(message = "密碼欄位必填")
+//    @NotBlank(message = "密碼欄位必填")
 //    @Pattern(regexp = "^(?=.*[A-Za-z])(?=.*\\d)[A-Za-z\\d]{8,}$",
 //            message = "密碼需為至少 8 位，且至少含 1 個英文字母與 1 個數字")
 	@Column(name = "password_hash")

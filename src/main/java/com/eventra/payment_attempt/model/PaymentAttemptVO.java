@@ -4,10 +4,13 @@ import java.io.Serializable;
 import java.sql.Timestamp;
 
 import com.eventra.order.model.OrderVO;
+import com.eventra.order.model.OrderProvider;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -20,39 +23,84 @@ import jakarta.persistence.Table;
 @Table(name = "payment_attempt")
 public class PaymentAttemptVO implements Serializable{
 
-//	payment_attempt 實體跟回傳 DTO會「高度重疊」。但還是建議分開，因為職責不同：
-	//	DTO（或 Map）：只負責「接收原始表單」→ 驗簽、驗證、一致性檢查
-	//	Entity（payment_attempt）：只負責「可信資料的持久化」
-//	即使欄位同名，也不要直接把 request 綁到 Entity，避免 over-posting、未驗簽先落庫。
-
+	/* **************** (1) ECPay & LinePay Common **************** */
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name = "payment_attempt_id")
 	private Integer paymentAttemptId;
+	
+	@Column(name = "is_duplicate", insertable = false)
+	private Boolean isDuplicate;
+	
+	@Column(name = "is_duplicate_resolved")
+	private Boolean isDuplicateResolved;
+	
+	@Enumerated(EnumType.STRING)
 	@Column(name = "payment_attempt_status")
-	private String paymentAttemptStatus; // pending, expired, success, failure
+	private PaymentAttemptStatus paymentAttemptStatus; // PENDING, EXPIRED, SUCCESS, FAILURE
+	
 	@Column(name = "order_id", insertable = false, updatable = false)
 	private Integer orderId;
+	
 	@JsonIgnore
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "order_id", referencedColumnName = "order_id", nullable = false)
 	private OrderVO order;
-	@Column(name = "merchant_id")
-	private String merchantId;
-	@Column(name = "merchant_trade_no") // "EC" + base36(System.currentTimeMillis()) + rand4
-	private String merchantTradeNo;
-	@Column(name = "store_id")
-	private String storeId;
-	@Column(name = "trade_no")
-	private String tradeNo;
-	@Column(name = "rtn_code")
-	private String rtnCode;
-	@Column(name = "rtn_msg")
-	private String rtnMsg;
-	@Column(name = "simulate_paid", columnDefinition = "TINYINT")
-	private Byte simulatePaid;
+	
+	@Enumerated(EnumType.STRING)
+	@Column(name = "provider")
+	private OrderProvider provider;
+	// ECPay
+	// LinePay
+	
+	@Column(name = "provider_order_id") 
+	private String providerOrderId;
+	// ECPay MerchantTradeNo "EC" + base36(System.currentTimeMillis()) + rand4
+	// LinePay orderId
+	
+	@Column(name = "provider_transaction_id") 
+	private String providerTransactionId;
+	// ECPay tradeNo
+	// LinePay transactionId
+	
 	@Column(name = "trade_amt")
 	private Integer tradeAmt;
+	// ECPay tradeAmt
+	// LinePay amount
+	
+	@Column(name = "rtn_code")
+	private String rtnCode;
+	// ECPay rtnCode
+	// LinePay returnCode
+	
+	@Column(name = "rtn_msg")
+	private String rtnMsg;
+	// ECPay rtnMsg
+	// LinePay returnMessage
+	
+	@Column(name = "created_at", insertable = false, updatable = false)
+	private Timestamp createdAt; 
+	
+	@Column(name = "updated_at", insertable = false, updatable = false)
+	private Timestamp updatedAt;
+	
+	/* **************** (2) LinePay-specific **************** */
+	@Column(name = "confirm_api_retry_count", columnDefinition = "TINYINT")
+	private Byte confirmApiRetryCount;
+	
+	@Column(name = "currency")
+	private String currency; // "TWD"
+	
+	@Column(name = "packages_json", columnDefinition = "TEXT")
+	private String packagesJson;
+	 
+	/* **************** (3) ECPay-specific **************** */
+	@Column(name = "merchant_id")
+	private String merchantId;
+	@Column(name = "store_id")
+	private String storeId;
+	@Column(name = "simulate_paid", columnDefinition = "TINYINT")
+	private Byte simulatePaid;
 	@Column(name = "payment_type")
 	private String paymentType;
 	@Column(name = "payment_type_charge_fee")
@@ -63,27 +111,31 @@ public class PaymentAttemptVO implements Serializable{
 	private String paymentDate;
 	@Column(name = "check_mac_value")
 	private String checkMacValue;
-	@Column(name = "created_at", insertable = false, updatable = false)
-	private Timestamp createdAt; 
 	@Column(name = "item_name")
 	private String itemName;
 	
-	public Timestamp getCreatedAt() {
-		return createdAt;
-	}
-	public void setCreatedAt(Timestamp createdAt) {
-		this.createdAt = createdAt;
-	}
 	public Integer getPaymentAttemptId() {
 		return paymentAttemptId;
 	}
 	public void setPaymentAttemptId(Integer paymentAttemptId) {
 		this.paymentAttemptId = paymentAttemptId;
 	}
-	public String getPaymentAttemptStatus() {
+	public Boolean getIsDuplicate() {
+		return isDuplicate;
+	}
+	public void setIsDuplicate(Boolean isDuplicate) {
+		this.isDuplicate = isDuplicate;
+	}
+	public Boolean getIsDuplicateResolved() {
+		return isDuplicateResolved;
+	}
+	public void setIsDuplicateResolved(Boolean isDuplicateResolved) {
+		this.isDuplicateResolved = isDuplicateResolved;
+	}
+	public PaymentAttemptStatus getPaymentAttemptStatus() {
 		return paymentAttemptStatus;
 	}
-	public void setPaymentAttemptStatus(String paymentAttemptStatus) {
+	public void setPaymentAttemptStatus(PaymentAttemptStatus paymentAttemptStatus) {
 		this.paymentAttemptStatus = paymentAttemptStatus;
 	}
 	public Integer getOrderId() {
@@ -98,29 +150,29 @@ public class PaymentAttemptVO implements Serializable{
 	public void setOrder(OrderVO order) {
 		this.order = order;
 	}
-	public String getMerchantId() {
-		return merchantId;
+	public OrderProvider getProvider() {
+		return provider;
 	}
-	public void setMerchantId(String merchantId) {
-		this.merchantId = merchantId;
+	public void setProvider(OrderProvider provider) {
+		this.provider = provider;
 	}
-	public String getMerchantTradeNo() {
-		return merchantTradeNo;
+	public String getProviderOrderId() {
+		return providerOrderId;
 	}
-	public void setMerchantTradeNo(String merchantTradeNo) {
-		this.merchantTradeNo = merchantTradeNo;
+	public void setProviderOrderId(String providerOrderId) {
+		this.providerOrderId = providerOrderId;
 	}
-	public String getStoreId() {
-		return storeId;
+	public String getProviderTransactionId() {
+		return providerTransactionId;
 	}
-	public void setStoreId(String storeId) {
-		this.storeId = storeId;
+	public void setProviderTransactionId(String providerTransactionId) {
+		this.providerTransactionId = providerTransactionId;
 	}
-	public String getTradeNo() {
-		return tradeNo;
+	public Integer getTradeAmt() {
+		return tradeAmt;
 	}
-	public void setTradeNo(String tradeNo) {
-		this.tradeNo = tradeNo;
+	public void setTradeAmt(Integer tradeAmt) {
+		this.tradeAmt = tradeAmt;
 	}
 	public String getRtnCode() {
 		return rtnCode;
@@ -134,17 +186,53 @@ public class PaymentAttemptVO implements Serializable{
 	public void setRtnMsg(String rtnMsg) {
 		this.rtnMsg = rtnMsg;
 	}
+	public Timestamp getCreatedAt() {
+		return createdAt;
+	}
+	public void setCreatedAt(Timestamp createdAt) {
+		this.createdAt = createdAt;
+	}
+	public Timestamp getUpdatedAt() {
+		return updatedAt;
+	}
+	public void setUpdatedAt(Timestamp updatedAt) {
+		this.updatedAt = updatedAt;
+	}
+	public Byte getConfirmApiRetryCount() {
+		return confirmApiRetryCount;
+	}
+	public void setConfirmApiRetryCount(Byte confirmApiRetryCount) {
+		this.confirmApiRetryCount = confirmApiRetryCount;
+	}
+	public String getCurrency() {
+		return currency;
+	}
+	public void setCurrency(String currency) {
+		this.currency = currency;
+	}
+	public String getPackagesJson() {
+		return packagesJson;
+	}
+	public void setPackagesJson(String packagesJson) {
+		this.packagesJson = packagesJson;
+	}
+	public String getMerchantId() {
+		return merchantId;
+	}
+	public void setMerchantId(String merchantId) {
+		this.merchantId = merchantId;
+	}
+	public String getStoreId() {
+		return storeId;
+	}
+	public void setStoreId(String storeId) {
+		this.storeId = storeId;
+	}
 	public Byte getSimulatePaid() {
 		return simulatePaid;
 	}
 	public void setSimulatePaid(Byte simulatePaid) {
 		this.simulatePaid = simulatePaid;
-	}
-	public Integer getTradeAmt() {
-		return tradeAmt;
-	}
-	public void setTradeAmt(Integer tradeAmt) {
-		this.tradeAmt = tradeAmt;
 	}
 	public String getPaymentType() {
 		return paymentType;
@@ -176,16 +264,6 @@ public class PaymentAttemptVO implements Serializable{
 	public void setCheckMacValue(String checkMacValue) {
 		this.checkMacValue = checkMacValue;
 	}
-	
-//	10300028：「訂單編號重覆，建立失敗，請返回商店頁面重新下單。」
-//	10300066：「交易付款結果待確認中，請勿出貨」，請至廠商管理後台確認已付款完成再出貨。
-//	10100248：「拒絕交易，請客戶聯繫發卡行確認原因」
-//	10100252：「額度不足，請客戶檢查卡片額度或餘額」
-//	10100254：「交易失敗，請客戶聯繫發卡行確認交易限制」
-//	10100251：「卡片過期，請客戶檢查卡片重新交易」
-//	10100255：「報失卡，請客戶更換卡片重新交易」
-//	10100256：「被盜用卡，請客戶更換卡片重新交易」
-	
 	public String getItemName() {
 		return itemName;
 	}
@@ -193,67 +271,98 @@ public class PaymentAttemptVO implements Serializable{
 		this.itemName = itemName;
 	}
 
+
 	// 送出前先 build 基本資訊
 	public static class Builder {
-		private String paymentAttemptStatus;
+		private PaymentAttemptStatus paymentAttemptStatus;
 		private OrderVO order;
-		private String merchantTradeNo;
-		private String merchantId;
+		private OrderProvider provider;
+		private String providerOrderId;
 		private Integer tradeAmt;
-//		private String paymentType;
-		private String tradeDate;
+		
+		// LinePay-specific（此處）
+		private String currency;
+		private String packagesJson;
+		private String providerTransactionId;
+		
+		// ECPay-specific（此處）
 		private String itemName;
+		private String tradeDate;
+		private String merchantId;
 
-		public Builder paymentAttemptStatus(String paymentAttemptStatus) {
+		// (1) Common 
+		public Builder paymentAttemptStatus(PaymentAttemptStatus paymentAttemptStatus) {
 			this.paymentAttemptStatus = paymentAttemptStatus;
 			return this;
 		}
-		
 		public Builder order(OrderVO order) {
 			this.order = order;
 			return this;
 		}
-
-		public Builder merchantTradeNo(String merchantTradeNo) {
-			this.merchantTradeNo = merchantTradeNo;
+		public Builder provider(OrderProvider provider) {
+			this.provider = provider;
 			return this;
 		}
-
+		public Builder providerOrderId(String providerOrderId) {
+			this.providerOrderId = providerOrderId;
+			return this;
+		}
+		public Builder tradeAmt(Integer tradeAmt) {
+			this.tradeAmt = tradeAmt;
+			return this;
+		}
+		// (2) LinePay-specific
+		public Builder currency(String currency) {
+			this.currency = currency;
+			return this;
+		}
+		public Builder packagesJson(String packagesJson) {
+			this.packagesJson = packagesJson;
+			return this;
+		}
+		public Builder providerTransactionId(String providerTransactionId) {
+			this.providerTransactionId = providerTransactionId;
+			return this;
+		}
+		// (3) ECPay-specific
+		public Builder itemName(String itemName) {
+			this.itemName = itemName;
+			return this;
+		}
+		public Builder tradeDate(String tradeDate) {
+			this.tradeDate = tradeDate;
+			return this;
+		}
 		public Builder merchantId(String merchantId) {
 			this.merchantId = merchantId;
 			return this;
 		}
 
-		public Builder tradeAmt(Integer tradeAmt) {
-			this.tradeAmt = tradeAmt;
-			return this;
-		}
-
-//		public Builder paymentType(String paymentType) {
-//			this.paymentType = paymentType;
-//			return this;
-//		}
-		
-		public Builder tradeDate(String tradeDate) {
-			this.tradeDate = tradeDate;
-			return this;
-		}
-		
-		public Builder itemName(String itemName) {
-			this.itemName = itemName;
-			return this;
-		}
-
-		public PaymentAttemptVO build() {
+		public PaymentAttemptVO buildECPay() {
 			PaymentAttemptVO vo = new PaymentAttemptVO();
 			vo.paymentAttemptStatus = paymentAttemptStatus;
 			vo.order = this.order;
-			vo.merchantTradeNo = this.merchantTradeNo;
-			vo.merchantId = this.merchantId;
+			vo.provider = this.provider;
+			vo.providerOrderId = this.providerOrderId;
 			vo.tradeAmt = this.tradeAmt;
-//			vo.paymentType = this.paymentType;
-			vo.tradeDate = this.tradeDate;
+			
 			vo.itemName = this.itemName;
+			vo.tradeDate = this.tradeDate;
+			vo.merchantId = this.merchantId;
+			return vo;
+		}
+		
+		public PaymentAttemptVO buildLinePay() {
+			PaymentAttemptVO vo = new PaymentAttemptVO();
+			vo.paymentAttemptStatus = paymentAttemptStatus;
+			vo.order = this.order;
+			vo.provider = this.provider;
+			vo.providerOrderId = this.providerOrderId;
+			vo.tradeAmt = this.tradeAmt;
+			
+			vo.currency = this.currency;
+			vo.packagesJson = this.packagesJson;
+			vo.providerTransactionId = this.providerTransactionId;
 			return vo;
 		}
 	}

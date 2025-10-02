@@ -3,209 +3,223 @@
 
 /* 所有 a */
 a {
-  color: #111;
-  text-decoration: none;
-  -webkit-transition: all 0.2s ease;
-  transition: all 0.2s ease;
-  outline: none;
+	color: #111;
+	text-decoration: none;
+	-webkit-transition: all 0.2s ease;
+	transition: all 0.2s ease;
+	outline: none;
 }
 
 /* 所有 分頁上 - 1400*470px 背景圖區 */
-.parallax-mirror > img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  object-position: center;
+.parallax-mirror>img {
+	width: 100%;
+	height: 100%;
+	object-fit: cover;
+	object-position: center;
 }
 
 .parallax-window {
-  width: 100%;
-  height: 470px;
-  /* 固定實際高度，取代 min-height */
-  position: relative;
-  overflow: hidden;
-  /* 多餘區域裁切 */
+	width: 100%;
+	height: 470px;
+	/* 固定實際高度，取代 min-height */
+	position: relative;
+	overflow: hidden;
+	/* 多餘區域裁切 */
 }
 
 /* 所有被 wow/aos/動畫類別控制的元素, 初始可見且不啟動動畫 */
 .wow {
-  visibility: visible !important;
+	visibility: visible !important;
 }
 
-.wow.animated,
-.wow.fadeIn {
-  animation: none !important;
+.wow.animated, .wow.fadeIn {
+	animation: none !important;
 }
 
 .strip_all_tour_list {
-  opacity: 1 !important;
-  transform: none !important;
+	opacity: 1 !important;
+	transform: none !important;
 }
 
 /* 所有 .col-lg-9 h3 */
-.col-lg-9 h3,
-.col-lg-3 h3 {
-  margin-bottom: 20px;
+.col-lg-9 h3, .col-lg-3 h3 {
+	margin-bottom: 20px;
+}
+
+/* 分頁"上一頁"左圓角 */
+.pagination .page-item:first-child .page-link {
+	border-top-right-radius: 0;
+	border-bottom-right-radius: 0;
+	border-top-left-radius: 0.4rem;
+	border-bottom-left-radius: 0.4rem;
+}
+
+/* 分頁"下一頁"右圓角 */
+.pagination .page-item:last-child .page-link {
+	border-top-left-radius: 0;
+	border-bottom-left-radius: 0;
+	border-top-right-radius: 0.4rem;
+	border-bottom-right-radius: 0.4rem;
 }
 
 /* ========================================================================= */
 /* header */
 #header-row {
-  margin-left: 0;
-  margin-right: -12%;
+	margin-left: 0;
+	margin-right: -12%;
 }
 
 a.cart_bt strong {
-  width: 40px;
-  height: 15px;
-  bottom: -12px;
-  right: -30px;
-  line-height: 15px;
-  border-radius: 15%;
+	width: 40px;
+	height: 15px;
+	bottom: -12px;
+	right: -30px;
+	line-height: 15px;
+	border-radius: 15%;
 }
 
 nav.col-md-9 {
-  display: flex;
+	display: flex;
 }
 
 #nav_icon_1 {
-  padding: 0 1%;
-  /* border: 1px solid yellow; */
-  margin-left: 4.5%;
-  width: 60%;
-  cursor: pointer;
+	padding: 0 1%;
+	/* border: 1px solid yellow; */
+	margin-left: 4.5%;
+	width: 60%;
+	cursor: pointer;
 }
 
-#nav_icon_1 > a {
-  color: #605f5f;
+#nav_icon_1>a {
+	color: #605f5f;
 }
 
-#nav_icon_1 > input {
-  width: 90%;
+#nav_icon_1>input {
+	width: 90%;
 }
 
 #nav_search {
-  padding: 1px 0px 1px 5px;
-  margin-left: 12px;
-  background: 0;
-  border: 1px solid silver;
-  border-radius: 15px;
+	padding: 1px 0px 1px 5px;
+	margin-left: 12px;
+	background: 0;
+	border: 1px solid silver;
+	border-radius: 15px;
 }
 
 #nav_search::placeholder {
-  color: rgb(200, 199, 199);
+	color: rgb(200, 199, 199);
 }
 
 #nav_search:focus {
-  border: 0;
-  outline: 2px solid gray;
+	border: 0;
+	outline: 2px solid gray;
 }
 
 #top_tools {
-  /* margin-bottom: 20px; */
+	/* margin-bottom: 20px; */
+	
 }
 
-#top_tools > li {
-  margin: 0 5px;
+#top_tools>li {
+	margin: 0 5px;
 }
 
-#top_tools > #nav_icon_4 {
-  margin: 0px;
+#top_tools>#nav_icon_4 {
+	margin: 0px;
 }
 
 /* ========================================================================= */
 /* header的搜尋 */
 /* 搜尋按鈕 */
-.search-overlay-menu > form {
-  top: 15%;
+.search-overlay-menu>form {
+	top: 15%;
 }
 
 .search-overlay-menu input[type="text"] {
-  height: 60%;
-  width: 70%;
-  font-size: 16px;
-  font-weight: 700;
-  border: 0;
-  border-radius: 15px;
-  padding-left: 15px;
-  outline: none;
-  box-shadow: none;
-  background: transparent !important;
-  border-bottom-color: #fff;
+	height: 60%;
+	width: 70%;
+	font-size: 16px;
+	font-weight: 700;
+	border: 0;
+	border-radius: 15px;
+	padding-left: 15px;
+	outline: none;
+	box-shadow: none;
+	background: transparent !important;
+	border-bottom-color: #fff;
 }
 
 /* 處理怪問題（選過去搜尋的內容變白色底） */
 .search-overlay-menu input[type="text"]:-webkit-autofill,
-.search-overlay-menu input[type="text"]:-webkit-autofill:focus,
-.search-overlay-menu input[type="text"]:-webkit-autofill:hover {
-  -webkit-box-shadow: 0 0 0 1000px rgba(0, 0, 0, 0.8) inset !important;
-  /* 模擬深色底 */
-  -webkit-text-fill-color: #ffffff !important;
-  caret-color: #ffffff;
+	.search-overlay-menu input[type="text"]:-webkit-autofill:focus,
+	.search-overlay-menu input[type="text"]:-webkit-autofill:hover {
+	-webkit-box-shadow: 0 0 0 1000px rgba(0, 0, 0, 0.8) inset !important;
+	/* 模擬深色底 */
+	-webkit-text-fill-color: #ffffff !important;
+	caret-color: #ffffff;
 }
 
 .search-overlay-menu input[type="text"]::placeholder {
-  color: #605f5f;
+	color: #605f5f;
 }
 
 .search-overlay-menu form button {
-  font-size: 24px;
-  right: 16%;
-  top: 6%;
+	font-size: 24px;
+	right: 16%;
+	top: 6%;
 }
 
 div#search_block_parent {
-  width: 60%;
-  height: 60%;
-  margin: 0 auto;
-  margin-top: 20vh;
+	width: 60%;
+	height: 60%;
+	margin: 0 auto;
+	margin-top: 20vh;
 }
 
-div#search_block_parent > h3 {
-  text-align: left;
-  padding-left: 8vw;
-  color: #ddd;
+div#search_block_parent>h3 {
+	text-align: left;
+	padding-left: 8vw;
+	color: #ddd;
 }
 
-div#search_block_parent > hr {
-  border: 1px solid #333;
-  width: 80%;
-  margin: 5vh auto;
+div#search_block_parent>hr {
+	border: 1px solid #333;
+	width: 80%;
+	margin: 5vh auto;
 }
 
 div#search_filter_block {
-  margin: 5vh 0;
+	margin: 5vh 0;
 }
 
 /* ===================================================================================有改過 */
-div#search_filter_block > button {
-  /* margin: 0vh 0.8vw 5vh 0;
+div#search_filter_block>button {
+	/* margin: 0vh 0.8vw 5vh 0;
 	padding: 0.25vw 0.5vw 0.25vw 0.25vw; */
-  /* height: 4vh; */
-  border-radius: 25px;
-
-  display: inline-block;
-  margin: 0 5px;
-  padding: 5px 16px;
+	/* height: 4vh; */
+	border-radius: 25px;
+	display: inline-block;
+	margin: 0 5px;
+	padding: 5px 16px;
 }
 
 div.search_block {
-  width: 75%;
-  margin: 2vh auto;
-  /* border: 10px solid green; */
+	width: 75%;
+	margin: 2vh auto;
+	/* border: 10px solid green; */
 }
 
-div.search_block > a {
-  border: 1.5px solid gray;
-  width: 15%;
-  height: 15%;
-  border-radius: 15px;
-  font-size: 1vw;
-  line-height: 2vw;
-  margin: 0 0.25vw;
-  margin-top: 1vw;
-  display: inline-block;
-  color: #fff;
+div.search_block>a {
+	border: 1.5px solid gray;
+	width: 15%;
+	height: 15%;
+	border-radius: 15px;
+	font-size: 1vw;
+	line-height: 2vw;
+	margin: 0 0.25vw;
+	margin-top: 1vw;
+	display: inline-block;
+	color: #fff;
 }
 
 /* ========================================================================= */
@@ -215,21 +229,21 @@ div.search_block > a {
 
 /* 展覽卡片(方) */
 .tour_container .tour_title {
-  padding: 15px 20px;
-  position: relative;
-  height: 75px;
+	padding: 15px 20px;
+	position: relative;
+	height: 75px;
 }
 
 .tour_container .tour_title h3 {
-  margin: 0;
-  font-size: 18px;
-  text-transform: uppercase;
-  font-weight: 400;
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  /* 限制 2 行 */
-  -webkit-box-orient: vertical;
-  overflow: hidden;
+	margin: 0;
+	font-size: 18px;
+	text-transform: uppercase;
+	font-weight: 400;
+	display: -webkit-box;
+	-webkit-line-clamp: 2;
+	/* 限制 2 行 */
+	-webkit-box-orient: vertical;
+	overflow: hidden;
 }
 
 /* ========================================================================= */
@@ -239,96 +253,96 @@ div.search_block > a {
 
 /* 展覽卡片(長) */
 .tour_list_desc {
-  padding: 25px;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
+	padding: 25px;
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
 }
 
 .tour_list_desc div {
-  padding: auto;
+	padding: auto;
 }
 
 .tour_list_desc h3 {
-  margin-bottom: 20px;
-  font-size: 20px;
-  overflow: hidden;
-  white-space: nowrap;
-  text-overflow: ellipsis;
+	margin-bottom: 20px;
+	font-size: 20px;
+	overflow: hidden;
+	white-space: nowrap;
+	text-overflow: ellipsis;
 }
 
 .tour_list_desc p {
-  margin-bottom: 15px;
+	margin-bottom: 15px;
 }
 
 .price_list {
-/*   display: flex; */
-  align-items: center;
-  justify-content: flex-end;
-  height: 220px;
-  font-size: 18px;
-  color: #e74c3c;
-/*   margin-left: -15px; */
-  text-align: right;
-  white-space: nowrap;
-/*   padding-right: 12px; */
+	/*   display: flex; */
+	align-items: center;
+	justify-content: flex-end;
+	height: 220px;
+	font-size: 18px;
+	color: #e74c3c;
+	/*   margin-left: -15px; */
+	text-align: right;
+	white-space: nowrap;
+	/*   padding-right: 12px; */
 }
 
 .price_list .currency {
-  font-size: 0.9em;
-  margin-right: 0.25em;
+	font-size: 0.9em;
+	margin-right: 0.25em;
 }
 
 /* 為你推薦區 */
 .col-lg-3 .recommend {
-  background: #fff;
-  -webkit-border-radius: 3px;
-  -moz-border-radius: 3px;
-  border-radius: 3px;
-  margin-bottom: 25px;
-  padding: 20px;
-  position: relative;
-  text-align: center;
-  border: 1px solid #ddd;
-  display: flex;
-  flex-direction: column;
-  gap: 15px;
+	background: #fff;
+	-webkit-border-radius: 3px;
+	-moz-border-radius: 3px;
+	border-radius: 3px;
+	margin-bottom: 25px;
+	padding: 20px;
+	position: relative;
+	text-align: center;
+	border: 1px solid #ddd;
+	display: flex;
+	flex-direction: column;
+	gap: 15px;
 }
 
 .col-lg-3 .recommend_item {
-  display: block;
-  padding: 10px 0;
-  text-decoration: none;
-  color: inherit;
-  border-bottom: 1px solid #ddd;
+	display: block;
+	padding: 10px 0;
+	text-decoration: none;
+	color: inherit;
+	border-bottom: 1px solid #ddd;
 }
 
 .col-lg-3 .recommend_item:last-child {
-  border-bottom: none;
+	border-bottom: none;
 }
 
 .col-lg-3 .recommend_item img {
-  width: 100%;
-  border-radius: 6px;
-  object-fit: cover;
+	width: 100%;
+	border-radius: 6px;
+	object-fit: cover;
 }
 
 .col-lg-3 .recommend_item h4 {
-  font-size: 14px;
-  font-weight: 600;
-  margin: 0 0 5px;
-  line-height: 1.4;
-  text-align: left;
-  overflow: hidden;
-  white-space: nowrap;
-  text-overflow: ellipsis;
+	font-size: 14px;
+	font-weight: 600;
+	margin: 0 0 5px;
+	line-height: 1.4;
+	text-align: left;
+	overflow: hidden;
+	white-space: nowrap;
+	text-overflow: ellipsis;
 }
 
 .col-lg-3 .recommend_item p {
-  font-size: 13px;
-  color: #666;
-  margin: 0;
-  text-align: left;
+	font-size: 13px;
+	color: #666;
+	margin: 0;
+	text-align: left;
 }
 
 /* ========================================================================= */
@@ -337,55 +351,60 @@ div.search_block > a {
 
 /* 熱門/最新切換 */
 .seg {
-  display: inline-grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 0;
-  position: relative;
-  padding: 2px;
-  background: #eee;
-  border-radius: 9999px;
-  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.12);
-  width: 200px;
-  height: 40px;
+	display: inline-grid;
+	grid-template-columns: 1fr 1fr;
+	gap: 0;
+	position: relative;
+	padding: 2px;
+	background: #eee;
+	border-radius: 9999px;
+	box-shadow: 0 6px 16px rgba(0, 0, 0, 0.12);
+	width: 200px;
+	height: 40px;
 }
 
 .seg input {
-  position: absolute;
-  inline-size: 1px;
-  block-size: 1px;
-  margin: -1px;
-  padding: 0;
-  border: 0;
-  clip: rect(0 0 0 0);
-  overflow: hidden;
+	position: absolute;
+	inline-size: 1px;
+	block-size: 1px;
+	margin: -1px;
+	padding: 0;
+	border: 0;
+	clip: rect(0, 0, 0, 0);
+	overflow: hidden;
 }
 
 .col-lg-9 .seg-wrap {
-  display: flex;
-  justify-content: center;
-  margin-bottom: 40px;
+	display: flex;
+	justify-content: center;
+	margin-bottom: 40px;
+}
+
+.col-lg-8 .seg-wrap {
+	display: flex;
+	justify-content: center;
+	margin-bottom: 40px;
 }
 
 .seg-link {
-  padding: 0.5rem 1.25rem;
-  border-radius: 9999px;
-  text-align: center;
-  color: #111;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  line-height: 1;
+	padding: 0.5rem 1.25rem;
+	border-radius: 9999px;
+	text-align: center;
+	color: #111;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	line-height: 1;
 }
 
-.seg-link[aria-current="page"],
-.seg-link.is-active {
-  background: #e04f67;
-  color: #fff;
+.seg-link[aria-current="page"], .seg-link.is-active {
+	background: #e04f67;
+	color: #fff;
 }
 
 .seg .seg-link:hover {
-  font-size: 16px;
-  font-weight: 700;
+	font-size: 16px;
+	font-weight: 700;
 }
 
 /* ========================================================================= */
@@ -393,43 +412,41 @@ div.search_block > a {
 
 /* 排序分頁:熱門, 評價, 最新上架, 離我最近 */
 .sort-tabs {
-  display: flex;
-  gap: 24px;
-  border-bottom: none;
-  margin-bottom: 0;
-  padding-bottom: 0;
+	display: flex;
+	gap: 24px;
+	border-bottom: none;
+	margin-bottom: 0;
+	padding-bottom: 0;
 }
 
 .sort-tab {
-  border: none;
-  /* 去掉預設邊框 */
-  padding: 0.5rem 0.5rem;
-  position: relative;
-  padding-bottom: 10px;
-  color: #666;
-  text-decoration: none;
-  transition: color 0.2s ease;
+	border: none;
+	/* 去掉預設邊框 */
+	padding: 0.5rem 0.5rem;
+	position: relative;
+	padding-bottom: 10px;
+	color: #666;
+	text-decoration: none;
+	transition: color 0.2s ease;
 }
 
 .sort-tab:hover {
-  color: #111;
+	color: #111;
 }
 
-.sort-tab[aria-current="true"],
-.sort-tab.is-active {
-  border-bottom: 1px solid #ff5a5f;
+.sort-tab[aria-current="true"], .sort-tab.is-active {
+	border-bottom: 1px solid #ff5a5f;
 }
 
-.sort-tab[aria-current="true"]::after,
-.sort-tab.is-active::after {
-  content: "";
-  position: absolute;
-  left: 0;
-  right: 0;
-  bottom: -1px;
-  height: 3px;
-  background: #ff6d3a;
-  border-radius: 2px;
+.sort-tab[aria-current="true"]::after, .sort-tab.is-active::after {
+	content: "";
+	position: absolute;
+	left: 0;
+	right: 0;
+	bottom: -1px;
+	height: 3px;
+	background: #ff6d3a;
+	border-radius: 2px;
 }
 
 /* ========================================================================= */
@@ -437,245 +454,265 @@ div.search_block > a {
 
 /* 展商資訊區 */
 .recommend-sidebar {
-  background-color: #fff;
-  border: 1px solid #ededed;
-  padding: 20px 25px;
-  margin-bottom: 25px;
-  border-radius: 6px;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+	background-color: #fff;
+	border: 1px solid #ededed;
+	padding: 20px 25px;
+	margin-bottom: 25px;
+	border-radius: 6px;
+	box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
 }
 
 .recommend-sidebar h4 {
-  margin-bottom: 15px;
-  font-size: 16px;
-  font-weight: 600;
+	margin-bottom: 15px;
+	font-size: 16px;
+	font-weight: 600;
 }
 
 .recommend-sidebar .contact-box p {
-  font-size: 14px;
-  display: flex;
-  align-items: flex-start;
-  gap: 8px;
-  flex-wrap: nowrap;
-  white-space: normal;
-  margin: 0 0 8px;
+	font-size: 14px;
+	display: flex;
+	align-items: flex-start;
+	gap: 8px;
+	flex-wrap: nowrap;
+	white-space: normal;
+	margin: 0 0 8px;
 }
 
 .sticky-sidebar {
-  position: sticky;
-  top: 70px;
+	position: sticky;
+	top: 70px;
 }
 
 .recommend-sidebar .sidebar-block {
-  padding: 15px 0;
-  border-bottom: 1px solid #ddd;
+	padding: 15px 0;
+	border-bottom: 1px solid #ddd;
 }
 
 .recommend-sidebar .sidebar-block:last-child {
-  border-bottom: none;
+	border-bottom: none;
 }
 
 .recommend-sidebar h3 {
-  margin-bottom: 10px;
+	margin-bottom: 10px;
 }
 
 .recommend-sidebar p {
-  margin-bottom: 8px;
-  line-height: 1.6;
-  text-align: justify;
-  text-justify: inter-ideograph;
+	margin-bottom: 8px;
+	line-height: 1.6;
+	text-align: justify;
+	text-justify: inter-ideograph;
 }
 
 .recommend-sidebar .company-name {
-  font-size: 18px;
-  color: #333;
-  margin-bottom: 15px;
-  font-weight: 600;
+	font-size: 18px;
+	color: #333;
+	margin-bottom: 15px;
+	font-weight: 600;
 }
 
 .recommend-sidebar .button_intro {
-  width: 100%;
-  border-radius: 30px;
-  padding: 8px 20px;
-  margin-top: 20px;
-  display: inline-block;
-  text-align: center;
+	width: 100%;
+	border-radius: 30px;
+	padding: 8px 20px;
+	margin-top: 20px;
+	display: inline-block;
+	text-align: center;
 }
 
 .recommend-sidebar .contact-box p i {
-  flex: 0 0 auto;
-  line-height: 1.6;
-  margin-top: 2px;
+	flex: 0 0 auto;
+	line-height: 1.6;
+	margin-top: 2px;
 }
 
 .recommend-sidebar .contact-box p span {
-  flex: 1 1 auto;
-  min-width: 0;
-  overflow-wrap: anywhere;
-  word-break: break-word;
-  line-height: 1.6;
+	flex: 1 1 auto;
+	min-width: 0;
+	overflow-wrap: anywhere;
+	word-break: break-word;
+	line-height: 1.6;
 }
 
 /* ========================================================================= */
 /* 地圖探索頁				map_explore.html */
+.gm-style-iw,
+.gm-style-iw-c {
+  max-width: 310px !important;
+  max-height: none !important;
+}
+
 .marker_info {
-  width: 280px;
-  height: 360px;
-  border-radius: 5px;
-  text-align: center;
-  background-color: white !important;
-  position: relative;
-  z-index: 9999999;
-  font-family: "Montserrat", Arial, sans-serif;
+	width: auto;
+	height: auto;
+	border-radius: 5px;
+	text-align: center;
+	background-color: white !important;
+	position: relative;
+	z-index: 9999999;
+	font-family: "Montserrat", Arial, sans-serif;
+	max-width: 300px;     /* 卡片最大寬度 */
+  	word-wrap: break-word; /* 避免文字超出 */
 }
 
 .marker_info img {
-  display: block;
-  -webkit-border-top-left-radius: 3px;
-  -webkit-border-top-right-radius: 3px;
-  -moz-border-radius-topleft: 3px;
-  -moz-border-radius-topright: 3px;
-  border-top-left-radius: 3px;
-  border-top-right-radius: 3px;
+	display: block;
+	-webkit-border-top-left-radius: 3px;
+	-webkit-border-top-right-radius: 3px;
+	-moz-border-radius-topleft: 3px;
+	-moz-border-radius-topright: 3px;
+	border-top-left-radius: 3px;
+	border-top-right-radius: 3px;
+	width: 100%;          /* 讓圖片跟著卡片寬度縮放 */
+  	height: auto;         /* 維持比例 */
+  	object-fit: cover;    /* 裁切方式，避免圖片變形 */
+  	border-radius: 8px;   /* 視覺更好看，可選 */
 }
 
+.marker_info h3,
+.marker_info p {
+  white-space: normal;      /* 允許換行 */
+  word-wrap: break-word;    /* 長單字或網址強制換行 */
+  overflow-wrap: break-word;/* 現代瀏覽器支援 */
+  text-align: center;       /* (可選) 置中看起來更整齊 */
+}
+
+
 .marker_info h3 {
-  font-size: 16px;
-  font-weight: 600;
-  line-height: 18px;
-  text-transform: uppercase;
-  margin-bottom: 20px;
-  padding: 0px 20px;
+	font-size: 16px;
+	font-weight: 600;
+	line-height: 18px;
+	text-transform: uppercase;
+	margin-bottom: 20px;
+	padding: 0px 20px;
 }
 
 .marker_info span {
-  display: block;
-  margin: 10px 0;
-  padding: 0px 20px;
-  font-size: 12px;
-  line-height: 16px;
-  color: #333;
-  margin-bottom: 0;
+	display: block;
+	margin: 10px 0;
+	padding: 0px 20px;
+	font-size: 12px;
+	line-height: 16px;
+	color: #333;
+	margin-bottom: 0;
 }
 
 .marker_tools {
-  margin: 10px 0 20px 0;
+	margin: 10px 0 20px 0;
 }
 
 /* ========================================================= */
 /* 會員中心 				admin.html */
 /* 收藏頁籤 */
 .page-link {
-  color: #555;
-  padding: 0.5rem 0.75rem;
-  line-height: 1.5;
-  border: 1px solid #dee2e6;
-  box-sizing: border-box;
+	color: #555;
+	padding: 0.5rem 0.75rem;
+	line-height: 1.5;
+	border: 1px solid #dee2e6;
+	box-sizing: border-box;
 }
 
 .page-item {
-  margin: 0;
+	margin: 0;
 }
 
 .page-item.active .page-link {
-  font-size: 16px;
-  /* z-index: 1; */
-  color: #fff;
-  background-color: #555;
-  border-color: #555;
+	font-size: 16px;
+	/* z-index: 1; */
+	color: #fff;
+	background-color: #555;
+	border-color: #555;
 }
 
 .page-item .page-link:hover {
-  background-color: #555;
-  border-color: #555;
-  color: #fff;
+	background-color: #555;
+	border-color: #555;
+	color: #fff;
 }
 
 /* ========================================================= */
 /* 通知頁籤 */
 #cat_nav a {
-  position: relative;
-  padding-right: 56px;
-  color: #1f2937;
-  font-weight: 600;
+	position: relative;
+	padding-right: 56px;
+	color: #1f2937;
+	font-weight: 600;
 }
 
-#cat_nav a:hover,
-#cat_nav a.active {
-  color: #fd7e14;
+#cat_nav a:hover, #cat_nav a.active {
+	color: #fd7e14;
 }
 
 #cat_nav a::after {
-  position: absolute;
-  right: 16px;
-  top: 50%;
-  transform: translateY(-50%);
-  font-size: 18px;
-  color: #9aa4b2;
+	position: absolute;
+	right: 16px;
+	top: 50%;
+	transform: translateY(-50%);
+	font-size: 18px;
+	color: #9aa4b2;
 }
 
 ul#cat_nav li a:after {
-  /* font-family: "fontello"; */
-  content: "";
-  position: absolute;
-  right: 15px;
-  top: 15px;
+	/* font-family: "fontello"; */
+	content: "";
+	position: absolute;
+	right: 15px;
+	top: 15px;
 }
 
 #cat_nav .notif-badge {
-  position: absolute;
-  right: 40px;
-  top: 50%;
-  transform: translateY(-50%);
-  min-width: 22px;
-  padding: 2px 6px;
-  border-radius: 999px;
-  font-size: 12px;
-  line-height: 1;
-  text-align: center;
-  font-weight: 700;
-  background: #dc3545;
-  color: #fff;
-  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.9);
+	position: absolute;
+	right: 40px;
+	top: 50%;
+	transform: translateY(-50%);
+	min-width: 22px;
+	padding: 2px 6px;
+	border-radius: 999px;
+	font-size: 12px;
+	line-height: 1;
+	text-align: center;
+	font-weight: 700;
+	background: #dc3545;
+	color: #fff;
+	box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.9);
 }
 
 #section-3 {
-  gap: 30px;
+	gap: 30px;
 }
 
 #section-3 aside.col-lg-3 {
-  flex: 0 0 250px;
-  max-width: 250px;
+	flex: 0 0 250px;
+	max-width: 250px;
 }
 
 #section-3 #faq {
-  flex: 1;
-  min-width: 0;
-  padding-left: 20px;
+	flex: 1;
+	min-width: 0;
+	padding-left: 20px;
 }
 
 #section-3 #faq table {
-  width: 100% !important;
-  margin: 0;
-  border-collapse: collapse;
+	width: 100% !important;
+	margin: 0;
+	border-collapse: collapse;
 }
 
 /* 未讀通知樣式 */
 #section-3 #faq .card.notification-unread {
-  background-color: #fff4e5 !important;
-  border-left: 4px solid #fd7e14 !important;
+	background-color: #fff4e5 !important;
+	border-left: 4px solid #fd7e14 !important;
 }
 
 /* 已讀通知樣式 */
 #section-3 #faq .notification-read {
-  background-color: #ffffff;
-  border-left: 4px solid #dddddd;
-  opacity: 0.92;
+	background-color: #ffffff;
+	border-left: 4px solid #dddddd;
+	opacity: 0.92;
 }
 
 #faq .card:hover {
-  background-color: #fff7f0 !important;
-  transition: background-color 0.2s;
+	background-color: #fff7f0 !important;
+	transition: background-color 0.2s;
 }
 
 /* ========================================================================= */
@@ -683,448 +720,445 @@ ul#cat_nav li a:after {
 
 /* 日期篩選彈窗 */
 .date-filter-popup {
-  display: none;
-  position: absolute;
-  width: 340px;
-  background: #fff;
-  border-radius: 12px;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
-  padding: 16px;
-  z-index: 3000;
+	display: none;
+	position: absolute;
+	width: 340px;
+	background: #fff;
+	border-radius: 12px;
+	box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+	padding: 16px;
+	z-index: 3000;
 }
 
 /* 頂部快速選擇 */
 .date-filter-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 10px;
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	margin-bottom: 10px;
 }
 
 .date-filter-header .btn-clear {
-  background: none;
-  border: 1px solid #ff5e3a;
-  color: #ff5e3a;
-  padding: 4px 10px;
-  border-radius: 16px;
-  cursor: pointer;
-  font-size: 13px;
+	background: none;
+	border: 1px solid #ff5e3a;
+	color: #ff5e3a;
+	padding: 4px 10px;
+	border-radius: 16px;
+	cursor: pointer;
+	font-size: 13px;
 }
 
 .date-filter-header .quick-select button {
-  border: 1px solid #ccc;
-  padding: 4px 10px;
-  margin-left: 6px;
-  border-radius: 16px;
-  background: #fff;
-  cursor: pointer;
-  font-size: 13px;
+	border: 1px solid #ccc;
+	padding: 4px 10px;
+	margin-left: 6px;
+	border-radius: 16px;
+	background: #fff;
+	cursor: pointer;
+	font-size: 13px;
 }
 
 /* 日曆主體 */
 .calendar-container {
-  margin-top: 8px;
+	margin-top: 8px;
 }
 
 .calendar-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  font-weight: bold;
-  margin-bottom: 8px;
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	font-weight: bold;
+	margin-bottom: 8px;
 }
 
 .calendar-header button {
-  border: none;
-  background: none;
-  font-size: 20px;
-  cursor: pointer;
+	border: none;
+	background: none;
+	font-size: 20px;
+	cursor: pointer;
 }
 
 /* 日曆表格 */
 .calendar-table {
-  width: 100%;
-  border-collapse: collapse;
-  text-align: center;
+	width: 100%;
+	border-collapse: collapse;
+	text-align: center;
 }
 
 .calendar-table th {
-  font-size: 14px;
-  color: #666;
-  padding-bottom: 4px;
+	font-size: 14px;
+	color: #666;
+	padding-bottom: 4px;
 }
 
 .calendar-table td {
-  padding: 6px;
-  cursor: pointer;
-  border-radius: 50%;
-  transition: all 0.2s;
+	padding: 6px;
+	cursor: pointer;
+	border-radius: 50%;
+	transition: all 0.2s;
 }
 
 .calendar-table td:hover {
-  background: #ffebe6;
+	background: #ffebe6;
 }
 
 .calendar-table td.active {
-  background: #ff5e3a;
-  color: white;
+	background: #ff5e3a;
+	color: white;
 }
 
 /* 確認按鈕 */
 .date-filter-footer {
-  margin-top: 12px;
-  text-align: right;
+	margin-top: 12px;
+	text-align: right;
 }
 
 .btn-confirm {
-  background: #e74c3c;
-  color: white;
-  padding: 6px 16px;
-  border: none;
-  border-radius: 6px;
-  cursor: pointer;
+	background: #e74c3c;
+	color: white;
+	padding: 6px 16px;
+	border: none;
+	border-radius: 6px;
+	cursor: pointer;
 }
 
 /* 日期範圍高亮 */
 .calendar-table td.in-range {
-  background: #f65c46;
-  color: #fff;
-  border-radius: 0;
+	background: #f65c46;
+	color: #fff;
+	border-radius: 0;
 }
 
 /* 範圍開始 */
 .calendar-table td.range-start {
-  background: #f65c46;
-  color: #fff;
-  border-radius: 20px 0 0 20px;
+	background: #f65c46;
+	color: #fff;
+	border-radius: 20px 0 0 20px;
 }
 
 /* 範圍結束 */
 .calendar-table td.range-end {
-  background: #f65c46;
-  color: #fff;
-  border-radius: 0 20px 20px 0;
+	background: #f65c46;
+	color: #fff;
+	border-radius: 0 20px 20px 0;
 }
 
 /* 區域篩選彈窗 */
 .region-filter-popup {
-  display: none;
-  position: absolute;
-  min-width: 280px;
-  background: #fff;
-  border-radius: 12px;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
-  padding: 16px;
-  z-index: 2000;
-  font-family: "Microsoft JhengHei", sans-serif;
+	display: none;
+	position: absolute;
+	min-width: 280px;
+	background: #fff;
+	border-radius: 12px;
+	box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+	padding: 16px;
+	z-index: 2000;
+	font-family: "Microsoft JhengHei", sans-serif;
 }
 
 /* 標題區：清除設定 + 全選 */
 .region-filter-header {
-  display: flex;
-  justify-content: space-between;
-  /* 左右分開 */
-  align-items: center;
-  margin-bottom: 10px;
+	display: flex;
+	justify-content: space-between;
+	/* 左右分開 */
+	align-items: center;
+	margin-bottom: 10px;
 }
 
 /* 清除設定 */
 .btn-clear {
-  border: 1px solid #f65c46;
-  background: #fff;
-  color: #f65c46;
-  padding: 4px 12px;
-  border-radius: 20px;
-  cursor: pointer;
-  font-size: 13px;
+	border: 1px solid #f65c46;
+	background: #fff;
+	color: #f65c46;
+	padding: 4px 12px;
+	border-radius: 20px;
+	cursor: pointer;
+	font-size: 13px;
 }
 
 /* 全選 */
 .btn-all {
-  border: 1px solid #bbb;
-  background: #fff;
-  padding: 4px 12px;
-  border-radius: 20px;
-  cursor: pointer;
-  font-size: 13px;
+	border: 1px solid #bbb;
+	background: #fff;
+	padding: 4px 12px;
+	border-radius: 20px;
+	cursor: pointer;
+	font-size: 13px;
 }
 
 /* 區域選項容器 */
 .region-options {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  /* 一排三個 */
-  gap: 10px 12px;
-  /* 上下10px、左右12px間距 */
-  margin-bottom: 12px;
+	display: grid;
+	grid-template-columns: repeat(3, 1fr);
+	/* 一排三個 */
+	gap: 10px 12px;
+	/* 上下10px、左右12px間距 */
+	margin-bottom: 12px;
 }
 
 /* 區域按鈕樣式 */
 .region-btn {
-  padding: 6px 0;
-  /* 上下間距即可，不用左右padding，讓寬度自動填滿 */
-  width: 100%;
-  /* 讓按鈕等寬 */
-  border: 1px solid #ddd;
-  border-radius: 20px;
-  background: #fff;
-  cursor: pointer;
-  font-size: 14px;
-  text-align: center;
-  transition: all 0.2s;
+	padding: 6px 0;
+	/* 上下間距即可，不用左右padding，讓寬度自動填滿 */
+	width: 100%;
+	/* 讓按鈕等寬 */
+	border: 1px solid #ddd;
+	border-radius: 20px;
+	background: #fff;
+	cursor: pointer;
+	font-size: 14px;
+	text-align: center;
+	transition: all 0.2s;
 }
 
 .region-btn.active {
-  background: #f65c46;
-  color: #fff;
-  border-color: #f65c46;
+	background: #f65c46;
+	color: #fff;
+	border-color: #f65c46;
 }
 
 /* 確認按鈕 */
 .region-footer {
-  margin-top: 15px;
-  text-align: right;
+	margin-top: 15px;
+	text-align: right;
 }
 
 .btn-confirm {
-  background: #f65c46;
-  color: white;
-  padding: 6px 16px;
-  border: none;
-  border-radius: 6px;
-  cursor: pointer;
+	background: #f65c46;
+	color: white;
+	padding: 6px 16px;
+	border: none;
+	border-radius: 6px;
+	cursor: pointer;
 }
 
 #searchEcho {
-  margin-top: 10px;
-  margin-bottom: 12px;
-  display: none;
-  /* 預設隱藏 */
+	margin-top: 10px;
+	margin-bottom: 12px;
+	display: none;
+	/* 預設隱藏 */
 }
 
 #searchEcho small {
-  font-size: 13px;
-  color: #fff;
+	font-size: 13px;
+	color: #fff;
 }
 
 #searchEcho span {
-  color: #fff;
+	color: #fff;
 }
 
 /* ===== 整體版面調整 ===== */
 #filtersBar .card-body {
-  padding: 1.25rem 1.25rem;
+	padding: 1.25rem 1.25rem;
 }
 
 #filtersForm .form-label {
-  color: #444;
-  font-weight: 600;
+	color: #444;
+	font-weight: 600;
 }
 
 /* 區域複選：橫向排列、間距一致、游標好點 */
 #regionGroup {
-  gap: 0.75rem;
+	gap: 0.75rem;
 }
 
 #regionGroup .form-check {
-  display: inline-flex;
-  align-items: center;
-  margin: 0;
+	display: contents;
+	align-items: center;
+	margin: 0;
 }
 
 #regionGroup .form-check-input {
-  cursor: pointer;
+	cursor: pointer;
 }
 
 #regionGroup .form-check-label {
-  cursor: pointer;
-  margin-left: 0.35rem;
+	cursor: pointer;
+	margin-left: 0.8rem;
 }
 
 /* 自訂重點色（調整為你的品牌色） */
 :root {
-  --brand-500: #e04f67;
-  --brand-100: #fde4e9;
+	--brand-500: #e04f67;
+	--brand-100: #fde4e9;
 }
 
 /* 支援的瀏覽器用 accent-color 改勾選色；不支援時保持預設色 */
 #regionGroup .form-check-input {
-  accent-color: var(--brand-500);
-  margin-left: 15px;
+	accent-color: var(--brand-500);
+	margin-left: 15px;
 }
 
 /* 複選 hover 視覺與可點區更大 */
 #regionGroup .form-check:hover .form-check-label {
-  text-decoration: underline;
-  text-underline-offset: 2px;
+	text-decoration: underline;
+	text-underline-offset: 2px;
 }
 
 /* ===== 日期區間輸入與彈窗 ===== */
 #dateRangeInput {
-  height: 38px;
-  text-align: left;
-  /* 亦可改 right，看你習慣 */
-  border-color: #e5e5e5;
-  transition: box-shadow 0.2s, border-color 0.2s;
+	height: 38px;
+	text-align: left;
+	/* 亦可改 right，看你習慣 */
+	border-color: #e5e5e5;
+	transition: box-shadow 0.2s, border-color 0.2s;
 }
 
 #dateRangeInput:focus {
-  border-color: var(--brand-500);
-  box-shadow: 0 0 0 0.2rem rgba(224, 79, 103, 0.15);
+	border-color: var(--brand-500);
+	box-shadow: 0 0 0 0.2rem rgba(224, 79, 103, 0.15);
 }
 
 #dateRangeInput:focus-visible {
-  outline: none;
+	outline: none;
 }
 
 #dateRangeBox {
-  min-height: 38px;
+	min-height: 38px;
 }
 
 /* 彈窗尺寸與陰影 */
 #datePopup.date-popup {
-  right: 0;
-  top: calc(100% + 0.5rem);
-  width: 320px;
-  background: #fff;
-  border: 1px solid #e5e5e5;
-  border-radius: 0.5rem;
-  padding: 0.75rem;
-  z-index: 1050;
-  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.12), 0 2px 8px rgba(0, 0, 0, 0.06);
+	right: 0;
+	top: calc(100% + 0.5rem);
+	width: 320px;
+	background: #fff;
+	border: 1px solid #e5e5e5;
+	border-radius: 0.5rem;
+	padding: 0.75rem;
+	z-index: 1050;
+	box-shadow: 0 10px 24px rgba(0, 0, 0, 0.12), 0 2px 8px
+		rgba(0, 0, 0, 0.06);
 }
 
 /* 月曆桌面對齊、手機寬度自適應 */
-@media (max-width: 576px) {
-  #datePopup.date-popup {
-    right: auto;
-    left: 0;
-    width: 100%;
-  }
+@media ( max-width : 576px) {
+	#datePopup.date-popup {
+		right: auto;
+		left: 0;
+		width: 100%;
+	}
 }
 
 /* 月曆表格風格 */
 .calendar-table {
-  table-layout: fixed;
+	table-layout: fixed;
 }
 
-.calendar-table th,
-.calendar-table td {
-  width: 14.285%;
-  text-align: center;
+.calendar-table th, .calendar-table td {
+	width: 14.285%;
+	text-align: center;
 }
 
 .calendar-table td {
-  cursor: pointer;
-  user-select: none;
-  border-radius: 0.375rem;
-  padding: 0.5rem 0;
+	cursor: pointer;
+	user-select: none;
+	border-radius: 0.375rem;
+	padding: 0.5rem 0;
 }
 
 .calendar-table td:hover {
-  background: #f7f7f7;
+	background: #f7f7f7;
 }
 
-.calendar-table td.range-start,
-.calendar-table td.range-end {
-  background: var(--brand-500);
-  color: #fff;
+.calendar-table td.range-start, .calendar-table td.range-end {
+	background: var(--brand-500);
+	color: #fff;
 }
 
 .calendar-table td.in-range {
-  background: var(--brand-100);
+	background: var(--brand-100);
 }
 
 /* 彈窗頂部控制列 */
 .date-header .btn {
-  line-height: 1;
+	line-height: 1;
 }
 
 /* ===== 回顯區 ===== */
 #fbSearchEcho small {
-  color: #666;
+	color: #666;
 }
 
 #fbSearchEcho small span {
-  color: #222;
+	color: #222;
 }
 
 /* ===== 排序 Segments（選配） ===== */
 .sort-tabs {
-  display: inline-flex;
-  gap: 1.25rem;
+	display: inline-flex;
+	gap: 1.25rem;
 }
 
 .sort-tabs .sort-tab {
-  color: #666;
-  text-decoration: none;
-  padding-bottom: 0.25rem;
-  border-bottom: 2px solid transparent;
+	color: #666;
+	text-decoration: none;
+	padding-bottom: 0.25rem;
+	border-bottom: 2px solid transparent;
 }
 
 .sort-tabs .sort-tab.is-active {
-  color: var(--brand-500);
-  border-bottom-color: var(--brand-500);
+	color: var(--brand-500);
+	border-bottom-color: var(--brand-500);
 }
 
 .sort-tabs .sort-tab:hover {
-  color: #111;
+	color: #111;
 }
 
 /* <filtersBar 專用 CSS（不影響 Search Menu）  */
-
 #fb-dateRangeBox {
-  min-height: 38px;
+	min-height: 38px;
 }
 
 #fb-datePopup.date-popup {
-  position: absolute;
-  right: 0;
-  top: calc(100% + 0.5rem);
-  width: 320px;
-  background: #fff;
-  border: 1px solid #e5e5e5;
-  border-radius: 0.5rem;
-  padding: 0.75rem;
-  z-index: 1050;
-  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.12), 0 2px 8px rgba(0, 0, 0, 0.06);
+	position: absolute;
+	right: 0;
+	top: calc(100% + 0.5rem);
+	width: 320px;
+	background: #fff;
+	border: 1px solid #e5e5e5;
+	border-radius: 0.5rem;
+	padding: 0.75rem;
+	z-index: 1050;
+	box-shadow: 0 10px 24px rgba(0, 0, 0, 0.12), 0 2px 8px
+		rgba(0, 0, 0, 0.06);
 }
 
 .calendar-table {
-  table-layout: fixed;
+	table-layout: fixed;
 }
 
-.calendar-table th,
-.calendar-table td {
-  width: 14.285%;
-  text-align: center;
+.calendar-table th, .calendar-table td {
+	width: 14.285%;
+	text-align: center;
 }
 
 .calendar-table td {
-  cursor: pointer;
-  user-select: none;
-  border-radius: 0.375rem;
-  padding: 0.5rem 0;
+	cursor: pointer;
+	user-select: none;
+	border-radius: 0.375rem;
+	padding: 0.5rem 0;
 }
 
 .calendar-table td:hover {
-  background: #f7f7f7;
+	background: #f7f7f7;
 }
 
-.calendar-table td.range-start,
-.calendar-table td.range-end {
-  background: #e04f67;
-  color: #fff;
+.calendar-table td.range-start, .calendar-table td.range-end {
+	background: #e04f67;
+	color: #fff;
 }
 
 .calendar-table td.in-range {
-  background: #fde4e9;
+	background: #fde4e9;
 }
 
-@media (max-width: 576px) {
-  #fb-datePopup.date-popup {
-    right: auto;
-    left: 0;
-    width: 100%;
-  }
+@media ( max-width : 576px) {
+	#fb-datePopup.date-popup {
+		right: auto;
+		left: 0;
+		width: 100%;
+	}
 }

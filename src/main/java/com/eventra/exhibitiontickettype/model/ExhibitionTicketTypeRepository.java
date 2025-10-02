@@ -28,4 +28,8 @@ public interface ExhibitionTicketTypeRepository extends JpaRepository<Exhibition
  // 3. 派生不能選欄位......
 // List<Integer> findExhibitionIdByExhibitionTicketTypeIdIn(Collection<Integer> ids);
  
+ List<ExhibitionTicketTypeVO> findByExhibitionId(Integer exhibitionId);
+ 
+ void deleteByExhibitionId(Integer exhibitionId);
+ 
 }

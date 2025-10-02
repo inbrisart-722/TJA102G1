@@ -81,7 +81,7 @@ public class AuthRestController {
             .secure(true)     // 僅 HTTPS 請求可送出 ；本地開發可暫時 false，上線必須是 true -> localhost 可以通過 true, 但 127.0.0.1 不行
             						// Secure 主要是防止 Cookie 在 HTTP 傳輸時被竊聽（防中間人攻擊）。
             						// 基礎安全
-            .sameSite("Lax")  // 決定 Cookie 是否能在「跨站請求」中被自動帶上。這就是 CSRF 攻擊的核心點。-> 補充：其實我們專案用 Strict 也沒差（同網域）
+            .sameSite("None")  // 決定 Cookie 是否能在「跨站請求」中被自動帶上。這就是 CSRF 攻擊的核心點。-> 補充：其實我們專案用 Strict 也沒差（同網域）
             						// Strict: Cookie 只在同站請求才會帶上
             							// 最嚴格的防護，幾乎消滅 CSRF，但也可能影響使用者體驗
 									// Lax: Cookie 在大部分跨站情境 不會帶上，但有一個例外：如果是「安全的 GET 請求」（例如使用者點超連結、提交 <form method="GET">），Cookie 還是會帶上。
@@ -98,7 +98,7 @@ public class AuthRestController {
         ResponseCookie refreshCookie = ResponseCookie.from(SecurityConfig.MEM_REFRESH_COOKIE, refresh)
             .httpOnly(true)
             .secure(true)
-            .sameSite("Strict") // 🔒 比 Lax 更嚴：避免第三方導流時夾帶刷新
+            .sameSite("None") // 🔒 比 Lax 更嚴：避免第三方導流時夾帶刷新
             .path("/")
             .maxAge(MEM_REFRESH_TTL) // ⏰ 7 天
             .build();
@@ -124,7 +124,7 @@ public class AuthRestController {
         ResponseCookie accessCookie = ResponseCookie.from(SecurityConfig.EXHIB_ACCESS_COOKIE, access)
             .httpOnly(true) 
             .secure(true)     
-            .sameSite("Strict") 
+            .sameSite("None") 
             .path("/")
             .maxAge(EXHIB_ACCESS_TTL) // 10 分鐘
             .build();
@@ -132,7 +132,7 @@ public class AuthRestController {
         ResponseCookie refreshCookie = ResponseCookie.from(SecurityConfig.EXHIB_REFRESH_COOKIE, refresh)
             .httpOnly(true)
             .secure(true)
-            .sameSite("Strict") 
+            .sameSite("None") 
             .path("/")
             .maxAge(EXHIB_REFRESH_TTL) // 3 天
             .build();

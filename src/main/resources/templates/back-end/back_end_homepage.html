@@ -1,11 +1,11 @@
 <!doctype html>
-<html lang="zh-Hant">
+<html xmlns:th="http://www.thymeleaf.org" lang="zh-Hant">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
     <title>Exhibitor | 首頁</title>
     <!-- Fonts & AdminLTE CSS -->
-    <link rel="preload" href="/back-end/css/adminlte.css" as="style" />
+    <!-- <link rel="preload" href="/back-end/css/adminlte.css" as="style" /> -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/source-sans-3@5.0.12/index.css" crossorigin="anonymous" media="print" onload="this.media='all'" />
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/overlaysscrollbars@2.11.0/styles/overlayscrollbars.min.css"/>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css"/>
@@ -50,7 +50,7 @@
                 <a href="#" class="nav-link"><i class="nav-icon bi bi-circle-fill"></i><p>銷售管理</p></a>
                 <ul class="nav nav-treeview">
                   <li class="nav-item"><a href="/back-end/exhibitor/order_list" class="nav-link"><p>訂單列表</p></a></li>
-                  <li class="nav-item"><a href="#" class="nav-link"><p>銷售列表</p></a></li>
+                  <!-- <li class="nav-item"><a href="#" class="nav-link"><p>銷售列表</p></a></li> -->
                 
                 </ul>
               </li>
@@ -66,7 +66,7 @@
           </nav>
               <!-- 底部：登出連結 -->
           <div class="p-3 border-top">
-            <a href="/back-end/exhibitor/exhibitor_login" id="logoutLink" class="nav-link text-danger">
+            <a href="/back-end/exhibitor/exhibitor_login" id="mylogout" class="nav-link text-danger">
               <i class="bi bi-box-arrow-right me-1"></i> 登出
             </a>
           </div>
@@ -97,19 +97,19 @@
             <!-- 指標卡片 -->
             <div class="row">
               <div class="col-12 col-sm-6 col-md-3">
-                <a href="../../../../../../../後台展商前端/dist/order_list.html" class="text-decoration-none text-dark">
+                <a href="/back-end/exhibitor/order_list" class="text-decoration-none text-dark">
                   <div class="info-box metric">
                     <span class="info-box-icon text-bg-primary shadow-sm">
                       <i class="bi bi-bag-check-fill"></i>
                     </span>
                     <div class="info-box-content">
                       <span class="info-box-text">新訂單</span>
-                      <span class="info-box-number">1</span>
+                      <span class="info-box-number" th:text="${newOrdersToday}">0</span>
                     </div>
                   </div>
                 </a>
               </div>
-              <div class="col-12 col-sm-6 col-md-3">
+              <!-- <div class="col-12 col-sm-6 col-md-3">
                 <div class="info-box metric">
                   <span class="info-box-icon text-bg-success shadow-sm"><i class="bi bi-people-fill"></i></span>
                   <div class="info-box-content">
@@ -117,13 +117,13 @@
                     <span class="info-box-number">2</span>
                   </div>
                 </div>
-              </div>
+              </div> -->
               <div class="col-12 col-sm-6 col-md-3">
                 <div class="info-box metric">
                   <span class="info-box-icon text-bg-warning shadow-sm"><i class="bi bi-cash-coin"></i></span>
                   <div class="info-box-content">
                     <span class="info-box-text">新訂單總額</span>
-                    <span class="info-box-number">1,000</span>
+                    <span class="info-box-number" th:text="${#numbers.formatInteger(newOrdersAmountToday, 0, 'POINT')}">0</span>
                   </div>
                 </div>
               </div>
@@ -135,12 +135,12 @@
                 <h5 class="card-title mb-0">公告列表</h5>
                 <div class="d-flex gap-2 align-items-center">
                   <!-- <a class="btn btn-dark" id="btnCreate">新增公告</a> -->
-                  <div class="search-wrap">
-                    <div class="input-group input-group-sm">
-                      <input class="form-control" type="text" id="searchInput" placeholder="搜尋公告…"/>
-                      <button class="btn btn-outline-secondary" id="btnSearch"><i class="bi bi-search"></i></button>
-                    </div>
-                  </div>
+                  <form class="search-wrap" method="get" th:action="@{/back-end/exhibitor/back_end_homepage}">
+				    <div class="input-group input-group-sm">
+				      <input class="form-control" type="text" name="q" th:value="${q}" placeholder="搜尋公告…" />
+				      <button class="btn btn-outline-secondary" type="submit"><i class="bi bi-search"></i></button>
+				    </div>
+				  </form>
                 </div>
               </div>
               <div class="card-body p-0">
@@ -155,43 +155,46 @@
                       </tr>
                     </thead>
                     <tbody id="annTbody">
-                        <tr>
-                            <td>2025/00/00</td>
-                            <td><a href="#" class="ann-link">網站維護公告</a></td>
-                            <td><span class="ann-link text-truncate" style="max-width: 620px; display:inline-block;">本○○平台將於2025/07/18 04:00~06:00進行網站例行性維護，屆時服務可能短暫中斷，造成不便敬請見諒。</span></td>
-                            <td class="text-end">
-                            <!-- <button class="btn btn-outline-secondary btn-sm me-1" data-action="edit">修改</button>
-                            <button class="btn btn-outline-danger btn-sm" data-action="delete">刪除</button> -->
-                            </td>
-                         
-                            
-                        </tr>
-                      <tr>
-                        <td>2025/00/00</td>
-                        <td><a href="#" class="ann-link">○○平台邀請你共同抗黃牛</a></td>
-                        <td><span class="ann-link text-truncate" style="max-width: 620px; display:inline-block;">自112年6月2日起，《文創法》第10條之…（示意文字）。</span></td>
-                        <td class="text-end">
-                        <!-- <button class="btn btn-outline-secondary btn-sm me-1" data-action="edit">修改</button>
-                        <button class="btn btn-outline-danger btn-sm" data-action="delete">刪除</button> -->
-                        </td>
-                    </tr>
-                      <tr><td colspan="4" style="height:40px; background:var(--bs-tertiary-bg);"></td></tr>
-                      <tr><td colspan="4" style="height:40px; background:var(--bs-tertiary-bg);"></td></tr>
-                      <tr><td colspan="4" style="height:40px; background:var(--bs-tertiary-bg);"></td></tr>
-                      <tr><td colspan="4" style="height:40px; background:var(--bs-tertiary-bg);"></td></tr>
-                      <tr><td colspan="4" style="height:40px; background:var(--bs-tertiary-bg);"></td></tr>
-                    </tbody>
+					  <tr th:if="${#lists.isEmpty(announcements)}">
+					    <td colspan="4" class="text-center text-secondary py-4">目前沒有公告</td>
+					  </tr>
+					
+					  <tr th:each="a : ${announcements}">
+					    <td th:text="${#dates.format(a.createdAt, 'yyyy/MM/dd')}">2025/00/00</td>
+					    <td>
+					      <a href="#" class="ann-link"
+					         th:text="${a.title}"
+					         th:attr="data-title=${a.title},data-date=${#dates.format(a.createdAt,'yyyy/MM/dd')},data-content=${a.content}">
+					        公告標題
+					      </a>
+					    </td>
+					    <td>
+					      <span class="ann-link text-truncate" style="max-width: 620px; display:inline-block;"
+					            th:text="${a.content}"
+					            th:attr="data-title=${a.title},data-date=${#dates.format(a.createdAt,'yyyy/MM/dd')},data-content=${a.content}">
+					        公告內容
+					      </span>
+					    </td>
+					    <td class="text-end"><!-- 如需操作按鈕可放這 --></td>
+					  </tr>
+					</tbody>
                   </table>
                 </div>
                 <div class="pager">
-                  <div class="page">«</div>
-                  <div class="page active">1</div>
-                  <div class="page">2</div>
-                  <div class="page">3</div>
-                  <div class="page">4</div>
-                  <div class="page">5</div>
-                  <div class="page">»</div>
-                </div>
+				  <a class="page" th:classappend="${currentPage==0} ? ' disabled'"
+				     th:href="@{/back-end/exhibitor/back_end_homepage(page=${currentPage-1},size=${10},q=${q})}">«</a>
+				
+				  <a class="page"
+				     th:each="i : ${#numbers.sequence(0, totalPages-1)}"
+				     th:text="${i+1}"
+				     th:classappend="${i==currentPage} ? ' active'"
+				     th:href="@{/back-end/exhibitor/back_end_homepage(page=${i},size=${10},q=${q})}">
+				    1
+				  </a>
+				
+				  <a class="page" th:classappend="${currentPage>=totalPages-1} ? ' disabled'"
+				     th:href="@{/back-end/exhibitor/back_end_homepage(page=${currentPage+1},size=${10},q=${q})}">»</a>
+				</div>
               </div>
             </div>
 
@@ -257,10 +260,12 @@
 
 
     <!-- Scripts -->
+    
     <script src="https://cdn.jsdelivr.net/npm/overlayscrollbars@2.11.0/browser/overlayscrollbars.browser.es6.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.min.js"></script>
-    <script src="../../../../../../../後台展商前端/dist/js/adminlte.js"></script>
+    <script src="/back-end/js/adminlte.min.js"></script>
+    <script src="/front-end/js/g1_10_custom_common_csrf.js"></script>
     <script>
       // Modal controls
       const modalEl = document.getElementById('annModal');
@@ -345,7 +350,6 @@
 
         // 若 modal 沒有放到頁面，直接離開（避免 null 錯誤）
         if(!viewModalEl || !viewTitleEl || !viewDateEl || !viewContentEl){
-        console.warn('[公告詳情] Modal 未找到：請確認已加入 annViewModal / annViewTitle / annViewDate / annViewContent');
         return;
         }
 
@@ -357,17 +361,9 @@
 
         e.preventDefault();
 
-        const tr = link.closest('tr');
-        if(!tr || tr.children.length < 3) return;
-
-        const dateText = (tr.children[0].textContent || '').trim();
-        const titleText = (tr.children[1].textContent || '').trim();
-        const contentText = (tr.children[2].textContent || '').trim();
-
-        // 安全賦值（節點已在上方判空）
-        viewDateEl.textContent = dateText || '-';
-        viewTitleEl.textContent = titleText || '(未命名公告)';
-        viewContentEl.textContent = contentText || '';
+        viewTitleEl.textContent = link.dataset.title || '(未命名公告)';
+        viewDateEl.textContent = link.dataset.date || '-';
+        viewContentEl.textContent = link.dataset.content || '';
 
         viewModal.show();
         });
@@ -439,15 +435,15 @@
     // });
     </script>
     <script>
-      document.getElementById('logoutLink')?.addEventListener('click', (e) => {
+      // document.getElementById('logoutLink')?.addEventListener('click', (e) => {
 //         e.preventDefault();
         // 清除登入紀錄
 //         sessionStorage.removeItem('exhibitorSession');
         // 導回登入頁
 //         window.location.href = '/back-end/exhibitor/exhibitor_login';
-      });
+   // });
     </script>
-    <script>
+   <script>
     (async () => {
       // 讓放了 data-include 的容器先隱藏，避免 FOUC
       document.querySelectorAll('[data-include]').forEach(el => el.style.visibility = 'hidden');
@@ -458,7 +454,7 @@
         const bust = `v=${encodeURIComponent((window.__PARTIALS_VERSION__) || '1')}`; // 可手動改版本清快取
         const src = url.includes('?') ? `${url}&${bust}` : `${url}?${bust}`;
         try {
-          const res = await fetch(src, { cache: 'no-store' });
+          const res = await csrfFetchToRedirect(src, { cache: 'no-store' });
           if (!res.ok) throw new Error(res.statusText);
           el.innerHTML = await res.text();
           el.style.visibility = 'visible';
@@ -505,7 +501,7 @@
         const bust = `v=${encodeURIComponent((window.__PARTIALS_VERSION__) || '1')}`; // 可手動改版本清快取
         const src = url.includes('?') ? `${url}&${bust}` : `${url}?${bust}`;
         try {
-          const res = await fetch(src, { cache: 'no-store' });
+          const res = await csrfFetchToRedirect(src, { cache: 'no-store' });
           if (!res.ok) throw new Error(res.statusText);
           el.innerHTML = await res.text();
           el.style.visibility = 'visible';
@@ -530,7 +526,7 @@
       // window.AdminLTE && window.AdminLTE.autoInit?.();
 
       // 3) 登出（若要清 sessionStorage / localStorage）
-      const logout = document.getElementById('logoutLink');
+      const logout = document.getElementById('mylogout');
       if (logout) {
         logout.addEventListener('click', (e) => {
           e.preventDefault(); // 若要攔截導頁再手動跳轉，取消註解

@@ -186,7 +186,6 @@
 //     */
 //}
 
-
 ///
 ///
 ///
@@ -222,102 +221,113 @@ import jakarta.servlet.http.HttpServletResponse;
 @Component
 public class JwtCookieAuthenticationFilter extends OncePerRequestFilter {
 
-    private final JwtUtil jwt;
+	private final JwtUtil jwt;
 //    private final JwtProperties jwtProps;
-    private final Duration MEM_ACCESS_TTL;
-    private final Duration EXHIB_ACCESS_TTL;
-    private final UserDetailsService uds;
+	private final Duration MEM_ACCESS_TTL;
+	private final Duration EXHIB_ACCESS_TTL;
+	private final UserDetailsService uds;
 
-    public JwtCookieAuthenticationFilter(JwtUtil jwt, JwtProperties jwtProps, UserDetailsService uds) {
-        this.jwt = jwt;
-        this.uds = uds;
-        this.MEM_ACCESS_TTL = jwtProps.memAccessTtl();
-        this.EXHIB_ACCESS_TTL = jwtProps.exhibAccessTtl();
-    }
+	public JwtCookieAuthenticationFilter(JwtUtil jwt, JwtProperties jwtProps, UserDetailsService uds) {
+		this.jwt = jwt;
+		this.uds = uds;
+		this.MEM_ACCESS_TTL = jwtProps.memAccessTtl();
+		this.EXHIB_ACCESS_TTL = jwtProps.exhibAccessTtl();
+	}
 
-    @Override
-    protected void doFilterInternal(HttpServletRequest req,
-                                    HttpServletResponse res,
-                                    FilterChain chain) throws ServletException, IOException {
+	@Override
+	protected void doFilterInternal(HttpServletRequest req, HttpServletResponse res, FilterChain chain)
+			throws ServletException, IOException {
 
-    	// 在 Spring Security 的設計裡
-    	// SecurityContextHolder.getContext().setAuthentication(auth) 只能有一個 Authentication。
-    	
-    	if(req.getRequestURI().startsWith("/front-end") || req.getRequestURI().startsWith("/api/front-end")) {
-        // 1) 嘗試處理會員 Token
-    		handleTokenFlow(req, res,
-                SecurityConfig.MEM_ACCESS_COOKIE,
-                SecurityConfig.MEM_REFRESH_COOKIE,
-                MEM_ACCESS_TTL);
-    		chain.doFilter(req, res);
-    		return;
-    	}
-    	else {
-        // 2) 嘗試處理展商 Token
-    		handleTokenFlow(req, res,
-                SecurityConfig.EXHIB_ACCESS_COOKIE,
-                SecurityConfig.EXHIB_REFRESH_COOKIE,
-                EXHIB_ACCESS_TTL);
+		// 在 Spring Security 的設計裡
+		// SecurityContextHolder.getContext().setAuthentication(auth) 只能有一個
+		// Authentication。
 
-    		chain.doFilter(req, res);
-    		return;
-    	}
-    }
+		// 設計成 路徑進去哪裡，我們就塞哪個 token -> uds 中 必定有一身份為 null 回傳的 authentication(token) 也就是我們希望的身份
+		String path = req.getRequestURI();
+//		System.out.println("JWT filter目前攔截路徑為: " + path);
+		// 1) 嘗試處理會員 Token
+		if (path.startsWith("/front-end") || path.startsWith("/api/front-end")) {
+			System.out.println(path + ": JWT filter 目前攔截 front-end 路徑，即將處理 MEM token");
+			handleTokenFlow(req, res, SecurityConfig.MEM_ACCESS_COOKIE, SecurityConfig.MEM_REFRESH_COOKIE,
+					MEM_ACCESS_TTL);
+			chain.doFilter(req, res);
+			return;
+		}
+		// 2) 嘗試處理展商 Token
+		else if (path.startsWith("/back-end") || path.startsWith("/api/back-end")){
+			System.out.println(path + ": JWT filter 目前攔截 back-end 路徑，即將處理 EXHIB token");
+			handleTokenFlow(req, res, SecurityConfig.EXHIB_ACCESS_COOKIE, SecurityConfig.EXHIB_REFRESH_COOKIE,
+					EXHIB_ACCESS_TTL);
+			chain.doFilter(req, res);
+			return;
+		}
+		else chain.doFilter(req, res);
+	}
 
-    // =================== 處理 Token 流程 ===================
-    private void handleTokenFlow(HttpServletRequest req,
-                                 HttpServletResponse res,
-                                 String accessCookieName,
-                                 String refreshCookieName,
-                                 Duration accessTtl) {
-        String accessToken = extractCookie(req.getCookies(), accessCookieName);
+	// =================== 處理 Token 流程 ===================
+	private void handleTokenFlow(HttpServletRequest req, HttpServletResponse res, String accessCookieName,
+			String refreshCookieName, Duration accessTtl) {
+		try {
+			String accessToken = extractCookie(req.getCookies(), accessCookieName);
 
-        if (accessToken != null && jwt.validate(accessToken)) {
-            // --- Access Token 有效 ---
-            authenticateUser(accessToken, req);
+			if (accessToken != null && jwt.validate(accessToken)) {
+				// --- Access Token 有效 ---
+				authenticateUser(accessToken, req);
 
-        } else {
-            // --- Access Token 無效或過期 → 嘗試 Refresh ---
-            String refreshToken = extractCookie(req.getCookies(), refreshCookieName);
+			} else {
+				// --- Access Token 無效或過期 → 嘗試 Refresh ---
+				String refreshToken = extractCookie(req.getCookies(), refreshCookieName);
 
-            if (refreshToken != null && jwt.validate(refreshToken) && jwt.isRefreshToken(refreshToken)) {
-                String username = jwt.getUsername(refreshToken);
+				if (refreshToken != null && jwt.validate(refreshToken) && jwt.isRefreshToken(refreshToken)) {
+					String username = jwt.getUsername(refreshToken);
 
-                // 1. 簽發新的 Access Token
-                String newAccess = jwt.generateAccess(username, accessTtl);
+					// 1. 簽發新的 Access Token
+					String newAccess = jwt.generateAccess(username, accessTtl);
 
-                // 2. 更新 Access Token Cookie
-                ResponseCookie newCookie = ResponseCookie.from(accessCookieName, newAccess)
-                        .httpOnly(true).secure(false) // ⚠️ 測試環境 false，正式要 true
-                        .sameSite("Lax").path("/")
-                        .maxAge(accessTtl)
-                        .build();
-                res.addHeader("Set-Cookie", newCookie.toString());
+					// 2. 更新 Access Token Cookie
+					ResponseCookie newCookie = ResponseCookie.from(accessCookieName, newAccess).httpOnly(true)
+							.secure(true) // ⚠️ 測試環境 false，正式要 true
+							.sameSite("None").path("/").maxAge(accessTtl).build();
+					res.addHeader("Set-Cookie", newCookie.toString());
 
-                // 3. 直接用新的 Access Token 完成身份驗證
-                authenticateUser(newAccess, req);
-            }
-        }
-    }
+					// 3. 直接用新的 Access Token 完成身份驗證
+					authenticateUser(newAccess, req);
+				}
+			}
+		} catch (Exception e) {
+			System.out.println("JwtCookieAuthenticationFilter: " + e.toString());
+			SecurityContextHolder.clearContext();
+		}
+	}
 
-    // =================== 小工具：取 Cookie 值 ===================
-    private String extractCookie(Cookie[] cookies, String name) {
-        if (cookies == null) return null;
-        return Arrays.stream(cookies)
-                .filter(c -> name.equals(c.getName()))
-                .map(Cookie::getValue)
-                .findFirst()
-                .orElse(null);
-    }
+	// =================== 小工具：取 Cookie 值 ===================
+	private String extractCookie(Cookie[] cookies, String name) {
+		if (cookies == null)
+			return null;
+		return Arrays.stream(cookies).filter(c -> name.equals(c.getName())).map(Cookie::getValue).findFirst()
+				.orElse(null);
+	}
 
-    // =================== 小工具：Token → Authentication ===================
-    private void authenticateUser(String token, HttpServletRequest req) {
-        String username = jwt.getUsername(token);
-        UserDetails user = uds.loadUserByUsername(username);
+	// =================== 小工具：Token → Authentication ===================
+	private void authenticateUser(String token, HttpServletRequest req) {
+		try {
+			String username = jwt.getUsername(token);
+//			System.out.println("JWT username= " + username);
+			
+			// @AuthenticationPrincipal Principal principal → 
+			// 這個會嘗試把 principal cast 成 java.security.Principal，結果不一定匹配（因為你塞的是 UserDetails）。
+			UserDetails user = uds.loadUserByUsername(username);
+//			System.out.println("UserDetails loaded: " + user);
 
-        var auth = new UsernamePasswordAuthenticationToken(user, null, user.getAuthorities());
-        auth.setDetails(new WebAuthenticationDetailsSource().buildDetails(req));
+			var auth = new UsernamePasswordAuthenticationToken(user, null, user.getAuthorities());
+			// 它是 附加請求的細節資訊，例如：remoteAddress（發出請求的 IP）, sessionId（如果有 session）
+			auth.setDetails(new WebAuthenticationDetailsSource().buildDetails(req));
 
-        SecurityContextHolder.getContext().setAuthentication(auth);
-    }
+			SecurityContextHolder.getContext().setAuthentication(auth);
+//			System.out.println("SecurityContext 已設定: " + SecurityContextHolder.getContext().getAuthentication());
+		} catch (Exception e) {
+			System.out.println("JwtCookieAuthenticationFilter: " + e.toString());
+			SecurityContextHolder.clearContext();
+		}
+	}
 }

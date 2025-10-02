@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <title>測試更新展覽 API</title>
+  <script src="/front-end/js/g1_10_custom_common_csrf.js"></script>
+</head>
+<body>
+  <h2>測試更新展覽</h2>
+  <label>展覽 ID：</label>
+  <input id="exhId" type="number" value="1"><br><br>
+
+  <label>地點：</label>
+  <input id="location" type="text" value="華山文創園區"><br><br>
+
+  <label>開始時間：</label>
+  <input id="startTime" type="text" value="2025-10-01T09:00:00"><br><br>
+
+  <label>結束時間：</label>
+  <input id="endTime" type="text" value="2025-10-15T18:00:00"><br><br>
+
+  <button onclick="updateExhibition()">更新展覽</button>
+
+  <script>
+    function updateExhibition() {
+      const exhId = document.getElementById("exhId").value;
+      const location = document.getElementById("location").value;
+      const startTime = document.getElementById("startTime").value;
+      const endTime = document.getElementById("endTime").value;
+
+      const body = {
+        exhibitionName: "測試展覽",
+        location: location,
+        startTime: startTime,
+        endTime: endTime
+      };
+
+      csrfFetch(`/api/admin/exhibitions/${exhId}/update`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(body)
+      })
+      .then(res => res.json())
+      .then(data => {
+        console.log("更新後的展覽資料:", data);
+        alert("展覽已更新，請檢查通知是否發送");
+      })
+      .catch(err => console.error("錯誤:", err));
+    }
+  </script>
+</body>
+</html>

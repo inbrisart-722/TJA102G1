@@ -80,7 +80,7 @@ window.csrfFetchToRedirect = function (url, options) {
   // 已經有 token，直接打
   return doFetch().then(res => {
     if (res.status === 401) {
-      sessionStorage.setItem("redirect", window.location.pathname);
+      sessionStorage.setItem("redirect", window.location.pathname + window.location.search);
        window.location.href = "/front-end/login";
       return new Promise(() => {}); // 停住，避免呼叫端繼續跑 then
     }

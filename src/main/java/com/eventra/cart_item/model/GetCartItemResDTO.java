@@ -2,12 +2,19 @@ package com.eventra.cart_item.model;
 
 public class GetCartItemResDTO {
 	private Long cartItemId;
+	private String photoPortrait;
 	private String exhibitionName;
 	private String ticketTypeName;
 	private Integer quantity;
 	private Integer price;
 	private String expirationTime;
 	
+	public String getPhotoPortrait() {
+		return photoPortrait;
+	}
+	public void setPhotoPortrait(String photoPortrait) {
+		this.photoPortrait = photoPortrait;
+	}
 	public Long getCartItemId() {
 		return cartItemId;
 	}
@@ -48,12 +55,18 @@ public class GetCartItemResDTO {
 	// --- Builder ---
     public static class Builder {
         private Long cartItemId;
+        private String photoPortrait;
         private String exhibitionName;
         private String ticketTypeName;
         private Integer quantity;
         private Integer price;
         private String expirationTime;
 
+        public Builder photoPortrait(String photoPortrait) {
+            this.photoPortrait = photoPortrait;
+            return this;
+        }
+        
         public Builder cartItemId(Long cartItemId) {
             this.cartItemId = cartItemId;
             return this;
@@ -85,6 +98,7 @@ public class GetCartItemResDTO {
         public GetCartItemResDTO build() {
             GetCartItemResDTO dto = new GetCartItemResDTO();
             dto.setCartItemId(this.cartItemId);
+            dto.setPhotoPortrait(this.photoPortrait);
             dto.setExhibitionName(this.exhibitionName);
             dto.setTicketTypeName(this.ticketTypeName);
             dto.setQuantity(this.quantity);

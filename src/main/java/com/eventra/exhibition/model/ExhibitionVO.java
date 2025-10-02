@@ -8,11 +8,14 @@ import org.hibernate.annotations.Formula;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import com.eventra.comment.model.CommentVO;
+import com.eventra.exhibitionstatus.model.ExhibitionStatus;
+import com.eventra.exhibitionstatus.model.ExhibitionStatusVO;
 import com.eventra.exhibitiontickettype.model.ExhibitionTicketTypeVO;
 import com.eventra.exhibitor.model.ExhibitorVO;
 import com.eventra.rating.model.RatingVO;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -23,6 +26,7 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
+import jakarta.persistence.Transient;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.PositiveOrZero;
@@ -36,7 +40,7 @@ public class ExhibitionVO {
     @Column(name = "exhibition_id")
 	private Integer exhibitionId;
     
-    @OneToMany(mappedBy = "exhibition")
+    @OneToMany(mappedBy = "exhibition", cascade = CascadeType.ALL, orphanRemoval = true) 
     private Set<ExhibitionTicketTypeVO> exhibitionTicketTypes;
     
     @OneToMany(mappedBy = "exhibition")
@@ -47,6 +51,10 @@ public class ExhibitionVO {
 
     @Column(name = "exhibition_status_id")
 	private Integer exhibitionStatusId;
+    
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "exhibition_status_id", insertable = false, updatable = false)
+    private ExhibitionStatusVO exhibitionStatus;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "exhibitor_id", nullable = false)
@@ -75,7 +83,6 @@ public class ExhibitionVO {
     @Column(name = "total_ticket_quantity")
 	private Integer totalTicketQuantity;
 
-    
     
     @Column(name = "sold_ticket_quantity")
 	private Integer soldTicketQuantity;
@@ -118,13 +125,21 @@ public class ExhibitionVO {
     public void setExhibitionId(Integer exhibitionId) {
         this.exhibitionId = exhibitionId;
     }
-
+    
     public Integer getExhibitionStatusId() {
-        return exhibitionStatusId;
+		return exhibitionStatusId;
+	}
+
+	public void setExhibitionStatusId(Integer exhibitionStatusId) {
+		this.exhibitionStatusId = exhibitionStatusId;
+	}
+
+	public ExhibitionStatusVO getExhibitionStatus() {
+        return exhibitionStatus;
     }
 
-    public void setExhibitionStatusId(Integer exhibitionStatusId) {
-        this.exhibitionStatusId = exhibitionStatusId;
+    public void setExhibitionStatus(ExhibitionStatusVO exhibitionStatus) {
+        this.exhibitionStatus = exhibitionStatus;
     }
 
     public ExhibitorVO getExhibitorVO() {
@@ -276,6 +291,28 @@ public class ExhibitionVO {
 
 	public void setAverageRatingScore(Double averageRatingScore) {
 		this.averageRatingScore = averageRatingScore;
+	}
+	
+	@Transient
+	public String getSaleStatus() {
+		if(this.getExhibitionStatusId() != null && this.getExhibitionStatusId() == 6) {
+			return "草稿";
+		}
+		
+		LocalDateTime now = LocalDateTime.now();
+		LocalDateTime start = this.getTicketStartTime(); // 開賣時間
+		LocalDateTime end = this.getEndTime(); // 結束時間
+		
+		if(start != null && start.isBefore(now) && (end == null || end.isAfter(now))) {
+			return "售票中";
+		}
+		if(start != null && start.isAfter(now)) {
+			return "尚未開賣";
+		}
+		if(end != null && end.isBefore(now)) {
+			return "已結束";
+		}
+		return "尚未開賣";
 	}
 }
 

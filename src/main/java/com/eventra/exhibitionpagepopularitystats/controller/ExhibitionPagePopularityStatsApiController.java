@@ -8,19 +8,22 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.eventra.exhibitionpagepopularitystats.model.ExhibitionPagePopularityStatsService;
 
-@RestController // 處理API
+@RestController
 @RequestMapping("/api/exhibitionPagePopularityStats")
+
 public class ExhibitionPagePopularityStatsApiController {
 
+	/**
+	 * 當展覽頁載入時, 前端會呼叫 API 記錄一次瀏覽
+	 * 
+	 */
+	
 	@Autowired
 	ExhibitionPagePopularityStatsService popularSvc;
-	
-    // 記錄展覽當日瀏覽數 (每呼叫一次就 +1)
-    // @param exhId 展覽 ID
-	@PostMapping("/view/{exhId}")
-	public String recordView(@PathVariable("exhId") Integer exhId) {
-	    popularSvc.recordTodayView(exhId);
-	    return "exhibitionId= " + exhId; // 回傳字串給前端
+
+	@PostMapping("/count/{exhibitionId}")
+	public String recordView(@PathVariable("exhibitionId") Integer exhibitionId) {
+	    popularSvc.recordTodayView(exhibitionId);
+	    return "OK: exhibitionId= " + exhibitionId;
 	}
-        
 }

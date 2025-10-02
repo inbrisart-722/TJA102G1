@@ -46,8 +46,8 @@ public class PlatformIndexController {
 //		List<ExhibitionVO> exhibitionList = EXHIBITION_REPO.findAll();
 
 //		model.addAttribute("EXHIBITION_REPO", exhibition);
-		List<ExhibitionReviewPageDTO> exhibitionList = EXHIBITION_SVC.getExhibitionsForReviewPage();
-		model.addAttribute("exhibitionList", exhibitionList);
+//		List<ExhibitionReviewPageDTO> exhibitionList = EXHIBITION_SVC.getExhibitionsForReviewPage();
+//		model.addAttribute("exhibitionList", exhibitionList);
 		return "platform/exhibition";
 
 	}

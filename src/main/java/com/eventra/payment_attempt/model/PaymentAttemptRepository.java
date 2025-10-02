@@ -13,7 +13,9 @@ import com.eventra.order.model.OrderVO;
 
 public interface PaymentAttemptRepository extends JpaRepository<PaymentAttemptVO, Integer>{
 
-	Optional<PaymentAttemptVO> findByMerchantTradeNo(String merchantTradeNo);
+	Optional<PaymentAttemptVO> findByProviderOrderId(String providerOrderId);
+	
+//	Optional<PaymentAttemptVO> findByProviderTransactionId(String providerTransactionId);
 	
 	// scheduler -> 且有建立索引了
 	@Query(value="select pa from PaymentAttemptVO pa where pa.createdAt < :threshold and "
@@ -21,4 +23,6 @@ public interface PaymentAttemptRepository extends JpaRepository<PaymentAttemptVO
 	List<PaymentAttemptVO> findExpiredPaymentAttempts(@Param("threshold") Timestamp threshold);
 	
 	Optional<PaymentAttemptVO> findTopByOrderIdOrderByCreatedAtDesc(Integer orderId);
+	
+//	Optional<PaymentAttemptVO> findByOrderIdAndPaymentAttemptStatus(Integer orderId, PaymentAttemptStatus status);
 }

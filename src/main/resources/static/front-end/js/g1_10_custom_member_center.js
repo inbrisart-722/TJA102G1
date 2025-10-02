@@ -1,15 +1,72 @@
 document.addEventListener("DOMContentLoaded", function() {
 
+	// 先處理 lineUserIdBoundAlready 參數
+	const params = new URLSearchParams(window.location.search);
+	const go = params.get("go");
+	
+	if(go === "ticket") {
+		document.querySelector("a.icon-ticket-2").click();
+		params.delete("go");
+		let newUrl;
+		if(params.size !== 0) newUrl = window.location.pathname + '?' + params.toString();
+		else newUrl = window.location.pathname;
+		window.history.replaceState({}, document.title, newUrl);
+	}
+	else document.querySelector("a.icon-profile").click();
+
+//	if(lineUserIdBoundAlready){
+//		// true -> 失敗
+//		if(lineUserIdBoundAlready === "true"){
+//			alert("由於此 LINE 帳號已經與其他會員帳號進行綁定，因此綁定失敗！")
+//		}
+//		// false -> 恭喜成功 
+//		else if(lineUserIdBoundAlready === "false"){
+//			alert("LINE 帳號成功綁定，後續可以使用 LINE 官方帳號來進行會員專屬查詢囉！");
+//		}
+//		// 彈窗顯示後，從 URL 中移除這個參數
+//		// 1. 移除特定的參數
+//		params.delete('lineUserIdBoundAlready');
+//		        
+//		// 2. 建立新的 URL
+//		const newUrl = window.location.pathname + '?' + params.toString();
+//		        
+//		// 3. 使用 history.replaceState() 更新 URL
+//		// 這樣就不會留下瀏覽歷史記錄，也不會重新載入頁面
+//		window.history.replaceState({}, document.title, newUrl);
+//	}
+	
+
+	// 登出 這個特別用把事件冒泡改 capturing 套用同架構但避免 tabs.js 先取並且丟錯誤（沒section-5 等等）
+
+	document.querySelector("#logout").addEventListener("click", function(e) {
+		e.preventDefault();
+		e.stopPropagation(); // 阻止傳到 tabs.js
+
+		const wants_to_logout = confirm("確認登出嗎？");
+
+		if (!wants_to_logout) return;
+
+		// 免 csrf 有放行
+		fetch("/api/auth/logout/member", {
+			method: "POST",
+			credentials: "include",
+		})
+			.then((res) => {
+				if (!res.ok) throw new Error("Logout failed");
+				location.href = "/front-end/login";
+			})
+			.catch((error) => {
+				console.log(error);
+			});
+
+	}, true);
+
 	let ordersByStatus = {};
 
 	// fetch 1 次而已: 載入用戶所有訂單 => 後續動態呼叫一堆 addEventListener
-	csrfFetch("/api/front-end/protected/order/getAllOrder", {
+	csrfFetchToRedirect("/api/front-end/protected/order/getAllOrder", {
 		method: "GET"
 	}).then((res) => {
-		if (res.status === 401) {
-		    sessionStorage.setItem("redirect", window.location.pathname);
-		    location.href = "/front-end/login";
-		}
 		if (!res.ok) throw new Error("getAllOrder: Not 2XX or 401");
 		return res.json();
 	})
@@ -37,6 +94,8 @@ document.addEventListener("DOMContentLoaded", function() {
 	document.addEventListener("click", function(e) {
 		const btn = e.target.closest("button.tab_order");
 		if (!btn) return;
+		e.preventDefault();
+
 		console.log(btn.textContent + ": btn is clicked");
 		clear_section1();
 		// 所有 btn 取消 -on
@@ -62,7 +121,7 @@ document.addEventListener("DOMContentLoaded", function() {
 		section1.innerHTML = `		<nav id="tablist_order" class="col-12">
 		  <button class="tab_order tab1">全部</button>
 		  <button class="tab_order tab2">付款中</button>
-		  <button class="tab_order tab3" style="background-color: #CE0000; color:white">付款失敗</button>
+		  <button class="tab_order tab3">付款失敗</button>
 		  <button class="tab_order tab4">付款逾時</button>
 		  <button class="tab_order tab5">已付款</button>
 		  <button class="tab_order tab6">已退款</button>
@@ -81,10 +140,12 @@ document.addEventListener("DOMContentLoaded", function() {
 			order_head_el.className = "order_head";
 			order_head_el.innerHTML = `
 				  <span class="order_id">訂單編號：<span>${order.orderUlid}</span></span>
-				  <span class="order_qty">數量：<span>${order.totalQuantity}</span></span>
-				  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+				  <span class="order_qty">總數量：<span>${order.totalQuantity}</span></span>
 				  <span class="order_amount">總金額：<span>${order.totalAmount}</span></span>
-				  <span class="order_status">${order.orderStatus}</span>
+				  <img class="order_provider_img" src="${order.orderProvider !== "LINEPay" ? "https://support.ecpay.com.tw/wp-content/uploads/2023/08/logo200x120-e1692354870320.png" : "https://upload.wikimedia.org/wikipedia/commons/thumb/4/42/Line_pay_logo.svg/1024px-Line_pay_logo.svg.png"}"/>
+				  
+				  <span class="order_provider">${order.orderProvider === "LINEPay" ? "Line Pay" : "綠界支付"}&nbsp;-&nbsp;<span class="order_status">${order.orderStatus}</span></span>
+				  <span class="order_creationTime">時間：<span>${order.creationTime}</span></span>
 				  <button class="expand">
 				    展開<i class="icon-angle-double-down"></i>
 				  </button>
@@ -106,14 +167,15 @@ document.addEventListener("DOMContentLoaded", function() {
 				order_item_head_el.className = "order_item_head";
 				order_item_head_el.innerHTML = ` 
 				<img
-				  src="img/0_exhibition/ChatGPT_exhibition_1.png"
-				  alt="推薦圖片"
+					class="exhibition_img"
+				  src="${group.exhibitionDTO.photoPortrait}"
+				  alt="${group.exhibitionDTO.exhibitionName}"
 				/>
 				<div>
 				  <span><strong>${group.exhibitionDTO.exhibitionName}</strong></span>
 				  <span>
 				    ${group.exhibitionDTO.location}<span
-				      >${group.exhibitionDTO.startTime.substring(0, 10) + " ~ " + group.exhibitionDTO.endTime.substring(0, 10)}</span
+				      >${(group.exhibitionDTO.startTime + " - " + group.exhibitionDTO.endTime).replaceAll("T", " ")}</span
 				    ></span
 				  >
 				</div>
@@ -126,7 +188,8 @@ document.addEventListener("DOMContentLoaded", function() {
 					order_item_body_el.innerHTML = `
 					<div class="order_item_ticket">
 					  <span>訂單明細編號：<span>${item.orderItemUlid}</span></span>
-					  <span>${item.ticketTypeName}</span>
+					  <span>票價：${item.unitPrice}</span>
+					  <span class="${order.orderStatus === '已付款' ? "paid" : ""}">${item.ticketTypeName}</span>
 					  ${order.orderStatus === '已付款' ? `<span class="qrcode_id">${item.ticketCode}
 					  </span><button class="qrcode">取得入場 QR Code</button>` : ''}
 					</div>
@@ -138,7 +201,7 @@ document.addEventListener("DOMContentLoaded", function() {
 			section1.appendChild(order_row_el);
 		})
 		// 把第一個預設展開！
-		section1.querySelector("div.order_row > div.order_head > button.expand").click();
+		section1.querySelector("div.order_row > div.order_head > button.expand")?.click();
 	}
 
 	// 改事件委派
@@ -174,6 +237,7 @@ document.addEventListener("DOMContentLoaded", function() {
 	document.addEventListener("click", function(e) {
 		const btn = e.target.closest("div.order_item_ticket > button.qrcode");
 		if (!btn) return;
+		e.preventDefault();
 
 		if (qrcode_modal.classList.contains("open")) return;
 
@@ -208,65 +272,105 @@ document.addEventListener("DOMContentLoaded", function() {
 		const canvas = qrcode_content.querySelector("canvas");
 		if (canvas) canvas.remove();
 	});
+
 	
-	// fetch 2 : 重送金流 /api/order/ECPay/resending
-	
-	document.addEventListener("click", function(e){
+
+	document.addEventListener("click", function(e) {
 		const btn_repay = e.target.closest("button.order_repay")
-		if(!btn_repay) return;
+		if (!btn_repay) return;
 		const order_ulid = btn_repay.closest("div.order_row").querySelector("span.order_id > span").innerText;
 		console.log(order_ulid);
-		csrfFetch("/api/front-end/protected/order/ECPay/resending", {
-			method: "POST",
-			headers: {
-				"CONTENT-TYPE": "text/plain" // 純字串
-			},
-			body: order_ulid
-		}).then((res) => {
-			if (res.status === 401) {
-			    sessionStorage.setItem("redirect", window.location.pathname);
-			    location.href = "/front-end/login";
-			}
-			if(!res.ok) throw new Error("ECPay/resending: Not 2XX or 401");
-			return res.json();
-		}).then((result) => {
-			if(result.status === "success"){
-				const form = document.createElement("form");
-				form.method = (result.method || "POST").toUpperCase();
-				form.action = result.action;
-				
-				// .entries returns an array of key-value pairs
-				// Each pair is itself a small array
-				Object.entries(result.fields).forEach(([k, v]) => {
-					const input = document.createElement("input");
-					input.type = "hidden";
-					input.name = k;
-					// null or undefined return ""
-					input.value = (v ?? "").toString();
-					form.appendChild(input);
-				});
-				
-				// noscript 保險（可選）
-				const btn = document.createElement("button");
-				btn.type = "submit";
-				btn.style.display = "none";
-				form.appendChild(btn);
-				
-				document.body.appendChild(form);
-				form.submit();
-			}else{
-				console.log("ECPay Re-sending failed")
-			}
-		}).catch((error) => {
-			console.log(error);		
-		});
+		
+		// fetch1 : 先判斷此訂單本來是哪個金流服務提供商
+		csrfFetchToRedirect("/api/front-end/protected/order/getOrderProvider?orderUlid=" + order_ulid, {
+			method: "GET"
+		})
+			.then(res => {
+				if (!res.ok) throw new Error("getOrderProvider: NOT 2XX or 401")
+				else return res.json();
+			})
+			.then(data => {
+				// fetch2 : 重送金流 /api/order/ECPay/resending       ||       /api/front-end/protected/linepay/resending-payment-request
+				console.log(data);
+				if (data === "ECPay") ECPay_resending(order_ulid);
+				else if (data === "LINEPay") LINEPay_resending(order_ulid);
+		})
+			.catch(error => console.log(error));
+
+		// 以下 function 目的是為了副作用，就先不另外處理 promise 結果部分了
+			
+		////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		const LINEPay_resending = function(order_ulid) {
+			return csrfFetchToRedirect("/api/front-end/protected/linepay/resending-payment-request", {
+				method: "POST",
+				headers:  {
+					"Content-Type": "text/plain" // 純字串
+				},
+				body: order_ulid
+			}).then((res) => {
+					if (!res.ok) throw new Error("linepay/resending-payment-request: Not 2XX or 401");
+					return res.json();
+			}).then((data) => {
+				//	console.log(data.status);
+					if(data.status?.toUpperCase() !== "SUCCESS")
+						alert(data.message); // 失敗的 message 是拿來 alert 用戶
+					else window.location.href = data.message; // 只有成功的 message 才是拿來轉導
+			}).catch(error => {
+				console.log(error);
+			})
+		}
+		
+		////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		const ECPay_resending = function(order_ulid) {
+			return csrfFetchToRedirect("/api/front-end/protected/order/ECPay/resending", {
+				method: "POST",
+				headers: {
+					"CONTENT-TYPE": "text/plain" // 純字串
+				},
+				body: order_ulid
+			}).then((res) => {
+				if (!res.ok) throw new Error("ECPay/resending: Not 2XX or 401");
+				return res.json();
+			}).then((result) => {
+				if (result.status === "success") {
+					const form = document.createElement("form");
+					form.method = (result.method || "POST").toUpperCase();
+					form.action = result.action;
+
+					// .entries returns an array of key-value pairs
+					// Each pair is itself a small array
+					Object.entries(result.fields).forEach(([k, v]) => {
+						const input = document.createElement("input");
+						input.type = "hidden";
+						input.name = k;
+						// null or undefined return ""
+						input.value = (v ?? "").toString();
+						form.appendChild(input);
+					});
+
+					// noscript 保險（可選）
+					const btn = document.createElement("button");
+					btn.type = "submit";
+					btn.style.display = "none";
+					form.appendChild(btn);
+
+					document.body.appendChild(form);
+					form.submit();
+				} else {
+					console.log("ECPay Re-sending failed")
+				}
+			}).catch((error) => {
+				console.log(error);
+			});
+		}
+
 
 	})
 
-	
-	
-	
-	
+
+
+
+
 });
 
 ////////////////////////////////////////////////////////////////
@@ -276,6 +380,34 @@ document.addEventListener("DOMContentLoaded", function() {
 ////////////////////////////////////////////////////////////////
 
 document.addEventListener("DOMContentLoaded", function() {
+	
+	// 先處理 lineUserIdBoundAlready 參數
+	const params = new URLSearchParams(window.location.search);
+	const lineUserIdBoundAlready = params.get("lineUserIdBoundAlready");
+	
+	if(lineUserIdBoundAlready){
+		// true -> 失敗
+		if(lineUserIdBoundAlready === "true"){
+			alert("由於此 LINE 帳號已經與其他會員帳號進行綁定，因此綁定失敗！")
+		}
+		// false -> 恭喜成功 
+		else if(lineUserIdBoundAlready === "false"){
+			alert("LINE 帳號成功綁定，後續可以使用 LINE 官方帳號來進行會員專屬查詢囉！");
+		}
+		// 彈窗顯示後，從 URL 中移除這個參數
+		// 1. 移除特定的參數
+		params.delete('lineUserIdBoundAlready');
+		        
+		// 2. 建立新的 URL
+		let newUrl;
+		if(params.size !== 0) newUrl = window.location.pathname + '?' + params.toString();
+		else newUrl = window.location.pathname;
+		        
+		// 3. 使用 history.replaceState() 更新 URL
+		// 這樣就不會留下瀏覽歷史記錄，也不會重新載入頁面
+		window.history.replaceState({}, document.title, newUrl);
+	}
+	
 	const user_img = document.querySelector("#user_img");
 	const file_input = document.querySelector("#js-upload-files");
 	const file_input_btn = document.querySelector("#js-upload-submit");
@@ -284,40 +416,296 @@ document.addEventListener("DOMContentLoaded", function() {
 
 	// 綁定更新頭像 file_input
 	file_input.addEventListener("change", function(e) {
-		const file = e.target.files[0];
-		if (file === null) return;
+		const user_photo = e.target.files[0];
+		if (user_photo === null) return;
 
-		const reader = new FileReader();
-		reader.addEventListener("load", function() {
-			user_img.src = `${reader.result}`;
-		});
-		reader.readAsDataURL(file);
+		const form_data = new FormData();
+		form_data.append("user_photo", user_photo);
+
+		csrfFetchToRedirect("/api/front-end/protected/member/update-photo", {
+			method: "POST",
+			body: form_data,
+		})
+			.then((res) => {
+				if (!res.ok) throw new Error("Not 2XX or 401");
+				else return res.json();
+			})
+			.then((result) => {
+				console.log(result[0]);
+				console.log(result[1]);
+
+				user_img.src = `${result[1]}`;
+			})
+			.catch(error => console.log(error));
+		//		const reader = new FileReader();
+		//		reader.addEventListener("load", function() {
+		//			user_img.src = `${reader.result}`;
+		//		});
+		//		reader.readAsDataURL(file);
 	});
 
-	// 綁定恢復預設按鈕
-	const btn_recover = document.querySelector("#btn_recover");
+	///////////////////////////////////////////////////////////
+	///////////////////////////////////////////////////////////
+	///////////////////////////////////////////////////////////
+
+	// 只驗證其中四項
+	function validateForm() {
+		const full_name = document.querySelector("#full_name").value.trim();
+		const nickname = document.querySelector("#nickname").value.trim();
+		const phone_number = document.querySelector("#phone_number").value.trim();
+		const address = document.querySelector("#address").value.trim();
+
+		let errors = {};
+
+
+		// 0. full_name: 長度 <= 50
+		if (full_name.length > 50) {
+			errors.full_name = "姓名不能超過 50 個字元";
+		}
+
+		// 1. nickname：必填 + 長度 <= 50
+		if (!nickname) {
+			errors.nickname = "平台暱稱必填";
+		} else if (nickname.length > 50) {
+			errors.nickname = "平台暱稱不能超過 50 個字元";
+		}
+
+		// 2. phone_number：可選填，但若填必須符合台灣電話格式
+		const taiwanPhoneRegex = /^(09\d{8}|0\d{1,2}\d{6,8})$/;
+		if (phone_number) {
+			if (!taiwanPhoneRegex.test(phone_number)) {
+				errors.phone_number = "電話格式必須為台灣電話（09xxxxxxxx 或 市話）";
+			}
+			if (phone_number.length > 15) {
+				errors.phone_number = "電話號碼不能超過 15 碼";
+			}
+		}
+
+		// 3. address：可選填，但長度 <= 255
+		if (address && address.length > 255) {
+			errors.address = "地址不能超過 255 個字元";
+		}
+
+		return errors;
+	}
+
+	function showErrors(errors) {
+		// 先清除舊的錯誤訊息
+		document.querySelectorAll(".error-msg").forEach(el => el.remove());
+
+		for (const [field, message] of Object.entries(errors)) {
+			const input = document.querySelector(`#${field}`);
+			const formGroup = input.closest(".form-group");
+
+			// 在該 input 下方加錯誤提示
+			const small = document.createElement("small");
+			small.classList.add("text-danger", "error-msg");
+			small.innerText = message;
+			formGroup.appendChild(small);
+		}
+	}
+
+	// 選取所有可以 update 項目
+	const full_name = document.querySelector("#full_name");
 	const nickname = document.querySelector("#nickname");
+	const gender = document.querySelector("#gender");
 	const phone_number = document.querySelector("#phone_number");
 	const birth_date = document.querySelector("#birth_date");
 	const address = document.querySelector("#address");
 
+	// 綁定恢復預設按鈕
+	const btn_recover = document.querySelector("#btn_recover");
+
 	btn_recover.addEventListener("click", function() {
-		nickname.value = phone_number.value = birth_date.value = address.value = "";
+		full_name.value = nickname.value = gender.value = phone_number.value = birth_date.value = address.value = "";
+		document.querySelectorAll(".error-msg").forEach(el => el.remove());
 	});
 
 	// 綁定儲存變更按鈕
 	const btn_save = document.querySelector("#btn_save");
+
+	const saved_full_name = document.querySelector("#saved_full_name");
 	const saved_nickname = document.querySelector("#saved_nickname");
+	const saved_gender = document.querySelector("#saved_gender");
 	const saved_phone_number = document.querySelector("#saved_phone_number");
 	const saved_birth_date = document.querySelector("#saved_birth_date");
 	const saved_address = document.querySelector("#saved_address");
-	btn_save.addEventListener("click", function() {
-		saved_nickname.innerText = nickname.value;
-		saved_phone_number.innerText = phone_number.value;
-		saved_birth_date.innerText = birth_date.value;
-		saved_address.innerText = address.value;
+
+	let saveable = true;
+	btn_save.addEventListener("click", function(e) {
+		e.preventDefault();
+
+		const errors = validateForm();
+
+		if (Object.keys(errors).length > 0) {
+			showErrors(errors);
+			console.log("驗證失敗:", errors);
+			return;
+		} else {
+			console.log("驗證成功，可以送出！");
+		}
+
+		const form_data = new FormData();
+		form_data.append("fullName", full_name.value);
+		form_data.append("nickname", nickname.value);
+		form_data.append("gender", gender.value);
+		form_data.append("phoneNumber", phone_number.value);
+		form_data.append("birthDate", birth_date.value);
+		form_data.append("address", address.value);
+
+		saveable = false;
+		csrfFetchToRedirect("/api/front-end/protected/member/update-info", {
+			method: "POST",
+			// FormData 不能搭配自己手動設定 Content-Type
+			// 也可採用 application/x-www-form-urlencoded + URLSearchParams();
+			body: form_data
+		})
+			.then((res) => {
+				if (!res.ok) throw new Error("Not 2XX or 401");
+				else return res.text();
+			})
+			.then((result) => {
+				setTimeout(() => {
+					console.log(result);
+					saved_full_name.innerText = full_name.value;
+					saved_nickname.innerText = nickname.value;
+					saved_gender.innerText = gender.value;
+					saved_phone_number.innerText = phone_number.value;
+					saved_birth_date.innerText = birth_date.value;
+					saved_address.innerText = address.value;
+					sendable = true;
+				}, 500);
+			})
+			.catch(error => {
+				console.log(error)
+				sendable = true;
+			});
 	});
 });
 
+// 取得基本資料區塊
+document.addEventListener("DOMContentLoaded", function() {
 
+	const btn_line_oauth2 = document.getElementById("line-oauth2");
+	const profile_summary = document.getElementById("profile_summary");
+	const related_account = document.getElementById("related_account");
+	// saved 區塊
+	let saved_email_el;
+	let saved_password_el;
+	const saved_full_name_el = document.getElementById("saved_full_name");
+	const saved_nickname_el = document.getElementById("saved_nickname");
+	const saved_gender_el = document.getElementById("saved_gender");
+	const saved_phone_number_el = document.getElementById("saved_phone_number");
+	const saved_birth_date_el = document.getElementById("saved_birth_date");
+	const saved_address_el = document.getElementById("saved_address");
+	// 圖片（user_img)
+	const user_img = document.querySelector("#user_img");
+	// update 區塊
+	const full_name_el = document.querySelector("#full_name");
+	const nickname_el = document.querySelector("#nickname");
+	const gender_el = document.querySelector("#gender");
+	const phone_number_el = document.querySelector("#phone_number");
+	const birth_date_el = document.querySelector("#birth_date");
+	const address_el = document.querySelector("#address");
 
+	const insert_if_oauth2 = function(oauth2provider) {
+		related_account.insertAdjacentHTML("afterbegin", `此帳號透過 <span>${oauth2provider}</span> 綁定`);
+	}
+	//	<h4 id="related_account">此帳號透過 <span>${oauth2provider}</span> 綁定</h4>
+	//			<br />
+	// 如果判斷不是 OAuth2 才需要加入的部分
+	const insert_if_not_oauth2 = function() {
+		// 1. saved 部分要加入信箱密碼
+
+		profile_summary.insertAdjacentHTML("afterbegin", `		<li>信箱 <span id="saved_email"></span>
+		</li>
+		<li>密碼 <span id="saved_password"></span>
+		</li>`);
+		// 2. update 部分要加入信箱密碼
+		const div_if_not_oauth2 = document.querySelector("div#if_not_oauth2");
+		div_if_not_oauth2.insertAdjacentHTML("beforeend", `<div class="col-md-6">
+									<div class="form-group">
+										<label>信箱</label>
+										<div class="btn_change_div">
+											<button id="change_mail">更改會員信箱</button>
+										</div>
+									</div>
+								</div>
+								<div class="col-md-6">
+									<div class="form-group">
+										<label>密碼</label>
+										<div class="btn_change_div">
+											<button id="change_password">重設密碼</button>
+										</div>
+									</div>
+								</div>`)
+
+		saved_email_el = document.getElementById("saved_email");
+		saved_password_el = document.getElementById("saved_password");
+
+		const btn_change_mail_el = document.getElementById("change_mail");
+		const btn_change_password_el = document.getElementById("change_password");
+
+		btn_change_mail_el.addEventListener("click", () => window.location.href = "/front-end/change-mail1")
+		btn_change_password_el.addEventListener("click", () => window.location.href = "/front-end/reset-password1")
+	};
+
+	csrfFetchToRedirect("/api/front-end/protected/member/getMemberInfo", {
+		method: "GET"
+	})
+		.then(res => {
+			if (!res.ok) throw new Error("getMemberInfo: NOT 2XX");
+			else return res.json();
+		})
+		.then(result => {
+			console.log(result);
+
+			if (result.lineUserId) {
+				btn_line_oauth2.classList.add("disabled");
+				btn_line_oauth2.innerText = "已完成 LINE 帳號綁定";
+			}
+			
+			// 如果非使用 OAuth2 登入 -> 才渲染更新框的 (1)信箱 (2)密碼 部分
+			if (!result.githubId && !result.facebookId && !result.googleId) {
+				insert_if_not_oauth2();
+				saved_email_el.innerText = result.email ? result.email : "-";
+				saved_password_el.innerText = "(已隱藏)";
+			}
+			else {
+				console.log("i used oauth2 to log in !!");
+				// 先渲染非 OAuth2 會員才有的值
+				let oauth2provider;
+				
+				btn_line_oauth2.classList.add("oauth2-user")
+
+				if (result.githubId) oauth2provider = "GitHub";
+				if (result.googleId) oauth2provider = "Google";
+				if (result.facebookId) oauth2provider = "Facebook";
+
+				insert_if_oauth2(oauth2provider);
+			}
+
+			// saved部分 -> 把 innerText 放上 -> 所有會員（不論是否 OAuth2）都有的值
+			saved_full_name_el.innerText = result.fullName ? result.fullName : "-";
+			saved_nickname_el.innerText = result.nickname ? result.nickname : "-";
+			saved_gender_el.innerText = result.gender ? result.gender : "-";
+			saved_phone_number_el.innerText = result.phoneNumber ? result.phoneNumber : "-";
+			saved_birth_date_el.innerText = result.birthDate ? result.birthDate : "-";
+			saved_address_el.innerText = result.address ? result.address : "-";
+
+			// update部分 -> 把 value 放上 -> 所有會員（不論是否 OAuth2）都有的值
+			full_name_el.value = result.fullName ? result.fullName : "";
+			nickname_el.value = result.nickname ? result.nickname : ""; // 其實一定有 (not null constraint)
+			gender_el.value = result.gender ? result.gender : "";
+			phone_number_el.value = result.phoneNumber ? result.phoneNumber : "";
+			birth_date_el.value = result.birthDate ? result.birthDate : "";
+			address_el.value = result.address ? result.address : "";
+
+			// 圖片部分
+			user_img.src = result.profilePic ? result.profilePic : "img/tourist_guide_pic.jpg";
+		})
+		.catch(error => {
+			console.log(error);
+		})
+
+});

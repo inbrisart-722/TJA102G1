@@ -6,6 +6,7 @@ import java.util.Set;
 
 import org.hibernate.annotations.Formula;
 
+import com.eventra.comment.controller.CommentStatus;
 import com.eventra.comment_reaction.model.CommentReactionVO;
 import com.eventra.exhibition.model.ExhibitionVO;
 import com.eventra.member.model.MemberVO;
@@ -14,6 +15,8 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -33,8 +36,10 @@ public class CommentVO implements Serializable {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Integer commentId;
 
+	// 「這個屬性在 Java 程式中是 Enum 類型，但在儲存到資料庫時，JPA 會將它的值轉換成 String 存進去。」
+	@Enumerated(EnumType.STRING)
 	@Column(name = "comment_status", insertable = false)
-	private String commentStatus;
+	private CommentStatus commentStatus;
 
 //	@JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
 //	@Column(name = "exhibition_id", insertable = false, updatable = false)
@@ -83,7 +88,7 @@ public class CommentVO implements Serializable {
 	private String content;
 
 //	@CreationTimestamp
-	@JsonFormat(pattern = "yyyy-MM-dd") // 輸出只用到這格式
+//	@JsonFormat(pattern = "yyyy-MM-dd") // 輸出只用到這格式
 	@Column(name = "created_at", insertable = false, updatable = false)
 	private Timestamp createdAt;
 
@@ -123,11 +128,11 @@ public class CommentVO implements Serializable {
 		this.commentId = commentId;
 	}
 
-	public String getCommentStatus() {
+	public CommentStatus getCommentStatus() {
 		return commentStatus;
 	}
 
-	public void setCommentStatus(String commentStatus) {
+	public void setCommentStatus(CommentStatus commentStatus) {
 		this.commentStatus = commentStatus;
 	}
 

@@ -672,11 +672,11 @@
                 <tbody>
                   <th:block th:each="DTO : ${listOfDTOs}">
                   	<tr th:attr="data-cart-item-id=${DTO.cartItemId}">
-                  		<td>
+                  	<td>
                       <div class="thumb_cart img_block">
                         <img
-                          src="img/0_exhibition/ChatGPT_exhibition_1.png"
-                          alt="推薦圖片"
+                          th:src="${DTO.photoPortrait != null ? DTO.photoPortrait : 'img/0_exhibition/ChatGPT_exhibition_1.png'}"
+                          th:alt="${DTO.exhibitionName != null ? DTO.exhibitionName : '推薦展覽'}"
                         />
                       </div>
                       <span th:text="${DTO.exhibitionName}" class="item_cart">當代藝術畫展 - TibaMe</span>
@@ -713,7 +713,7 @@
                 value="pay_method1"
                 checked
               />
-              <label for="pay_method1">Visa、MasterCard、JCB</label>
+              <img class="orderProvider ecpay" src="https://support.ecpay.com.tw/wp-content/uploads/2023/08/logo200x120-e1692354870320.png" /><label for="pay_method1">信用卡 - 綠界支付</label>
               <br />
               <input
                 id="pay_method2"
@@ -721,7 +721,7 @@
                 name="pay_method"
                 value="pay_method2"
               />
-              <label for="pay_method2">美國運通卡</label>
+              <img class="orderProvider linepay" src="https://upload.wikimedia.org/wikipedia/commons/thumb/4/42/Line_pay_logo.svg/1024px-Line_pay_logo.svg.png" /><label for="pay_method2">Line Pay</label>
             </div>
             <!--End step -->
 
@@ -742,15 +742,15 @@
                   我（或監護人）已詳閱並同意
                   <a href="#"><strong>買賣契約書</strong></a
                   >（必填）
-                  <input type="checkbox" />
+                  <input type="checkbox" id="agreement"/>
                   <span class="checkmark"></span>
                 </label>
               </div>
               <a
                 href="confirmation.html"
-                id="pay"
+                id="third-party-payment"
                 class="btn_1 dark_green medium"
-                >前往支付頁面</a
+                >前往 第三方支付頁</a
               >
             </div>
           </div>
@@ -939,6 +939,7 @@
     <script src="js/g1_10_custom_common_csrf.js"></script>
     <script src="js/g1_10_custom_common.js"></script>
     <script src="js/g1_10_custom_payment.js"></script>
-    <script src="js/g1_6_search_modal.js"></script>
+    <script src="js/g1_6_search_history.js"></script>  <!-- 存搜尋紀錄用 -->
+    <script src="js/g1_6_search_modal.js"></script>	 <!-- 導頁至搜尋結果頁用 -->
   </body>
 </html>

@@ -1,5 +1,128 @@
+let my_profile_pic;
 // 分開包了很多事件委派（但其實應該包一起）
 document.addEventListener("DOMContentLoaded", function() {
+
+	// 馬上打api去取頭像（不重導向）-> 可能會有 bug（取得比留言等處慢的時候 -> then 可解）
+	fetch("/api/front-end/protected/member/getMyProfilePic", {
+		method: "GET"
+	})
+		.then(res => {
+			if (!res.ok) throw new Error("getMyProfilePic: NOT 2XX");
+			else return res.text();
+		})
+		.then(pic => {
+			// 只有 default_pic 或 實際 member_pic 2種狀況
+			my_profile_pic = pic;
+			// 可以在此處理重新 refresh
+			const img = document.querySelector("section.top-reply > form.form_reply > img.replier_self");
+			img.src = my_profile_pic;
+		})
+		.catch(error => {
+			console.log(error);
+			my_profile_pic = "img/tourist_guide_pic.jpg";
+		});
+
+	const div_related_exhib = document.querySelector("div#related_exhib");
+	// 準備取側欄所需的 2 個參數
+	const btn_more_related_exhib = document.querySelector("#more_related_exhib > .btn_full");
+
+	btn_more_related_exhib.addEventListener("click", function() {
+		// 1. 先取 URL exhibitionId  -> data-exhibition-id
+		let exhibitionId = btn_more_related_exhib.dataset.exhibitionId;
+		// 2. 再取 btn 上的 -> data-average-rating-score
+		let averageRatingScore = btn_more_related_exhib.dataset.averageRatingScore;
+
+		// /api/exhibitions/sidebar?exhibitionId=" + exhibitionId + "&averageRatingScore=" + averageRatingScore
+		let queryString = "/api/exhibitions/sidebar";
+		if (exhibitionId) queryString += "?exhibitionId=" + exhibitionId;
+		if (!exhibitionId && averageRatingScore) queryString += "?averageRatingScore=" + averageRatingScore;
+		if (exhibitionId && averageRatingScore) queryString += "&averageRatingScore=" + averageRatingScore;
+
+		// fetch
+		fetch(queryString, {
+			"method": "GET"
+		})
+			.then(res => {
+				if (!res.ok) console.log("sidebar: Not 2XX");
+				else return res.json();
+			})
+			.then(result => {
+				// ExhibitionSidebarResultDTO
+				// hasNextPage
+				// list (exhibitionId, photoPortrait, exhibitionName, location
+				// startTime, endTime, averageRatingScore, totalRatingCount;
+
+				let to_exhibitionId;
+				let to_averageRatingScore;
+				result.list.forEach(e => {
+					const wrapper = document.createElement("div");
+					// e.photoPortrait
+					wrapper.innerHTML =
+						`
+							<div class="sidebar_exhib_block">
+								<a href="/front-end/exhibitions?exhibitionId=${e.exhibitionId}">
+									<div class="sidebar_exhib_img">
+										<img src="${e.photoPortrait}"
+											alt="推薦圖片" />
+									</div> <span class="sidebar_exhib_title">${e.exhibitionName}</span> <span
+										class="sidebar_exhib_loc"><i class="icon-location"></i>&nbsp;${e.location}</span>
+									<span class="sidebar_exhib_time"><i class="icon-clock"></i>&nbsp;${(e.startTime.replace("T", " ") + " -</br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" + e.endTime).replace("T", " ")}</span>
+									<div class="rating">
+									</div>
+								</a>
+							</div>
+					`
+					// 動態設計星星數（評價）	
+					// 星星顯示
+					const div_stars = wrapper.querySelector("div.rating");
+					const score = Number(e.averageRatingScore) || 0;
+					const fullStars = Math.floor(score);
+					const hasHalf = (score - fullStars) >= 0.5;
+
+					for (let i = 0; i < fullStars; i++) {
+						div_stars.insertAdjacentHTML("beforeend", `<i class="icon-star voted"></i>`);
+					}
+					if (hasHalf) {
+						div_stars.insertAdjacentHTML("beforeend", `<i class="icon-star-half-alt voted"></i>`);
+					}
+					for (let i = fullStars + (hasHalf ? 1 : 0); i < 5; i++) {
+						div_stars.insertAdjacentHTML("beforeend", `<i class="icon-star-empty"></i>`);
+					}
+					div_stars.insertAdjacentHTML("beforeend", ` <span><small>(${e.totalRatingCount})</small></span>`);
+
+
+					// 插入 wrapper 和 hr
+					btn_more_related_exhib.insertAdjacentElement("beforebegin", wrapper);
+					const hr = document.createElement("hr");
+					const hr2 = document.createElement("hr");
+					btn_more_related_exhib.insertAdjacentElement("beforebegin", hr);
+					btn_more_related_exhib.insertAdjacentElement("beforebegin", hr2);
+					// 更新 sidebar 高度
+					// offsetHeight 是 JavaScript DOM 屬性，用來取得一個元素的視覺高度
+					// 包括了元素的內容、內邊距 (padding) 和邊框 (border)。
+					const currentHeight = div_related_exhib.offsetHeight;
+					const newMinHeight = (currentHeight + 145) + "px";
+					div_related_exhib.style.minHeight = newMinHeight;
+					// 最後一圈的值會覆蓋，後續拿去渲染 btn dataset 的值
+					to_exhibitionId = e.exhibitionId;
+					to_averageRatingScore = e.averageRatingScore;
+				})
+				// 要記得此次取完的全部渲染完以後，要更動 btn dataset 的值
+				btn_more_related_exhib.dataset.exhibitionId = to_exhibitionId;
+				btn_more_related_exhib.dataset.averageRatingScore = to_averageRatingScore;
+
+				if (!result.hasNextPage) {
+					btn_more_related_exhib.innerText = "已經到底了！";
+					btn_more_related_exhib.disabled = true;
+				}
+			})
+			.catch(error => console.log(error));
+	});
+	
+	btn_more_related_exhib.click();
+
+
+
 	// 父層留言 + 子層回覆 新增 start
 	document.addEventListener("click", function(e) {
 		const btn_send = e.target.closest("form.form_reply > button");
@@ -14,9 +137,11 @@ document.addEventListener("DOMContentLoaded", function() {
 
 			// 收集數據
 			// 收集數據 -> 1. exhibition_id;
-			const path_name = window.location.pathname;
-			const last_slash_index = path_name.lastIndexOf("/");
-			const exhibition_id = path_name.substring(last_slash_index);
+			//			const path_name = window.location.pathname;
+			//			const last_slash_index = path_name.lastIndexOf("/");
+			//			const exhibition_id = path_name.substring(last_slash_index);
+			const params = new URLSearchParams(window.location.search);
+			const exhibitionId = params.get("exhibitionId");
 			// 收集數據 -> 2. parent_comment_id
 			const parent_comment = btn_send.closest("div.review_strip_single");
 			let parent_comment_id;
@@ -25,13 +150,13 @@ document.addEventListener("DOMContentLoaded", function() {
 
 			// exhibition_id, parent_comment_id, content
 			send_data = {
-				exhibitionId: 2, // test
+				exhibitionId: Number(exhibitionId), // test
 				parentCommentId: parent_comment_id,
 				content: comment_value,
 			};
 
 			// fetch 1 => 新增父子留言
-			csrfFetch("/api/front-end/protected/comment/addComment", {
+			csrfFetchToRedirect("/api/front-end/protected/comment/addComment", {
 				method: "POST",
 				headers: {
 					"Content-Type": "application/json",
@@ -39,10 +164,6 @@ document.addEventListener("DOMContentLoaded", function() {
 				body: JSON.stringify(send_data),
 			})
 				.then((res) => {
-					if (res.status === 401) {
-						sessionStorage.setItem("redirect", window.location.pathname);
-						location.href = "/front-end/login";
-					}
 					if (!res.ok) throw new error("addComment: Not 2XX or 401");
 					return res.json();
 				})
@@ -55,17 +176,16 @@ document.addEventListener("DOMContentLoaded", function() {
 						// 子層
 						const reply_body_html = document.createElement("div");
 						reply_body_html.className = "reply_body";
-						reply_body_html.dataset.commentId = result.commentVO.commentId;
+						reply_body_html.dataset.commentId = result.comment.commentId;
 						// member 圖片、member 暱稱 or 姓名
 						reply_body_html.innerHTML = `<!-- 單個回覆 -->
                         <img
-                          src="./img/avatar1.jpg"
+                          src="${result.comment.member.profilePic}"
                           alt="Image"
                           class="rounded-circle replier_others"
                         />
-                        <h6>${"result.memberId: " + result.commentVO.memberId
-							}</h6>
-                        <small>${result.commentVO.createdAt}</small>
+                        <h6>${result.comment.member.nickname}</h6>
+                        <small>${result.comment.createdAt}</small>
                         <div class="report_block">
                           <button>...</button>
                           <ul>
@@ -83,7 +203,7 @@ document.addEventListener("DOMContentLoaded", function() {
                       <!-- 單個回覆 end -->`;
 						const report_block = reply_body_html.querySelector(".report_block");
 						const p = document.createElement("p");
-						p.innerText = result.commentVO.content; // comment_value
+						p.innerText = result.comment.content; // comment_value
 						report_block.insertAdjacentElement("afterend", p);
 						// 找到插入區塊
 						const sub_reply_block = btn_send
@@ -98,16 +218,16 @@ document.addEventListener("DOMContentLoaded", function() {
 						const review_strip_single_html = document.createElement("div");
 						review_strip_single_html.className = "review_strip_single";
 						review_strip_single_html.dataset.commentId =
-							result.commentVO.commentId; // data-comment-id 設值
+							result.comment.commentId; // data-comment-id 設值
 						review_strip_single_html.innerHTML = `
                   <!-- 留言 header 部分 -->
                   <img
-                    src="img/avatar1.jpg"
+                    src="${result.comment.member.profilePic}"
                     alt="Image"
-                    class="rounded-circle"
+                    class="rounded-circle comment-avatar"
                   />
-                  <h4>${"result.memberId: " + result.commentVO.memberId}</h4>
-                  <small> ${result.commentVO.createdAt}&nbsp;&nbsp;</small>
+                  <h4>${result.comment.member.nickname}</h4>
+                  <small> ${result.comment.createdAt}&nbsp;&nbsp;</small>
                   <div class="report_block">
                     <button>...</button>
                     <ul>
@@ -133,7 +253,7 @@ document.addEventListener("DOMContentLoaded", function() {
                     <!-- 本人回覆輸入 -->
                     <form action="" class="form_reply sub">
                       <img
-                        src="./img/avatar1.jpg"
+                        src="${result.comment.member.profilePic}"
                         alt="Image"
                         class="rounded-circle replier_self"
                       />
@@ -143,13 +263,18 @@ document.addEventListener("DOMContentLoaded", function() {
                       </button>
                     </form>
                     <article class="reply_block">
+					<!-- 單個回覆 插入 start -->
+					                          <button class="btn_full btn_more_comments_child">
+					                          查看更多回覆
+					                          </button>
+					                          <!-- 單個回覆 插入 end -->
                     </article>
                     </section>`;
 						const report_block =
 							review_strip_single_html.querySelector(".report_block");
 						const p = document.createElement("p");
 						p.className = "review_content";
-						p.innerText = result.commentVO.content; // comment_value
+						p.innerText = result.comment.content; // comment_value
 						report_block.insertAdjacentElement("afterend", p);
 						// 找到插入區塊
 						const top_reply = document.querySelector("section.top-reply");
@@ -327,9 +452,11 @@ document.addEventListener("DOMContentLoaded", function() {
 			btn_more_parent.innerText = "載入中...";
 			// 收集數據
 			// 收集數據 -> 1. exhibition_id;
-			const path_name = window.location.pathname;
-			const last_slash_index = path_name.lastIndexOf("/");
-			const exhibition_id = path_name.substring(last_slash_index);
+			//			const path_name = window.location.pathname;
+			//			const last_slash_index = path_name.lastIndexOf("/");
+			//			const exhibition_id = path_name.substring(last_slash_index);
+			const params = new URLSearchParams(window.location.search);
+			const exhibitionId = params.get("exhibitionId");
 			// 收集數據 -> 2. created_at;
 			// const created_at = btn_more_parent.dataset.createdAt;
 			// 收集數據 -> 3. comment_id;
@@ -337,7 +464,7 @@ document.addEventListener("DOMContentLoaded", function() {
 			// 收集數據 -> 4. is_parent;
 
 			const send_data = {
-				exhibitionId: 2, // test
+				exhibitionId: Number(exhibitionId), // test
 				// createdAt: created_at,
 				commentId: comment_id,
 			};
@@ -367,11 +494,11 @@ document.addEventListener("DOMContentLoaded", function() {
 						// 圖片與會員姓名還沒處理 !!!!!!!
 						div.innerHTML = `
                       <img
-                        src="./img/avatar1.jpg"
+                        src="${c.member.profilePic}"
                         alt="Image"
-                        class="rounded-circle"
+                        class="rounded-circle comment-avatar"
                       />
-                      <h4>${"memberId: " + c.memberId}</h4>
+                      <h4>${c.member.nickname}</h4>
                       <small> ${c.createdAt}&nbsp;&nbsp;</small>
                       <div class="report_block">
                         <button>...</button>
@@ -404,7 +531,7 @@ document.addEventListener("DOMContentLoaded", function() {
                         <!-- 本人回覆輸入 -->
                         <form action="" class="form_reply sub">
                           <img
-                            src="./img/avatar1.jpg"
+                            src="${my_profile_pic}"
                             alt="Image"
                             class="rounded-circle replier_self"
                           />
@@ -431,11 +558,13 @@ document.addEventListener("DOMContentLoaded", function() {
 						const icon_like = div.querySelector("i.icon-thumbs-up");
 						const icon_dislike = div.querySelector("i.icon-thumbs-down");
 
-						// undefined / LIKE / DISLIKE
-						const member_reaction = result.mapReaction[c.commentId];
-						if (member_reaction === "LIKE") icon_like.classList.add("-on");
-						else if (member_reaction === "DISLIKE")
-							icon_dislike.classList.add("-on");
+						if (result.status === "member") {
+							// undefined / LIKE / DISLIKE
+							const member_reaction = result.mapReaction[c.commentId];
+							if (member_reaction === "LIKE") icon_like.classList.add("-on");
+							else if (member_reaction === "DISLIKE")
+								icon_dislike.classList.add("-on");
+						}
 					});
 
 					btn_more_parent.innerText = "查看更多留言";
@@ -460,9 +589,11 @@ document.addEventListener("DOMContentLoaded", function() {
 
 			// 收集數據
 			// 收集數據 -> 1. exhibition_id;
-			const path_name = window.location.pathname;
-			const last_slash_index = path_name.lastIndexOf("/");
-			const exhibition_id = path_name.substring(last_slash_index);
+			//			const path_name = window.location.pathname;
+			//			const last_slash_index = path_name.lastIndexOf("/");
+			//			const exhibition_id = path_name.substring(last_slash_index);
+			const params = new URLSearchParams(window.location.search);
+			const exhibitionId = params.get("exhibitionId");
 			// 收集數據 -> 2. created_at;
 			// const created_at = btn_more_child.dataset.createdAt;
 			// 收集數據 -> 3. comment_id;
@@ -473,7 +604,7 @@ document.addEventListener("DOMContentLoaded", function() {
 			).dataset.commentId;
 
 			const send_data = {
-				exhibitionId: 2, // test
+				exhibitionId: Number(exhibitionId), // test
 				// createdAt: created_at, // cursor 用
 				commentId: comment_id, // cursor 用
 				parentCommentId: parent_comment_id, // 抓 div.reivew_strip_single 的值
@@ -507,11 +638,11 @@ document.addEventListener("DOMContentLoaded", function() {
 						div.innerHTML = `
           <!-- 單個回覆 -->
                         <img
-                          src="./img/avatar1.jpg"
+                          src="${r.member.profilePic}"
                           alt="Image"
                           class="rounded-circle replier_others"
                         />
-                        <h6>${"r.memberId: " + r.memberId}</h6>
+                        <h6>${r.member.nickname}</h6>
                         <small>${r.createdAt}</small>
                         <div class="report_block">
                           <button>...</button>
@@ -539,12 +670,13 @@ document.addEventListener("DOMContentLoaded", function() {
 						const icon_like = div.querySelector("i.icon-thumbs-up");
 						const icon_dislike = div.querySelector("i.icon-thumbs-down");
 
-						// undefined / LIKE / DISLIKE
-						const member_reaction = result.mapReaction[r.commentId];
-						if (member_reaction === "LIKE") icon_like.classList.add("-on");
-						else if (member_reaction === "DISLIKE")
-							icon_dislike.classList.add("-on");
-
+						if (result.status === "member") {
+							// undefined / LIKE / DISLIKE
+							const member_reaction = result.mapReaction[r.commentId];
+							if (member_reaction === "LIKE") icon_like.classList.add("-on");
+							else if (member_reaction === "DISLIKE")
+								icon_dislike.classList.add("-on");
+						}
 						// 小心 max-height 問題...
 					});
 
@@ -566,7 +698,7 @@ document.addEventListener("DOMContentLoaded", function() {
 				});
 		}
 
-		// 點擊回覆 也要相當於點了一次 查看更多回復
+		// 點擊回覆 也要相當於點了一次 查看更多回覆
 		if (e.target.closest(".btn_reply")) {
 			const btn_reply = e.target.closest(".btn_reply");
 			const section_reply = btn_reply
@@ -590,54 +722,6 @@ document.addEventListener("DOMContentLoaded", function() {
 	});
 	// 頁面載入當下 -> （父層）模擬實際點了一次「查看更多留言」
 	document.querySelector(".btn_more_comments_parent").click();
-
-	// 側欄 查看更多
-	const sidebar_more_related_exhib_btn = document.querySelector(
-		"div#more_related_exhib > button.btn_full_exhib"
-	);
-	sidebar_more_related_exhib_btn.addEventListener("click", function() {
-		// fetch
-		const more_exhib_block_html = `              <hr />
-              <div>
-                <div class="sidebar_exhib_block">
-                  <a href="">
-                    <div class="sidebar_exhib_img">
-                      <img
-                        src="img/0_exhibition/ChatGPT_exhibition_1.png"
-                        alt="推薦圖片"
-                      />
-                    </div>
-                    <span class="sidebar_exhib_title"
-                      >當代藝術畫展 - TibaMe</span
-                    >
-                    <span class="sidebar_exhib_loc"
-                      ><i class="icon-location"></i>&nbsp;台北市立美術館</span
-                    >
-                    <span class="sidebar_exhib_time"
-                      ><i class="icon-clock"></i>&nbsp;08/12~08/25</span
-                    >
-                    <div class="rating">
-                      <i class="icon-star voted"></i
-                      ><i class="icon-star voted"></i
-                      ><i class="icon-star voted"></i
-                      ><i class="icon-star voted"></i
-                      ><i class="icon-star-half-alt voted"></i>
-                      <span><small>(75)</small></span>
-                    </div>
-                  </a>
-                </div>
-              </div>`;
-
-		// 只是模擬一次多個展覽（之後改成實際 fetch 到的筆數）
-		for (let i = 0; i < 3; i++) {
-			this.closest("div#more_related_exhib").insertAdjacentHTML(
-				"beforebegin",
-				more_exhib_block_html
-			);
-		}
-		this.innerText = "已經到底了！";
-		this.disabled = true;
-	});
 
 	/////////////////////////////////////////////////////////////////////
 	/////////////////////////////////////////////////////////////////////
@@ -765,6 +849,8 @@ document.addEventListener("DOMContentLoaded", function() {
 		}
 	}
 
+	let flag_btn_add_cart_and_go = false;
+
 	const addCartItem = function(send_data) {
 		const adults_el = document.querySelector("input#adults");
 		const students_el = document.querySelector("input#students");
@@ -772,7 +858,7 @@ document.addEventListener("DOMContentLoaded", function() {
 		const disabled_el = document.querySelector("input#disabled");
 		const mili_and_police_el = document.querySelector("input#mili_and_police");
 
-		csrfFetch("/api/front-end/protected/cartItem/addCartItem", {
+		csrfFetchToRedirect("/api/front-end/protected/cartItem/addCartItem", {
 			method: "POST",
 			headers: {
 				"Content-Type": "application/json",
@@ -780,33 +866,35 @@ document.addEventListener("DOMContentLoaded", function() {
 			body: JSON.stringify(send_data),
 		})
 			.then((res) => {
-				if (res.status === 401) {
-					// 存入localStorage
-					sessionStorage.setItem("redirect", window.location.pathname);
-					sessionStorage.setItem("send_data", JSON.stringify(send_data));
-					// 再轉導
-					window.location.href = "/front-end/login";
-				}
+				//				if (res.status === 401) {
+				// 存入localStorage
+				//					sessionStorage.setItem("redirect", window.location.pathname);
+				//					sessionStorage.setItem("send_data", JSON.stringify(send_data));
+				// 再轉導
+				//					window.location.href = "/front-end/login";
+				//				}
 				if (!res.ok) {
 					throw new Error("addCartItem: Not 2XX or 401");
 				}
 				return res.text();
 			})
 			.then((result) => {
-				// if (result.status === "success") {
-				showToast("已加入購物車", "success");
-				console.log(result);
-				// } else if (result.status === "failed") {
-				// showToast("加入購物車失敗", "error");
-				// }
-				adults_el.value =
-					students_el.value =
-					elderly_el.value =
-					disabled_el.value =
-					mili_and_police_el.value =
-					"0";
+				if(adults_el) adults_el.value = "0";
+				if(students_el) students_el.value = "0";
+				if(elderly_el) elderly_el.value = "0";
+				if(disabled_el) disabled_el.value = "0";
+				if(mili_and_police_el) mili_and_police_el.value = "0";
+				
 				recalcTotal();
 				clearTable();
+				if (result === "success") {
+					showToast("已加入購物車", "success");
+					if (flag_btn_add_cart_and_go) {
+						setTimeout(() => location.href = "/front-end/cart", 50)
+					}
+				} else if (result === "failure") {
+					showToast("剩餘票數不足，加入購物車失敗", "error");
+				}
 			})
 			.catch((error) => {
 				console.log("error");
@@ -815,13 +903,15 @@ document.addEventListener("DOMContentLoaded", function() {
 			});
 	}
 
-	const redirect_send_data = sessionStorage.getItem("send_data");
-	if (redirect_send_data) {
-		if (!sessionStorage.getItem("redirect")) {
-			addCartItem(JSON.parse(redirect_send_data));
-			sessionStorage.removeItem("send_data");
-		}
-	}
+	//	const redirect_send_data = sessionStorage.getItem("send_data");
+	//	if (redirect_send_data) {
+	//		if (!sessionStorage.getItem("redirect")) {
+	//			setTimeout(() => {
+	//				addCartItem(JSON.parse(redirect_send_data))
+	//				sessionStorage.removeItem("send_data");
+	//				}, 1000)
+	//		}
+	//	}
 
 	const btn_add_cart = document.querySelector("a#add_cart");
 
@@ -830,20 +920,22 @@ document.addEventListener("DOMContentLoaded", function() {
 
 		// 收集數據
 		// 收集數據 -> 1. exhibition_id;
-		const path_name = window.location.pathname;
-		const last_slash_index = path_name.lastIndexOf("/");
-		const exhibition_id = path_name.substring(last_slash_index + 1);
+		//		const path_name = window.location.pathname;
+		//		const last_slash_index = path_name.lastIndexOf("/");
+		//		const exhibition_id = path_name.substring(last_slash_index + 1);
+		const params = new URLSearchParams(window.location.search);
+		const exhibitionId = params.get("exhibitionId");
 		// 收集數據 -> 2. ticket_datas;
 		const adults_el = document.querySelector("input#adults");
 		const students_el = document.querySelector("input#students");
 		const elderly_el = document.querySelector("input#elderly");
 		const disabled_el = document.querySelector("input#disabled");
 		const mili_and_police_el = document.querySelector("input#mili_and_police");
-		const adults = Number(adults_el.value);
-		const students = Number(students_el.value);
-		const elderly = Number(elderly_el.value);
-		const disabled = Number(disabled_el.value);
-		const mili_and_police = Number(mili_and_police_el.value);
+		const adults = adults_el ? Number(adults_el.value) : 0;
+		const students = students_el ? Number(students_el.value) : 0;
+		const elderly = elderly_el ? Number(elderly_el.value) : 0;
+		const disabled = disabled_el ? Number(disabled_el.value) : 0;
+		const mili_and_police = mili_and_police_el ? Number(mili_and_police_el.value) : 0;
 		if (
 			adults === 0 &&
 			students === 0 &&
@@ -870,7 +962,7 @@ document.addEventListener("DOMContentLoaded", function() {
 		// 1全票，2學生票，3敬老票，4身心障礙者票，5軍警票
 
 		const send_data = {
-			exhibitionId: 2, // test
+			exhibitionId: Number(exhibitionId), // test
 			ticketDatas: ticket_datas,
 		};
 
@@ -883,7 +975,7 @@ document.addEventListener("DOMContentLoaded", function() {
 	btn_add_cart_and_go.addEventListener("click", function(e) {
 		e.preventDefault();
 		btn_add_cart.click();
-		location.href = "/front-end/cart";
+		flag_btn_add_cart_and_go = true;
 	});
 	// JavaScript 動態取得路徑的方法 by 小吳
 
@@ -957,7 +1049,7 @@ document.addEventListener("DOMContentLoaded", function() {
 			commentId: comment_id,
 			reaction,
 		};
-		csrfFetch("/api/front-end/protected/commentReaction/updateReaction", {
+		csrfFetchToRedirect("/api/front-end/protected/commentReaction/updateReaction", {
 			method: "POST",
 			headers: {
 				"Content-Type": "application/json",
@@ -965,10 +1057,6 @@ document.addEventListener("DOMContentLoaded", function() {
 			body: JSON.stringify(send_data),
 		})
 			.then((res) => {
-				if (res.status === 401) {
-					sessionStorage.setItem("redirect", window.location.pathname);
-					location.href = "/front-end/login";
-				}
 				if (!res.ok) throw new Error("updateReaction: Not 2XX or 401");
 				return res.json();
 			})
@@ -1087,15 +1175,15 @@ document.addEventListener("DOMContentLoaded", function() {
 		// 評價按鈕
 		const btn_open_rate_modal = e.target.closest("button#btn_open_rate_modal");
 		if (!btn_open_rate_modal) return;
-		openRate();
 		// 收集數據
 		// 收集數據 -> 1. exhibition_id;
-		const path_name = window.location.pathname;
-		const last_slash_index = path_name.lastIndexOf("/");
-		const exhibition_id = path_name.substring(last_slash_index);
+		//		const path_name = window.location.pathname;
+		//		const last_slash_index = path_name.lastIndexOf("/");
+		//		const exhibition_id = path_name.substring(last_slash_index);
+		const params = new URLSearchParams(window.location.search);
+		const exhibitionId = params.get("exhibitionId");
 
-		// 測試先放 2
-		csrfFetch("/api/front-end/rating/getMyRating?exhibitionId=" + "2", {
+		csrfFetchToRedirect("/api/front-end/protected/rating/getMyRating?exhibitionId=" + exhibitionId, {
 			method: "GET",
 		})
 			.then((res) => {
@@ -1103,6 +1191,7 @@ document.addEventListener("DOMContentLoaded", function() {
 				return res.json();
 			})
 			.then((result) => {
+				openRate();
 				console.log(result);
 				// status, canRate, originalRating
 				// Main logic
@@ -1147,9 +1236,9 @@ document.addEventListener("DOMContentLoaded", function() {
 	}
 
 	document.addEventListener("click", function(e) {
-		e.preventDefault();
 		const btn_submit_rate = e.target.closest("#rate_form .btn_submit");
 		if (!btn_submit_rate) return;
+		e.preventDefault();
 
 		const ratingScore_el = formRate.querySelector(
 			"input[name='rating']:checked"
@@ -1171,9 +1260,12 @@ document.addEventListener("DOMContentLoaded", function() {
 
 		if (ratingScore === originalRatingScore) return;
 
-		csrfFetch(
+		const params = new URLSearchParams(window.location.search);
+		const exhibitionId = params.get("exhibitionId");
+
+		csrfFetchToRedirect(
 			"/api/front-end/protected/rating/upsertRating?exhibitionId=" +
-			2 + // test
+			exhibitionId +
 			"&ratingScore=" +
 			ratingScore,
 			{
@@ -1183,10 +1275,6 @@ document.addEventListener("DOMContentLoaded", function() {
 			.then((res) => {
 				if (!res.ok) throw new Error("upsertRating: Not 2XX or 401");
 				// 其實前端已經擋不該評價的（包含未登入），但還是寫一次邏輯怕有人路徑亂送，後端取不到 Authentication 可能出錯
-				if (res.status === 401) {
-					sessionStorage.setItem("redirect", window.location.pathname);
-					location.href = "/front-end/login";
-				}
 				return res.json();
 			})
 			.then((result) => {
@@ -1213,5 +1301,330 @@ document.addEventListener("DOMContentLoaded", function() {
 	});
 });
 
-// 待 fetch 清單
-// fetch /api/cartItem/* -> 處理 新增評價
+document.addEventListener("DOMContentLoaded", function() {
+	// 瀏覽器會打開一條 持續不關閉的 HTTP GET 請求。
+	// 伺服器（Spring）回應的 body 就是一個 不斷追加資料的文字流（text/event-stream）。
+	// 瀏覽器內建解析器會讀這個流，每當遇到 \n\n 就觸發一個 message 事件。
+	const params = new URLSearchParams(window.location.search);
+	const exhibitionId = params.get("exhibitionId");
+	const eventSource = new EventSource("/api/sse/exhibition-ticket/subscribe/" + exhibitionId);
+
+	// 後端 -> emitter.send(SseEmitter.event().name("ticket-update").data(remaining));
+	eventSource.addEventListener("ticket-update", function(event) {
+		const remaining = event.data; // 後端送來的剩餘票數
+		document.querySelector("#sse_ticket_left").textContent = remaining; // 更新頁面
+	})
+
+	eventSource.onerror = (err) => {
+		console.error("ticket-update SSE error: ", err);
+	}
+})
+
+/////////////////////////////////////////////
+/////////////////////////////////////////////
+// 全域大廳聊天室 websocket
+/////////////////////////////////////////////
+/////////////////////////////////////////////
+
+document.addEventListener("DOMContentLoaded", function() {
+
+	const chatToggle = document.getElementById("chat-toggle");
+	const chatWindow = document.getElementById("chat-window");
+	const chatClose = document.getElementById("chat-close");
+	const chatSend = document.getElementById("chat-send");
+	const chatInput = document.getElementById("chat-input");
+	const chatBody = document.getElementById("chat-body");
+	const chatOverlay = document.getElementById("chat-overlay");
+	const chatOnlineCount = document.getElementById("chat-online-count");
+	chatWindow.style.display = "none";
+
+	let myMemberId; // 核心! 定義我的 memberId !!
+
+	let hasGottenMyMemberId = false;
+	let timestampCursor; // 每次拿這個時間去 fetch 更舊的 10 筆！
+	let isLoading = false; // 避免重複請求用！
+	let oldestReached = false;
+
+	/* ================= 處理 chat window 顯示與 input 處 disabled ================= */
+	function toggleChatWindow(memberId) {
+		// 對話框 本來是隱藏 就顯示
+		if (chatWindow.style.display === "none") {
+			// 非會員要處理 輸入框 disabled
+			if (!memberId) {
+				chatInput.disabled = true;
+				chatSend.disabled = true;
+				chatOverlay.style.display = "flex";
+			}
+			else {
+				chatInput.disabled = false;
+				chatSend.disabled = false;
+				chatOverlay.style.display = "none";
+			}
+
+			// 不管如何都把 chatWindow 打開
+			chatWindow.style.display = "flex";
+		}
+		// 對話框 本來是顯示 就隱藏
+		else chatWindow.style.display = "none";
+	}
+
+	/* ================= 處理時間顯示 ================= */
+	function formatTime(timestamp) {
+		//			const date = new Date(timestamp).toLocaleDateString();
+		const date = new Date(timestamp).toLocaleTimeString('zh-TW', {
+			hour: '2-digit',
+			minute: '2-digit',
+			hour12: true
+		});
+		return date;
+	}
+
+	/* ================= 處理滑動 -> 繼續載入舊訊息 ================= */
+	chatBody.addEventListener("scroll", async () => {
+		// console.log(chatBody.scrollTop); // 上方還能滑動之高度
+		// console.log(chatBody.scrollHeight) // 總共可滑動之高度
+
+		// 滑到頂部就繼續載入
+		if (chatBody.scrollTop === 0 && !isLoading && !oldestReached) {
+			isLoading = true;
+
+			const msgs = await getMessages(timestampCursor);
+			if (msgs && msgs.length > 0) {
+
+				//				msgs.forEach((msg, index) => {
+				//					if (Number(msg.memberId) === Number(myMemberId)) // 都轉數字比
+				//						appendMessage("self", msg);
+				//					// 後端送回來這則，是別人發的
+				//					else appendMessage("others", msg);
+				//					
+				//					// 更新 timestamp cursor
+				//				})
+
+				for (let i = msgs.length - 1; i >= 0; i--) {
+					if (Number(msgs[i].memberId) === Number(myMemberId)) // 都轉數字比
+						appendMessage("self", msgs[i], true);
+					// 後端送回來這則，是別人發的
+					else appendMessage("others", msgs[i], true);
+
+					if (i === 0) {
+						timestampCursor = msgs[i].sentTime;
+					}
+				}
+			}
+			else {
+				oldestReached = true;
+				isLoading = false;
+				return;
+			}
+			recordable = true;
+			isLoading = false;
+		}
+
+	})
+
+	/* ================= 處理第一次點擊 toggle btn 開啟對話窗 ================= */
+	// 按鈕打開或關閉 window -> 可優化把 icon 換成 x 但先略
+	chatToggle.addEventListener("click", () => {
+
+		// 第一次點擊 打開聊天室 按鈕
+		// 打開以後就持續同步聊天室直到斷線了，所以第二次不用再取
+		if (!hasGottenMyMemberId) {
+			// 1. 馬上先建立連線
+			connect();
+			// 2. 先取在線人數 -> 改在連線中取，否則會取不到自己的連線數字
+			// 3. 取自己的 memberId -> 拿來後續判斷顯示左還右！
+			getMyMemberId().then(memberId => {
+				myMemberId = memberId;
+				toggleChatWindow(myMemberId);
+				hasGottenMyMemberId = true;
+			})
+			// 4. 取過去的聊天記錄
+			const timestamp = Date.now(); // 拿到一個 long 類型的數值
+			getMessages(timestamp).then(list => {
+				list.forEach((msg, index) => {
+					// msg -> memberId, agentId, avatarSrc, content, sentTime
+					if (Number(msg.memberId) === Number(myMemberId)) // 都轉數字比
+						appendMessage("self", msg);
+					// 後端送回來這則，是別人發的
+					else appendMessage("others", msg);
+					if (index === 0) timestampCursor = msg.sentTime;
+				})
+			});
+		}
+
+		// 非第一次點擊 打開聊天室 按鈕 -> 純 toggle
+		else toggleChatWindow(myMemberId);
+
+		chatBody.scrollTop = chatBody.scrollHeight;
+	});
+
+	/* ================= 部分事件綁定 ================= */
+	// window 右上角的關閉按鈕
+	chatClose.addEventListener("click", () => {
+		chatWindow.style.display = "none";
+	});
+	// 送出按鈕 -> 送訊息
+	chatSend.addEventListener("click", sendMessage);
+	// 或按下 Enter -> 送訊息
+	chatInput.addEventListener("keyup", (e) => {
+		if (e.key === "Enter") sendMessage();
+	});
+
+	/* ================= api: 取得初始在線人數 ================= */
+	function getInitOnlineCount() {
+		return fetch("/api/front-end/chat/initCount", { method: "GET" })
+			.then(res => {
+				if (!res.ok) throw new Error("Not 2XX");
+				return res.text();
+			})
+			.catch(error => {
+				console.log("initCount: " + error);
+				return null;
+			})
+	}
+
+	/* ================= api: 確認自己是誰 ================= */
+	function getMyMemberId() {
+		return csrfFetch("/api/front-end/protected/member/getMyMemberId", { method: "GET" })
+			.then((res) => {
+				if (!res.ok) return res.text().then(text => {throw new Error("getMyMemberId: " + text);})
+				return res.text();
+			})
+			.then((result) => {
+				if (result === "") {
+					console.log("getMyMemberId: NOT MEMBER!");
+					return null;
+				}
+				else {
+					console.log("getMyMemberId: memberId= " + result);
+					return result;
+				}
+			})
+			.catch((error) => {
+				console.log(error);
+				return null;
+			});
+	}
+	/* ================= api: 拿過去的聊天訊息紀錄 ================= */
+
+	function getMessages(timestamp) {
+		return fetch("/api/front-end/chat/getMessages?timestamp=" + timestamp, {
+			method: "GET"
+		})
+			.then(res => {
+				if (!res.ok) throw new Error("getMessages: NOT 2XX");
+				else return res.json();
+			})
+			.catch(error => {
+				console.log(error);
+				return null;
+			})
+	}
+
+	/* ================= SockJS + STOMP + WebSocket ================= */
+	let stompClient = null;
+
+	function connect() {
+		const socket = new SockJS("/front-end/ws-chat");
+		// 後端設定的 endpoint -> WebSocketConfig 裡 registry.addEndpoint("/ws-chat")
+		// SockJs 為 WebSocket 兼容層 ->「使用 WebSocket，但失敗就自動降級」的連線
+		stompClient = Stomp.over(socket);
+		// 代表在「SockJS 的連線」上再套用 STOMP 協議，這樣就能用
+		// .connect()
+		// .subscribe()
+		// .send() 這些方法
+
+		// 核心 part1 -> .connect()
+		// 參數1: headers, 可選，可用來傳遞認證資訊
+		// 參數2: callback function，當連線建立成功時，會立即被執行
+		// frame 參數: 包含了連線成功的資訊，包含伺服器端的細節等...
+		stompClient.connect({}, function(frame) {
+			console.log('Connected: ' + frame);
+
+			getInitOnlineCount().then(onlineCount => {
+				chatOnlineCount.innerText = onlineCount;
+			})
+
+			// 核心 part2 -> .subscribe()
+			// 參數1: 訂閱位址
+			// 訂閱後端廣播頻道（配合後端 @SendTo("...") 或 convertAndSend(...))
+			// 參數2: callback function，處理接收到的訊息
+			stompClient.subscribe('/topic/messages', function(message) {
+				// 和 HTTP Protocol res.json() 不同情況，此處為 ws Protocol，message.body 直接是 json 字串而非串流
+				// res.json() 和 JSON.parse() 的根本區別在於：
+				// res.json() 是一個 "stream reader + JSON parser"：它會先讀取一個串流，然後解析成物件。
+				// JSON.parse() 是一個 "JSON parser"：它直接將一個已知的 JSON 字串解析成物件。
+				const msg = JSON.parse(message.body);
+				// 後端送回來這則，是我本人發的
+				console.log("msg.memberId: " + msg.memberId);
+				console.log("myMemberId: " + myMemberId);
+				if (Number(msg.memberId) === Number(myMemberId)) // 都轉數字比
+					appendMessage("self", msg);
+				// 後端送回來這則，是別人發的
+				else appendMessage("others", msg);
+			})
+
+			stompClient.subscribe('/topic/onlineCount', function(message) {
+				chatOnlineCount.innerText = message.body;
+			})
+		})
+	}
+
+	function sendMessage() {
+		const text = chatInput.value.trim();
+		if (!text) return;
+
+		// 核心 part3 -> .send()
+		// 往後端 @MessageMapping("...") 送訊息
+		stompClient.send("/app/chat", {}, JSON.stringify({
+			// text 前端取 -> memberId, agentId, sentTime, avatarSrc 後端取
+			content: text,
+		}))
+
+		chatInput.value = ""; // 清空輸入框
+	}
+
+	/* =================================================== */
+
+	function appendMessage(sender, msg, prepend = false) {
+		const msgDiv = document.createElement("div");
+		msgDiv.classList.add("message", sender);
+
+		const avatar = document.createElement("img");
+		avatar.classList.add("avatar");
+		avatar.src = msg.avatarSrc;
+
+		const bubble = document.createElement("div");
+		bubble.classList.add("bubble");
+		bubble.textContent = msg.content;
+
+		const time = document.createElement("time");
+		time.classList.add(sender);
+		time.textContent = formatTime(msg.sentTime);
+
+		msgDiv.appendChild(avatar);
+		msgDiv.appendChild(bubble);
+		msgDiv.appendChild(time);
+
+		if (prepend) {
+			// 1. 找到目前最上面那個訊息 (載入前第一個元素)
+			const firstMsg = chatBody.firstElementChild;
+			const prevTop = firstMsg ? firstMsg.getBoundingClientRect().top : 0;
+
+			// 2. 插入新訊息
+			chatBody.prepend(msgDiv);
+			requestAnimationFrame(() => msgDiv.classList.add("show"));
+
+			// 3. 計算插入後這個元素的新位置
+			const newTop = firstMsg ? firstMsg.getBoundingClientRect().top : 0;
+
+			// 4. 調整 scrollTop → 補回位移
+			chatBody.scrollTop += (newTop - prevTop);
+		} else {
+			chatBody.appendChild(msgDiv);
+			// 自動捲到最底
+			chatBody.scrollTop = chatBody.scrollHeight;
+			requestAnimationFrame(() => msgDiv.classList.add("show"));
+		}
+	}
+})

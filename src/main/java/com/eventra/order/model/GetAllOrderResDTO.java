@@ -1,14 +1,31 @@
 package com.eventra.order.model;
 
+import java.sql.Timestamp;
 import java.util.List;
 
 public class GetAllOrderResDTO {
 	private String orderUlid;
-	private String orderStatus;
+	private OrderStatus orderStatus;
 	private Integer totalAmount;
 	private Integer totalQuantity;
+	private String creationTime;
+	private OrderProvider orderProvider;
 	private List<GetAllOrderResGroupedDTO> groups;
 	
+	public String getCreationTime() {
+		return creationTime;
+	}
+	public GetAllOrderResDTO setCreationTime(String creationTime) {
+		this.creationTime = creationTime;
+		return this;
+	}
+	public OrderProvider getOrderProvider() {
+		return orderProvider;
+	}
+	public GetAllOrderResDTO setOrderProvider(OrderProvider orderProvider) {
+		this.orderProvider = orderProvider;
+		return this;
+	}
 	public String getOrderUlid() {
 		return orderUlid;
 	}
@@ -16,10 +33,10 @@ public class GetAllOrderResDTO {
 		this.orderUlid = orderUlid;
 		return this;
 	}
-	public String getOrderStatus() {
+	public OrderStatus getOrderStatus() {
 		return orderStatus;
 	}
-	public GetAllOrderResDTO setOrderStatus(String orderStatus) {
+	public GetAllOrderResDTO setOrderStatus(OrderStatus orderStatus) {
 		this.orderStatus = orderStatus;
 		return this;
 	}
