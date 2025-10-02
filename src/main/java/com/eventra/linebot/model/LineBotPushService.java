@@ -25,7 +25,8 @@ public class LineBotPushService {
 		this.CHANNEL_ACCESS_TOKEN = channelAccessToken;
 	}
 
-	public void pushCartItem(String lineUserId) {
+	public void pushExpiringCartItem(String lineUserId){
+	System.out.println("LineBotPushService: pushExpiringCartItem");
       String json = """
       {
       		"to": "%s",
@@ -38,7 +39,9 @@ public class LineBotPushService {
       		]
       }
 
-      """.formatted(lineUserId, "要過期了冰鳥");
+      """.formatted(lineUserId, "🔔提醒：您有購物車明細將於 5 分鐘內過期並釋票！請儘速前往結帳");
+      try { send(json); }
+      catch (Exception e) { System.out.println(e.toString()); }
     }
 
 	public void pushOrder(String lineUserId, OrderLineBotCarouselDTO dto) throws Exception {

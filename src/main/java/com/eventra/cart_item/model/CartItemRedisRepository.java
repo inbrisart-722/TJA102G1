@@ -2,6 +2,7 @@ package com.eventra.cart_item.model;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -12,6 +13,8 @@ import com.util.RedisPoolExecutor;
 
 import redis.clients.jedis.Response;
 import redis.clients.jedis.Transaction;
+import redis.clients.jedis.params.SetParams;
+import redis.clients.jedis.resps.Tuple;
 
 @Repository
 public class CartItemRedisRepository {
@@ -25,13 +28,51 @@ public class CartItemRedisRepository {
 
 	private static final Integer WEAK_TTL_IN_SECONDS = 31 * 60; // 31mins（整台車用，小 buffer）
 	private static final Long TTL_IN_MILLISECONDS = 30 * 60 * 1000L; // 30mins（單筆明細用）
+	private static final Long ABOUT_TO_EXPIRE_IN_MILLISECONDS = 5 * 60 * 1000L; // 5mins (5分鐘後過期通知用）
+	
+	private static final String GLOBAL_EXP_KEY = "cart:items:globalExp";
+	private static final String NOTIFY_LOCK_KEY_PREFIX = "cart:notify:lock:";
 	
 	private String hKey(Integer memberId) {return "cart:items:" + memberId;}
 	private String zKey(Integer memberId) {return "cart:items:exp:" + memberId;}
 	
-//	public List<CartItemRedisVO> checkFiveMinutesLeft(long now){
-//		
-//	}
+	// 排程通知 cart item 即將過期使用
+	public List<Integer> getExpiringMemberList(long now) {
+		List<String> memberIdStrs = JEDIS.execute(jedis -> {
+			return jedis.zrangeByScore(GLOBAL_EXP_KEY, Double.NEGATIVE_INFINITY, now + ABOUT_TO_EXPIRE_IN_MILLISECONDS);
+		});
+
+		if(memberIdStrs == null || memberIdStrs.isEmpty()) return Collections.emptyList();
+		return memberIdStrs.stream().map(Integer::valueOf).collect(Collectors.toList());
+	}
+
+	// 傳入會員清單，過濾並回傳 5 分鐘內尚未被通知過的會員清單
+	public List<Integer> filterUnnotifiedMembers(List<Integer> memberIds) {
+		// 如果參數根本為空 -> 直接回傳空集合
+	    if (memberIds == null || memberIds.isEmpty()) return Collections.emptyList();
+
+	    return JEDIS.execute(jedis -> {
+	        List<Integer> result = new ArrayList<>();
+	        // 逐一檢查每個會員
+	        for (Integer memberId : memberIds) {
+	            String lockKey = NOTIFY_LOCK_KEY_PREFIX + memberId;
+	            // NX -> Not Exists -> 只有當此 key 不存在時才會執行
+	            // EX 300 -> 這個 key 有效期間為 300 秒（5分鐘）
+	            	// -> 如果 key 還不存在，設置，並且 TTL 300 秒，回傳 "OK"
+	            	// -> 如果 key 存在，不做任何事，回傳 null
+	            // 比起使用 SET + EXPIRE，此為原子操作更安全
+	            // setex 也沒辦法配合 NX 所以不能替代。
+	            String ok = jedis.set(lockKey, "1", SetParams.setParams().nx().ex(300));
+	            // 在 Redis 協議中，SET 成功會回傳字串 "OK"
+	            // 如果 NX 檢查沒通過，會回傳 null
+	            if ("OK".equals(ok)) {
+	                result.add(memberId); // 表示這次可以通知
+	            }
+	        }
+	        return result;
+	    });
+	}
+
 	
 	/* 主動清理：刪掉已過期的 cartItem（讀/寫前都先呼叫一次） */
 	public List<CartItemRedisVO> cleanupExpired(Integer memberId, long now) {
@@ -50,6 +91,9 @@ public class CartItemRedisRepository {
 			t.zrem(zKey, expiredIds.toArray(new String[0]));
 		    t.exec();
 		    List<String> listOfVOJsons = vals.get();
+		    
+			// *** 維護全域過期 zset
+			updateGlobalExpireScoreByMemberId(zKey, memberId.toString());
 		    
 		    if(listOfVOJsons == null || listOfVOJsons.isEmpty()) return null;
 		    
@@ -95,6 +139,14 @@ public class CartItemRedisRepository {
 			t.expire(hKey, WEAK_TTL_IN_SECONDS);
 			t.expire(zKey , WEAK_TTL_IN_SECONDS);
 			t.exec();
+			
+			// *** 維護全域過期 zset
+			// 如果是第一次新增（之前沒有其他 key）
+			if (jedis.zcard(zKey) == 1) {
+				jedis.zadd(GLOBAL_EXP_KEY, expireAt, memberId.toString());
+			}
+			// 不是就不需要做事
+			
 			return null;
 		});
 	}
@@ -115,6 +167,9 @@ public class CartItemRedisRepository {
 			t.hdel(hKey, ids);
 			t.zrem(zKey, ids);
 			t.exec();
+			
+			// *** 維護全域過期 zset
+			updateGlobalExpireScoreByMemberId(zKey, memberId.toString());
 			
 			List<String> listOfVOJsons = r1.get();
 			if(listOfVOJsons == null || listOfVOJsons.isEmpty()) return null;
@@ -141,6 +196,9 @@ public class CartItemRedisRepository {
 			t.zrem(zKey, String.valueOf(cartItemId));
 			t.exec();
 			
+			// *** 維護全域過期 zset
+			updateGlobalExpireScoreByMemberId(zKey, memberId.toString());
+			
 			String VOJson = r1.get();
 			if(VOJson == null || VOJson.isEmpty()) return null;
 			else return JSON_CODEC.read(VOJson, CartItemRedisVO.class);
@@ -157,6 +215,9 @@ public class CartItemRedisRepository {
 			t.del(hKey);
 			t.del(zKey);
 			t.exec();
+			
+			// *** 維護全域過期 zset
+			jedis.zrem(GLOBAL_EXP_KEY, memberId.toString());
 			
 			List<String> listOfVOJsons = vals.get();
 			
@@ -233,5 +294,21 @@ public class CartItemRedisRepository {
 				JSON_CODEC.read(JEDIS.execute(jedis -> jedis.hget(hKey, cartItemId)), CartItemRedisVO.class);
 		
 		return cartItemRedisVO;
+	}
+	
+	private void updateGlobalExpireScoreByMemberId(String zKey, String memberId) {
+		// *** 維護全域過期 zset
+		JEDIS.execute(jedis -> {
+			List<Tuple> minItem = jedis.zrangeWithScores(zKey, 0, 0);
+			if (minItem.isEmpty()) {
+				// 沒有 item 了，從全域刪除
+				jedis.zrem(GLOBAL_EXP_KEY, memberId);
+			} else {
+				// 還有 item，更新全域最早過期時間
+				Tuple tuple = minItem.iterator().next();
+				jedis.zadd(GLOBAL_EXP_KEY, tuple.getScore(), memberId);
+			}
+			return null;
+		});
 	}
 }

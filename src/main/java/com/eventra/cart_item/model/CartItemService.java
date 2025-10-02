@@ -4,8 +4,10 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -13,6 +15,7 @@ import com.eventra.exhibition.model.ExhibitionRepository;
 import com.eventra.exhibition.model.ExhibitionVO;
 import com.eventra.exhibitiontickettype.model.ExhibitionTicketTypeRepository;
 import com.eventra.exhibitiontickettype.model.ExhibitionTicketTypeVO;
+import com.eventra.linebot.model.LineBotPushService;
 import com.eventra.member.model.MemberRepository;
 import com.eventra.member.model.MemberVO;
 import com.sse.ticket.TicketSseEmitterService;
@@ -31,22 +34,51 @@ public class CartItemService {
 	
 	// SSE 推票數用
 	private final TicketSseEmitterService TICKET_SSE_SERVICE;
+	// Line bot
+	private final LineBotPushService LINE_BOT_PUSH_SERVICE;
 
 	public CartItemService(MemberRepository memberRepository, CartItemRedisRepository cartItemRedisRepository, ExhibitionRepository exhibitionRepository,
-			ExhibitionTicketTypeRepository exhibitionTicketTypeRepository, TicketSseEmitterService ticketSseService) {
+			ExhibitionTicketTypeRepository exhibitionTicketTypeRepository, TicketSseEmitterService ticketSseService,
+			LineBotPushService lineBotPushService) {
     
 		this.MEMBER_REPO = memberRepository;
 		this.CART_ITEM_REDIS_REPO = cartItemRedisRepository;
 		this.EXHIBITION_REPO = exhibitionRepository;
 		this.EXHIBITION_TICKET_TYPE_REPO = exhibitionTicketTypeRepository;
 		this.TICKET_SSE_SERVICE = ticketSseService;
+		this.LINE_BOT_PUSH_SERVICE = lineBotPushService;
 	}
 
-//	public List<CartItemRedisVO> checkFiveMinutesLeft(long now){
-//		List<MemberVO> members = MEMBER_REPO.findAll();
-//		
-//		
-//	}
+	public List<CartItemRedisVO> pushGlobalExpiringCartItem(){
+		long now = System.currentTimeMillis();
+		System.out.println("pushGlobalExpiringCartItem: getting memberIds");
+		List<Integer> memberIds = CART_ITEM_REDIS_REPO.getExpiringMemberList(now);
+		for(Integer id : memberIds) System.out.println(id);
+		System.out.println("=====");
+		List<Integer> unnotifiedMemberIds = CART_ITEM_REDIS_REPO.filterUnnotifiedMembers(memberIds);
+		for(Integer id : unnotifiedMemberIds) System.out.println(id);
+		System.out.println("=====");
+		// 截斷
+		if (unnotifiedMemberIds == null || unnotifiedMemberIds.isEmpty()) return null;
+		// 開始處理通知
+		for(Integer memberId : unnotifiedMemberIds) {
+			System.out.println("memberId: " + memberId);
+			Optional<MemberVO> memberOp = MEMBER_REPO.findById(memberId);
+			if(memberOp.isPresent()) {
+				MemberVO member = memberOp.get();
+				String lineUserId = member.getLineUserId();
+				System.out.println("lineUserId: " + lineUserId);
+				if(lineUserId != null) LINE_BOT_PUSH_SERVICE.pushExpiringCartItem(lineUserId);
+			}
+		}
+		
+		return null;
+	}
+	
+	@Async
+	public void broadcastTicketCount(Integer exhibitionId, int remaining) {
+		TICKET_SSE_SERVICE.broadcastTicketCount(exhibitionId, remaining);
+	}
 	
 	public void cleanupExpired(Integer memberId, Long now) {
 		/* ********* 1st part : 清理過期購物車 ********* */
@@ -57,8 +89,10 @@ public class CartItemService {
 		Map<Integer, Integer> qtyByExhId = listOfVOs.stream().collect(Collectors
 				.groupingBy(CartItemRedisVO::getExhibitionId, Collectors.summingInt(CartItemRedisVO::getQuantity)));
 
-		for (Map.Entry<Integer, Integer> entry : qtyByExhId.entrySet())
+		for (Map.Entry<Integer, Integer> entry : qtyByExhId.entrySet()) {
 			EXHIBITION_REPO.updateSoldTicketQuantity(entry.getKey(), -entry.getValue());
+			callSseBroadcast(entry.getKey()); // 丟到 private method 處理完讓它去 call public async method
+		}
 	}
 
 	public void addCartItem(AddCartItemReqDTO req, Integer memberId) throws IllegalStateException{
@@ -96,10 +130,7 @@ public class CartItemService {
 
 			CART_ITEM_REDIS_REPO.addCartItem(cartItemRedisVO);
 		}
-		Integer totalTicketQuantity = EXHIBITION_REPO.findById(exhibitionId).orElseThrow().getTotalTicketQuantity();
-		Integer soldTicketQuantity = EXHIBITION_REPO.findById(exhibitionId).orElseThrow().getSoldTicketQuantity();
-
-		TICKET_SSE_SERVICE.broadcastTicketCount(exhibitionId, totalTicketQuantity - soldTicketQuantity);
+		callSseBroadcast(exhibitionId); // 丟到 private method 處理完讓它去 call public async method
 	}
 
 	public String removeOneCartItem(Integer cartItemId, Integer memberId) {
@@ -116,6 +147,8 @@ public class CartItemService {
 		/* ********* 3rd part : 扣除展覽售票量 ********* */
 		Integer quantity = vo.getQuantity();
 		EXHIBITION_REPO.updateSoldTicketQuantity(exhibitionId, -quantity);
+		
+		callSseBroadcast(exhibitionId); // 丟到 private method 處理完讓它去 call public async method
 		return "success";
 	}
 
@@ -129,8 +162,10 @@ public class CartItemService {
 		Map<Integer, Integer> qtyByExhId = listOfVOs.stream().collect(Collectors
 				.groupingBy(CartItemRedisVO::getExhibitionId, Collectors.summingInt(CartItemRedisVO::getQuantity)));
 
-		for (Map.Entry<Integer, Integer> entry : qtyByExhId.entrySet())
+		for (Map.Entry<Integer, Integer> entry : qtyByExhId.entrySet()) {
 			EXHIBITION_REPO.updateSoldTicketQuantity(entry.getKey(), -entry.getValue());
+			callSseBroadcast(entry.getKey()); // 丟到 private method 處理完讓它去 call public async method
+		}
 
 		return "success";
 
@@ -209,5 +244,12 @@ public class CartItemService {
 			res.setStatus("success").setBackgroundExpireTime(backgroundExpireTime);
 		}
 		return res;
+	}
+	
+	private void callSseBroadcast(Integer exhibitionId) {
+		Integer totalTicketQuantity = EXHIBITION_REPO.findById(exhibitionId).orElseThrow().getTotalTicketQuantity();
+		Integer soldTicketQuantity = EXHIBITION_REPO.findById(exhibitionId).orElseThrow().getSoldTicketQuantity();
+		// sse: broadcast ticketcount
+		broadcastTicketCount(exhibitionId, totalTicketQuantity - soldTicketQuantity);
 	}
 }
