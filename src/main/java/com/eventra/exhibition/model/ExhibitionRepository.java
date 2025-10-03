@@ -84,7 +84,7 @@ public interface ExhibitionRepository extends JpaRepository<ExhibitionVO, Intege
 	// 全部（分頁）
 	Page<ExhibitionVO> findByExhibitorVO_ExhibitorIdAndExhibitionNameContainingIgnoreCase(Integer exhibitorId, String exhibitionName, Pageable pageable);
 
-	// 查詢審核狀態
+	// 查詢審核狀態 
 	Page<ExhibitionVO> findByExhibitorVO_ExhibitorIdAndExhibitionStatusIdAndExhibitionNameContainingIgnoreCase(
 	        Integer exhibitorId, Integer exhibitionStatusId, String nameKeyword, Pageable pageable);
 	
