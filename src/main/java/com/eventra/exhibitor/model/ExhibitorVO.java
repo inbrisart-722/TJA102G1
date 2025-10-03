@@ -4,11 +4,12 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.DynamicUpdate;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
-
+@DynamicUpdate
 @Entity
 @Table(name = "exhibitor")
 public class ExhibitorVO {
@@ -22,7 +23,7 @@ public class ExhibitorVO {
     @Column(name = "review_status_id")
 	private Integer reviewStatusId;
 	
-
+    @Column(name="exhibitor_registration_name")
 	private String exhibitorRegistrationName;
 
 //    @NotBlank(message = "統編欄位必填")
@@ -51,7 +52,7 @@ public class ExhibitorVO {
 	@Column(name = "company_address")
 	private String companyAddress;
 	
-	@Column(name = "bank_account_name")
+	@Column(name = "bank_account_name", nullable = false)
 	private String bankAccountName;
 	
 	@Column(name = "bank_code")

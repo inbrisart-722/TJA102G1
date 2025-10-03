@@ -4,6 +4,8 @@
 
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+
+
 <title>Eventra 管理者平台 — 廠商申請列表</title>
 <!--begin::Accessibility Meta Tags-->
 <meta name="viewport"
@@ -166,6 +168,22 @@ body {
 			</div>
 		</aside>
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 		<!-- Main -->
 		<main class="app-main">
 			<div class="app-content-header">
@@ -187,6 +205,17 @@ body {
 										<th style="width: 40%;">操作</th>
 									</tr>
 								</thead>
+
+
+
+
+
+
+
+
+
+
+
 								<tbody>
 
 
@@ -194,15 +223,14 @@ body {
 									<th:block th:each="exhibitorVO : ${exhibitorList}">
 										<tr>
 
-											
+
 
 
 
 											<!-- 由 1/2/3 轉中文文字 -->
 											<td th:switch="${exhibitorVO.reviewStatusId}"><span
 												th:case="1">未審核</span> <span th:case="2">已審核</span> <span
-												th:case="3">已退回</span> <span th:case="*">未知</span> 
-												<!-- 防呆：遇到 null 或其他值 -->
+												th:case="3">已退回</span> <span th:case="*">未知</span> <!-- 防呆：遇到 null 或其他值 -->
 											</td>
 											<td th:text="${exhibitorVO.exhibitorRegistrationName}"></td>
 
@@ -224,7 +252,7 @@ body {
 
 
 
-										</tr> 
+										</tr>
 								</tbody>
 							</table>
 						</div>
@@ -243,7 +271,19 @@ body {
 					</div>
 				</div>
 			</div>
+
+		
+
+
+
+
+
 		</main>
+
+
+
+
+
 
 		<footer class="app-footer">
 			<strong>Copyright &copy; 2025&nbsp;&nbsp;<span
@@ -269,6 +309,30 @@ body {
       OverlayScrollbarsGlobal.OverlayScrollbars(sw, { scrollbars:{ autoHide:'leave' }});
     }
   });
+  
+  
+  
+  document.addEventListener('DOMContentLoaded', () => {
+	  const form = document.getElementById('vat-search-form');
+	  const vat  = document.getElementById('vat');
+
+	  form.addEventListener('submit', (e) => {
+	    // 允許使用者貼上含空白或破折號的字串，先淨化後再驗證
+	    const raw = (vat.value || '').trim();
+	    const v = raw.replace(/[^0-9]/g, '');   // 移除非數字
+	    vat.value = v;                          // 送出前覆寫成純數字
+	    if (!/^\d{8}$/.test(v)) {
+	      e.preventDefault();
+	      vat.classList.add('is-invalid');
+	      vat.focus();
+	    } else {
+	      vat.classList.remove('is-invalid');
+	    }
+	  });
+
+	  vat.addEventListener('input', () => vat.classList.remove('is-invalid'));
+	});
+  
 </script>
 </body>
 </html>

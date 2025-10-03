@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Comparator;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -30,11 +29,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.eventra.comment.controller.CommentStatus;
 import com.eventra.comment.model.CommentRepository;
-
-import com.eventra.exhibitionstatus.model.ExhibitionStatusVO;
-
 import com.eventra.eventnotification.model.EventNotificationService.NotificationType;
-
 import com.eventra.exhibitiontickettype.model.ExhibitionTicketTypeRepository;
 import com.eventra.exhibitiontickettype.model.ExhibitionTicketTypeVO;
 import com.eventra.exhibitor.backend.controller.dto.ExhibitionCreateDTO;
@@ -72,6 +67,10 @@ public class ExhibitionServiceImpl implements ExhibitionService {
 	private static final int DRAFT_STATUS_ID = 6;
 	private final String DEFAULT_PHOTO_LANDSCAPE;
 
+	
+
+
+	
 	@Autowired
 	public ExhibitionServiceImpl(ExhibitionRepository repository, CommentRepository commentRepository, ExhibitionTicketTypeRepository exhibitionTicketTypeRepository, TicketTypeRepository ticketTypeRepository, @Value("${default.exhibition-photo-landscape}") String defaultPhotoLandscape, NotificationPushService notificationPushService) {
 		this.repository = repository;
@@ -82,6 +81,11 @@ public class ExhibitionServiceImpl implements ExhibitionService {
 		this.notificationPushService = notificationPushService;
 	}
 
+
+
+
+	
+	
 	@Transactional
 	public void addExhibition(ExhibitionCreateDTO dto, Integer exhibitorId) {
 
@@ -169,6 +173,26 @@ public class ExhibitionServiceImpl implements ExhibitionService {
 			exhibitionTicketTypeRepository.save(ett);
 			
 		}
+	
+		 // 將 DTO 資料轉換成 Entity
+ 	
+ 		exhibitionVO.setExhibitionTicketTypes(dto.getExhibitionTicketTypes());
+ 		exhibitionVO.setExhibitionName(dto.getExhibitionName());
+ 		exhibitionVO.setStartTime(dto.getStartTime());
+ 		exhibitionVO.setEndTime(dto.getEndTime());
+ 		exhibitionVO.setLocation(dto.getLocation());
+ 		exhibitionVO.setTicketStartTime(dto.getTicketStartTime());
+ 		exhibitionVO.setTotalTicketQuantity(dto.getTotalTicketQuantity());
+ 		exhibitionVO.setDescription(dto.getDescription());
+ 		exhibitionVO.setExhibitionStatusId(4);
+ 		
+ 		exhibitionVO.setExhibitorVO(entityManager.getReference(ExhibitorVO.class, exhibitorId)); 
+ 		
+ 		repository.save(exhibitionVO);
+	
+	
+	
+	
 	}
 	// 解析前端 hidden 的 ticketJson，只保留「有名稱且價格 >= 0」的項目
 	private List<TicketJsonItem>  parseTicketJson(String json){
@@ -222,7 +246,12 @@ public class ExhibitionServiceImpl implements ExhibitionService {
 	    if (dto.getExhibitionId() == null) {
 	        throw new IllegalArgumentException("缺少 exhibitionId，無法更新");
 	    }
+	    	
+	    
+	
 
+	    
+	    
 	    // 1) 取原資料
 	    ExhibitionVO vo = repository.findById(dto.getExhibitionId())
 	            .orElseThrow(() -> new IllegalArgumentException("展覽不存在: " + dto.getExhibitionId()));
@@ -532,4 +561,23 @@ public class ExhibitionServiceImpl implements ExhibitionService {
 		
 		return new SliceImpl<>(dtos, pageable, exhibitionsSlice.hasNext());
 	}
+	
+	
+	
+	public List<ExhibitionReviewPageDTO> getExhibitionsForReviewPage(){
+		  List<ExhibitionVO> exhibitions = repository.findAll();
+		  
+		  List<ExhibitionReviewPageDTO> dtos = new ArrayList<>();
+		  for(ExhibitionVO vo : exhibitions) {
+		   ExhibitionReviewPageDTO dto = new ExhibitionReviewPageDTO();
+		   dto.setExhibitionStatus(vo.getExhibitionStatus().getExhibitionStatus());
+		   dto.setExhibitionName(vo.getExhibitionName());
+		   dto.setExhibitorName(vo.getExhibitorVO().getExhibitorRegistrationName());
+		   dto.setExhibitionId(vo.getExhibitionId());
+		   
+		   dtos.add(dto);
+		  }
+		  
+		  return dtos;
+		 }
 }
