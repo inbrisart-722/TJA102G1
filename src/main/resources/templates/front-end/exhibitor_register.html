@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
 
 <head>
 <meta charset="utf-8" />
@@ -66,86 +66,111 @@
 							</div>
 							<hr />
 
-							<form>
+							<form th:action="@{/front-end/exhibitor_register}"
+								th:object="${form}" method="post">
+
 								<div class="divider">
 									<span>註冊資訊</span>
 								</div>
-								<!-- 統一編號 (登入帳號) -->
+
+								<!-- 統一編號 -->
 								<div class="form-group">
 									<label>統一編號（登入帳號）<font color="red">*</font></label> <input
-										type="text" class="form-control" name="business_id_number"
-										placeholder="請輸入 8 碼統一編號" pattern="[0-9]{8}" required />
+										type="text" class="form-control"
+										th:field="*{businessIdNumber}" placeholder="請輸入 8 碼統一編號" />
+									<div th:if="${#fields.hasErrors('businessIdNumber')}"
+										th:errors="*{businessIdNumber}" class="text-danger"></div>
 								</div>
 
 								<!-- 密碼 -->
 								<div class="form-group">
 									<label>輸入密碼<font color="red">*</font></label> <input
-										type="password" class="form-control" name="password"
-										id="password1" placeholder="請輸入密碼" required />
+										type="password" class="form-control"
+										th:field="*{password}" placeholder="請輸入密碼" />
+									<div th:if="${#fields.hasErrors('password')}"
+										th:errors="*{password}" class="text-danger"></div>
 								</div>
 
-								<!-- 再次輸入密碼 -->
+								<!-- 確認密碼 -->
 								<div class="form-group">
 									<label>再次輸入密碼<font color="red">*</font></label> <input
-										type="password" class="form-control" name="confirm_password"
-										id="password2" placeholder="請再次輸入密碼" required />
+										type="password" class="form-control"
+										th:field="*{confirmPassword}" placeholder="請再次輸入密碼" />
+									<div th:if="${#fields.hasErrors('confirmPassword')}"
+										th:errors="*{confirmPassword}" class="text-danger"></div>
 								</div>
 
 								<div class="divider">
 									<span>基本資訊</span>
 								</div>
+
 								<!-- 公司名稱 -->
 								<div class="form-group">
 									<label>公司名稱<font color="red">*</font></label> <input
-										type="text" class="form-control" name="company_name"
-										maxlength="255" required />
+										type="text" class="form-control" th:field="*{companyName}"
+										maxlength="255" />
+									<div th:if="${#fields.hasErrors('companyName')}"
+										th:errors="*{companyName}" class="text-danger"></div>
 								</div>
 
 								<!-- 公司地址 -->
 								<div class="form-group">
 									<label>公司地址<font color="red">*</font></label> <input
-										type="text" class="form-control" name="company_name"
-										maxlength="255" required />
+										type="text" class="form-control" th:field="*{companyAddress}"
+										maxlength="255" />
+									<div th:if="${#fields.hasErrors('companyAddress')}"
+										th:errors="*{companyAddress}" class="text-danger"></div>
 								</div>
 
 								<!-- 聯絡電話 -->
 								<div class="form-group">
 									<label>聯絡電話<font color="red">*</font></label> <input
-										type="text" class="form-control" name="contact_phone"
-										maxlength="50" required />
+										type="text" class="form-control" th:field="*{contactPhone}"
+										maxlength="50" />
+									<div th:if="${#fields.hasErrors('contactPhone')}"
+										th:errors="*{contactPhone}" class="text-danger"></div>
 								</div>
 
 								<!-- 聯絡信箱 -->
 								<div class="form-group">
 									<label>聯絡信箱<font color="red">*</font></label> <input
-										type="email" class="form-control" name="email" required />
+										type="text" class="form-control" th:field="*{email}" />
+									<div th:if="${#fields.hasErrors('email')}" th:errors="*{email}"
+										class="text-danger"></div>
 								</div>
 
 								<div class="divider">
 									<span>帳戶資訊</span>
 								</div>
+
 								<!-- 銀行代碼 -->
 								<div class="form-group">
 									<label>銀行代碼<font color="red">*</font></label> <input
-										type="text" class="form-control" name="contact_name"
-										maxlength="100" required />
+										type="text" class="form-control" th:field="*{bankCode}" />
+									<div th:if="${#fields.hasErrors('bankCode')}"
+										th:errors="*{bankCode}" class="text-danger"></div>
 								</div>
+
 								<!-- 銀行戶名 -->
 								<div class="form-group">
 									<label>銀行戶名<font color="red">*</font></label> <input
-										type="text" class="form-control" name="contact_name"
-										maxlength="100" required />
+										type="text" class="form-control" th:field="*{bankAccountName}" />
+									<div th:if="${#fields.hasErrors('bankAccountName')}"
+										th:errors="*{bankAccountName}" class="text-danger"></div>
 								</div>
+
 								<!-- 銀行帳號 -->
 								<div class="form-group">
 									<label>銀行帳號<font color="red">*</font></label> <input
-										type="text" class="form-control" name="contact_name"
-										maxlength="100" required />
+										type="text" class="form-control"
+										th:field="*{bankAccountNumber}" />
+									<div th:if="${#fields.hasErrors('bankAccountNumber')}"
+										th:errors="*{bankAccountNumber}" class="text-danger"></div>
 								</div>
 
-								<div id="pass-info" class="clearfix"></div>
 								<button type="submit" class="btn_full">審核註冊</button>
 							</form>
+
 
 						</div>
 					</div>
@@ -227,8 +252,10 @@
 
 	<script src="js/g1_10_custom_common_csrf.js"></script>
 	<script src="js/g1_10_custom_common.js"></script>
-	<script src="js/g1_6_search_history.js"></script> <!-- 存搜尋紀錄用 -->
-	<script src="js/g1_6_search_modal.js"></script> <!-- 導頁至搜尋結果頁用 -->
+	<script src="js/g1_6_search_history.js"></script>
+	<!-- 存搜尋紀錄用 -->
+	<script src="js/g1_6_search_modal.js"></script>
+	<!-- 導頁至搜尋結果頁用 -->
 </body>
 
 </html>

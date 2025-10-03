@@ -289,6 +289,21 @@
 	bottom: 80px !important;
 }
 </style>
+<script>
+// 先處理 exhibitorRegister 參數
+const params = new URLSearchParams(window.location.search);
+const exhibitorRegister = params.get("exhibitorRegister");
+
+if(exhibitorRegister === "true") {
+	alert("恭喜展商註冊提交成功，後續審核狀態會於 1~2 個工作天內透過指定信箱進行聯繫")
+	params.delete("exhibitorRegister");
+	let newUrl;
+	if(params.size !== 0) newUrl = window.location.pathname + '?' + params.toString();
+	else newUrl = window.location.pathname;
+	window.history.replaceState({}, document.title, newUrl);
+}
+
+</script>
 </body>
 
 </html>
