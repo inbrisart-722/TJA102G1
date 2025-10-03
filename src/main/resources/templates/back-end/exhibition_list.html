@@ -151,9 +151,14 @@
 						    All
 						  </a>
 						  <a class="btn btn-outline-secondary btn-sm"
-						     th:classappend="${tab}=='draft' ? ' active'"
-						     th:href="@{/back-end/exhibitor/exhibition_list(tab='draft', page=0, size=${param.size} ?: 10, q=${q})}">
-						    草稿
+						     th:classappend="${tab}=='pending' ? ' active'"
+						     th:href="@{/back-end/exhibitor/exhibition_list(tab='pending', page=0, size=${param.size} ?: 10, q=${q})}">
+						    待審核
+						  </a>
+						  <a class="btn btn-outline-secondary btn-sm"
+						     th:classappend="${tab}=='rejected' ? ' active'"
+						     th:href="@{/back-end/exhibitor/exhibition_list(tab='rejected', page=0, size=${param.size} ?: 10, q=${q})}">
+						    未通過審核
 						  </a>
 						  <a class="btn btn-outline-secondary btn-sm"
 						     th:classappend="${tab}=='not_on_sale' ? ' active'"
@@ -170,14 +175,19 @@
 						     th:href="@{/back-end/exhibitor/exhibition_list(tab='ended', page=0, size=${param.size} ?: 10, q=${q})}">
 						    已結束
 						  </a>
+						   <a class="btn btn-outline-secondary btn-sm"
+						     th:classappend="${tab}=='draft' ? ' active'"
+						     th:href="@{/back-end/exhibitor/exhibition_list(tab='draft', page=0, size=${param.size} ?: 10, q=${q})}">
+						    草稿
+						  </a>
 					</div>
-						<div class="vr mx-1"></div> 
+						<!-- <div class="vr mx-1"></div> 
 						<div class="dropdown"> <button class="btn btn-outline-secondary btn-sm dropdown-toggle" data-bs-toggle="dropdown">審核狀態</button> 
 						<ul class="dropdown-menu" id="auditMenu"> <li><a class="dropdown-item" data-audit="">全部</a></li> <li><a class="dropdown-item" data-audit="待審核">待審核</a></li> 
 						<li><a class="dropdown-item" data-audit="已通過">已通過</a></li> 
 						<li><a class="dropdown-item" data-audit="未通過">未通過</a></li> 
 						</ul>
-						 </div>
+						 </div> -->
 						 <form th:action="@{/back-end/exhibitor/exhibition_list}" method="get" class="ms-auto d-flex gap-2">
 						   <!-- 保留目前的分頁/分頁大小/目前的tab -->
 						   <input type="hidden" name="tab" th:value="${tab}">
@@ -215,7 +225,7 @@
 										</td>
 										<td><span class="status-pill"
 											th:text="${ex.saleStatus}">尚未開賣</span></td>
-										<td th:text="${ex.totalTicketQuantity}">0</td>
+										<td th:text="|${ex.leftTicketQuantity}/${ex.totalTicketQuantity?:0}|">0/0</td>
 										<td class="text-end">
 											<!-- 編輯模式 --> 
 											<a th:href="@{/back-end/exhibitor/edit/{id}(id=${ex.exhibitionId})}"
@@ -223,11 +233,11 @@
 											class="bi bi-gear"></i> 編輯
 											</a>
 											<!-- 預覽 --> 
-											<a
+											<!-- <a
 											th:href="@{/back-end/preview/{id}(id=${ex.exhibitionId})}"
 											class="btn btn-outline-primary btn-sm"> <i
 											class="bi bi-eye"></i> 預覽
-											</a>
+											</a> -->
 										</td>
 									</tr>
 								</tbody>
@@ -326,13 +336,25 @@
       // window.AdminLTE && window.AdminLTE.autoInit?.();
 
       // 3) 登出（若要清 sessionStorage / localStorage）
-      const logout = document.getElementById('logoutLink');
+      const logout = document.getElementById('mylogout');
       if (logout) {
         logout.addEventListener('click', (e) => {
-          // e.preventDefault(); // 若要攔截導頁再手動跳轉，取消註解
-          sessionStorage.removeItem('auth');       // 依專案實際使用的 key
-          sessionStorage.removeItem('editingEvent');
+          e.preventDefault(); // 若要攔截導頁再手動跳轉，取消註解
+//           sessionStorage.removeItem('auth');       // 依專案實際使用的 key
+//           sessionStorage.removeItem('editingEvent');
           // location.href = logout.getAttribute('href'); // 若攔截，最後導回登入頁
+          
+          // 可以不用 csrfFetch (有另外放權限)
+          fetch("/api/auth/logout/exhibitor", { 
+        	method: "POST",
+          })
+          .then((res) => {
+        	  if(res.status === 204)
+        		  location.href = "/back-end/exhibitor/exhibitor_login";
+        	  if(!res.ok) throw new Error("Not 2XX");
+          })
+          .catch(error => console.log(error))
+          
         });
       }
     })();

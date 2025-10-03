@@ -17,7 +17,6 @@ import com.eventra.exhibitiontickettype.model.ExhibitionTicketTypeRepository;
 import com.eventra.exhibitiontickettype.model.ExhibitionTicketTypeVO;
 import com.eventra.linebot.model.LineBotPushService;
 import com.eventra.member.model.MemberRepository;
-import com.eventra.member.model.MemberVO;
 import com.sse.ticket.TicketSseEmitterService;
 import com.util.MillisToMinutesSecondsUtil;
 
@@ -95,6 +94,11 @@ public class CartItemService {
 		}
 	}
 
+	@Async
+	public void broadcastTicketCount(Integer exhibitionId, Integer leftTicketQuantity) {
+		TICKET_SSE_SERVICE.broadcastTicketCount(exhibitionId, leftTicketQuantity);
+	}
+	
 	public void addCartItem(AddCartItemReqDTO req, Integer memberId) throws IllegalStateException{
 //		Integer memberId = MEMBER_REPO.findByEmail(SecurityContextHolder.getContext().getAuthentication().getName()).orElse(null).getMemberId();
 		
@@ -131,6 +135,7 @@ public class CartItemService {
 			CART_ITEM_REDIS_REPO.addCartItem(cartItemRedisVO);
 		}
 		callSseBroadcast(exhibitionId); // 丟到 private method 處理完讓它去 call public async method
+
 	}
 
 	public String removeOneCartItem(Integer cartItemId, Integer memberId) {

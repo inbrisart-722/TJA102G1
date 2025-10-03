@@ -66,7 +66,7 @@
           </nav>
          <!-- 底部：登出連結 -->
           <div class="p-3 border-top">
-            <a href="/back-end/exhibitor/exhibitor_login" id="logoutLink" class="nav-link text-danger">
+            <a href="/back-end/exhibitor/exhibitor_login" id="mylogout" class="nav-link text-danger">
               <i class="bi bi-box-arrow-right me-1"></i> 登出
             </a>
           </div>
@@ -171,12 +171,12 @@
 					    <td th:text="${o.orderUlid}">ULID</td>
 					
 					    <!-- 若要顯示活動名稱，DTO 要多帶；先留空或用 '-' -->
-					    <td>-</td>
+					    <td th:text="${o.exhibitionName} ?: '-'">-</td>
 					
 					    <td th:text="${o.fullName}">訂購人</td>
 					
 					    <!-- 票種/數量（DTO 目前只有 itemCount，票種名稱若要顯示需擴充 DTO） -->
-					    <td>-</td>
+					    <td th:text="${o.ticketTypeName} ?: '-'">-</td>
 					
 					    <td class="text-end" th:text="${o.itemCount}">0</td>
 					
@@ -314,18 +314,7 @@
 	  }
 	</script>
     
-    
     <script>
-        document.getElementById('logoutLink')?.addEventListener('click', (e) => {
-          e.preventDefault();
-          // 清除登入紀錄
-          sessionStorage.removeItem('exhibitorSession');
-          // 導回登入頁
-          window.location.href = '/back-end/exhibitor/exhibitor_login';
-        });
-      </script>
-
-      <script>
     (async () => {
       // 讓放了 data-include 的容器先隱藏，避免 FOUC
       document.querySelectorAll('[data-include]').forEach(el => el.style.visibility = 'hidden');
@@ -361,13 +350,25 @@
       // window.AdminLTE && window.AdminLTE.autoInit?.();
 
       // 3) 登出（若要清 sessionStorage / localStorage）
-      const logout = document.getElementById('logoutLink');
+      const logout = document.getElementById('mylogout');
       if (logout) {
         logout.addEventListener('click', (e) => {
-          // e.preventDefault(); // 若要攔截導頁再手動跳轉，取消註解
-          sessionStorage.removeItem('auth');       // 依專案實際使用的 key
-          sessionStorage.removeItem('editingEvent');
+          e.preventDefault(); // 若要攔截導頁再手動跳轉，取消註解
+//           sessionStorage.removeItem('auth');       // 依專案實際使用的 key
+//           sessionStorage.removeItem('editingEvent');
           // location.href = logout.getAttribute('href'); // 若攔截，最後導回登入頁
+          
+          // 可以不用 csrfFetch (有另外放權限)
+          fetch("/api/auth/logout/exhibitor", { 
+        	method: "POST",
+          })
+          .then((res) => {
+        	  if(res.status === 204)
+        		  location.href = "/back-end/exhibitor/exhibitor_login";
+        	  if(!res.ok) throw new Error("Not 2XX");
+          })
+          .catch(error => console.log(error))
+          
         });
       }
     })();
