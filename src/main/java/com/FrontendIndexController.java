@@ -172,10 +172,10 @@ public class FrontendIndexController {
 		return "front-end/verif_registration_mail";
 	}
 	
-	@GetMapping("/exhibitor_register")
-	public String exhibitorRegister() {
-		return "front-end/exhibitor_register";
-	}
+//	@GetMapping("/exhibitor_register")
+//	public String exhibitorRegister() {
+//		return "front-end/exhibitor_register";
+//	}
 	
 	@GetMapping("/map_explore")
     public String mapExplore(Model model) {

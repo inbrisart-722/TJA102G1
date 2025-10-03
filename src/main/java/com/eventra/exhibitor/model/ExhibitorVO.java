@@ -19,7 +19,7 @@ public class ExhibitorVO {
 	private Integer exhibitorId;
 
 
-    @Column(name = "review_status_id")
+    @Column(name = "review_status_id", insertable = false)
 	private Integer reviewStatusId;
 	
 

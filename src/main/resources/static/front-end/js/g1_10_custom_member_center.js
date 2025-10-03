@@ -471,14 +471,17 @@ document.addEventListener("DOMContentLoaded", function() {
 		}
 
 		// 2. phone_number：可選填，但若填必須符合台灣電話格式
-		const taiwanPhoneRegex = /^(09\d{8}|0\d{1,2}\d{6,8})$/;
+		// 只允許台灣手機：09xxxxxxxx 或 09xx-xxx-xxx
+		const taiwanMobileRegex = /^(09\d{8}|09\d{2}-\d{3}-\d{3})$/;
+
 		if (phone_number) {
-			if (!taiwanPhoneRegex.test(phone_number)) {
-				errors.phone_number = "電話格式必須為台灣電話（09xxxxxxxx 或 市話）";
-			}
-			if (phone_number.length > 15) {
-				errors.phone_number = "電話號碼不能超過 15 碼";
-			}
+		    if (!taiwanMobileRegex.test(phone_number)) {
+		        errors.phone_number = "電話格式必須為台灣手機號碼（09xxxxxxxx 或 09xx-xxx-xxx）";
+		    }
+		    if (phone_number.length > 13) { 
+		        // 10 碼純數字 or 含 dash 最多 12 碼，保險起見設 13
+		        errors.phone_number = "電話號碼不能超過 13 碼";
+		    }
 		}
 
 		// 3. address：可選填，但長度 <= 255
@@ -567,6 +570,7 @@ document.addEventListener("DOMContentLoaded", function() {
 			.then((result) => {
 				setTimeout(() => {
 					alert("會員資料更新成功！")
+					document.querySelectorAll(".error-msg").forEach(el => el.remove());
 					console.log(result);
 					saved_full_name.innerText = full_name.value;
 					saved_nickname.innerText = nickname.value;
