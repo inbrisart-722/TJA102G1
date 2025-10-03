@@ -99,6 +99,7 @@ public interface ExhibitionRepository extends JpaRepository<ExhibitionVO, Intege
 		       "AND e.ticketStartTime BETWEEN :now AND :until")
 	 List<ExhibitionVO> findExhibitionsStartingWithin(@Param("now") LocalDateTime now, @Param("until") LocalDateTime until);
 	 
+	 // 暫時不判斷 3, 4
 	 Slice<ExhibitionVO> findByStartTimeAfter(LocalDateTime now, Pageable pageable);
 
 	  // 找最近展覽
@@ -114,13 +115,13 @@ public interface ExhibitionRepository extends JpaRepository<ExhibitionVO, Intege
 	    		 WHERE r.exhibition_id = e.exhibition_id)
 	    	  AS averageRatingScore
 	        FROM exhibition e
-	        WHERE e.latitude is not null and e.longitude is not null
+	        WHERE e.exhibitionStatusId in (3,4) and e.latitude is not null and e.longitude is not null
 	        ORDER BY distance
 	        """, nativeQuery = true)
 	    Slice<ExhibitionVO> findNearestExhibition(@Param("lat") Double lat, @Param("lng") Double lng, Pageable pageable);
 	    
-	    @Query("SELECT e FROM ExhibitionVO e WHERE (e.averageRatingScore < :score) OR "
-	    		+ " (e.averageRatingScore = :score AND e.exhibitionId > :eid) ORDER BY e.averageRatingScore DESC")
+	    @Query("SELECT e FROM ExhibitionVO e WHERE e.exhibitionStatusId in (3,4) AND ( (e.averageRatingScore < :score) OR "
+	    		+ " (e.averageRatingScore = :score AND e.exhibitionId > :eid) ) ORDER BY e.averageRatingScore DESC, e.exhibitionId ASC")
 	    Slice<ExhibitionVO> findExhibitionsByAverageRatingScoreDesc(@Param("score") Double score, @Param("eid") Integer exhibitionId, Pageable pageable);
 	    
 	  /* 防止超賣，當訂單狀態為已付款時，總票數扣除已販售票數大於等於訂單購買票數時才可更新已販售票數之數量，
