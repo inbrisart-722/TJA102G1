@@ -492,7 +492,7 @@ public class ExhibitionServiceImpl implements ExhibitionService {
 				.setStartTime(vo.getStartTime())
 				.setEndTime(vo.getEndTime())
 				// 測試
-				.setPageUrl("http://localhost:8088/front-end/exhibitions?exhibitionId=" + vo.getExhibitionId());
+				.setPageUrl("https://eventra.ddns.net/front-end/exhibitions?exhibitionId=" + vo.getExhibitionId());
 			return dto;
 		}).collect(Collectors.toList());
 		
@@ -521,7 +521,7 @@ public class ExhibitionServiceImpl implements ExhibitionService {
 				.setStartTime(vo.getStartTime())
 				.setEndTime(vo.getEndTime())
 				// 測試
-				.setPageUrl("http://localhost:8088/front-end/exhibitions?exhibitionId=" + vo.getExhibitionId());
+				.setPageUrl("https://eventra.ddns.net/front-end/exhibitions?exhibitionId=" + vo.getExhibitionId());
 			return dto;
 		}).collect(Collectors.toList());
 		
