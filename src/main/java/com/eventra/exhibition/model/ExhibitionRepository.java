@@ -115,7 +115,7 @@ public interface ExhibitionRepository extends JpaRepository<ExhibitionVO, Intege
 	    		 WHERE r.exhibition_id = e.exhibition_id)
 	    	  AS averageRatingScore
 	        FROM exhibition e
-	        WHERE e.exhibitionStatusId in (3,4) and e.latitude is not null and e.longitude is not null
+	        WHERE e.exhibition_status_id in (3,4) and e.latitude is not null and e.longitude is not null
 	        ORDER BY distance
 	        """, nativeQuery = true)
 	    Slice<ExhibitionVO> findNearestExhibition(@Param("lat") Double lat, @Param("lng") Double lng, Pageable pageable);
