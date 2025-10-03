@@ -20,7 +20,7 @@
 	</properties>
 	<dependencies>
 		<!-- 柏燁 start -->
-		
+
 		<!-- 基本的 QR Code 生成與解析 API。-->
 		<!-- 如果只想產生 BitMatrix，用這個就行。-->
 		<dependency>
@@ -373,6 +373,15 @@
 	</dependencies>
 
 	<build>
+		<!-- 加入 resources，確保 .well-known 資料夾會被打包 -->
+		<resources>
+			<resource>
+				<directory>src/main/resources</directory>
+				<includes>
+					<include>**/*</include>
+				</includes>
+			</resource>
+		</resources>
 		<plugins>
 			<plugin><!-- ＠用途說明: Package as an executable jar/war -->
 				<groupId>org.springframework.boot</groupId>
