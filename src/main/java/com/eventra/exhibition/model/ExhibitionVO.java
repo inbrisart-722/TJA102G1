@@ -84,8 +84,8 @@ public class ExhibitionVO {
 	private Integer totalTicketQuantity;
 
     
-    @Column(name = "sold_ticket_quantity")
-	private Integer soldTicketQuantity;
+    @Column(name = "sold_ticket_quantity", insertable = false, updatable = true)
+	private Integer soldTicketQuantity = 0; // 20251003 柏燁
 
     
     @Column(name = "description", columnDefinition="LONGTEXT")
@@ -96,12 +96,12 @@ public class ExhibitionVO {
 	private Double longitude;
 
 
-    @Column(name = "total_rating_count")
-	private Integer totalRatingCount;
+    @Column(name = "total_rating_count", insertable = false, updatable = true)
+	private Integer totalRatingCount = 0; // 20251003 柏燁
 
 
-    @Column(name = "total_rating_score")
-	private Integer totalRatingScore;
+    @Column(name = "total_rating_score", insertable = false, updatable = true)
+	private Integer totalRatingScore = 0 ; // 20251003 柏燁
     
     @Formula("case when total_rating_count > 0"
     		+ " then ROUND(total_rating_score / total_rating_count, 1)"

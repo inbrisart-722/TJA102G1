@@ -375,7 +375,7 @@ public class LineBotWebhookService {
 		            "text": "%s",
 		            "quickReply": {
 		              "items": [
-		        		{ "type": "action", "action": { "type": "uri", "label": "立即前往綁定", "uri": "http://localhost:8088/front-end/admin" } }
+		        		{ "type": "action", "action": { "type": "uri", "label": "立即前往綁定", "uri": "https://eventra.ddns.net/front-end/admin" } }
 		              ]
 		            }
 		          }]
