@@ -14,9 +14,9 @@ public class ExpiringCartItemLineBotScheduler {
 		this.CART_ITEM_SERVICE = cartItemService;
 	}
 	
-	@Scheduled(fixedRate = 20_000)
+	@Scheduled(fixedRate = 30_000)
 	public void checkFiveMinutesLeft() {
-//		Long now = System.currentTimeMillis();
-//		CART_ITEM_SERVICE.checkFiveMinutesLeft(now);
+		System.out.println("ExpiringCartItemLineBotScheduler: checkFiveMinutesLeft");
+		CART_ITEM_SERVICE.pushGlobalExpiringCartItem();
 	}
 }

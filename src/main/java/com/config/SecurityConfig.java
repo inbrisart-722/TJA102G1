@@ -353,35 +353,35 @@ public class SecurityConfig {
 					if (req.getQueryString() != null)
 						target += "&" + req.getQueryString();
 					res.sendRedirect(target);
-				}), new AntPathRequestMatcher("/front-end/**", null, true))
+				}), new AntPathRequestMatcher("/front-end/**"))
 				// 2. 後台
 				.defaultAuthenticationEntryPointFor(((req, res, authEx) -> {
 					String target = "/back-end/exhibitor/exhibitor_login?redirect=" + req.getRequestURI();
 					if (req.getQueryString() != null)
 						target += "&" + req.getQueryString();
 					res.sendRedirect(target);
-				}), new AntPathRequestMatcher("/back-end/**", null, true))
+				}), new AntPathRequestMatcher("/back-end/**"))
 				.defaultAuthenticationEntryPointFor(new LoginUrlAuthenticationEntryPoint("/platform/login"),
-						new AntPathRequestMatcher("/platform/**", null, true))
-				// AntPathRequestMatcher 的邏輯是：
-				// 檢查 路徑開頭 是否匹配。
-				// /front-end/** 意思就是「以 /front-end/ 開頭」。
-				// 但它不會要求「URL 必須是從根就開始匹配」。
-				// authentication
+						new AntPathRequestMatcher("/platform/**"))
+				
 				.defaultAuthenticationEntryPointFor( // 對 /api/** 的請求
 						restEntryPoint, // 使用自訂 entry point → 回 401 + JSON
 						new AntPathRequestMatcher("/api/**"))
 				// authorization
 				.accessDeniedHandler((req, res, exception) -> {
 					String uri = req.getRequestURI();
-					if (uri.startsWith("/api/")) {
-						res.setStatus(HttpServletResponse.SC_FORBIDDEN);
-						res.setContentType("acpplicaiton/json;charset=UTF-8");
-						res.getWriter().write("{\"error\":\"forbidden\"}");
-					}
-					if (uri.startsWith("/back-end")) {
+//					if (uri.startsWith("/api/")) {
+//						res.setStatus(HttpServletResponse.SC_FORBIDDEN);
+//						res.setContentType("application/json;charset=UTF-8");
+//						res.getWriter().write("{\"error\":\"forbidden\"}");
+//					}
+					System.out.println(">>> uri=" + req.getRequestURI());
+					System.out.println(">>> ctx=" + req.getContextPath());
+					System.out.println(">>> access denied, auth=" + SecurityContextHolder.getContext().getAuthentication());
+					
+					if (uri.startsWith("/back-end") || uri.startsWith("/api/back-end")) {
 						res.sendRedirect("/back-end/exhibitor/exhibitor_login?redirect=" + req.getRequestURI());
-					} else if (uri.startsWith("/front-end")) {
+					} else if (uri.startsWith("/front-end") || uri.startsWith("/api")) {
 						res.sendRedirect("/front-end/login?redirect=" + req.getRequestURI());
 					}
 				})
