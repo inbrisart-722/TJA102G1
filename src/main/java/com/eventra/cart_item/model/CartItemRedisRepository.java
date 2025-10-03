@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Repository;
@@ -35,6 +36,37 @@ public class CartItemRedisRepository {
 	
 	private String hKey(Integer memberId) {return "cart:items:" + memberId;}
 	private String zKey(Integer memberId) {return "cart:items:exp:" + memberId;}
+	
+	// cleanup Global Exp 不然會有很多靠著 ttl 過期的會員 id 留在裡面...
+	
+	public void cleanupGlobalExp() {
+		long now = System.currentTimeMillis();
+				
+		JEDIS.execute(jedis -> {
+			List<Tuple> expiredEntries = jedis.zrangeByScoreWithScores(GLOBAL_EXP_KEY, Double.NEGATIVE_INFINITY, now);
+			
+			for(Tuple entry : expiredEntries) {
+				String memberId = entry.getElement();
+				String zKey = zKey(Integer.valueOf(memberId));
+				
+				if(!jedis.exists(zKey) || jedis.zcard(zKey) == 0) {
+					// 該會員購物車已空 → 從 global 移除
+	                jedis.zrem(GLOBAL_EXP_KEY, memberId);
+	                System.out.println("清理 globalExp: 移除 memberId=" + memberId);
+				} else {
+					// 更新 score 為該會員最早的 expiration
+					List<Tuple> minExp = jedis.zrangeWithScores(zKey, 0, 0);
+	                if (!minExp.isEmpty()) {
+	                    double newExpire = minExp.iterator().next().getScore();
+	                    jedis.zadd(GLOBAL_EXP_KEY, newExpire, memberId);
+	                    System.out.println("更新 globalExp: memberId=" + memberId + " 新expire=" + newExpire);
+	                }
+				}
+			}
+			return null;
+		});
+		// 找出所有過期的會員
+	}
 	
 	// 排程通知 cart item 即將過期使用
 	public List<Integer> getExpiringMemberList(long now) {
@@ -198,6 +230,7 @@ public class CartItemRedisRepository {
 			
 			// *** 維護全域過期 zset
 			updateGlobalExpireScoreByMemberId(zKey, memberId.toString());
+			
 			
 			String VOJson = r1.get();
 			if(VOJson == null || VOJson.isEmpty()) return null;

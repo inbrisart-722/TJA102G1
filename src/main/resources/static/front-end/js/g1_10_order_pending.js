@@ -33,7 +33,7 @@ const fetch_order_result = function() {
 			else {
 				console.log("30秒都沒更新，看來該做點什麼了");
 				alert("目前訂單狀態正在查詢中，請您稍後至「會員中心 - 訂單頁」查看狀態");
-				location.href = "/front-end/admin";
+				location.href = "/front-end/admin?go=ticket";
 			}
 		})
 		.catch((error) => {

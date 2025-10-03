@@ -1,4 +1,24 @@
 document.addEventListener("DOMContentLoaded", function () {
+	
+	function showError(msg) {
+	  // 先刪掉舊的錯誤訊息（避免重複）
+	  const oldError = document.querySelector("#login-error");
+	  if (oldError) oldError.remove();
+
+	  // 建立一個 <div> 或 <p>
+	  const errorEl = document.createElement("p");
+	  errorEl.id = "login-error";
+	  errorEl.textContent = msg;
+	  errorEl.style.color = "red"; // 或加 class
+	  errorEl.style.margin = "5px 0 10px 0";
+
+	  // 找到目標節點
+	  const forgotP = document.getElementById("forgot-password-p");
+
+	  // 插到它前面
+	  forgotP.parentNode.insertBefore(errorEl, forgotP);
+	}
+
   // 1. 登入按鈕本身
   const btn_login = document.querySelector("a#btn_login");
   btn_login.addEventListener("click", function (e) {
@@ -23,7 +43,7 @@ document.addEventListener("DOMContentLoaded", function () {
         return res.json();
       })
       .then((result) => {
-        console.log(result);
+      	console.log(result.status);
 		
 		// api - redirect
 		const redirect_api = sessionStorage.getItem("redirect");
@@ -54,6 +74,7 @@ document.addEventListener("DOMContentLoaded", function () {
       })
       .catch((error) => {
         console.log(error);
+		showError("輸入的帳號或密碼有錯誤！");
       });
   });
   

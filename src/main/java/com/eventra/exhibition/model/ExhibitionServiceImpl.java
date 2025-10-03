@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Comparator;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -30,16 +29,14 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.eventra.comment.controller.CommentStatus;
 import com.eventra.comment.model.CommentRepository;
-
-import com.eventra.exhibitionstatus.model.ExhibitionStatusVO;
-
 import com.eventra.eventnotification.model.EventNotificationService.NotificationType;
-
 import com.eventra.exhibitiontickettype.model.ExhibitionTicketTypeRepository;
 import com.eventra.exhibitiontickettype.model.ExhibitionTicketTypeVO;
 import com.eventra.exhibitor.backend.controller.dto.ExhibitionCreateDTO;
 import com.eventra.exhibitor.model.ExhibitorDTO;
 import com.eventra.exhibitor.model.ExhibitorVO;
+import com.eventra.member.fileupload.FileCategory;
+import com.eventra.member.fileupload.LocalFileUploadService;
 import com.eventra.notificationpush.model.NotificationPushService;
 import com.eventra.order.model.OrderRepository;
 import com.eventra.order.model.OrderStatus;
@@ -59,6 +56,7 @@ public class ExhibitionServiceImpl implements ExhibitionService {
 	private final ExhibitionTicketTypeRepository exhibitionTicketTypeRepository;
 	private final TicketTypeRepository ticketTypeRepository;
 	private final OrderRepository orderRepository;
+	private final LocalFileUploadService localFileUploadService;
 	private record TicketJsonItem(String name, Integer price) {
 	}
 	
@@ -75,9 +73,10 @@ public class ExhibitionServiceImpl implements ExhibitionService {
 	private static final int DEFAULT_STATUS_ID = 1;
 	private static final int DRAFT_STATUS_ID = 6;
 	private final String DEFAULT_PHOTO_LANDSCAPE;
-
+	
 	@Autowired
-	public ExhibitionServiceImpl(ExhibitionRepository repository, CommentRepository commentRepository, ExhibitionTicketTypeRepository exhibitionTicketTypeRepository, TicketTypeRepository ticketTypeRepository, @Value("${default.exhibition-photo-landscape}") String defaultPhotoLandscape, NotificationPushService notificationPushService, OrderRepository orderRepository) {
+	public ExhibitionServiceImpl(ExhibitionRepository repository, CommentRepository commentRepository, ExhibitionTicketTypeRepository exhibitionTicketTypeRepository, TicketTypeRepository ticketTypeRepository, @Value("${default.exhibition-photo-landscape}") String defaultPhotoLandscape, NotificationPushService notificationPushService, OrderRepository orderRepository,
+			LocalFileUploadService localFileUploadService) {
 		this.repository = repository;
 		this.exhibitionTicketTypeRepository = exhibitionTicketTypeRepository;
 		this.ticketTypeRepository = ticketTypeRepository;
@@ -85,6 +84,7 @@ public class ExhibitionServiceImpl implements ExhibitionService {
 		this.DEFAULT_PHOTO_LANDSCAPE = defaultPhotoLandscape;
 		this.notificationPushService = notificationPushService;
 		this.orderRepository = orderRepository;
+		this.localFileUploadService = localFileUploadService; 
 	}
 
 	@Transactional
@@ -118,40 +118,15 @@ public class ExhibitionServiceImpl implements ExhibitionService {
 		/** 圖片儲存處理 **/
 		// 2) 第一次 save : 先存到 DB 取得自增 id
 		ExhibitionVO saved = repository.save(exhibitionVO);
-		Integer id = saved.getExhibitionId(); // 取得資料夾名稱要用的 id
 
-		// 3) 建立 /static/uploads/exhibitions/{id}/ 目錄
-		Path baseDir = Paths.get("/Users/lianliwei/uploads/exhibitions", String.valueOf(id));
-		try {
-			Files.createDirectories(baseDir);
-		} catch (IOException e) {
-			throw new RuntimeException("建立圖片目錄失敗: " + baseDir, e);
-		}
-
-		// 4) 存portrait
 		MultipartFile portrait = dto.getPhotoPortrait();
-		if(portrait != null && !portrait.isEmpty()) {
-			String filename = "p_" + UUID.randomUUID() + "_" + portrait.getOriginalFilename();
-			try {
-				portrait.transferTo(baseDir.resolve(filename));
-				saved.setPhotoPortrait("uploads/exhibitions/" + id + "/" + filename);
-			}catch(IOException e) {
-				throw new RuntimeException("存 portrait 失敗", e);
-			}
-		}
-		
-		// 5) 存 landscape
+		String photo_portrait = localFileUploadService.save(portrait, FileCategory.exhibition_portrait);
 		MultipartFile landscape = dto.getPhotoLandscape();
-		if(landscape != null && !landscape.isEmpty()) {
-			String filename = "l_" + UUID.randomUUID() + "_" + landscape.getOriginalFilename();
-			try {
-				landscape.transferTo(baseDir.resolve(filename));
-				saved.setPhotoLandscape("uploads/exhibitions/" + id + "/" + filename);
-			}catch(IOException e) {
-				throw new RuntimeException("存 landscape 失敗", e);
-			}
-		}
-
+		String photo_landscape = localFileUploadService.save(landscape, FileCategory.exhibition_landscape);
+		
+		saved.setPhotoPortrait(photo_portrait);
+		saved.setPhotoLandscape(photo_landscape);
+		
 		// 6) 第二次 save : 更新圖片路徑
 		repository.save(saved);
 

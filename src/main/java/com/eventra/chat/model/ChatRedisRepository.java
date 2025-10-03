@@ -1,6 +1,7 @@
 package com.eventra.chat.model;
 
 import java.util.ArrayList;
+
 import java.util.Collections;
 import java.util.List;
 
@@ -9,6 +10,7 @@ import org.springframework.stereotype.Repository;
 import com.util.JsonCodec;
 import com.util.RedisPoolExecutor;
 
+import redis.clients.jedis.resps.Tuple;
 @Repository
 public class ChatRedisRepository {
 
@@ -25,6 +27,13 @@ public class ChatRedisRepository {
 		this.JEDIS = jedis;
 	}
 	
+	public void cleanupExpiredChatMessages() {
+		Long now = System.currentTimeMillis();
+		JEDIS.execute(jedis -> {
+			jedis.zremrangeByScore(MSG_KEY, Double.NEGATIVE_INFINITY, now);
+			return null;
+		});
+	}
 	// 排程 每10mins 掃 超過 3 天的 msgs 全刪除
 	
 	public void addMessage(ChatMessageResDTO res) {

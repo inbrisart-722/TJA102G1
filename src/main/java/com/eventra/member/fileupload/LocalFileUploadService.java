@@ -1,5 +1,6 @@
 package com.eventra.member.fileupload;
 
+import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -7,6 +8,8 @@ import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.util.Set;
 import java.util.UUID;
+
+import javax.imageio.ImageIO;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
@@ -21,6 +24,24 @@ public class LocalFileUploadService implements FileUploadService {
 	
 	private final Path root;
 	
+	public String saveBufferedImage(BufferedImage image, FileCategory type, String format) {
+	    String dir = type.toString();
+	    try {
+	        if (!Files.exists(root.resolve(dir))) {
+	            Files.createDirectories(root.resolve(dir));
+	        }
+
+	        String filename = UUID.randomUUID() + "_cropped." + format;
+	        Path filePath = root.resolve(dir).resolve(filename);
+
+	        ImageIO.write(image, format, filePath.toFile());
+
+	        return "/" + dir + "/" + filename;
+	    } catch (IOException e) {
+	        throw new RuntimeException("Could not save cropped image", e);
+	    }
+	}
+	
 	public LocalFileUploadService(@Value("${app.upload.dir}") String localRoot) {
 		this.root = Paths.get(localRoot);
 	}
@@ -30,6 +51,7 @@ public class LocalFileUploadService implements FileUploadService {
 		// Path filePath = subDir.resolve("abc.png"); // uploads/avatars/abc.png
 	// .normalize 會「標準化路徑」，把裡面多餘的 . 或 .. 拿掉 -> 避免有人故意傳 ../../etc/passwd 類似的路徑，降低目錄穿越攻擊風險
 		// Path path = root.resolve("../uploads/avatars/../abc.png").normalize(); // uploads/abc.png
+	
 	
 	@Override
 	public String save(MultipartFile file, FileCategory type) {

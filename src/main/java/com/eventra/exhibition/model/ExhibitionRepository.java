@@ -101,7 +101,7 @@ public interface ExhibitionRepository extends JpaRepository<ExhibitionVO, Intege
 	 
 	 Slice<ExhibitionVO> findByStartTimeAfter(LocalDateTime now, Pageable pageable);
 
-	  // 找最近一個展覽
+	  // 找最近展覽
 	    @Query(value = """
 	        SELECT e.*, (
 	            6371000 * acos(

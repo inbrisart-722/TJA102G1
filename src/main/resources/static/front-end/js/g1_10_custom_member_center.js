@@ -566,6 +566,7 @@ document.addEventListener("DOMContentLoaded", function() {
 			})
 			.then((result) => {
 				setTimeout(() => {
+					alert("會員資料更新成功！")
 					console.log(result);
 					saved_full_name.innerText = full_name.value;
 					saved_nickname.innerText = nickname.value;
@@ -574,7 +575,7 @@ document.addEventListener("DOMContentLoaded", function() {
 					saved_birth_date.innerText = birth_date.value;
 					saved_address.innerText = address.value;
 					sendable = true;
-				}, 500);
+				});
 			})
 			.catch(error => {
 				console.log(error)
