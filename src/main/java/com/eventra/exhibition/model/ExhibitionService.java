@@ -53,5 +53,12 @@ public interface ExhibitionService {
 
     Page<ExhibitionVO> findEnded(Integer exhibitorId, int page, int size, String q);
 
+    // 給審核狀態用
+    Page<ExhibitionVO> findByStatus(Integer exhibitorId, Integer statusId, int page, int size, String q);
+
   
+    // 訂單列表用
+    void markOrderPaid(Integer orderId); 
+    	
+    
 }

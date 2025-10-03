@@ -10,14 +10,14 @@ public class OrderSummaryDTO {
 	private String orderUlid;
 	private String fullName;
 	private OrderStatus orderStatus;
-	private Integer itemCount;
+	private Long itemCount;
 	private Integer totalAmount;
 	private Timestamp createdAt;
 	private String exhibitionName;
 	private String ticketTypeName;
 	
 	public OrderSummaryDTO(Integer orderId, String orderUlid, String fullName, OrderStatus orderStatus,
-			Integer itemCount, Integer totalAmount, Timestamp createdAt) {
+			Long itemCount, Integer totalAmount, Timestamp createdAt, String exhibitionName, String ticketTypeName) {
 		super();
 		this.orderId = orderId;
 		this.orderUlid = orderUlid;
@@ -26,8 +26,8 @@ public class OrderSummaryDTO {
 		this.itemCount = itemCount;
 		this.totalAmount = totalAmount;
 		this.createdAt = createdAt;
-//		this.exhibitionName = exhibitionName;
-//		this.ticketTypeName = ticketTypeName;
+		this.exhibitionName = exhibitionName;
+		this.ticketTypeName = ticketTypeName;
 	}
 	public Integer getOrderId() {
 		return orderId;
@@ -65,10 +65,10 @@ public class OrderSummaryDTO {
 	public void setCreatedAt(Timestamp createdAt) {
 		this.createdAt = createdAt;
 	}
-	public Integer getItemCount() {
+	public Long getItemCount() {
 		return itemCount;
 	}
-	public void setItemCount(Integer itemCount) {
+	public void setItemCount(Long itemCount) {
 		this.itemCount = itemCount;
 	}
 	public String getExhibitionName() {

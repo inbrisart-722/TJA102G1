@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -14,7 +15,6 @@ import com.eventra.exhibition.model.ExhibitionVO;
 import com.eventra.exhibitiontickettype.model.ExhibitionTicketTypeRepository;
 import com.eventra.exhibitiontickettype.model.ExhibitionTicketTypeVO;
 import com.eventra.member.model.MemberRepository;
-import com.eventra.member.model.MemberVO;
 import com.sse.ticket.TicketSseEmitterService;
 import com.util.MillisToMinutesSecondsUtil;
 
@@ -61,6 +61,11 @@ public class CartItemService {
 			EXHIBITION_REPO.updateSoldTicketQuantity(entry.getKey(), -entry.getValue());
 	}
 
+	@Async
+	public void broadcastTicketCount(Integer exhibitionId, Integer leftTicketQuantity) {
+		TICKET_SSE_SERVICE.broadcastTicketCount(exhibitionId, leftTicketQuantity);
+	}
+	
 	public void addCartItem(AddCartItemReqDTO req, Integer memberId) throws IllegalStateException{
 //		Integer memberId = MEMBER_REPO.findByEmail(SecurityContextHolder.getContext().getAuthentication().getName()).orElse(null).getMemberId();
 		
@@ -99,7 +104,7 @@ public class CartItemService {
 		Integer totalTicketQuantity = EXHIBITION_REPO.findById(exhibitionId).orElseThrow().getTotalTicketQuantity();
 		Integer soldTicketQuantity = EXHIBITION_REPO.findById(exhibitionId).orElseThrow().getSoldTicketQuantity();
 
-		TICKET_SSE_SERVICE.broadcastTicketCount(exhibitionId, totalTicketQuantity - soldTicketQuantity);
+		broadcastTicketCount(exhibitionId, totalTicketQuantity - soldTicketQuantity);
 	}
 
 	public String removeOneCartItem(Integer cartItemId, Integer memberId) {

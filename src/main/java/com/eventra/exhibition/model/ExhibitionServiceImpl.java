@@ -41,6 +41,9 @@ import com.eventra.exhibitor.backend.controller.dto.ExhibitionCreateDTO;
 import com.eventra.exhibitor.model.ExhibitorDTO;
 import com.eventra.exhibitor.model.ExhibitorVO;
 import com.eventra.notificationpush.model.NotificationPushService;
+import com.eventra.order.model.OrderRepository;
+import com.eventra.order.model.OrderStatus;
+import com.eventra.order.model.OrderVO;
 import com.eventra.tickettype.model.TicketTypeRepository;
 import com.eventra.tickettype.model.TicketTypeVO;
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -55,6 +58,7 @@ public class ExhibitionServiceImpl implements ExhibitionService {
 	private final ExhibitionRepository repository;
 	private final ExhibitionTicketTypeRepository exhibitionTicketTypeRepository;
 	private final TicketTypeRepository ticketTypeRepository;
+	private final OrderRepository orderRepository;
 	private record TicketJsonItem(String name, Integer price) {
 	}
 	
@@ -73,13 +77,14 @@ public class ExhibitionServiceImpl implements ExhibitionService {
 	private final String DEFAULT_PHOTO_LANDSCAPE;
 
 	@Autowired
-	public ExhibitionServiceImpl(ExhibitionRepository repository, CommentRepository commentRepository, ExhibitionTicketTypeRepository exhibitionTicketTypeRepository, TicketTypeRepository ticketTypeRepository, @Value("${default.exhibition-photo-landscape}") String defaultPhotoLandscape, NotificationPushService notificationPushService) {
+	public ExhibitionServiceImpl(ExhibitionRepository repository, CommentRepository commentRepository, ExhibitionTicketTypeRepository exhibitionTicketTypeRepository, TicketTypeRepository ticketTypeRepository, @Value("${default.exhibition-photo-landscape}") String defaultPhotoLandscape, NotificationPushService notificationPushService, OrderRepository orderRepository) {
 		this.repository = repository;
 		this.exhibitionTicketTypeRepository = exhibitionTicketTypeRepository;
 		this.ticketTypeRepository = ticketTypeRepository;
 		this.commentRepository = commentRepository;
 		this.DEFAULT_PHOTO_LANDSCAPE = defaultPhotoLandscape;
 		this.notificationPushService = notificationPushService;
+		this.orderRepository = orderRepository;
 	}
 
 	@Transactional
@@ -281,6 +286,11 @@ public class ExhibitionServiceImpl implements ExhibitionService {
 	    // 按儲存為草稿按鈕後變更展覽狀態為草稿
 	    if (Boolean.TRUE.equals(dto.getDraft())) {
             vo.setExhibitionStatusId(DRAFT_STATUS_ID);
+        }else {
+            // 若原本是草稿，改成「待審核」
+            if (Objects.equals(vo.getExhibitionStatusId(), DRAFT_STATUS_ID)) {
+                vo.setExhibitionStatusId(DEFAULT_STATUS_ID); // 待審核
+            }
         }
 	    // 4)
 	    repository.save(vo); // 儲存展覽本體，把剛剛更新的圖片路徑寫回資料庫
@@ -450,6 +460,16 @@ public class ExhibitionServiceImpl implements ExhibitionService {
 	public Page<ExhibitionVO> findEnded(Integer exhibitorId, int page, int size, String q) {
 		return repository.findEnded(exhibitorId, DRAFT_STATUS_ID, (q == null ? "" : q), defaultPageable(page, size));
 	}
+	
+	@Override
+	public Page<ExhibitionVO> findByStatus(Integer exhibitorId, Integer statusId, int page, int size, String q) {
+	    return repository.findByExhibitorVO_ExhibitorIdAndExhibitionStatusIdAndExhibitionNameContainingIgnoreCase(
+	            exhibitorId,
+	            statusId,
+	            (q == null ? "" : q),
+	            PageRequest.of(page, size, Sort.by("startTime").descending())
+	    );
+	}
 
 	public ExhibitionSidebarResultDTO findSidebarExhibitionsByRatingScore(Integer exhibitionId, Double averageRatingScore){
 		Pageable pageable = PageRequest.ofSize(5);
@@ -531,5 +551,51 @@ public class ExhibitionServiceImpl implements ExhibitionService {
 		}).collect(Collectors.toList());
 		
 		return new SliceImpl<>(dtos, pageable, exhibitionsSlice.hasNext());
+	}
+	
+	// 在訂單改成「已付款」時扣庫存
+	@Transactional
+	public void markOrderPaid(Integer orderId) {
+	    OrderVO order = orderRepository.findById(orderId).orElseThrow();
+
+	    if (order.getOrderStatus() == OrderStatus.已付款) return; // 冪等
+
+	    // 依展覽彙總本訂單要扣的張數
+	    Map<Integer, Long> qtyByExhibition = order.getOrderItems().stream()
+	        .collect(Collectors.groupingBy(
+	            oi -> oi.getExhibitionTicketType().getExhibition().getExhibitionId(),
+	            Collectors.counting()
+	        ));
+
+	    // 逐個展覽嘗試扣庫存
+	    for (var e : qtyByExhibition.entrySet()) {
+	        Integer exhibitionId = e.getKey();
+	        int delta = e.getValue().intValue();
+	        int updated = repository.tryIncreaseSold(exhibitionId, delta);
+	        if (updated == 0) {
+	            throw new IllegalStateException("庫存不足或已售罄（exhibitionId=" + exhibitionId + "）");
+	        }
+	    }
+
+	    order.setOrderStatus(OrderStatus.已付款);
+	}
+	
+	// 訂單改成「已退款」時加庫存
+	@Transactional
+	public void refundOrder(Integer orderId) {
+	    OrderVO order = orderRepository.findById(orderId).orElseThrow();
+	    if (order.getOrderStatus() == OrderStatus.已退款) return;
+
+	    Map<Integer, Long> qtyByExhibition = order.getOrderItems().stream()
+	        .collect(Collectors.groupingBy(
+	            oi -> oi.getExhibitionTicketType().getExhibition().getExhibitionId(),
+	            Collectors.counting()
+	        ));
+
+	    for (var e : qtyByExhibition.entrySet()) {
+	        repository.decreaseSold(e.getKey(), e.getValue().intValue());
+	    }
+
+	    order.setOrderStatus(OrderStatus.已退款);
 	}
 }

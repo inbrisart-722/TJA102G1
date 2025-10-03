@@ -44,8 +44,10 @@ import jakarta.validation.Valid;
 public class BackendIndexController {
 	
 	private static final Integer DRAFT_STATUS_ID = 6;
+	private static final Integer PENDING_STATUS_ID  = 1;
+	private static final Integer REJECTED_STATUS_ID = 2;
 	private final ExhibitionService exhibitionService;
-	private final Integer TEST_EXHIBITOR = 6;
+	private final Integer TEST_EXHIBITOR = 2;
 	private final TicketTypeRepository ticketTypeRepository;
 	private final ExhibitorRepository exhibitorRepository;
 	private final PlatformAnnouncementRepository platformAnnouncementRepository;
@@ -225,10 +227,12 @@ public class BackendIndexController {
         Page<ExhibitionVO> p;
 
         switch (tab) {
-            case "draft" -> p = exhibitionService.findDrafts(exhibitorId, DRAFT_STATUS_ID, page, size, q); // 6=草稿
+	        case "pending"     -> p = exhibitionService.findByStatus(exhibitorId, PENDING_STATUS_ID,  page, size, q);
+	        case "rejected"    -> p = exhibitionService.findByStatus(exhibitorId, REJECTED_STATUS_ID, page, size, q);
             case "not_on_sale" -> p = exhibitionService.findNotOnSale(exhibitorId, page, size, q);
             case "on_sale" -> p = exhibitionService.findOnSale(exhibitorId, page, size, q);
             case "ended" -> p = exhibitionService.findEnded(exhibitorId, page, size, q);
+            case "draft" -> p = exhibitionService.findDrafts(exhibitorId, DRAFT_STATUS_ID, page, size, q); // 6=草稿
             default -> p = exhibitionService.findAll(exhibitorId, page, size, q);
         }
         model.addAttribute("tab", tab);
