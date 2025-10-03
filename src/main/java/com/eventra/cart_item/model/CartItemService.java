@@ -17,6 +17,7 @@ import com.eventra.exhibitiontickettype.model.ExhibitionTicketTypeRepository;
 import com.eventra.exhibitiontickettype.model.ExhibitionTicketTypeVO;
 import com.eventra.linebot.model.LineBotPushService;
 import com.eventra.member.model.MemberRepository;
+import com.eventra.member.model.MemberVO;
 import com.sse.ticket.TicketSseEmitterService;
 import com.util.MillisToMinutesSecondsUtil;
 
