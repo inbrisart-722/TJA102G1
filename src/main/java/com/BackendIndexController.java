@@ -251,6 +251,7 @@ public class BackendIndexController {
     							@RequestParam(defaultValue = "0") int page,
     							@RequestParam(defaultValue = "10") int size) {
     	
+    	Integer exhibitorId = TEST_EXHIBITOR;
     	// 將字串轉為 Enum；無效或空就給 null
         com.eventra.order.model.OrderStatus statusEnum = null;
         if(status != null && !status.isBlank()) {
@@ -261,7 +262,7 @@ public class BackendIndexController {
         	}
         }
     	
-    	Page<OrderSummaryDTO> p = orderRepository.findOrderSummaries(statusEnum, q, PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt")));
+    	Page<OrderSummaryDTO> p = orderRepository.findOrderSummaries(exhibitorId, statusEnum, q, PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt")));
     	
     	
     	model.addAttribute("orders", p.getContent());
