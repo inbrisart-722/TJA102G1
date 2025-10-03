@@ -121,7 +121,7 @@ public class LineBotWebhookService {
 //        replyWithText(replyToken, "感謝加入好友！輸入『查展覽』開始體驗。");
         try { Thread.sleep(100); }
         catch (InterruptedException e) { System.out.println(e.toString()); }
-        replyWithQuickReplyBindAccount(replyToken, "💡小提示：建議先完成 Eventra 會員綁定以便使用完整查詢功能");
+        replyWithQuickReplyBindAccount(replyToken, "💡小提示：建議先完成 Eventra 會員綁定以便使用完整查詢功能（若已綁定會員請忽略）");
     }
     
     private void handleMessageEvent(JsonNode event) throws Exception {
@@ -236,6 +236,8 @@ public class LineBotWebhookService {
     		};
     		
     		Slice<OrderLineBotCarouselDTO> orders = ORDER_SERVICE.findOrdersByLineUserId(lineUserId, orderStatus, page, SIZE);
+    		// fallback
+    		if(orders == null || orders.isEmpty()) replyWithText(replyToken, "您目前沒有「" + orderStatus.toString() + "」狀態的訂單哦！");
     		
     		ObjectNode carousel = FLEX_BUILDER.buildOrderCarousel(orders.getContent(), orders.hasNext(), action, type, page + 1);
         	String json = FLEX_BUILDER.wrapFlexReply(replyToken, carousel);
@@ -267,15 +269,15 @@ public class LineBotWebhookService {
     	// Image carousel template
     // 7. Flex Message
     
-//    private void replyWithText(String replyToken, String text) throws Exception {
-//        String json = """
-//        {
-//          "replyToken": "%s",
-//          "messages": [{ "type": "text", "text": "%s" }]
-//        }
-//        """.formatted(replyToken, text);
-//        sendReply(json);
-//    }
+    private void replyWithText(String replyToken, String text) throws Exception {
+        String json = """
+        {
+          "replyToken": "%s",
+          "messages": [{ "type": "text", "text": "%s" }]
+        }
+        """.formatted(replyToken, text);
+        sendReply(json);
+    }
 
     private void replyWithQuickReplyExhibition(String replyToken, String text) throws Exception {
     	// postback -> 傳送隱藏 data 給 webhook -> {"type": "postback", "label": "我要付款", "data": "action=pay&itemid=123"}
