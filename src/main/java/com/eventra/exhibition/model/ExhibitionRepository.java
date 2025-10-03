@@ -84,6 +84,10 @@ public interface ExhibitionRepository extends JpaRepository<ExhibitionVO, Intege
 	// 全部（分頁）
 	Page<ExhibitionVO> findByExhibitorVO_ExhibitorIdAndExhibitionNameContainingIgnoreCase(Integer exhibitorId, String exhibitionName, Pageable pageable);
 
+	// 查詢審核狀態
+	Page<ExhibitionVO> findByExhibitorVO_ExhibitorIdAndExhibitionStatusIdAndExhibitionNameContainingIgnoreCase(
+	        Integer exhibitorId, Integer exhibitionStatusId, String nameKeyword, Pageable pageable);
+	
 	 /** 
 	  * peichenlu
 	  * [收藏展覽通知(event notification) - 開賣提醒]
@@ -118,4 +122,26 @@ public interface ExhibitionRepository extends JpaRepository<ExhibitionVO, Intege
 	    @Query("SELECT e FROM ExhibitionVO e WHERE (e.averageRatingScore < :score) OR "
 	    		+ " (e.averageRatingScore = :score AND e.exhibitionId > :eid) ORDER BY e.averageRatingScore DESC")
 	    Slice<ExhibitionVO> findExhibitionsByAverageRatingScoreDesc(@Param("score") Double score, @Param("eid") Integer exhibitionId, Pageable pageable);
+	    
+	  /* 防止超賣，當訂單狀態為已付款時，總票數扣除已販售票數大於等於訂單購買票數時才可更新已販售票數之數量，
+	             */    		 
+	    @Modifying
+	    @Query("""
+	    		update ExhibitionVO e
+	    			set e.soldTicketQuantity = coalesce(e.soldTicketQuantity, 0) + :delta
+	    		where e.exhibitionId = :exhibitionId
+	    		    and(coalesce(e.totalTicketQuantity, 0)) - (coalesce(e.soldTicketQuantity, 0)) >= :delta
+	    		""")
+	    
+	    int tryIncreaseSold(@Param("exhibitionId") Integer exhibitionId,
+	    					@Param("delta") int delta);
+	    
+	    @Modifying
+	    @Query("""
+	    		update ExhibitionVO e
+	    		    set e.soldTicketQuantity = greatest(coalesce(e.soldTicketQuantity,0) - :delta, 0)
+	    		where e.exhibitionId = :exhibitionId
+	    """)
+	    int decreaseSold(@Param("exhibitionId") Integer exhibitionId,
+	                     @Param("delta") int delta);
 }

@@ -295,9 +295,17 @@ public class ExhibitionVO {
 	
 	@Transient
 	public String getSaleStatus() {
-		if(this.getExhibitionStatusId() != null && this.getExhibitionStatusId() == 6) {
-			return "草稿";
-		}
+		if(this.getExhibitionStatusId() != null) {
+			if(this.getExhibitionStatusId() == 6) {
+				return "草稿";
+			}
+			if(this.getExhibitionStatusId() == 1) {
+				return "待審核";
+			}
+			if(this.getExhibitionStatusId() == 2) {
+				return "未通過審核";
+			}
+		}				 	
 		
 		LocalDateTime now = LocalDateTime.now();
 		LocalDateTime start = this.getTicketStartTime(); // 開賣時間
@@ -313,6 +321,12 @@ public class ExhibitionVO {
 			return "已結束";
 		}
 		return "尚未開賣";
+	}
+	
+	public int getLeftTicketQuantity() {
+		int total = (this.totalTicketQuantity == null ? 0 : this.totalTicketQuantity);
+		int sold = (this.soldTicketQuantity == null ? 0 : this.soldTicketQuantity);
+		return Math.max(total - sold, 0);
 	}
 }
 
