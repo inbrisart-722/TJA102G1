@@ -1,19 +1,23 @@
-// 側邊欄捲軸樣式
-const SELECTOR_SIDEBAR_WRAPPER = '.sidebar-wrapper';
-const Default = {
-    scrollbarTheme: 'os-theme-light',
-    scrollbarAutoHide: 'leave',
-    scrollbarClickScroll: true,
-};
-document.addEventListener('DOMContentLoaded', function () {
-    const sidebarWrapper = document.querySelector(SELECTOR_SIDEBAR_WRAPPER);
-    if (sidebarWrapper && OverlayScrollbarsGlobal?.OverlayScrollbars !== undefined) {
-        OverlayScrollbarsGlobal.OverlayScrollbars(sidebarWrapper, {
-            scrollbars: {
-                theme: Default.scrollbarTheme,
-                autoHide: Default.scrollbarAutoHide,
-                clickScroll: Default.scrollbarClickScroll,
-            },
-        });
-    }
+// 搜尋按鈕錯誤驗證提示
+document.addEventListener("DOMContentLoaded", function () {
+  const searchForm = document.getElementById("searchForm");
+  const keywordInput = document.getElementById("keywordInput");
+  const keywordError = document.getElementById("keywordError");
+
+  if (searchForm) {
+    searchForm.addEventListener("submit", function (e) {
+      const keyword = keywordInput.value.trim();
+
+      // 顯示錯誤提示
+      if (!keyword) {
+        e.preventDefault();
+        keywordError.style.display = "block";
+        return;
+      }
+
+      // 隱藏錯誤提示
+      keywordError.style.display = "none";
+    });
+  }
 });
+

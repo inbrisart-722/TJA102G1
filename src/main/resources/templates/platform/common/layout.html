@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+</head>
+<body>
+	<!-- 頁首 -->
+	<nav th:fragment="header"
+		class="app-header navbar navbar-expand bg-body-tertiary"
+		data-bs-theme="dark">
+		<div class="container-fluid">
+			<!-- 漢堡 -->
+			<ul class="navbar-nav">
+				<li class="nav-item"><a class="nav-link"
+					data-lte-toggle="sidebar" href="#" role="button"> <i
+						class="bi bi-list"></i>
+				</a></li>
+			</ul>
+
+			<!-- 登出 -->
+			<ul class="navbar-nav ms-auto">
+				<li class="user-footer"><a href="#"
+					class="btn btn-default btn-flat float-end">登出</a></li>
+			</ul>
+		</div>
+	</nav>
+
+
+	<!-- 左側欄 -->
+	<aside th:fragment="sidebar" class="app-sidebar bg-body-tertiary"
+		data-bs-theme="dark">
+		<div class="sidebar-brand">
+			<a th:href="@{/platform/index}" class="brand-link"> <img
+				src="img/AdminLTELogo.png" alt="AdminLTE Logo"
+				class="brand-image opacity-75 shadow" /> <span
+				class="brand-text fw-light">Eventra</span>
+			</a>
+		</div>
+
+		<div class="sidebar-wrapper">
+			<nav class="mt-2">
+				<ul class="nav sidebar-menu flex-column" data-lte-toggle="treeview"
+					role="navigation" aria-label="Main navigation"
+					data-accordion="false" id="navigation">
+
+					<!-- 會員列表 -->
+					<li class="nav-item"><a th:href="@{/platform/member}"
+						class="nav-link"> <i class="nav-icon bi bi-people-fill"></i>
+							<p>會員列表</p>
+					</a></li>
+
+					<!-- 展商列表 -->
+					<li class="nav-item"><a th:href="@{/platform/partner}"
+						class="nav-link"> <i class="nav-icon bi bi-people-fill"></i>
+							<p>展商列表</p>
+					</a></li>
+
+					<!-- 展商註冊審核管理 -->
+					<li class="nav-item"><a th:href="@{/platform/exhibitor}"
+						class="nav-link"> <i class="nav-icon bi bi-pencil-square"></i>
+							<p>展商註冊審核管理</p>
+					</a></li>
+
+<!-- 					<li class="nav-item"><a href="#" class="nav-link"> <i -->
+<!-- 							class="nav-icon bi bi-people-fill"></i> -->
+<!-- 							<p> -->
+<!-- 								用戶管理 <i class="nav-arrow bi bi-chevron-right"></i> -->
+<!-- 							</p> -->
+<!-- 					</a> 子選單 -->
+<!-- 						<ul class="nav nav-treeview"> -->
+<!-- 							<li class="nav-item"><a th:href="@{/platform/member}" -->
+<!-- 								class="nav-link" style="padding-left: 56px;"> -->
+<!-- 									<p>會員列表</p> -->
+<!-- 							</a></li> -->
+<!-- 							<li class="nav-item"><a th:href="@{/platform/partner}" -->
+<!-- 								class="nav-link" style="padding-left: 56px;"> -->
+<!-- 									<p>展商列表</p> -->
+<!-- 							</a></li> -->
+<!-- 						</ul></li> 留言管理 -->
+<!-- 					<li class="nav-item"><a href="#" class="nav-link"> <i -->
+<!-- 							class="nav-icon bi bi-chat-left-text-fill"></i> -->
+<!-- 							<p> -->
+<!-- 								留言管理 <i class="nav-arrow bi bi-chevron-right"></i> -->
+<!-- 							</p> -->
+<!-- 					</a> -->
+<!-- 						<ul class="nav nav-treeview"> -->
+<!-- 							<li class="nav-item"><a th:href="@{/platform/comment}" -->
+<!-- 								class="nav-link" style="padding-left: 56px;"> -->
+<!-- 									<p>留言列表</p> -->
+<!-- 							</a></li> -->
+<!-- 							<li class="nav-item"><a th:href="@{/platform/report}" -->
+<!-- 								class="nav-link" style="padding-left: 56px;"> -->
+<!-- 									<p>檢舉管理</p> -->
+<!-- 							</a></li> -->
+<!-- 						</ul></li> 申請管理 -->
+<!-- 					<li class="nav-item"><a href="#" class="nav-link"> <i -->
+<!-- 							class="nav-icon bi bi-pencil-square"></i> -->
+<!-- 							<p> -->
+<!-- 								申請管理 <i class="nav-arrow bi bi-chevron-right"></i> -->
+<!-- 							</p> -->
+<!-- 					</a> -->
+<!-- 						<ul class="nav nav-treeview"> -->
+<!-- 							<li class="nav-item"><a th:href="@{/platform/exhibitor}" -->
+<!-- 								class="nav-link" style="padding-left: 56px;"> -->
+<!-- 									<p>展商申請</p> -->
+<!-- 							</a></li> -->
+<!-- 							<li class="nav-item"><a th:href="@{/platform/exhibition}" -->
+<!-- 								class="nav-link" style="padding-left: 56px;"> -->
+<!-- 									<p>展覽申請</p> -->
+<!-- 							</a></li> -->
+<!-- 						</ul></li> 訂單管理 -->
+<!-- 					<li class="nav-item"><a href="#" class="nav-link"> <i -->
+<!-- 							class="nav-icon bi bi-circle"></i> -->
+<!-- 							<p>訂單管理</p> -->
+<!-- 					</a></li> 報表管理 -->
+<!-- 					<li class="nav-item"><a href="#" class="nav-link"> <i -->
+<!-- 							class="nav-icon bi bi-circle"></i> -->
+<!-- 							<p>報表管理</p> -->
+<!-- 					</a></li> -->
+<!-- 				</ul> -->
+			</nav>
+		</div>
+	</aside>
+
+	<!-- 頁尾 -->
+	<footer th:fragment="footer" class="app-footer">
+		<strong> Copyright &copy; 2025&nbsp;&nbsp; <span
+			class="text-decoration-none">Eventra Inc.</span>
+		</strong> ｜ Tibame TJA102 G1 專題製作
+	</footer>
+
+	<script>
+// 	// 側邊欄捲軸樣式
+// 	const SELECTOR_SIDEBAR_WRAPPER = '.sidebar-wrapper';
+// 	const Default = {
+// 	    scrollbarTheme: 'os-theme-light',
+// 	    scrollbarAutoHide: 'leave',
+// 	    scrollbarClickScroll: true,
+// 	};
+// 	document.addEventListener('DOMContentLoaded', function () {
+// 	    const sidebarWrapper = document.querySelector(SELECTOR_SIDEBAR_WRAPPER);
+// 	    if (sidebarWrapper && OverlayScrollbarsGlobal?.OverlayScrollbars !== undefined) {
+// 	        OverlayScrollbarsGlobal.OverlayScrollbars(sidebarWrapper, {
+// 	            scrollbars: {
+// 	                theme: Default.scrollbarTheme,
+// 	                autoHide: Default.scrollbarAutoHide,
+// 	                clickScroll: Default.scrollbarClickScroll,
+// 	            },
+// 	        });
+// 	    }
+// 	});
+	</script>
+</body>
+</html>

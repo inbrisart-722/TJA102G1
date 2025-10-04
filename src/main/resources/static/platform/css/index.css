@@ -1,19 +1,28 @@
-    /* 卡片專用 */
-    .info-box-number {
-      font-size: 48px;
-      text-align: center;
-    }
+/* 卡片專用 */
+.info-box-number {
+	font-size: 48px;
+	text-align: center;
+}
 
-    .info-box .info-box-number {
-      margin: 0;
-    }
+.info-box .info-box-number {
+	margin: 0;
+}
 
-    .info-box-content {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      /* 水平置中 */
-      justify-content: center;
-      /* 垂直置中（可選） */
-      text-align: center;
-    }
+.info-box-content {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	/* 水平置中 */
+	justify-content: center;
+	/* 垂直置中（可選） */
+	text-align: center;
+}
+
+/* 公告內容顯示一行, 多餘文字省略號 */
+.table td:nth-child(3) {
+	max-width: 500px;
+	white-space: nowrap; /* 不換行 */
+	overflow: hidden; /* 超出隱藏 */
+	text-overflow: ellipsis; /* 超出部分以 … 顯示 */
+	vertical-align: middle;
+}
