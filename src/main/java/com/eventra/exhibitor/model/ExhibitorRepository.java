@@ -10,4 +10,8 @@ public interface ExhibitorRepository extends JpaRepository<ExhibitorVO, Integer>
 	
 	boolean existsByBusinessIdNumber(String businessIdNumber);
 	boolean existsByEmail(String email);
+
+	// 平台公告用, 根據審核狀態 ID 統計數量
+	long countByReviewStatusId(Integer reviewStatusId);
+	
 }
