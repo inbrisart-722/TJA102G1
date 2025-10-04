@@ -18,8 +18,8 @@ public class ClearExpiredPaymentAttemptScheduler {
 //	@Scheduled(fixedRate = 60_000)
 	@Scheduled(cron = "0 * * * * ?") // 秒 分 時 日 月 星期
 	public void clearExpiredPaymentAttempts() {
-//		System.out.println("-----0: 先掃 40分鐘以上但仍為 pending 的 payment attempt-----");
-//		ORDER_SERVICE.clearExpiredPaymentAttempts();
+		System.out.println("-----0: 先掃 40分鐘以上但仍為 pending 的 payment attempt-----");
+		ORDER_SERVICE.clearExpiredPaymentAttempts();
 	}
 }
 // clearExpiredPaymentAttempts 把 payment attempt 掃掉之前，會先打 api

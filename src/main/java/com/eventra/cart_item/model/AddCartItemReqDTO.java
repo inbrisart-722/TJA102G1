@@ -18,4 +18,9 @@ public class AddCartItemReqDTO {
 	public void setTicketDatas(Map<String, Integer> ticketDatas) {
 		this.ticketDatas = ticketDatas;
 	}
+	
+	@Override
+	public String toString() {
+		return "AddCartItemReqDTO [exhibitionId=" + exhibitionId + ", ticketDatas=" + ticketDatas + "]";
+	}
 }

@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8">
+  <title>展商申請失敗</title>
+</head>
+<body style="margin:0; padding:0; background-color:#f6f8fa; font-family:Arial, Helvetica, sans-serif;">
+
+  <!-- 外層容器 -->
+  <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0">
+    <tr>
+      <td align="center" style="padding:30px 0;">
+        
+        <!-- 卡片 -->
+        <table role="presentation" width="600" cellspacing="0" cellpadding="0" border="0" 
+               style="background:#ffffff; border-radius:8px; overflow:hidden; border:1px solid #e0e0e0;">
+          
+          <!-- Header -->
+          <tr>
+            <td align="center" style="background: darkcyan; padding:20px;">
+              <h1 style="margin:0; color:#ffffff; font-size:22px;">【Eventra】展商申請失敗 📩</h1>
+            </td>
+          </tr>
+          
+          <!-- 內容 -->
+          <tr>
+            <td style="padding:30px; color:#333; font-size:15px; line-height:1.6;">
+              <p style="margin:0 0;">親愛的展商，您好：</p>
+              <p style="margin:0 0 15px;">
+                感謝您進行 <strong>Eventra</strong> 展商註冊，<br/>
+                <hr>
+                經過審核以後，確認您的<span style="color: red; font-weight: 800;"> 資格不符合 </span>展商條件，原因如以下：
+              </p>
+
+				<div style="width: 90%; margin: 30px auto; border: 1px solid lightgrey;" th:text="${rejectReason}">
+				你是一隻小狗！！你是一隻小狗！！你是一隻小狗！！你是一隻小狗！！你是一隻小狗！！你是一隻小狗！！你是一隻小狗！！你是一隻小狗！！你是一隻小狗！！你是一隻小狗！！你是一隻小狗！！你是一隻小狗！！你是一隻小狗！！
+				</div>
+				<p style="margin-top: 30px;">
+					請點擊以下按鈕，重新進行展商註冊。
+				</p>
+              <!-- 驗證按鈕 -->
+              <p style="text-align:center; margin:30px 0;">
+                <a th:href="${domain+'/front-end/exhibitor_register?token='+token}"
+                   style="background:darkcyan; color:#ffffff; text-decoration:none;
+                          padding:14px 28px; border-radius:5px; font-size:16px; display:inline-block;">
+                   立即重新註冊
+                </a>
+              </p>
+
+              <p style="margin:0 0 15px; font-size:13px; color:#555;">
+                如果按鈕無法點擊，請將以下連結貼到瀏覽器開啟：<br/>
+                <a th:href="${domain+'/front-end/exhibitor_register?token='+token}"
+                th:text="${domain+'/front-end/exhibitor_register?token='+token}"
+                   style="color:#007BFF; word-break:break-all;">
+                   https://eventra.ddns.net/front-end/exhibitor_register
+                </a>
+              </p>
+
+            </td>
+          </tr>
+          
+          <!-- Footer -->
+          <tr>
+            <td align="center" style="background:#f0f0f0; padding:15px; font-size:12px; color:#999;">
+              © 2025 Eventra, All rights reserved.<br/>
+              這是一封系統自動發送的郵件，請勿直接回覆。
+            </td>
+          </tr>
+
+        </table>
+      </td>
+    </tr>
+  </table>
+
+</body>
+</html>

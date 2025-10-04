@@ -85,8 +85,8 @@
 								<!-- 密碼 -->
 								<div class="form-group">
 									<label>輸入密碼<font color="red">*</font></label> <input
-										type="password" class="form-control"
-										th:field="*{password}" placeholder="請輸入密碼" />
+										type="password" class="form-control" th:field="*{password}"
+										placeholder="請輸入密碼" />
 									<div th:if="${#fields.hasErrors('password')}"
 										th:errors="*{password}" class="text-danger"></div>
 								</div>
@@ -167,6 +167,8 @@
 									<div th:if="${#fields.hasErrors('bankAccountNumber')}"
 										th:errors="*{bankAccountNumber}" class="text-danger"></div>
 								</div>
+
+								<input type="hidden" name="token" id="tokenField" th:value=${token}>
 
 								<button type="submit" class="btn_full">審核註冊</button>
 							</form>
@@ -256,6 +258,15 @@
 	<!-- 存搜尋紀錄用 -->
 	<script src="js/g1_6_search_modal.js"></script>
 	<!-- 導頁至搜尋結果頁用 -->
+	<script>
+  document.addEventListener("DOMContentLoaded", () => {
+    const params = new URLSearchParams(window.location.search);
+    const token = params.get("token");
+    if (token) {
+      document.getElementById("tokenField").value = token;
+    }
+  });
+</script>
 </body>
 
 </html>
