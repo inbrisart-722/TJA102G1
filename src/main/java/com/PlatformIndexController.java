@@ -115,6 +115,7 @@ public class PlatformIndexController {
 	@GetMapping("/platform/partner")
 	public String partner() {
 		return "platform/partner";
+	}
     
 	/* ========== 1st part: 展商列表 ========== */
 	@GetMapping("/platform/exhibitor_list")

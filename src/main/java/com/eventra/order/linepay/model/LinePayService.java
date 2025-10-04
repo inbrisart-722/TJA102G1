@@ -641,6 +641,7 @@ public class LinePayService {
 	}
 	
 	private String genTicketCode(String ulid) {
+		
 		return "TK-" + ulid.substring(13, 20) + "-" + new SimpleDateFormat("yyyyMMdd").format(new Date()) + "-"
 				+ ThreadLocalRandom.current().nextInt(1, 9999);
 	}
