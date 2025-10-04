@@ -299,12 +299,12 @@ public class ExhibitionVO {
 			if(this.getExhibitionStatusId() == 6) {
 				return "草稿";
 			}
-			if(this.getExhibitionStatusId() == 1) {
-				return "待審核";
-			}
-			if(this.getExhibitionStatusId() == 2) {
-				return "未通過審核";
-			}
+//			if(this.getExhibitionStatusId() == 1) {
+//				return "待審核";
+//			}
+//			if(this.getExhibitionStatusId() == 2) {
+//				return "未通過審核";
+//			}
 		}				 	
 		
 		LocalDateTime now = LocalDateTime.now();

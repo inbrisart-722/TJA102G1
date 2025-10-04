@@ -51,18 +51,14 @@ public class CartItemService {
 
 	public List<CartItemRedisVO> pushGlobalExpiringCartItem(){
 		long now = System.currentTimeMillis();
-		System.out.println("pushGlobalExpiringCartItem: getting memberIds");
+		
 		List<Integer> memberIds = CART_ITEM_REDIS_REPO.getExpiringMemberList(now);
-		for(Integer id : memberIds) System.out.println(id);
-		System.out.println("=====");
 		List<Integer> unnotifiedMemberIds = CART_ITEM_REDIS_REPO.filterUnnotifiedMembers(memberIds);
-		for(Integer id : unnotifiedMemberIds) System.out.println(id);
-		System.out.println("=====");
+		
 		// 截斷
 		if (unnotifiedMemberIds == null || unnotifiedMemberIds.isEmpty()) return null;
 		// 開始處理通知
 		for(Integer memberId : unnotifiedMemberIds) {
-			System.out.println("memberId: " + memberId);
 			Optional<MemberVO> memberOp = MEMBER_REPO.findById(memberId);
 			if(memberOp.isPresent()) {
 				MemberVO member = memberOp.get();
@@ -75,7 +71,6 @@ public class CartItemService {
 		return null;
 	}
 	
-	@Async
 	public void broadcastTicketCount(Integer exhibitionId, int remaining) {
 		TICKET_SSE_SERVICE.broadcastTicketCount(exhibitionId, remaining);
 	}
@@ -101,7 +96,6 @@ public class CartItemService {
 	}
 	
 	public void addCartItem(AddCartItemReqDTO req, Integer memberId) throws IllegalStateException{
-//		Integer memberId = MEMBER_REPO.findByEmail(SecurityContextHolder.getContext().getAuthentication().getName()).orElse(null).getMemberId();
 		
 		cleanupExpired(memberId, System.currentTimeMillis());
 		// AddCartItemRequDTO -> exhibitionId, ticketDatas

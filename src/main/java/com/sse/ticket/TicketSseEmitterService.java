@@ -1,6 +1,7 @@
 package com.sse.ticket;
 
 import java.io.IOException;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
@@ -59,30 +60,44 @@ public class TicketSseEmitterService {
 	
 	// 推送票數給所有的 client
 	public void broadcastTicketCount(Integer exhibitionId, int remaining) {
-		
-		Map<String, SseEmitter> clients = exhibitionClients.get(exhibitionId);
-		
-		// 你要推播 exhibitionId=123 的票數更新
-		// 但目前 還沒有人訂閱 123（exhibitionClients 裡根本沒有這個 key）
-		// 這時候 clients == null，就不用推播，直接 return
-			// 如果硬迭代會 NullPointerException
-		if(clients == null) return;
-		
-		for(SseEmitter emitter : clients.values()) {
-			try{
-				// .send -> 推送訊息給客戶端
-					// .event -> builder
-					// .name -> 事件名稱(前端可用 addEventListener 監聽)
-					// .data -> 真正傳送的資料（剩餘票數）
-				emitter.send(SseEmitter.event() 
-						.name("ticket-update")
-						.data(remaining));
-			} catch (IOException e) {
-				// .complete -> 結束 SSE 連線
-				// 如果發送失敗（通常是 client 斷線），就關掉 emitter（SSE 連線）並且讓 callback 移除此清單
-				emitter.complete();
-				clients.values().remove(emitter); // 確保 map 中不會再有壞掉的 emitter, id 也一併移除
-			}
-		}
+	    Map<String, SseEmitter> clients = exhibitionClients.get(exhibitionId);
+	    if (clients == null || clients.isEmpty()) return;
+
+	    // Iterator 版本：可安全移除失效 emitter
+	    for (Iterator<Map.Entry<String, SseEmitter>> it = clients.entrySet().iterator(); it.hasNext();) {
+	        Map.Entry<String, SseEmitter> entry = it.next();
+	        SseEmitter emitter = entry.getValue();
+
+	        try {
+	            emitter.send(SseEmitter.event()
+	                    .name("ticket-update")
+	                    .data(remaining));
+
+	            // 1. 有人死掉會丟 IllegalStateException
+	        } catch (IllegalStateException | IOException e) {
+	            // 已失效 (client 斷線 or async context closed)
+	            // ↓↓↓ 重點是這裡要非常防守式 ↓↓↓
+	            try {
+	                emitter.complete();
+	            }
+	            // 3. emitter.complete() 已經在 error 狀態會丟 IllegalStateException
+	            catch (IllegalStateException ignored) {
+	                // emitter 已經被標記 error / complete 不可再用 → 忽略即可
+	            }
+	            // 2. 要用 for Each 背後就是用 iterator -> 若直接移除 value 也會爆 ConcurrentModification
+	            it.remove(); // 安全移除，不會 ConcurrentModification
+	            
+	            // 因為 Iterator 的 remove() 是唯一「安全地在迭代中移除元素」的方式。
+	            // 它會幫你同步更新 expectedModCount，讓迭代器知道：
+	            // “是我自己移除的，不是別人亂動。”
+	            
+	        }
+	        
+//	        catch (IOException e) {
+//	        	emitter.complete();
+//	        	clients.values().remove(emitter);
+//	        }
+	        
+	    }
 	}
 }

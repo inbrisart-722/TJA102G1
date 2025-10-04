@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8">
+  <title>展商申請通過</title>
+</head>
+<body style="margin:0; padding:0; background-color:#f6f8fa; font-family:Arial, Helvetica, sans-serif;">
+
+  <!-- 外層容器 -->
+  <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0">
+    <tr>
+      <td align="center" style="padding:30px 0;">
+        
+        <!-- 卡片 -->
+        <table role="presentation" width="600" cellspacing="0" cellpadding="0" border="0" 
+               style="background:#ffffff; border-radius:8px; overflow:hidden; border:1px solid #e0e0e0;">
+          
+          <!-- Header -->
+          <tr>
+            <td align="center" style="background: darkcyan; padding:20px;">
+              <h1 style="margin:0; color:#ffffff; font-size:22px;">【Eventra】恭喜通過展商申請 📩</h1>
+            </td>
+          </tr>
+          
+          <!-- 內容 -->
+          <tr>
+            <td style="padding:30px; color:#333; font-size:15px; line-height:1.6;">
+              <p style="margin:0 0;">親愛的展商，您好：</p>
+              <p style="margin:0 0 15px;">
+                感謝您進行 <strong>Eventra</strong> 展商註冊，<br/>
+                <hr>
+                經過審核以後，確認您的<span style="color: green; font-weight: 800;"> 資格符合 </span>展商條件，請點擊以下按鈕，使用當初登錄之「帳號（統一編號）、密碼」登入展商平台。
+              </p>
+
+              <!-- 驗證按鈕 -->
+              <p style="text-align:center; margin:30px 0;">
+                <a th:href="${domain+'/back-end/exhibitor/exhibitor_login'}"
+                   style="background:darkcyan; color:#ffffff; text-decoration:none;
+                          padding:14px 28px; border-radius:5px; font-size:16px; display:inline-block;">
+                   立即前往登入
+                </a>
+              </p>
+
+              <p style="margin:0 0 15px; font-size:13px; color:#555;">
+                如果按鈕無法點擊，請將以下連結貼到瀏覽器開啟：<br/>
+                <a th:href="${domain+'/back-end/exhibitor/exhibitor_login'}"
+                th:text="${domain+'/back-end/exhibitor/exhibitor_login'}"
+                   style="color:#007BFF; word-break:break-all;">
+                   https://eventra.ddns.net/back-end/exhibitor/exhibitor_login
+                </a>
+              </p>
+
+            </td>
+          </tr>
+          
+          <!-- Footer -->
+          <tr>
+            <td align="center" style="background:#f0f0f0; padding:15px; font-size:12px; color:#999;">
+              © 2025 Eventra, All rights reserved.<br/>
+              這是一封系統自動發送的郵件，請勿直接回覆。
+            </td>
+          </tr>
+
+        </table>
+      </td>
+    </tr>
+  </table>
+
+</body>
+</html>

@@ -130,7 +130,7 @@
 <body class="layout-fixed sidebar-expand-lg bg-body-tertiary">
 	<div class="app-wrapper">
 		<!-- Header（自動注入） -->
-		<!--  <div data-include="/back-end/header.html"></div> -->
+		<div data-include="/back-end/header.html"></div> 
 
 
 		<!-- Sidebar -->
@@ -145,8 +145,7 @@
 			<div class="sidebar-wrapper">
 				<nav class="mt-2">
 					<ul class="nav sidebar-menu flex-column" data-lte-toggle="treeview"
-						role="navigation" data-accordion="false">
-						<li class="nav-item"><a class="nav-link"><p>展商後台</p></a></li>
+						role="navigation" data-accordion="true">
 						<li class="nav-item menu-open"><a href="#" class="nav-link"><i
 								class="nav-icon bi bi-circle-fill"></i>
 								<p>展覽管理</p></a>
@@ -331,7 +330,7 @@
 						<div id="ticketList" class="mt-2"></div>
 						<!-- 隱藏欄位 -->
     					<input type="hidden" th:field="*{ticketJson}" id="ticketJson"/>
-    					<input type="hidden" th:field="*{draft}" id="isDraft" value="false">
+    					<!-- <input type="hidden" th:field="*{draft}" id="isDraft" value="false"> -->
 					</div>
 				</div>
 
@@ -385,12 +384,12 @@
 					<!-- <button class="btn btn-outline-secondary" id="btnPreview">
 						<i class="bi bi-eye me-1"></i>預覽
 					</button> -->
-					<button type="button" class="btn btn-primary" id="btnSaveDraft">
-						<i class="bi bi-save me-1"></i>儲存為草稿
-					</button>
-					<button type="submit" class="btn btn-success">
-						<i class="bi bi-check2-circle me-1"></i>完成
-					</button>
+					<button type="submit" class="btn btn-primary" name="action" value="draft">
+				      <i class="bi bi-save me-1"></i>儲存為草稿
+				    </button>
+				    <button type="submit" class="btn btn-success" name="action" value="publish">
+				      <i class="bi bi-check2-circle me-1"></i>完成
+				    </button>
 				</div>
 			</form>
 
@@ -434,6 +433,7 @@
 	<script
 		src="https://cdn.jsdelivr.net/npm/overlayscrollbars@2.11.0/browser/overlayscrollbars.browser.es6.min.js"></script>
 	<script src="/back-end/js/adminlte.min.js"></script>
+	<script src="/back-end/js/sidebar_toggle.js"></script>
 	<script src="/front-end/js/g1_10_custom_common_csrf.js"></script>
 
 	<script>
@@ -594,11 +594,7 @@
       }
     }
 
-	    document.getElementById('btnSaveDraft').addEventListener('click', (e) => {
-	    	  e.preventDefault();
-	    	  document.getElementById('isDraft').value = 'true';
-	    	  document.getElementById('eventForm').submit();
-	    	});
+	    
 	</script>
 	<script>
 	document.getElementById("mylogout")?.addEventListener("click", (e) => {
@@ -607,53 +603,7 @@
 		  window.location.href = "/back-end/exhibitor/exhibitor_login";
 		});
 	</script>
-	<script>
-    (async () => {
-      // 讓放了 data-include 的容器先隱藏，避免 FOUC
-      document.querySelectorAll('[data-include]').forEach(el => el.style.visibility = 'hidden');
-
-      // 載入所有 partial
-      const tasks = [...document.querySelectorAll('[data-include]')].map(async (el) => {
-        const url = el.getAttribute('data-include');
-        const bust = `v=${encodeURIComponent((window.__PARTIALS_VERSION__) || '1')}`; // 可手動改版本清快取
-        const src = url.includes('?') ? `${url}&${bust}` : `${url}?${bust}`;
-        try {
-          const res = await csrfFetchToRedirect(src, { cache: 'no-store' });
-          if (!res.ok) throw new Error(res.statusText);
-          el.innerHTML = await res.text();
-          el.style.visibility = 'visible';
-          el.dispatchEvent(new CustomEvent('partial:loaded', { bubbles: true }));
-        } catch (err) {
-          el.innerHTML = `<!-- include failed: ${url} -->`;
-          el.style.visibility = 'visible';
-          console.warn('Include failed:', url, err);
-        }
-      });
-
-      await Promise.all(tasks);
-
-      // 1) 根據目前 URL 自動加上 active（如果 sidebar 裡的 a[href] 剛好指到當前頁）
-      const here = location.pathname.split('/').pop() || 'index.html';
-      document.querySelectorAll('aside a.nav-link, aside .nav-treeview a.nav-link').forEach(a => {
-        const href = (a.getAttribute('href') || '').split('/').pop();
-        if (href && href === here) a.classList.add('active');
-      });
-
-      // 2) AdminLTE 如果要初始化（依你專案需要）
-      // window.AdminLTE && window.AdminLTE.autoInit?.();
-
-      // 3) 登出（若要清 sessionStorage / localStorage）
-      const logout = document.getElementById('logoutLink');
-      if (logout) {
-        logout.addEventListener('click', (e) => {
-          // e.preventDefault(); // 若要攔截導頁再手動跳轉，取消註解
-          sessionStorage.removeItem('auth');       // 依專案實際使用的 key
-          sessionStorage.removeItem('editingEvent');
-          // location.href = logout.getAttribute('href'); // 若攔截，最後導回登入頁
-        });
-      }
-    })();
-    </script>
+	
     <!-- // ===== 票種：固定 5 種、可啟用/停用 ===== -->
 	
 
@@ -889,7 +839,36 @@
 	})();
 	</script>
 	<script>
-    (async () => {
+	(function setupSidebarActive(){
+		  const menu = document.querySelector('.sidebar-menu');
+		  if (!menu) return;
+
+		  // 清掉舊狀態
+		  menu.querySelectorAll('a.nav-link.active').forEach(a => a.classList.remove('active'));
+		  menu.querySelectorAll('li.nav-item.menu-open').forEach(li => li.classList.remove('menu-open'));
+
+		  // 找目前頁
+		  const here = new URL(location.href).pathname;
+		  const links = [...menu.querySelectorAll('a.nav-link[href]:not([href="#"])')];
+
+		  let activeLink = links.find(a => {
+		    try { return new URL(a.getAttribute('href'), location.origin).pathname === here; }
+		    catch { return false; }
+		  });
+		  if (!activeLink) {
+		    const hereName = here.split('/').pop();
+		    activeLink = links.find(a => (a.getAttribute('href')||'').split('/').pop() === hereName);
+		  }
+		  if (!activeLink) return;
+
+		  // 高亮 + 展開父群組（交給 AdminLTE 處理動畫與互斥）
+		  activeLink.classList.add('active');
+		  activeLink.closest('.nav-treeview')?.closest('.nav-item')?.classList.add('menu-open');
+		})();
+
+	</script>
+	<script>
+     (async () => {
       // 讓放了 data-include 的容器先隱藏，避免 FOUC
       document.querySelectorAll('[data-include]').forEach(el => el.style.visibility = 'hidden');
 
@@ -913,15 +892,15 @@
 
       await Promise.all(tasks);
 
-      // 1) 根據目前 URL 自動加上 active（如果 sidebar 裡的 a[href] 剛好指到當前頁）
+     /*  // 1) 根據目前 URL 自動加上 active（如果 sidebar 裡的 a[href] 剛好指到當前頁）
       const here = location.pathname.split('/').pop() || 'index.html';
       document.querySelectorAll('aside a.nav-link, aside .nav-treeview a.nav-link').forEach(a => {
         const href = (a.getAttribute('href') || '').split('/').pop();
         if (href && href === here) a.classList.add('active');
-      });
+      }); */
 
       // 2) AdminLTE 如果要初始化（依你專案需要）
-      // window.AdminLTE && window.AdminLTE.autoInit?.();
+      // window.AdminLTE && window.AdminLTE.autoInit?.(); */
 
       // 3) 登出（若要清 sessionStorage / localStorage）
       const logout = document.getElementById('mylogout');
@@ -945,7 +924,7 @@
           
         });
       }
-    })();
+     })(); 
     </script>
 	
 

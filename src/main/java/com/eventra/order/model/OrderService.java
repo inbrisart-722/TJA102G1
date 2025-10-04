@@ -200,8 +200,8 @@ public class OrderService {
 	}
 	
 	// 給 order_list 頁面用
-	public Page<OrderSummaryDTO> list(OrderStatus statusEnum, String q, int page, int size){
+	public Page<OrderSummaryDTO> list(Integer exhibitorId, OrderStatus statusEnum, String q, int page, int size){
 		PageRequest pageable = PageRequest.of(page, size);
-		return ORDER_REPO.findOrderSummaries(statusEnum, q, pageable);
+		return ORDER_REPO.findOrderSummaries(exhibitorId, statusEnum, q, pageable);
 	}
 }
