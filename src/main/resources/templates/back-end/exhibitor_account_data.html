@@ -32,16 +32,15 @@
         </div>
         <div class="sidebar-wrapper">
           <nav class="mt-2">
-            <ul class="nav sidebar-menu flex-column" data-lte-toggle="treeview" role="navigation" data-accordion="false">
-              <li class="nav-item"><a  class="nav-link"><p>展商後台</p></a></li>
-              <li class="nav-item menu-open">
+            <ul class="nav sidebar-menu flex-column" data-lte-toggle="treeview" role="navigation" data-accordion="true">
+              <li class="nav-item">
                 <a href="#" class="nav-link"><i class="nav-icon bi bi-circle-fill"></i><p>展覽管理</p></a>
                 <ul class="nav nav-treeview">
                   <li class="nav-item"><a href="/back-end/exhibitor/exhibition_list" class="nav-link"><p>展覽列表</p></a></li>
                 
                 </ul>
               </li>
-              <li class="nav-item menu-open">
+              <li class="nav-item">
                 <a href="#" class="nav-link"><i class="nav-icon bi bi-circle-fill"></i><p>銷售管理</p></a>
                 <ul class="nav nav-treeview">
                   <li class="nav-item"><a href="/back-end/exhibitor/order_list" class="nav-link"><p>訂單列表</p></a></li>
@@ -49,7 +48,7 @@
                 
                 </ul>
               </li>
-               <li class="nav-item menu-open">
+               <li class="nav-item">
                 <a href="#" class="nav-link"><i class="nav-icon bi bi-circle-fill"></i><p>會員中心</p></a>
                 <ul class="nav nav-treeview">
                   <li class="nav-item"><a href="/back-end/exhibitor/exhibitor_info" class="nav-link"><p>展商資訊</p></a></li>
@@ -242,12 +241,43 @@
 	</div>
 
 	
-    <script src="https://cdn.jsdelivr.net/npm/overlayscrollbars@2.11.0/browser/overlayscrollbars.browser.es6.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/overlayscrollbars@2.11.0/browser/overlayscrollbars.browser.es6.min.js"></script>
     <script src="/back-end/js/adminlte.min.js"></script>
+    <script src="/back-end/js/sidebar_toggle.js"></script>
     <script src="/front-end/js/g1_10_custom_common_csrf.js"></script>
 
+
+	<script>
+	(function setupSidebarActive(){
+		  const menu = document.querySelector('.sidebar-menu');
+		  if (!menu) return;
+
+		  // 清掉舊狀態
+		  menu.querySelectorAll('a.nav-link.active').forEach(a => a.classList.remove('active'));
+		  menu.querySelectorAll('li.nav-item.menu-open').forEach(li => li.classList.remove('menu-open'));
+
+		  // 找目前頁
+		  const here = new URL(location.href).pathname;
+		  const links = [...menu.querySelectorAll('a.nav-link[href]:not([href="#"])')];
+
+		  let activeLink = links.find(a => {
+		    try { return new URL(a.getAttribute('href'), location.origin).pathname === here; }
+		    catch { return false; }
+		  });
+		  if (!activeLink) {
+		    const hereName = here.split('/').pop();
+		    activeLink = links.find(a => (a.getAttribute('href')||'').split('/').pop() === hereName);
+		  }
+		  if (!activeLink) return;
+
+		  // 高亮 + 展開父群組（交給 AdminLTE 處理動畫與互斥）
+		  activeLink.classList.add('active');
+		  activeLink.closest('.nav-treeview')?.closest('.nav-item')?.classList.add('menu-open');
+		})();
+
+	</script>
     <script>
     (async () => {
       // 讓放了 data-include 的容器先隱藏，避免 FOUC
@@ -274,11 +304,45 @@
       await Promise.all(tasks);
 
       // 1) 根據目前 URL 自動加上 active（如果 sidebar 裡的 a[href] 剛好指到當前頁）
-      const here = location.pathname.split('/').pop() || 'index.html';
-      document.querySelectorAll('aside a.nav-link, aside .nav-treeview a.nav-link').forEach(a => {
-        const href = (a.getAttribute('href') || '').split('/').pop();
-        if (href && href === here) a.classList.add('active');
-      });
+  	// 呼叫時機：partials 載入完 & DOM 準備好
+     /*  document.addEventListener('partial:loaded', setupSidebar);
+      document.addEventListener('DOMContentLoaded', setupSidebar);
+
+      function setupSidebar(){
+        const herePath = new URL(location.href).pathname; // 例如 /back-end/exhibitor/exhibitor_info
+        const aside = document.querySelector('aside');
+        if(!aside) return;
+
+        // 1-1) 清理舊狀態
+        aside.querySelectorAll('a.nav-link.active').forEach(a=>a.classList.remove('active'));
+        aside.querySelectorAll('.nav-item.menu-open').forEach(li=>li.classList.remove('menu-open'));
+
+        // 1-2) 找出與目前路徑完全相同的連結
+        const links = [...aside.querySelectorAll('a.nav-link[href]')];
+        const activeLink =
+          links.find(a => {
+            try {
+              return new URL(a.getAttribute('href'), location.origin).pathname === herePath;
+            } catch { return false; }
+          }) ||
+          // 退一步：以檔名比對
+          links.find(a => (a.getAttribute('href')||'').split('/').pop() === herePath.split('/').pop());
+
+        if(!activeLink) return;
+
+        // 1-3) 標記 active 並僅打開該群組
+        activeLink.classList.add('active');
+        const group = activeLink.closest('.nav-item'); // 上層群組 li
+        if(group){
+          group.classList.add('menu-open'); // AdminLTE 會顯示這組的 .nav-treeview
+        }
+
+        // 1-4) 其餘群組保持關閉（無 menu-open 就是關閉）
+        aside.querySelectorAll('.nav.nav-treeview').forEach(ul => {
+          const parent = ul.closest('.nav-item');
+          ul.style.display = parent?.classList.contains('menu-open') ? '' : 'none';
+        });
+      } */
 
       // 2) AdminLTE 如果要初始化（依你專案需要）
       // window.AdminLTE && window.AdminLTE.autoInit?.();

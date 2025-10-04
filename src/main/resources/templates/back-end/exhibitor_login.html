@@ -118,6 +118,8 @@ body {
 				<h1 class="login-title">登入</h1>
 				<p class="login-sub">請輸入您的帳號與密碼以登入展商後台</p>
 
+				<div id="loginAlert" class="alert alert-danger d-none" role="alert"></div>
+				
 				<form id="loginForm" novalidate>
 					<!-- 統編 -->
 					<div class="mb-3">
@@ -194,39 +196,112 @@ body {
       return s % 10 === 0;
     }
 
-    // 切換密碼可視
-    document.getElementById('togglePwd').addEventListener('click', function(){
-      const ipt = document.getElementById('password');
-      const icon = this.querySelector('i');
-      const show = ipt.type === 'password';
-      ipt.type = show ? 'text' : 'password';
-      icon.classList.toggle('bi-eye', !show);
-      icon.classList.toggle('bi-eye-slash', show);
+    function toHalfWidthDigits(str){
+      return (str || '').replace(/[０-９]/g, ch => String.fromCharCode(ch.charCodeAt(0) - 0xFF10 + 0x30));
+    }
+    function isEightDigits(str){ return /^[0-9]{8}$/.test(str); }
+    function isValidTaiwanVAT(num){
+      if(!/^\d{8}$/.test(num)) return false;
+      const w = [1,2,1,2,1,2,4,1];
+      const s = num.split('').reduce((acc, d, i) => {
+        const p = +d * w[i];
+        return acc + Math.floor(p/10) + (p%10);
+      }, 0);
+      if (num[6] === '7') return (s % 10 === 0) || ((s + 1) % 10 === 0);
+      return s % 10 === 0;
+    }
+
+    // 輸入時清除紅框 + 關閉頂部 alert
+    ['vat','password'].forEach(id=>{
+      const el = document.getElementById(id);
+      el.addEventListener('input', ()=>{
+        el.classList.remove('is-invalid');
+        const alertBox = document.getElementById('loginAlert');
+        alertBox.classList.add('d-none');
+        alertBox.textContent = '';
+      });
     });
 
-    // 表單送出
-    document.getElementById('loginForm').addEventListener('submit', function(e){
+    // ✅ 單一 submit 監聽（請先把你原本多出來的 submit 監聽與那段沒有 then/catch 的 fetch 刪掉）
+    document.getElementById('loginForm').addEventListener('submit', async function(e){
       e.preventDefault();
 
-      // 正規化輸入
       const vatIpt = document.getElementById('vat');
       const pwdIpt = document.getElementById('password');
+      const alertBox = document.getElementById('loginAlert');
+
+      // 正規化 + 前端基本驗證
       vatIpt.value = toHalfWidthDigits(vatIpt.value).replace(/\s+/g, '');
+      const vatOk = isEightDigits(vatIpt.value);
+      const chkOk = !ENFORCE_TW_VAT_CHECKSUM || isValidTaiwanVAT(vatIpt.value);
+      const pwdOk = (pwdIpt.value || '').length >= 8;
 
-      // 驗證：先檢查 8 碼，再看是否要檢查 checksum
-      let vatOk = isEightDigits(vatIpt.value);
-      let chkOk = !ENFORCE_TW_VAT_CHECKSUM || isValidTaiwanVAT(vatIpt.value);
-      let pwdOk = (pwdIpt.value || '').length >= 8;
-
-      // 顯示/隱藏錯誤
       vatIpt.classList.toggle('is-invalid', !vatOk || !chkOk);
       document.getElementById('vatError').textContent =
         !vatOk ? '請輸入 8 碼數字的統編' :
         (!chkOk ? '統編檢核未通過，請確認是否輸入正確' : '');
-
       pwdIpt.classList.toggle('is-invalid', !pwdOk);
-
       if (!(vatOk && chkOk && pwdOk)) return;
+
+      // 呼叫登入 API
+      try {
+        const res = await fetch("/api/auth/login/exhibitor", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ username: vatIpt.value, password: pwdIpt.value }),
+        });
+
+        if (!res.ok) {
+          // 嘗試讀取後端錯誤訊息
+          let msg = '登入失敗';
+          try {
+            const err = await res.json();
+            if (err && err.message) msg = err.message;
+          } catch(_) {}
+
+          if (res.status === 401) {
+            // ❌ 帳密錯誤 → 兩欄標紅 + 同步顯示訊息 + 頂部 alert
+            vatIpt.classList.add('is-invalid');
+            pwdIpt.classList.add('is-invalid');
+            document.getElementById('vatError').textContent = msg;
+            document.getElementById('pwdError').textContent = msg;
+            alertBox.textContent = msg;
+            alertBox.classList.remove('d-none');
+            /* pwdIpt.value = ''; */
+            pwdIpt.focus();
+          } else if (res.status === 403) {  // ← 新增這段
+        	    // 狀態不允許登入（待核准/未通過）
+        	    vatIpt.classList.add('is-invalid');
+        	    alertBox.textContent = msg;
+        	    alertBox.classList.remove('d-none');
+          } else if (res.status === 400) {
+            alertBox.textContent = msg; // 例如缺欄位
+            alertBox.classList.remove('d-none');
+          } else {
+            alert(msg);
+          }
+          return; // 結束流程
+        }
+
+        // ✅ 成功：原本 redirect 流程
+        await res.json(); // 若需要可用結果
+        const redirect_api = sessionStorage.getItem("redirect");
+        sessionStorage.removeItem("redirect");
+
+        const params = new URLSearchParams(window.location.search);
+        let redirect_ssr = params.get("redirect");
+        if (redirect_ssr && !redirect_ssr.startsWith("/back-end/")) redirect_ssr = null;
+
+        if (!redirect_ssr && !redirect_api)
+          window.location.href = "/back-end/exhibitor/back_end_homepage";
+        else if (redirect_api) window.location.href = redirect_api;
+        else window.location.href = redirect_ssr;
+
+      } catch (err) {
+        alertBox.textContent = '網路或伺服器異常，稍後再試';
+        alertBox.classList.remove('d-none');
+      }
+    });
 
       // 模擬登入：你可在這裡串 API，成功後導到列表
 //       const session = {
@@ -235,7 +310,7 @@ body {
 //       };
 //       sessionStorage.setItem('exhibitorSession', JSON.stringify(session));
 
-      // 柏燁測試（放上登入 AJAX）
+     /*  // 柏燁測試（放上登入 AJAX）
       const send_data = {
     	username: vatIpt.value,
     	password: pwdIpt.value,
@@ -271,11 +346,30 @@ body {
 	      })
 	      .catch((error) => {
 	        console.log(error);
-	      });
+	      }); */
 
-      // 導向活動列表（可改成你的路徑）
-    });
+	  
     
   </script>
+  <script>
+	  // 切換密碼可視（乾淨版）
+	  (function () {
+	    const ipt = document.getElementById('password');
+	    const btn = document.getElementById('togglePwd');
+	    if (!ipt || !btn) return;
+	
+	    btn.addEventListener('click', function (e) {
+	      e.preventDefault(); // 保險，避免任何提交副作用
+	      const icon = this.querySelector('i');
+	      const isPwd = ipt.getAttribute('type') === 'password';
+	      ipt.setAttribute('type', isPwd ? 'text' : 'password');
+	      // 切換圖示
+	      icon.classList.toggle('bi-eye', !isPwd);
+	      icon.classList.toggle('bi-eye-slash', isPwd);
+	      // 保持焦點在密碼框（體驗較好）
+	      ipt.focus({ preventScroll: true });
+	    });
+	  })();
+	</script>
 </body>
 </html>
