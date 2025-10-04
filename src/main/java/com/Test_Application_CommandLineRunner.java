@@ -1,17 +1,10 @@
 package com;
 
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.UUID;
+import java.util.Date;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-
-import com.eventra.linebot.util.RichMenuInitializer;
-import com.eventra.order.linepay.model.LinePayPaymentRequestCheckResDTO;
-import com.eventra.order.linepay.model.LinePayService;
 
 @SpringBootApplication
 public class Test_Application_CommandLineRunner implements CommandLineRunner {
