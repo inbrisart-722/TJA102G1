@@ -72,7 +72,7 @@ public class ExhibitionServiceImpl implements ExhibitionService {
 	@PersistenceContext
 	private EntityManager entityManager;
 	
-	private static final int DEFAULT_STATUS_ID = 1;
+	private static final int DEFAULT_STATUS_ID = 3;
 	private static final int DRAFT_STATUS_ID = 6;
 	private final String DEFAULT_PHOTO_LANDSCAPE;
 
@@ -88,7 +88,7 @@ public class ExhibitionServiceImpl implements ExhibitionService {
 	}
 
 	@Transactional
-	public void addExhibition(ExhibitionCreateDTO dto, Integer exhibitorId) {
+	public void addExhibition(ExhibitionCreateDTO dto, Integer exhibitorId, boolean isDraft) {
 
 		
 //		for(ExhibitionTicketTypeVO vo :  dto.getExhibitionTicketTypes()){
@@ -101,7 +101,7 @@ public class ExhibitionServiceImpl implements ExhibitionService {
 		ExhibitionVO exhibitionVO = ExhibitionMapper.toVO(dto);
 
 		// 若是草稿 -> 草稿id，否則預設
-		if(Boolean.TRUE.equals(dto.getDraft())) {
+		if(isDraft) {
 			exhibitionVO.setExhibitionStatusId(DRAFT_STATUS_ID);
 		}else if(exhibitionVO.getExhibitionStatusId() == null) {
 			exhibitionVO.setExhibitionStatusId(DEFAULT_STATUS_ID);
@@ -157,7 +157,7 @@ public class ExhibitionServiceImpl implements ExhibitionService {
 
 		// 7) 票種：解析 ticketJson 並寫入子表（最小改動、逐筆 save）
 		List<TicketJsonItem> ticketJsonItem = parseTicketJson(dto.getTicketJson());
-		if(ticketJsonItem.isEmpty()) {
+		if(!isDraft && ticketJsonItem.isEmpty()) {
 			// 允許只選部分，但至少要有一個有效票種
 			throw new IllegalArgumentException("請至少設定一種有效票種(需有價格");
 		}
@@ -223,7 +223,7 @@ public class ExhibitionServiceImpl implements ExhibitionService {
 	// 實作展覽編輯後更新
 	@Override
 	@Transactional
-	public void updateExhibition(ExhibitionCreateDTO dto, Integer exhibitorId) {
+	public void updateExhibition(ExhibitionCreateDTO dto, Integer exhibitorId, boolean isDraft) {
 	    if (dto.getExhibitionId() == null) {
 	        throw new IllegalArgumentException("缺少 exhibitionId，無法更新");
 	    }
@@ -284,12 +284,12 @@ public class ExhibitionServiceImpl implements ExhibitionService {
 	    }
 	    
 	    // 按儲存為草稿按鈕後變更展覽狀態為草稿
-	    if (Boolean.TRUE.equals(dto.getDraft())) {
+	    if (isDraft) {
             vo.setExhibitionStatusId(DRAFT_STATUS_ID);
         }else {
-            // 若原本是草稿，改成「待審核」
+            // 若原本是草稿，改成其他販售狀態
             if (Objects.equals(vo.getExhibitionStatusId(), DRAFT_STATUS_ID)) {
-                vo.setExhibitionStatusId(DEFAULT_STATUS_ID); // 待審核
+                vo.setExhibitionStatusId(DEFAULT_STATUS_ID); 
             }
         }
 	    // 4)
@@ -299,6 +299,9 @@ public class ExhibitionServiceImpl implements ExhibitionService {
 	    
 	    // 1) 解析前端送來的 ticketJson
 	    List<TicketJsonItem> items = parseTicketJson(dto.getTicketJson()); // 將隱藏欄位 ticketJson (JSON 字串) 解析成物件清單 (name, price)
+	    if(!isDraft && items.isEmpty()) {
+	    	throw new IllegalArgumentException("請至少設定一種有效票種(需有價格)");
+	    }
 	    
 	    // 2) 合併同名 (避免前端重複名稱造成重複 insert)
 	    Map<String, Integer> incomingByName = new LinkedHashMap<>(); // 用名稱作key，LinkedHashMap保留順序

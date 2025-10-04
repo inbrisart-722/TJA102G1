@@ -37,7 +37,7 @@
         </div>
         <div class="sidebar-wrapper">
           <nav class="mt-2">
-            <ul class="nav sidebar-menu flex-column" data-lte-toggle="treeview" role="navigation" data-accordion="false">
+            <ul class="nav sidebar-menu flex-column" data-lte-toggle="treeview" role="navigation" data-accordion="true">
               <li class="nav-item"><a  class="nav-link"><p>展商後台</p></a></li>
               <li class="nav-item menu-open">
                 <a href="#" class="nav-link"><i class="nav-icon bi bi-circle-fill"></i><p>展覽管理</p></a>
@@ -46,7 +46,7 @@
                 
                 </ul>
               </li>
-              <li class="nav-item menu-open">
+              <li class="nav-item">
                 <a href="#" class="nav-link"><i class="nav-icon bi bi-circle-fill"></i><p>銷售管理</p></a>
                 <ul class="nav nav-treeview">
                   <li class="nav-item"><a href="/back-end/exhibitor/order_list" class="nav-link"><p>訂單列表</p></a></li>
@@ -54,7 +54,7 @@
                 
                 </ul>
               </li>
-               <li class="nav-item menu-open">
+               <li class="nav-item">
                 <a href="#" class="nav-link"><i class="nav-icon bi bi-circle-fill"></i><p>會員中心</p></a>
                 <ul class="nav nav-treeview">
                   <li class="nav-item"><a href="/back-end/exhibitor/exhibitor_info" class="nav-link"><p>展商資訊</p></a></li>
@@ -265,7 +265,7 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/overlayscrollbars@2.11.0/browser/overlayscrollbars.browser.es6.min.js"></script>
     <script src="/back-end/js/adminlte.min.js"></script>
-    <script src="/back-end/js/sidebar_toggle.js"></script>
+    <!-- <script src="/back-end/js/sidebar_toggle.js"></script> -->
     <script src="/front-end/js/g1_10_custom_common_csrf.js"></script>
     <script>
       // Modal controls
@@ -444,42 +444,92 @@
 //         window.location.href = '/back-end/exhibitor/exhibitor_login';
    // });
     </script>
+    <script>
+    (function setupSidebarActive(){
+    	  const menu = document.querySelector('.sidebar-menu');
+    	  if (!menu) return;
+
+    	  // 清掉舊狀態
+    	  menu.querySelectorAll('a.nav-link.active').forEach(a => a.classList.remove('active'));
+    	  menu.querySelectorAll('li.nav-item.menu-open').forEach(li => li.classList.remove('menu-open'));
+
+    	  // 找目前頁
+    	  const here = new URL(location.href).pathname;
+    	  const links = [...menu.querySelectorAll('a.nav-link[href]:not([href="#"])')];
+
+    	  let activeLink = links.find(a => {
+    	    try { return new URL(a.getAttribute('href'), location.origin).pathname === here; }
+    	    catch { return false; }
+    	  });
+    	  if (!activeLink) {
+    	    const hereName = here.split('/').pop();
+    	    activeLink = links.find(a => (a.getAttribute('href')||'').split('/').pop() === hereName);
+    	  }
+    	  if (!activeLink) return;
+
+    	  // 高亮 + 展開父群組（交給 AdminLTE 處理動畫與互斥）
+    	  activeLink.classList.add('active');
+    	  activeLink.closest('.nav-treeview')?.closest('.nav-item')?.classList.add('menu-open');
+    	})();
+
+    </script>
    
     <script>
-    (async () => {
-      // 讓放了 data-include 的容器先隱藏，避免 FOUC
-      document.querySelectorAll('[data-include]').forEach(el => el.style.visibility = 'hidden');
+     (async () => {
+    	  // 先把 partials 載入
+    	  const tasks = [...document.querySelectorAll('[data-include]')].map(async (el) => {
+    	    const url = el.getAttribute('data-include');
+    	    const bust = `v=${encodeURIComponent((window.__PARTIALS_VERSION__) || '1')}`;
+    	    const src = url.includes('?') ? `${url}&${bust}` : `${url}?${bust}`;
+    	    try {
+    	      const res = await csrfFetchToRedirect(src, { cache: 'no-store' });
+    	      el.innerHTML = await res.text();
+    	    } catch (_) {}
+    	  });
+    	  await Promise.all(tasks);
+     })();
+   	</script>
 
-      // 載入所有 partial
-      const tasks = [...document.querySelectorAll('[data-include]')].map(async (el) => {
-        const url = el.getAttribute('data-include');
-        const bust = `v=${encodeURIComponent((window.__PARTIALS_VERSION__) || '1')}`; // 可手動改版本清快取
-        const src = url.includes('?') ? `${url}&${bust}` : `${url}?${bust}`;
-        try {
-          const res = await csrfFetchToRedirect(src, { cache: 'no-store' });
-          if (!res.ok) throw new Error(res.statusText);
-          el.innerHTML = await res.text();
-          el.style.visibility = 'visible';
-          el.dispatchEvent(new CustomEvent('partial:loaded', { bubbles: true }));
-        } catch (err) {
-          el.innerHTML = `<!-- include failed: ${url} -->`;
-          el.style.visibility = 'visible';
-          console.warn('Include failed:', url, err);
-        }
-      });
+    <!--  <script>
+    	 // >>> 重要：載入完就「直接呼叫一次」
+    	  setupSidebar();
 
-      await Promise.all(tasks);
+    	  // 之後若有 partial 再次載入，也能觸發
+    	  document.addEventListener('partial:loaded', setupSidebar);
+    	  // 有些瀏覽器使用 bfcache 返回頁面時用 pageshow，補一個保險
+    	  window.addEventListener('pageshow', setupSidebar);
 
-      // 1) 根據目前 URL 自動加上 active（如果 sidebar 裡的 a[href] 剛好指到當前頁）
-      const here = location.pathname.split('/').pop() || 'index.html';
-      document.querySelectorAll('aside a.nav-link, aside .nav-treeview a.nav-link').forEach(a => {
-        const href = (a.getAttribute('href') || '').split('/').pop();
-        if (href && href === here) a.classList.add('active');
-      });
+    	  function setupSidebar(){
+    	    const herePath = location.pathname; // 例：/back-end/exhibitor/exhibitor_info
+    	    const aside = document.querySelector('aside');
+    	    if(!aside) return;
 
-      // 2) AdminLTE 如果要初始化（依你專案需要）
-      window.AdminLTE && window.AdminLTE.autoInit?.();
+    	    // 清理
+    	    aside.querySelectorAll('a.nav-link.active').forEach(a=>a.classList.remove('active'));
+    	    aside.querySelectorAll('.nav-item.menu-open').forEach(li=>li.classList.remove('menu-open'));
 
+    	    // 尋找當前連結
+    	    const links = [...aside.querySelectorAll('a.nav-link[href]')];
+    	    const activeLink =
+    	      links.find(a => {
+    	        try { return new URL(a.getAttribute('href'), location.origin).pathname === herePath; }
+    	        catch { return false; }
+    	      }) ||
+    	      links.find(a => (a.getAttribute('href')||'').split('/').pop() === herePath.split('/').pop());
+
+    	    if(!activeLink) return;
+
+    	    // 標記 active + 展開唯一群組
+    	    activeLink.classList.add('active');
+    	    activeLink.closest('.nav-item')?.classList.add('menu-open');
+
+    	    // **不要**再手動改 .nav-treeview 的 display，讓 AdminLTE 自己控管
+    	  }
+
+    	  // AdminLTE 自動初始化（可留）
+    	  window.AdminLTE && window.AdminLTE.autoInit?.(); 
+    </script> -->
+	<script>
       // 3) 登出（若要清 sessionStorage / localStorage）
       const logout = document.getElementById('mylogout');
       if (logout) {
@@ -500,9 +550,9 @@
           })
           .catch(error => console.log(error))
           
-        });
-      }
-    })();
+        })
+      };
+     
     </script>
 
 

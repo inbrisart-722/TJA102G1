@@ -17,6 +17,9 @@ import com.config.SecurityConfig; // ⚙️ 你的安全設定（這裡只拿常
 import com.properties.JwtProperties;
 import com.security.jwt.JwtUtil;  // 🔏 你自訂的 JWT 工具類（簽發/驗證/解析）
 
+import com.eventra.exhibitor.model.ExhibitorRepository;
+import com.eventra.exhibitor.model.ExhibitorVO;
+
 import jakarta.validation.constraints.NotBlank; // ✅ 驗證請求欄位用（不可為空白）
 
 //大部分實務專案都是「集中式 Auth 服務」：
@@ -38,15 +41,18 @@ public class AuthRestController {
     private final Duration EXHIB_ACCESS_TTL;
     private final Duration EXHIB_REFRESH_TTL;
     private final JwtUtil jwt;              // 🛠️ 簽發/驗證/解析 JWT 的工具
+    
+    private final ExhibitorRepository exhibitorRepository;
 
 
-    public AuthRestController(AuthenticationManager am, JwtProperties jwtProps, JwtUtil jwt) {
+    public AuthRestController(AuthenticationManager am, JwtProperties jwtProps, JwtUtil jwt, ExhibitorRepository exhibitorRepository) {
         this.am = am;
         this.jwt = jwt;
         this.MEM_ACCESS_TTL = jwtProps.memAccessTtl();
         this.MEM_REFRESH_TTL = jwtProps.memRefreshTtl();
         this.EXHIB_ACCESS_TTL = jwtProps.exhibAccessTtl();
         this.EXHIB_REFRESH_TTL = jwtProps.exhibRefreshTtl();
+        this.exhibitorRepository = exhibitorRepository;
     }
 
     // ===================== 登入 =====================
@@ -113,34 +119,79 @@ public class AuthRestController {
     }
     @PostMapping("/login/exhibitor")
     public ResponseEntity<?> loginExhibitor(@RequestBody LoginReq req) {
-        Authentication auth = am.authenticate(
-            new UsernamePasswordAuthenticationToken(req.username(), req.password()));
-
-        // 驗證成功
+    	// 必填檢查
+        if (req == null || req.username() == null || req.username().isBlank()
+                || req.password() == null || req.password().isBlank()) {
+            return ResponseEntity.badRequest().body(
+                java.util.Map.of("code","MISSING_FIELDS","message","請輸入帳號與密碼")
+            );
+        }
         
-        String access  = jwt.generateAccess(auth.getName(), EXHIB_ACCESS_TTL);
-        String refresh = jwt.generateRefresh(auth.getName(), EXHIB_REFRESH_TTL);
-
-        ResponseCookie accessCookie = ResponseCookie.from(SecurityConfig.EXHIB_ACCESS_COOKIE, access)
-            .httpOnly(true) 
-            .secure(true)     
-            .sameSite("None") 
-            .path("/")
-            .maxAge(EXHIB_ACCESS_TTL) // 10 分鐘
-            .build();
-
-        ResponseCookie refreshCookie = ResponseCookie.from(SecurityConfig.EXHIB_REFRESH_COOKIE, refresh)
-            .httpOnly(true)
-            .secure(true)
-            .sameSite("None") 
-            .path("/")
-            .maxAge(EXHIB_REFRESH_TTL) // 3 天
-            .build();
-
-        return ResponseEntity.ok()
-            .header(HttpHeaders.SET_COOKIE, accessCookie.toString())
-            .header(HttpHeaders.SET_COOKIE, refreshCookie.toString())
-            .body(new LoginRes("ok"));
+        // 先查展商
+        ExhibitorVO exhibitor = exhibitorRepository.findByBusinessIdNumber(req.username())
+                .orElse(null);
+        if (exhibitor == null) {
+            // 和帳密錯誤維持同語意（避免暴露存在與否）
+            return ResponseEntity.status(401).body(
+                java.util.Map.of("code","BAD_CREDENTIALS","message","帳號或密碼不正確")
+            );
+        }
+        
+        Integer reviewStatusId = null;
+        try {
+        	reviewStatusId = exhibitor.getReviewStatusId();
+        }catch(Exception ignore) {
+        	
+        }
+        // 1:待核准、3:未通過 → 禁止登入
+        if(reviewStatusId != null && (reviewStatusId == 1 || reviewStatusId == 3)) {
+        	String msg = (reviewStatusId == 1) ? "帳號待核准，暫時無法登入" : "帳號審核未通過，暫時無法登入";
+        	return ResponseEntity.status(403).body(
+        			java.util.Map.of("code","EXHIBITOR_NOT_ALLOWED","message", msg)
+        			);
+        }
+        
+        try {
+	        Authentication auth = am.authenticate(
+	            new UsernamePasswordAuthenticationToken(req.username(), req.password()));
+	
+	        // 驗證成功
+	        
+	        String access  = jwt.generateAccess(auth.getName(), EXHIB_ACCESS_TTL);
+	        String refresh = jwt.generateRefresh(auth.getName(), EXHIB_REFRESH_TTL);
+	
+	        ResponseCookie accessCookie = ResponseCookie.from(SecurityConfig.EXHIB_ACCESS_COOKIE, access)
+	            .httpOnly(true) 
+	            .secure(true)     
+	            .sameSite("None") 
+	            .path("/")
+	            .maxAge(EXHIB_ACCESS_TTL) // 10 分鐘
+	            .build();
+	
+	        ResponseCookie refreshCookie = ResponseCookie.from(SecurityConfig.EXHIB_REFRESH_COOKIE, refresh)
+	            .httpOnly(true)
+	            .secure(true)
+	            .sameSite("None") 
+	            .path("/")
+	            .maxAge(EXHIB_REFRESH_TTL) // 3 天
+	            .build();
+	
+	        return ResponseEntity.ok()
+	            .header(HttpHeaders.SET_COOKIE, accessCookie.toString())
+	            .header(HttpHeaders.SET_COOKIE, refreshCookie.toString())
+	            .body(new LoginRes("ok"));
+        }catch(org.springframework.security.authentication.BadCredentialsException e) {
+        	// 帳號或密碼錯誤
+        	return ResponseEntity.status(401).body(
+        			java.util.Map.of("code","BAD_CREDENTIALS", "message", "帳號或密碼不正確")
+        			);
+        			
+        }catch(org.springframework.security.core.AuthenticationException e) {
+        	// 其他認證失敗也同樣回 401（統一訊息避免洩漏）
+        	return ResponseEntity.status(401).body(
+        			java.util.Map.of("code","AUTH_FAILED","message","帳號或密碼不正確")
+        			);
+        }
     }
 
     // ===================== 刷新 Token =====================

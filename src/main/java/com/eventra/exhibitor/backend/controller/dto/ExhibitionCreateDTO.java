@@ -6,6 +6,7 @@ import java.util.Set;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.eventra.exhibition.PublishChecks;
 import com.eventra.exhibitiontickettype.model.ExhibitionTicketTypeVO;
 
 import jakarta.validation.constraints.NotBlank;
@@ -41,31 +42,31 @@ public class ExhibitionCreateDTO {
 //	@JsonIgnore
     private Set<ExhibitionTicketTypeVO> exhibitionTicketTypes;
 
-	@NotBlank(message = "展覽名稱必填")
+	@NotBlank(message = "展覽名稱必填", groups = PublishChecks.class)
     @Size(max = 100, message = "展覽名稱長度不可超過 100 字")
 	private String exhibitionName;
 	
 	@DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm")
-	@NotNull(message = "請勿空白")
+	@NotNull(message = "請勿空白", groups = PublishChecks.class)
 	private LocalDateTime startTime;
 	
 	@DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm")
-	@NotNull(message = "請勿空白")
+	@NotNull(message = "請勿空白", groups = PublishChecks.class)
 	private LocalDateTime endTime;
 
-	@NotBlank(message = "展覽地點必填")
+	@NotBlank(message = "展覽地點必填", groups = PublishChecks.class)
 	@Size(max = 255, message = "展覽地點長度不可超過 255 字")
 	private String location;
 	
 	@DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm")
-	@NotNull(message = "請勿空白")
+	@NotNull(message = "請勿空白", groups = PublishChecks.class)
 	private LocalDateTime ticketStartTime;
 
-	@NotNull(message = "必須填入總販售票數")
+	@NotNull(message = "必須填入總販售票數", groups = PublishChecks.class)
 	@PositiveOrZero(message = "總票數需為 0 或正整數")
 	private Integer totalTicketQuantity;
 
-	@NotBlank(message = "展覽資訊必填")
+	@NotBlank(message = "展覽資訊必填", groups = PublishChecks.class)
 	private String description;
 	
 	public Integer getExhibitionId() {
@@ -188,4 +189,5 @@ public class ExhibitionCreateDTO {
 		this.description = description;
 	}
 
+	
 }

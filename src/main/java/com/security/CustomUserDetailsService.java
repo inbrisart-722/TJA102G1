@@ -10,7 +10,7 @@ import com.eventra.exhibitor.model.ExhibitorVO;
 import com.eventra.member.model.MemberRepository;
 import com.eventra.member.model.MemberVO;
 
-@Service
+@Service("customUserDetailsService")
 public class CustomUserDetailsService implements UserDetailsService {
 
 	private final MemberRepository MEMBER_REPO;
