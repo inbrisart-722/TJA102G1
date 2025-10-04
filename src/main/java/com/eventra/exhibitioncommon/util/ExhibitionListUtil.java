@@ -10,7 +10,7 @@ public class ExhibitionListUtil {
         ExhibitionListDTO dto = new ExhibitionListDTO();
         dto.setExhibitionId((Integer) r[0]);
         dto.setExhibitionName((String) r[1]);
-        dto.setPhotoLandscape((String) r[2]);
+        dto.setPhotoPortrait((String) r[2]);
         if (hasTotalViews) {
             dto.setTotalViews(r[3] != null ? ((Number) r[3]).intValue() : 0);
         }
@@ -22,7 +22,7 @@ public class ExhibitionListUtil {
         ExhibitionListDTO dto = new ExhibitionListDTO();
         dto.setExhibitionId((Integer) r[0]);
         dto.setExhibitionName((String) r[1]);
-        dto.setPhotoLandscape((String) r[2]);
+        dto.setPhotoPortrait((String) r[2]);
         dto.setMinPrice(r[3] != null ? ((Number) r[3]).intValue() : null);
         dto.setMaxPrice(r[4] != null ? ((Number) r[4]).intValue() : null);
         dto.setStartTime(r[5] != null ? ((Timestamp) r[5]).toLocalDateTime() : null);
@@ -39,7 +39,7 @@ public class ExhibitionListUtil {
         ExhibitionListDTO dto = new ExhibitionListDTO();
         dto.setExhibitionId((Integer) r[0]);
         dto.setExhibitionName((String) r[1]);
-        dto.setPhotoLandscape((String) r[2]);
+        dto.setPhotoPortrait((String) r[2]);
         dto.setMinPrice(r[3] != null ? ((Number) r[3]).intValue() : null);
         dto.setMaxPrice(r[4] != null ? ((Number) r[4]).intValue() : null);
         dto.setStartTime(r[5] != null ? ((Timestamp) r[5]).toLocalDateTime() : null);

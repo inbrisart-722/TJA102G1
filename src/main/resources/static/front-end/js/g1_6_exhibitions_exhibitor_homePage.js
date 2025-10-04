@@ -61,7 +61,7 @@ document.addEventListener("DOMContentLoaded", function () {
                                 <div class="row">
                                     <div class="col-lg-4 col-md-4 position-relative">
                                         <div class="img_list">
-                                            <img src="${exh.photoLandscape || 'img/0_exhibition/ChatGPT_exhibition_1.png'}" alt="${exh.exhibitionName}">
+                                            <img src="${exh.photoPortrait}" alt="${exh.exhibitionName}">
                                         </div>
                                     </div>
                                     <div class="col-lg-6 col-md-6">

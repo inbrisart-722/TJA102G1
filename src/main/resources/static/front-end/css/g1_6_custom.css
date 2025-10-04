@@ -27,6 +27,14 @@ a {
 	/* 多餘區域裁切 */
 }
 
+.img_list img {
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    left: 0;
+}
+
+
 /* 所有被 wow/aos/動畫類別控制的元素, 初始可見且不啟動動畫 */
 .wow {
 	visibility: visible !important;

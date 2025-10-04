@@ -29,9 +29,9 @@ document.addEventListener("DOMContentLoaded", () => {
 	      var card = `
 			<div class="item">
 				<div class="tour_container">
-					<div class="img_container">
-						<a href="/front-end/exhibitions/${exh.exhibitionId}">
-							<img src="img/0_exhibition/ChatGPT_exhibition_2.png" 
+				<div class="img_container" style="height:267.83px">
+					<a href="/front-end/exhibitions/${exh.exhibitionId}">
+							<img src="${exh.photoPortrait}" 
 							class="img-fluid" alt="${exh.exhibitionName}">
 							<div class="short_info">
 								<span class="price">
