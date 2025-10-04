@@ -107,11 +107,6 @@ public class PlatformIndexController {
 		return "platform/platform_edit";
 	}
 
-	@GetMapping("/platform/member")
-	public String member() {
-		return "platform/member";
-	}
-
 	@GetMapping("/platform/partner")
 	public String partner() {
 		return "platform/partner";
@@ -141,18 +136,6 @@ public class PlatformIndexController {
 		ExhibitorVO exhibitor = EXHIBITOR_REPO.findById(exhibitorId).orElseThrow();
 		model.addAttribute("exhibitor", exhibitor);
 		return "platform/exhibitor_detail";
-	}
-
-	@GetMapping("/platform/exhibitor_review_success")
-	public String exhibitorReviewSuccess(@RequestParam("token") String token, @RequestParam("domain") String domain) {
-
-		return "platform/exhibitor_review_success";
-	}
-
-	@GetMapping("/platform/exhibitor_review_failure")
-	public String exhibitorReviewFailure(@RequestParam("token") String token, @RequestParam("domain") String domain) {
-
-		return "platform/exhibitor_review_failure";
 	}
 
 	/* ========== 4th part: 會員列表 ========== */
