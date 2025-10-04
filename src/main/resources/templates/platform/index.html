@@ -2,310 +2,306 @@
 <html lang="zh-Hant">
 
 <head>
-<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-<title>Eventra管理者平台</title>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <title>Eventra管理者平台</title>
 
-<link rel="stylesheet"
-	href="https://cdn.jsdelivr.net/npm/@fontsource/source-sans-3@5.0.12/index.css"
-	integrity="sha256-tXJfXfp6Ewt1ilPzLDtQnJV4hclT9XuaZUKyUvmyr+Q="
-	crossorigin="anonymous" media="print" onload="this.media='all'" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/source-sans-3@5.0.12/index.css"
+    integrity="sha256-tXJfXfp6Ewt1ilPzLDtQnJV4hclT9XuaZUKyUvmyr+Q=" crossorigin="anonymous" media="print"
+    onload="this.media='all'" />
 
-<link rel="stylesheet"
-	href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css"
-	crossorigin="anonymous" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css"
+    crossorigin="anonymous" />
 
-<link rel="stylesheet" href="css/adminlte.css" />
+  <link rel="stylesheet" href="./css/adminlte.css" />
 
-<link rel="stylesheet" href="css/index.css" />
+  <link rel="stylesheet" href="./css/index.css" />
 </head>
 
-<body
-	class="layout-fixed sidebar-expand-lg sidebar-open bg-body-tertiary">
-	<div class="app-wrapper">
+<body class="layout-fixed sidebar-expand-lg sidebar-open bg-body-tertiary">
+  <div class="app-wrapper">
 
-		<!-- 頁首 -->
-		<nav class="app-header navbar navbar-expand bg-body-tertiary"
-			data-bs-theme="dark">
-			<div class="container-fluid">
-				<!-- 漢堡 -->
-				<ul class="navbar-nav">
-					<li class="nav-item"><a class="nav-link"
-						data-lte-toggle="sidebar" href="#" role="button"> <i
-							class="bi bi-list"></i>
-					</a></li>
-				</ul>
+    <!-- 頁首 -->
+    <nav class="app-header navbar navbar-expand bg-body-tertiary" data-bs-theme="dark">
+      <div class="container-fluid">
+        <!-- 漢堡 -->
+        <ul class="navbar-nav">
+          <li class="nav-item">
+            <a class="nav-link" data-lte-toggle="sidebar" href="#" role="button">
+              <i class="bi bi-list"></i>
+            </a>
+          </li>
+        </ul>
 
-				<!-- 登出 -->
-				<ul class="navbar-nav ms-auto">
-					<li class="user-footer"><a href="#"
-						class="btn btn-default btn-flat float-end">登出</a></li>
-				</ul>
-			</div>
-		</nav>
-
-
-		<!-- 左側欄 -->
-		<aside class="app-sidebar bg-body-tertiary" data-bs-theme="dark">
-			<div class="sidebar-brand">
-				<a th:href="@{/platform/index}" class="brand-link"> <img
-					src="img/AdminLTELogo.png" alt="AdminLTE Logo"
-					class="brand-image opacity-75 shadow" /> <span
-					class="brand-text fw-light">Eventra</span>
-				</a>
-			</div>
-
-			<div class="sidebar-wrapper">
-				<nav class="mt-2">
-					<ul class="nav sidebar-menu flex-column" data-lte-toggle="treeview"
-						role="navigation" aria-label="Main navigation"
-						data-accordion="false" id="navigation">
-
-						<!-- 用戶管理 -->
-						<li class="nav-item"><a href="#" class="nav-link"> <i
-								class="nav-icon bi bi-people-fill"></i>
-								<p>
-									用戶管理 <i class="nav-arrow bi bi-chevron-right"></i>
-								</p>
-						</a> <!-- 子選單 -->
-							<ul class="nav nav-treeview">
-								<li class="nav-item"><a th:href="@{/platform/member}"
-									class="nav-link" style="padding-left: 56px;">
-										<p>會員列表</p>
-								</a></li>
-								<li class="nav-item"><a th:href="@{/platform/partner}"
-									class="nav-link" style="padding-left: 56px;">
-										<p>展商列表</p>
-								</a></li>
-							</ul></li>
-
-						<!-- 留言管理 -->
-						<li class="nav-item"><a href="#" class="nav-link"> <i
-								class="nav-icon bi bi-chat-left-text-fill"></i>
-								<p>
-									留言管理 <i class="nav-arrow bi bi-chevron-right"></i>
-								</p>
-						</a>
-							<ul class="nav nav-treeview">
-								<li class="nav-item"><a th:href="@{/platform/comment}"
-									class="nav-link" style="padding-left: 56px;">
-										<p>留言列表</p>
-								</a></li>
-								<li class="nav-item"><a th:href="@{/platform/report}"
-									class="nav-link" style="padding-left: 56px;">
-										<p>檢舉管理</p>
-								</a></li>
-							</ul></li>
-
-						<!-- 申請管理 -->
-						<li class="nav-item"><a href="#" class="nav-link"> <i
-								class="nav-icon bi bi-pencil-square"></i>
-								<p>
-									申請管理 <i class="nav-arrow bi bi-chevron-right"></i>
-								</p>
-						</a>
-							<ul class="nav nav-treeview">
-								<li class="nav-item"><a th:href="@{/platform/exhibitor}"
-									class="nav-link" style="padding-left: 56px;">
-										<p>展商申請</p>
-								</a></li>
-								<li class="nav-item"><a th:href="@{/platform/exhibition}"
-									class="nav-link" style="padding-left: 56px;">
-										<p>展覽申請</p>
-								</a></li>
-							</ul></li>
-
-						<!--             訂單管理 -->
-						<!--             <li class="nav-item"> -->
-						<!--               <a href="#" class="nav-link"> -->
-						<!--                 <i class="nav-icon bi bi-circle"></i> -->
-						<!--                 <p>訂單管理</p> -->
-						<!--               </a> -->
-						<!--             </li> -->
-
-						<!--             報表管理 -->
-						<!--             <li class="nav-item"> -->
-						<!--               <a href="#" class="nav-link"> -->
-						<!--                 <i class="nav-icon bi bi-circle"></i> -->
-						<!--                 <p>報表管理</p> -->
-						<!--               </a> -->
-						<!--             </li> -->
-					</ul>
-				</nav>
-			</div>
-		</aside>
+        <!-- 登出 -->
+        <ul class="navbar-nav ms-auto">
+          <li class="user-footer">
+            <a href="#" class="btn btn-default btn-flat float-end">登出</a>
+          </li>
+        </ul>
+      </div>
+    </nav>
 
 
-		<!-- 主畫面 -->
-		<main class="app-main">
-			<!-- 主畫面首 -->
-			<div class="app-content-header">
-				<div class="container-fluid">
-					<div class="container-fluid "
-						style="margin-top: 10px; margin-bottom: 40px;">
-						<!-- 頁面標題 -->
-						<div class="container-fluid">
-							<h3 class="mb-0" style="font-weight: 700; font-size: 36px;">Eventra
-								平台管理系統</h3>
-						</div>
-					</div>
+    <!-- 左側欄 -->
+    <aside class="app-sidebar bg-body-tertiary" data-bs-theme="dark">
+      <div class="sidebar-brand">
+        <a href="./index.html" class="brand-link">
+          <img src="img/AdminLTELogo.png" alt="AdminLTE Logo" class="brand-image opacity-75 shadow" />
+          <span class="brand-text fw-light">Eventra</span>
+        </a>
+      </div>
 
-					<!-- 卡片區 -->
-					<div class="app-content" style="margin-bottom: 40px;">
-						<div class="container-fluid">
-							<div class="row">
-								<div class="col-12 col-sm-6 col-md-3">
-									<div class="info-box shadow-sm">
-										<div class="info-box-content">
-											<span class="info-box-number">760</span> <span
-												class="info-box-text">待審核廠商</span>
-										</div>
-									</div>
-								</div>
+      <div class="sidebar-wrapper">
+        <nav class="mt-2">
+          <ul class="nav sidebar-menu flex-column" data-lte-toggle="treeview" role="navigation"
+            aria-label="Main navigation" data-accordion="false" id="navigation">
 
-								<div class="col-12 col-sm-6 col-md-3">
-									<div class="info-box shadow-sm">
-										<div class="info-box-content">
-											<span class="info-box-number">760</span> <span
-												class="info-box-text">待審核活動</span>
-										</div>
-									</div>
-								</div>
+            <!-- 用戶管理 -->
+            <li class="nav-item">
+              <a href="#" class="nav-link">
+                <i class="nav-icon bi bi-people-fill"></i>
+                <p>
+                  用戶管理
+                  <i class="nav-arrow bi bi-chevron-right"></i>
+                </p>
+              </a>
+              <!-- 子選單 -->
+              <ul class="nav nav-treeview">
+                <li class="nav-item">
+                  <a href="member.html" class="nav-link" style="padding-left: 56px;">
+                    <p>會員列表</p>
+                  </a>
+                </li>
+                <li class="nav-item">
+                  <a href="partner.html" class="nav-link" style="padding-left: 56px;">
+                    <p>廠商列表</p>
+                  </a>
+                </li>
+              </ul>
+            </li>
 
-								<div class="col-12 col-sm-6 col-md-3">
-									<div class="info-box shadow-sm">
-										<div class="info-box-content">
-											<span class="info-box-number">2,000</span> <span
-												class="info-box-text">待處理檢舉留言</span>
-										</div>
-									</div>
-								</div>
+            <!-- 留言管理 -->
+            <li class="nav-item">
+              <a href="#" class="nav-link">
+                <i class="nav-icon bi bi-chat-left-text-fill"></i>
+                <p>
+                  留言管理
+                  <i class="nav-arrow bi bi-chevron-right"></i>
+                </p>
+              </a>
+              <ul class="nav nav-treeview">
+                <li class="nav-item">
+                  <a href="comment.html" class="nav-link" style="padding-left: 56px;">
+                    <p>留言列表</p>
+                  </a>
+                </li>
+                <li class="nav-item">
+                  <a href="report.html" class="nav-link" style="padding-left: 56px;">
+                    <p>檢舉管理</p>
+                  </a>
+                </li>
+              </ul>
+            </li>
 
-								<div class="col-12 col-sm-6 col-md-3">
-									<div class="info-box shadow-sm">
-										<div class="info-box-content">
-											<span class="info-box-number">41,410</span> <span
-												class="info-box-text">廠商總數</span>
-										</div>
-									</div>
-								</div>
-							</div>
-						</div>
-					</div>
+            <!-- 申請管理 -->
+            <li class="nav-item">
+              <a href="#" class="nav-link">
+                <i class="nav-icon bi bi-pencil-square"></i>
+                <p>
+                  申請管理
+                  <i class="nav-arrow bi bi-chevron-right"></i>
+                </p>
+              </a>
+              <ul class="nav nav-treeview">
+                <li class="nav-item">
+                  <a href="exhibitor.html" class="nav-link" style="padding-left: 56px;">
+                    <p>展商申請</p>
+                  </a>
+                </li>
+                <li class="nav-item">
+                  <a href="exhibition.html" class="nav-link" style="padding-left: 56px;">
+                    <p>活動申請</p>
+                  </a>
+                </li>
+              </ul>
+            </li>
 
+            <!-- 訂單管理 -->
+            <li class="nav-item">
+              <a href="#" class="nav-link">
+                <i class="nav-icon bi bi-circle"></i>
+                <p>訂單管理</p>
+              </a>
+            </li>
 
-					<!-- 公告區 -->
-					<div class="container-fluid">
-						<!-- 公告區標題 -->
-						<div class="container-fluid">
-							<h3 class="mb-0" style="margin: 0 1rem; font-size: 24px;">公告列表</h3>
-						</div>
-					</div>
-					<div class="container-fluid">
-						<div class="d-flex justify-content-end"
-							style="margin-bottom: 15px;">
-							<a th:href="@{/platform/platform_edit}">
-								<button type="button" class="btn btn-primary btn-sm"
-									style="margin: 0 1rem;">新增公告</button>
-							</a>
-
-						</div>
-
-						<div class="card mb-4">
-							<div class="card-header d-flex align-items-center">
-								<h3 class="card-title mb-0">公告一覽</h3>
-
-								<!-- 右側外層容器：重點是 ms-auto -->
-								<div class="ms-auto d-flex align-items-center">
-									<form class="d-flex" role="search">
-										<input class="form-control w-auto me-2" type="search"
-											aria-label="Search" />
-										<button class="btn btn-outline-success btn-sm" type="submit">搜尋</button>
-									</form>
-								</div>
-							</div>
-
-							<div class="card-body">
-								<table class="table table-bordered">
-									<thead>
-										<tr style="text-align: center;">
-											<th style="width: 3.5rem">編號</th>
-											<th>標題</th>
-											<th>內容</th>
-											<th>建立日期</th>
-											<th>更新日期</th>
-											<th style="width: 4rem">修改</th>
-											<th style="width: 4rem">刪除</th>
-										</tr>
-									</thead>
-									<tbody>
-										<th:block th:each="annVO : ${annListData}">
-											<tr class="align-middle">
-												<td style="text-align: center;"
-													th:text="${annVO.platformAnnouncementId}"></td>
-												<td th:text="${annVO.title}"></td>
-												<td th:text="${annVO.content}"></td>
-												<td style="text-align: center;" th:text="${annVO.createdAt}"></td>
-												<td style="text-align: center;" th:text="${annVO.updatedAt}"></td>
-												<td>
-													<form method="get" th:action="@{/platform/edit}">
-														<button type="submit"
-															class="btn btn-outline-warning btn-sm">修改</button>
-														<input type="hidden" name="platformAnnouncementId"
-															th:value="${annVO.platformAnnouncementId}">
-													</form>
-												</td>
-												<td>
-													<form method="post" th:action="@{/platform/delete}">
-														<button type="submit"
-															class="btn btn-outline-danger btn-sm">刪除</button>
-														<input type="hidden" name="platformAnnouncementId"
-															th:value="${annVO.platformAnnouncementId}">
-													</form>
-												</td>
-											</tr>
-										</th:block>
-									</tbody>
-								</table>
-							</div>
-
-							<!-- 分頁 -->
-							<div class="card-footer clearfix">
-								<nav aria-label="...">
-									<ul class="pagination pagination-sm m-0 float-end">
-										<li class="page-item disabled"><a class="page-link">上一頁</a></li>
-										<li class="page-item active" aria-current="page"><a
-											class="page-link" href="#">1</a></li>
-										<li class="page-item"><a class="page-link" href="#">2</a></li>
-										<li class="page-item"><a class="page-link" href="#">3</a></li>
-										<li class="page-item"><a class="page-link" href="#">下一頁</a></li>
-									</ul>
-								</nav>
-							</div>
-						</div>
-					</div>
-				</div>
-		</main>
+            <!-- 報表管理 -->
+            <li class="nav-item">
+              <a href="#" class="nav-link">
+                <i class="nav-icon bi bi-circle"></i>
+                <p>報表管理</p>
+              </a>
+            </li>
+          </ul>
+        </nav>
+      </div>
+    </aside>
 
 
-		<!-- 頁尾 -->
-		<footer class="app-footer">
-			<strong> Copyright &copy; 2025&nbsp;&nbsp; <span
-				class="text-decoration-none">Eventra Inc.</span>
-			</strong> ｜ Tibame TJA102 G1 專題製作
-		</footer>
-	</div>
+    <!-- 主畫面 -->
+    <main class="app-main">
+      <!-- 主畫面首 -->
+      <div class="app-content-header">
+        <div class="container-fluid">
+          <div class="container-fluid " style="margin-top: 10px; margin-bottom: 40px;">
+            <!-- 頁面標題 -->
+            <div class="container-fluid">
+              <h3 class="mb-0" style="font-weight: 700; font-size: 36px; ">Eventra 平台管理系統</h3>
+            </div>
+          </div>
+
+          <!-- 卡片區 -->
+          <div class="app-content" style="margin-bottom: 40px;">
+            <div class="container-fluid">
+              <div class="row">
+                <div class="col-12 col-sm-6 col-md-3">
+                  <div class="info-box shadow-sm">
+                    <div class="info-box-content">
+                      <span class="info-box-number">760</span>
+                      <span class="info-box-text">待審核廠商</span>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="col-12 col-sm-6 col-md-3">
+                  <div class="info-box shadow-sm">
+                    <div class="info-box-content">
+                      <span class="info-box-number">760</span>
+                      <span class="info-box-text">待審核活動</span>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="col-12 col-sm-6 col-md-3">
+                  <div class="info-box shadow-sm">
+                    <div class="info-box-content">
+                      <span class="info-box-number">2,000</span>
+                      <span class="info-box-text">待處理檢舉留言</span>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="col-12 col-sm-6 col-md-3">
+                  <div class="info-box shadow-sm">
+                    <div class="info-box-content">
+                      <span class="info-box-number">41,410</span>
+                      <span class="info-box-text">廠商總數</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
 
 
-	<script
-		src="https://cdn.jsdelivr.net/npm/overlayscrollbars@2.11.0/browser/overlayscrollbars.browser.es6.min.js"
-		crossorigin="anonymous"></script>
-	<script
-		src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"
-		crossorigin="anonymous"></script>
-	<script
-		src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.min.js"
-		crossorigin="anonymous"></script>
-	<script src="js/adminlte.js"></script>
-	<script src="js/index.js"></script>
+          <!-- 公告區 -->
+          <div class="container-fluid">
+            <!-- 公告區標題 -->
+            <div class="container-fluid">
+              <h3 class="mb-0" style="margin: 0 1rem; font-size: 24px;">公告列表</h3>
+            </div>
+          </div>
+          <div class="container-fluid">
+            <div class="d-flex justify-content-end" style="margin-bottom: 15px;">
+              <a href="./platform_edit.html">
+                <button type="button" class="btn btn-primary btn-sm" style="margin: 0 1rem;">新增公告</button>
+              </a>
+              
+            </div>
+
+            <div class="card mb-4">
+              <div class="card-header d-flex align-items-center">
+                <h3 class="card-title mb-0">公告一覽</h3>
+
+                <!-- 右側外層容器：重點是 ms-auto -->
+                <div class="ms-auto d-flex align-items-center">
+                  <form class="d-flex" role="search">
+                    <input class="form-control w-auto me-2" type="search" aria-label="Search" />
+                    <button class="btn btn-outline-success btn-sm" type="submit">搜尋</button>
+                  </form>
+                </div>
+              </div>
+
+              <div class="card-body">
+                <table class="table table-bordered">
+                  <thead>
+                    <tr style="text-align: center;">
+                      <th style="width: 3.5rem">編號</th>
+                      <th>標題</th>
+                      <th>內容</th>
+                      <th style="width: 4rem">修改</th>
+                      <th style="width: 4rem">刪除</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr class="align-middle">
+                      <td style="text-align: center;">1</td>
+                      <td>系統維護公告：服務暫停通知</td>
+                      <td>
+                        親愛的用戶，為提升服務品質，我們將於2024年8月20日凌晨01:00至03:00進行系統維護，期間部分服務將暫停使用。感謝您的理解與配合。
+                      </td>
+                      <td><button type="button" class="btn btn-outline-warning btn-sm">修改</button></td>
+                      <td><button type="button" class="btn btn-outline-danger btn-sm">刪除</button></td>
+                    </tr>
+                    <tr class="align-middle">
+                      <td style="text-align: center;">1</td>
+                      <td>系統維護公告：服務暫停通知</td>
+                      <td>
+                        親愛的用戶，為提升服務品質，我們將於2024年8月20日凌晨01:00至03:00進行系統維護，期間部分服務將暫停使用。感謝您的理解與配合。
+                      </td>
+                      <td><button type="button" class="btn btn-outline-warning btn-sm">修改</button></td>
+                      <td><button type="button" class="btn btn-outline-danger btn-sm">刪除</button></td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+
+              <!-- 分頁 -->
+              <div class="card-footer clearfix">
+                <nav aria-label="...">
+                  <ul class="pagination pagination-sm m-0 float-end">
+                    <li class="page-item disabled"><a class="page-link">上一頁</a></li>
+                    <li class="page-item active" aria-current="page">
+                      <a class="page-link" href="#">1</a>
+                    </li>
+                    <li class="page-item"><a class="page-link" href="#">2</a></li>
+                    <li class="page-item"><a class="page-link" href="#">3</a></li>
+                    <li class="page-item"><a class="page-link" href="#">下一頁</a></li>
+                  </ul>
+                </nav>
+              </div>
+            </div>
+          </div>
+        </div>
+    </main>
+
+
+    <!-- 頁尾 -->
+    <footer class="app-footer">
+      <strong>
+        Copyright &copy; 2025&nbsp;&nbsp;
+        <span class="text-decoration-none">Eventra Inc.</span>
+      </strong>
+      ｜ Tibame TJA102 G1 專題製作
+    </footer>
+  </div>
+
+
+  <script src="https://cdn.jsdelivr.net/npm/overlayscrollbars@2.11.0/browser/overlayscrollbars.browser.es6.min.js"
+    crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"
+    crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.min.js" crossorigin="anonymous"></script>
+  <script src="./js/adminlte.js"></script>
+  <script src="./js/index.js"></script>
 </body>
 </html>

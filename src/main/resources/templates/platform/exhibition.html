@@ -160,7 +160,7 @@ body {
 				</nav>
 			</div>
 		</aside>
-		<!-- Main（會員列表頁面） -->
+		Main（會員列表頁面）
 		<main class="app-main">
 			<div class="app-content-header">
 				<div class="container-fluid">
@@ -172,7 +172,7 @@ body {
 
 						<h3 class="mb-0 fw-bold" style="font-size: 36px;">活動申請列表</h3>
 
-						<!-- 右上搜尋框 -->
+						
 						<form class="d-flex" role="search"
 							style="max-width: 420px; width: 100%;">
 							<input class="form-control form-control-lg me-2" type="search"
@@ -198,48 +198,45 @@ body {
 										<th style="width: 25%;">操作</th>
 
 									</tr>
-								</thead>
-
 								<tbody id="tbody">
-
-									<th:block th:each="exhibitionVO : ${exhibitionList}">
-
-										<td th:text="${exhibitionVO.exhibitionStatus}"></td>
-
-										<td th:text="${exhibitionVO.exhibitionName}"></td>
-
-										
-										<td th:text="${exhibitionVO.exhibitorName}"></td>
-
-										<td class="text-center">
-										
-										<form method="post" id="sendccc"
-											th:action="@{/platform/exhibition_detail}">
-											<input type="submit" value="修改" style="display: block">
-											<input type="hidden" name="exhibitionId"
-												th:value="${exhibitionVO.exhibitionId}">
-										</form>
-										
-										 
-
-
-										</td>
-										</tr>
-									</th:block>
-
-
+								
+								
+								<th:block th:each="exhibitionVO : ${exhibitionList}">
+<!-- 									<th:block th:each="exhibitionVO, iterStat : ${exhibitionList}"> -->
+<!-- 										<tr th:object="${exhibitionVO}"> -->
+<!-- 											<td th:text="*{exhibitionStatus}"></td> -->
+<!-- 											<td th:text="*{exhibitionName}"></td> -->
+<!-- 											<td th:text="*{exhibitorName}"></td> -->
+<!-- 											<td class="text-center"> -->
+<!-- 												<form method="post" -->
+<!-- 													th:action="@{/platform/exhibition_detail}" -->
+<!-- 													th:object="${exhibitionVO}"> -->
+<!-- 													帶出主鍵 -->
+<!-- 													<input type="hidden" th:field="*{exhibitionId}" /> -->
+<!-- 													若有開啟 CSRF，記得帶 token -->
+<!-- 													<input type="hidden" th:name="${_csrf.parameterName}" -->
+<!-- 														th:value="${_csrf.token}" /> -->
+<!-- 													<button type="submit" class="btn btn-sm btn-primary">修改</button> -->
+<!-- 												</form> -->
+<!-- 											</td> -->
+<!-- 										</tr> -->
+<!-- 									</th:block> -->
 								</tbody>
+
+
+
+							
 							</table>
 						</div>
 					</div>
-					<!-- 分頁 -->
+
 					<div class="card-footer bg-white">
 						<nav aria-label="Member pagination">
 							<ul class="pagination pagination-sm justify-content-center mb-0">
 								<li class="page-item disabled"><a class="page-link"
 									href="#" tabindex="-1" aria-disabled="true">«</a></li>
 								<li class="page-item active"><a class="page-link" href="#">1</a></li>
-								
+
 								<li class="page-item"><a class="page-link" href="#">»</a></li>
 							</ul>
 						</nav>
