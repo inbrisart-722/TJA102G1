@@ -17,15 +17,15 @@ public class ExpiringCartItemLineBotScheduler {
 		this.CART_ITEM_REDIS_REPO = cartItemRedisRepository;
 	}
 	
-//	@Scheduled(fixedRate = 30_000)
-//	public void checkFiveMinutesLeft() {
-//		System.out.println("ExpiringCartItemLineBotScheduler: checkFiveMinutesLeft");
-//		CART_ITEM_SERVICE.pushGlobalExpiringCartItem();
-//	}
+	@Scheduled(fixedRate = 30_000)
+	public void checkFiveMinutesLeft() {
+		System.out.println("ExpiringCartItemLineBotScheduler: checkFiveMinutesLeft");
+		CART_ITEM_SERVICE.pushGlobalExpiringCartItem();
+	}
 	
-//	@Scheduled(fixedRate = 45_000)
-//	public void cleanupGlobalExp(){
-//		System.out.println("ExpiringCartItemLineBotScheduler: cleanupGlobalExp");
-//		CART_ITEM_REDIS_REPO.cleanupGlobalExp();
-//	}
+	@Scheduled(fixedRate = 45_000)
+	public void cleanupGlobalExp(){
+		System.out.println("ExpiringCartItemLineBotScheduler: cleanupGlobalExp");
+		CART_ITEM_REDIS_REPO.cleanupGlobalExp();
+	}
 }

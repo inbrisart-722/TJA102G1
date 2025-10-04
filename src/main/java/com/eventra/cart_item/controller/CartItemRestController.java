@@ -32,8 +32,11 @@ public class CartItemRestController {
 	public String addCartItem(@RequestBody AddCartItemReqDTO req, Principal principal) {
 		Integer memberId = principal != null ? Integer.valueOf(principal.getName()) : null;
 		
+		System.out.println(req.toString());
+		
 		try {CART_ITEM_SERVICE.addCartItem(req, memberId);}
 		catch (IllegalStateException e) {
+//			e.printStackTrace();
 			System.out.println(e.toString());
 			return "failure";
 		}

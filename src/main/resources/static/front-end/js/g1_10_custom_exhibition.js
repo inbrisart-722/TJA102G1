@@ -950,16 +950,6 @@ document.addEventListener("DOMContentLoaded", function() {
 		if (elderly > 0) ticket_datas[3] = elderly;
 		if (disabled > 0) ticket_datas[4] = disabled;
 		if (mili_and_police > 0) ticket_datas[5] = mili_and_police;
-		// 先寫死給後端取 ticket_type_id
-
-		// const ticket_datas = {
-		//   1: adults,
-		//   2: students,
-		//   3: elderly,
-		//   4: disabled,
-		//   5: mili_and_police,
-		// };
-		// 1全票，2學生票，3敬老票，4身心障礙者票，5軍警票
 
 		const send_data = {
 			exhibitionId: Number(exhibitionId), // test
