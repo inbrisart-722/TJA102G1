@@ -24,7 +24,7 @@ import com.eventra.exhibitorstatus.model.ExhibitorStatusVO;
 public class ExhibitorService {
 
 	@Autowired
-    private ExhibitorRepository exhibitorRepo;
+	private ExhibitorRepository exhibitorRepo;
 	@Autowired
 	private PasswordEncoder passwordEncoder;
 	@Autowired
@@ -114,4 +114,13 @@ public class ExhibitorService {
     	
     	return new PageImpl(dtos, exhibitors.getPageable(), exhibitors.getTotalElements());
     }
+  	// 平台公告首頁用, 展商總數
+	public long countAll() {
+		return exhibitorRepo.count();
+	}
+
+	// 平台公告首頁用, 待核准展商數量（review_status_id = 1）
+	public long countByStatusId(int statusId) {
+		return exhibitorRepo.countByReviewStatusId(statusId);
+	}
 }

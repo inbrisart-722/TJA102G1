@@ -577,5 +577,8 @@ public class ExhibitionServiceImpl implements ExhibitionService {
 	    order.setOrderStatus(OrderStatus.已退款);
 	}
 	
-	
+	// 平台公告用, 展覽總數
+    public long countAll() {
+        return repository.count(); // 直接用 JPA 內建 count()
+    }
 }

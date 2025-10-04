@@ -9,6 +9,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import jakarta.validation.constraints.NotBlank;
 
 @Entity
 @Table (name ="platform_announcement")
@@ -20,8 +21,10 @@ public class PlatformAnnouncementVO implements Serializable {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Integer platformAnnouncementId;
 	
+	@NotBlank(message = "公告標題不可為空")
 	private String title;
 	
+	// 內容不在VO做錯誤驗證, 手動判斷 summernote 的 <p><br></p>
 	@Column(name ="content", columnDefinition = "longtext") // 定義資料庫的型別為longtext
 	private String content;
 	

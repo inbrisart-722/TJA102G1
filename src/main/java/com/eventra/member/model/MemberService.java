@@ -7,6 +7,7 @@ import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Objects;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.core.user.OAuth2User;
@@ -24,6 +25,9 @@ public class MemberService {
 	
 //	@PersistenceContext
 //	private EntityManager entityManager;
+	
+	@Autowired
+    private MemberRepository memberRepo;
 	
 	private final MemberRepository MEMBER_REPO;
 	private final MemberRedisRepository MEMBER_REDIS_REPO;
@@ -281,4 +285,9 @@ public class MemberService {
         
         return params.get("asid");
 	}
+	
+	// 平台公告用, 會員總數
+    public long countAll() {
+        return memberRepo.count();
+    }
 }

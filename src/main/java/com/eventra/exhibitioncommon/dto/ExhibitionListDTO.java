@@ -5,7 +5,7 @@ import java.time.LocalDateTime;
 public class ExhibitionListDTO {
     private Integer exhibitionId;		// 展覽id
     private String exhibitionName;		// 展覽名稱
-    private String photoLandscape;		// 展覽圖片
+    private String photoPortrait;		// 展覽圖片
     private Integer minPrice;			// 最低票價
     private Integer maxPrice;			// 最高票價
     private LocalDateTime startTime;   	// 展覽開始時間
@@ -19,13 +19,13 @@ public class ExhibitionListDTO {
     public ExhibitionListDTO() {}
 
     // 有參數建構子
-	public ExhibitionListDTO(Integer exhibitionId, String exhibitionName, String photoLandscape, Integer minPrice,
+	public ExhibitionListDTO(Integer exhibitionId, String exhibitionName, String photoPortrait, Integer minPrice,
 			Integer maxPrice, LocalDateTime startTime, LocalDateTime endTime, String location, Integer totalViews,
 			Integer ratingCount, Double averageRatingScore) {
 		super();
 		this.exhibitionId = exhibitionId;
 		this.exhibitionName = exhibitionName;
-		this.photoLandscape = photoLandscape;
+		this.photoPortrait = photoPortrait;
 		this.minPrice = minPrice;
 		this.maxPrice = maxPrice;
 		this.startTime = startTime;
@@ -53,12 +53,12 @@ public class ExhibitionListDTO {
 		this.exhibitionName = exhibitionName;
 	}
 
-	public String getPhotoLandscape() {
-		return photoLandscape;
+	public String getPhotoPortrait() {
+		return photoPortrait;
 	}
 
-	public void setPhotoLandscape(String photoLandscape) {
-		this.photoLandscape = photoLandscape;
+	public void setPhotoPortrait(String photoPortrait) {
+		this.photoPortrait = photoPortrait;
 	}
 
 	public Integer getMinPrice() {
