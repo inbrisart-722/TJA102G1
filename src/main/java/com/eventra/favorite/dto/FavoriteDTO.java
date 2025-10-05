@@ -6,6 +6,7 @@ public class FavoriteDTO {
     private boolean favoriteStatus;		// 收藏狀態
     private Double averageRatingScore;  // 平均評分
     private Integer totalRatingCount;   // 總評價數
+    private String photoPortrait;       // 展覽圖片 (新增)
     
     // 無參數建構子
 	public FavoriteDTO() {
@@ -14,13 +15,14 @@ public class FavoriteDTO {
 
 	// 有參數建構子
 	public FavoriteDTO(Integer exhibitionId, String exhibitionName, boolean favoriteStatus, Double averageRatingScore,
-			Integer totalRatingCount) {
+			Integer totalRatingCount, String photoPortrait) {
 		super();
 		this.exhibitionId = exhibitionId;
 		this.exhibitionName = exhibitionName;
 		this.favoriteStatus = favoriteStatus;
 		this.averageRatingScore = averageRatingScore;
 		this.totalRatingCount = totalRatingCount;
+		this.photoPortrait = photoPortrait;
 	}
 
 	// getter/setter
@@ -62,6 +64,14 @@ public class FavoriteDTO {
 
 	public void setTotalRatingCount(Integer totalRatingCount) {
 		this.totalRatingCount = totalRatingCount;
+	}
+
+	public String getPhotoPortrait() {
+		return photoPortrait;
+	}
+
+	public void setPhotoPortrait(String photoPortrait) {
+		this.photoPortrait = photoPortrait;
 	}
 
 }

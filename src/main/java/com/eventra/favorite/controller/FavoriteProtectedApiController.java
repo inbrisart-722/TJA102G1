@@ -37,9 +37,9 @@ public class FavoriteProtectedApiController {
 	        boolean favoriteStatus = favSvc.toggleFavorite(memId, exhId);
 
             // 2. 回傳新的收藏狀態 (DTO 給前端 AJAX 用)
-            return new FavoriteDTO(exhId, null, favoriteStatus, null, null);
+            return new FavoriteDTO(exhId, null, favoriteStatus, null, null, null);
         } catch (Exception e) {
-            return new FavoriteDTO(exhId, null, false, null, null);
+            return new FavoriteDTO(exhId, null, false, null, null, null);
         }
     }
 
@@ -47,32 +47,42 @@ public class FavoriteProtectedApiController {
 	// ========== 載入會員所有收藏清單(status = 1) ==========
 		@GetMapping("/list")
 		public List<FavoriteDTO> listFavorites() {
-			// 1. 從 SecurityContextHolder 拿登入id
 		    Integer memId = Integer.valueOf(SecurityContextHolder.getContext().getAuthentication().getName());
-		    
-			// 2. 取會員收藏清單 (只撈 favorite_status = 1的資料)
 		    List<FavoriteVO> voList = favSvc.findFavoritesByMember(memId);
-			
-			// 3. 建立 List 容器, 用來存放轉換好的 FavoriteDTO (第1層 集合)
-		    List<FavoriteDTO> dtoList = new ArrayList<>();
-		    
-			// 4. 用 for 迴圈把每筆 VO 轉成 DTO
-		    for (FavoriteVO fav : voList) {
-		        Optional<ExhibitionVO> opt = exhRepo.findById(fav.getExhibitionId());
-		        if (opt.isPresent()) {
-		            ExhibitionVO exh = opt.get();
-		            String name = exh.getExhibitionName();
-		            boolean status = (fav.getFavoriteStatus() != null && fav.getFavoriteStatus() == 1);
 
-		            dtoList.add(new FavoriteDTO(
+		    List<FavoriteDTO> dtoList = new ArrayList<>();
+
+		    for (FavoriteVO fav : voList) {
+		        String name = (fav.getExhibition() != null)
+		                ? fav.getExhibition().getExhibitionName()
+		                : "查無展覽名稱";
+
+		        boolean status = (fav.getFavoriteStatus() != null && fav.getFavoriteStatus() == 1);
+
+		        // 取出圖片欄位
+		        String photoPortrait = (fav.getExhibition() != null)
+		                ? fav.getExhibition().getPhotoPortrait()
+		                : null;
+
+		        // 若有評價欄位，也可一併取出 (若目前 ExhibitionVO 已有 avgRatingScore、ratingCount)
+		        Double avgScore = (fav.getExhibition() != null)
+		                ? fav.getExhibition().getAverageRatingScore()
+		                : null;
+
+		        Integer ratingCount = (fav.getExhibition() != null)
+		                ? fav.getExhibition().getTotalRatingCount()
+		                : null;
+
+		        dtoList.add(new FavoriteDTO(
 		                fav.getExhibitionId(),
 		                name,
 		                status,
-		                exh.getAverageRatingScore(),   // Formula 已經算好
-		                exh.getTotalRatingCount()      // 評價總數
-		            ));
-		        }
+		                avgScore,
+		                ratingCount,
+		                photoPortrait
+		        ));
 		    }
+
 		    return dtoList;
 		}
 
@@ -91,13 +101,13 @@ public class FavoriteProtectedApiController {
 					FavoriteVO fav = opt.get();
 					// 收藏狀態 = 1, 有收藏
 					boolean isFavorited = (fav.getFavoriteStatus() != null && fav.getFavoriteStatus() == 1);
-	                return new FavoriteDTO(exhId, null, isFavorited, null, null);
+	                return new FavoriteDTO(exhId, null, isFavorited, null, null, null);
 				} else {
 					// 收藏狀態 = 0 / null, 沒收藏
-					return new FavoriteDTO(exhId, null, false, null, null);
+					return new FavoriteDTO(exhId, null, false, null, null, null);
 				}
 			} catch (Exception e) {
-				return new FavoriteDTO(exhId, null, false, null, null);
+				return new FavoriteDTO(exhId, null, false, null, null, null);
 			}
 		}
 }
