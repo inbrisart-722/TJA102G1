@@ -1,0 +1,45 @@
+<div th:fragment="chat-widget">
+	<div id="chat-widget">
+		<!-- Sticky Button -->
+		<button id="chat-toggle">
+			<i class=" icon-chat-5"></i>
+		</button>
+
+		<!-- Chat Window -->
+		<div id="chat-window">
+			<div class="chat-header">
+				<span>Eventra - 聊天大廳</span> <span><sub>(目前在線人數: <span
+						id="chat-online-count">1</span>人)
+				</sub></span>
+				<button id="chat-close">✕</button>
+			</div>
+			<div class="chat-body" id="chat-body">
+				<!-- 				<div class="message others"> -->
+				<!-- 					<img src="img/group1_img/aa志嘉.png" class="avatar"> -->
+				<!-- 					<div class="bubble">Hi 👋 有什麼可以幫忙的嗎？</div> -->
+				<!-- 					<time class="others">上午8:12</time> -->
+				<!-- 				</div> -->
+				<!-- 				<div class="message self"> -->
+				<!-- 					<img src="img/group1_img/aa志嘉.png" class="avatar" /> -->
+				<!-- 					<div class="bubble">Hi 👋 我是志嘉</div> -->
+				<!-- 					<time class="self">下午12:37</time> -->
+				<!-- 				</div> -->
+				<div id="chat-overlay">
+					<button onclick="location.href='/front-end/login'">登入</button>
+					<span>登入後才能留言哦！</span>
+				</div>
+
+			</div>
+
+			<div class="chat-footer">
+				<input type="text" id="chat-input" placeholder="輸入訊息..." />
+				<button id="chat-send">➤</button>
+			</div>
+		</div>
+	</div>
+	<link rel="stylesheet"
+		th:href="@{css/g1_10_custom_chat.css}">
+	<script th:src="@{js/sockjs.min.js}"></script>
+	<script th:src="@{js/stomp.min.js}"></script>
+	<script th:src="@{js/g1_10_custom_chat.js}"></script>
+</div>

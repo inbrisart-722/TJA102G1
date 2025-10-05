@@ -230,7 +230,8 @@
 		<!--form -->
 	</div>
 	<!-- /Sign In Popup -->
-
+    <!-- websocket 聊天室使用（內含多份檔案） -->
+	<div th:replace="fragments/chat-widget :: chat-widget"></div>
 
 	<!-- Common scripts -->
 	<script src="js/g1_10_custom_common_csrf.js"></script>
@@ -248,47 +249,11 @@
 	<script src="js/g1_6_search_modal.js"></script>
 	<!-- 導頁至搜尋結果頁用 -->
 
-	<!-- dify.ai ai chatbot -->
-	<script>
-		window.difyChatbotConfig = {
-			token : '6dNmiwvbRPuqvJW7',
-			inputs : {
-				welcome_message : "您好，歡迎來到 Eventra，請詢問任何問題！"
-			// You can define the inputs from the Start node here
-			// key is the variable name
-			// e.g.
-			// name: "NAME"
-			},
-			systemVariables : {
-			// user_id: 'YOU CAN DEFINE USER ID HERE',
-			// conversation_id: 'YOU CAN DEFINE CONVERSATION ID HERE, IT MUST BE A VALID UUID',
-			},
-			userVariables : {
-			// avatar_url: 'YOU CAN DEFINE USER AVATAR URL HERE',
-			// name: 'YOU CAN DEFINE USER NAME HERE',
-			},
-		}
-	</script>
+	<script src="js/g1_10_custom_dify.js"></script>
 	<script src="https://udify.app/embed.min.js" id="6dNmiwvbRPuqvJW7"
-		defer>
-		
-	</script>
-	<style>
-#dify-chatbot-bubble-button {
-	background-color: rgba(37, 29, 28, 0.65) !important;
-	position: fixed;
-	left: 24px;
-	bottom: 24px;
-}
-
-#dify-chatbot-bubble-window {
-	width: 24rem !important;
-	height: 32rem !important;
-	position: fixed !important;
-	left: 24px !important;
-	bottom: 80px !important;
-}
-</style>
+		defer></script>
+	<link href="css/g1_10_custom_dify.css" rel="stylesheet" />	
+	
 <script>
 // 先處理 exhibitorRegister 參數
 const params = new URLSearchParams(window.location.search);

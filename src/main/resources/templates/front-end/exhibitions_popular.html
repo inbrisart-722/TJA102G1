@@ -167,6 +167,8 @@
 		<!--form -->
 	</div>
 	<!-- /Sign In Popup -->
+	    <!-- websocket 聊天室使用（內含多份檔案） -->
+	<div th:replace="fragments/chat-widget :: chat-widget"></div>
 
 	<!-- Common scripts -->
 	<script src="js/jquery-3.7.1.min.js"></script>
@@ -179,6 +181,11 @@
 	<script src="js/g1_6_exhibitions_popular.js"></script>
 	<script src="js/g1_6_search_history.js"></script> <!-- 存搜尋紀錄用 -->
 	<script src="js/g1_6_search_modal.js"></script> <!-- 導頁至搜尋結果頁用 -->
+	    <!-- 以下 3 個引入 (2js + 1css) 為 dify.ai 使用 -->
+    <script src="js/g1_10_custom_dify.js"></script>
+	<script src="https://udify.app/embed.min.js" id="6dNmiwvbRPuqvJW7"
+		defer></script>
+	<link href="css/g1_10_custom_dify.css" rel="stylesheet" />
 </body>
 
 </html>
