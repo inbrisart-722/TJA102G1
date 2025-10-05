@@ -1,19 +1,15 @@
 package com.eventra.exhibition.model;
 
-import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.Set;
 
 import org.hibernate.annotations.Formula;
-import org.springframework.format.annotation.DateTimeFormat;
 
 import com.eventra.comment.model.CommentVO;
-import com.eventra.exhibitionstatus.model.ExhibitionStatus;
 import com.eventra.exhibitionstatus.model.ExhibitionStatusVO;
 import com.eventra.exhibitiontickettype.model.ExhibitionTicketTypeVO;
 import com.eventra.exhibitor.model.ExhibitorVO;
 import com.eventra.rating.model.RatingVO;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -27,9 +23,6 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import jakarta.persistence.Transient;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.PositiveOrZero;
 
 @Entity
 @Table(name = "Exhibition")
@@ -328,6 +321,15 @@ public class ExhibitionVO {
 		int sold = (this.soldTicketQuantity == null ? 0 : this.soldTicketQuantity);
 		return Math.max(total - sold, 0);
 	}
+	@Transient
+	private String lastRejectReason;
+	public String getLastRejectReason() { return lastRejectReason; }
+	public void setLastRejectReason(String v) { this.lastRejectReason = v; }
+	
+	
+	
+	
+	
 }
 
 

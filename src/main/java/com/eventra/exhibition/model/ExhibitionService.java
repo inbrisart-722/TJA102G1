@@ -7,13 +7,23 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import com.eventra.exhibition.backend.controller.dto.ExhibitionReviewReqDTO;
 import com.eventra.exhibitor.backend.controller.dto.ExhibitionCreateDTO;
+
+
 
 /**
  * 
  */
 public interface ExhibitionService {
 
+	// 展覽審核用
+	void endExhibition(Integer exhibitionId);
+
+	void updateStatus(Integer exhibitionId, Integer statusId);
+
+	void reviewAndSave(ExhibitionReviewReqDTO dto);
+//====================================================================//
 	/**
 	 * 新增展覽
 	 * 
@@ -21,8 +31,8 @@ public interface ExhibitionService {
 	 * @param exhibitorId Integer
 	 */
 
-	void addExhibition(ExhibitionCreateDTO dto, Integer exhibitorId, boolean isDraft) ;
-	
+	void addExhibition(ExhibitionCreateDTO dto, Integer exhibitorId, boolean isDraft);
+
 	/**
 	 * 分頁(參數使用int是因為JPA的page方法預設是int所以可以直接丟進去，Integer要額外處理null的判斷)
 	 * 
@@ -34,7 +44,6 @@ public interface ExhibitionService {
 
 	ExhibitionVO findById(Integer id);
 
-	
 	void updateExhibition(ExhibitionCreateDTO dto, Integer id, boolean isDraft);
 
 //	/* 更新展覽時觸發通知用, 編輯展覽會呼叫此方法 */
@@ -58,5 +67,6 @@ public interface ExhibitionService {
 	void markOrderPaid(Integer orderId);
 
 	// 平台公告用, 展覽總數
-    public long countAll();
+	public long countAll();
+
 }
