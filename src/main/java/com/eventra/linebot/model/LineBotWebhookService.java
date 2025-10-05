@@ -253,6 +253,7 @@ public class LineBotWebhookService {
         	String lineUserId = event.path("source").path("userId").asText();
         	
         	Slice<OrderItemLineBotCarouselDTO> orderItems = ORDER_ITEM_SERVICE.findOrderItemsByLineUserId(lineUserId, orderUlid, OrderStatus.已付款, page, SIZE);
+        	for(OrderItemLineBotCarouselDTO dto: orderItems.getContent()) System.out.println(dto.getTicketCode());
         	ObjectNode carousel = FLEX_BUILDER.buildOrderItemCarousel(orderItems.getContent(), orderItems.hasNext(), action, orderUlid, page + 1);
         	String json = FLEX_BUILDER.wrapFlexReply(replyToken, carousel);
         	System.out.println(json.toString());
