@@ -9,7 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/front-end/load-photo")
+@RequestMapping("/load-photo")
 public class LoadPhotoController {
 
     private final LocalFileUploadService localFileUploadService;
