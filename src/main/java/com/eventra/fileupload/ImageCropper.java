@@ -1,4 +1,4 @@
-package com.eventra.member.fileupload;
+package com.eventra.fileupload;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;

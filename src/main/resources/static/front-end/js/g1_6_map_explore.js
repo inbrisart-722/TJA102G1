@@ -62,7 +62,7 @@ function loadNearbyExhibitions(lat, lng, radius) {
 				// InfoBox 內容（展覽卡片）
 				const content = `
 				<div class="marker_info" id="marker_info">
-					<img src="img/0_exhibition/ChatGPT_exhibition_4.png" alt="${item.exhibitionName}" style="width:260px; object-fit:cover"/>
+					<img src="${item.photoPortrait}" alt="${item.exhibitionName}" style="width:260px; object-fit:cover"/>
 					<h3>${item.exhibitionName}</h3>
 					<span class="location">${item.location}</span>
 					<span class="start_time">${formatDate(item.startTime)} ~ ${formatDate(item.endTime)}</span>

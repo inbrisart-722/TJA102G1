@@ -119,7 +119,7 @@ body {
 				<p class="login-sub">請輸入您的帳號與密碼以登入展商後台</p>
 
 				<div id="loginAlert" class="alert alert-danger d-none" role="alert"></div>
-				
+
 				<form id="loginForm" novalidate>
 					<!-- 統編 -->
 					<div class="mb-3">
@@ -160,7 +160,7 @@ body {
 
 					<button class="btn btn-primary w-100 py-3 fs-5" type="submit">登入</button>
 
-					
+
 				</form>
 			</div>
 		</div>
@@ -290,12 +290,21 @@ body {
 
         const params = new URLSearchParams(window.location.search);
         let redirect_ssr = params.get("redirect");
+        let ticketCode = params.get("ticketCode");
         if (redirect_ssr && !redirect_ssr.startsWith("/back-end/")) redirect_ssr = null;
 
         if (!redirect_ssr && !redirect_api)
           window.location.href = "/back-end/exhibitor/back_end_homepage";
         else if (redirect_api) window.location.href = redirect_api;
-        else window.location.href = redirect_ssr;
+        else {
+        	 if (ticketCode) {
+        		const url = new URL(redirect_ssr, window.location.origin);
+        		url.searchParams.set("ticketCode", ticketCode);
+        	 	window.location.href = url.toString();
+        	 } else {
+        		window.location.href = redirect_ssr;
+        	 }
+        }
 
       } catch (err) {
         alertBox.textContent = '網路或伺服器異常，稍後再試';
@@ -351,7 +360,7 @@ body {
 	  
     
   </script>
-  <script>
+	<script>
 	  // 切換密碼可視（乾淨版）
 	  (function () {
 	    const ipt = document.getElementById('password');

@@ -1,5 +1,7 @@
 package com.eventra.order_item.model;
 
+import java.util.Optional;
+
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -17,4 +19,6 @@ public interface OrderItemRepository extends JpaRepository<OrderItemVO, Integer>
 
 	Slice<OrderItemVO> findByOrder_MemberAndOrder_OrderUlidAndOrder_OrderStatus(MemberVO member, String orderUlid, OrderStatus status,
 			Pageable pageable);
+	
+	Optional<OrderItemVO> findByTicketCode(String ticketCode);
 }

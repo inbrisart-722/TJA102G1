@@ -1,4 +1,4 @@
-package com.eventra.member.fileupload;
+package com.eventra.fileupload;
 
 import java.awt.image.BufferedImage;
 import java.io.IOException;

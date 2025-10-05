@@ -14,7 +14,7 @@ document.addEventListener("DOMContentLoaded", function () {
             <div id="logo">
               <a href="/front-end/index"
                 ><img
-                  src="img/logo.png"
+                  src="img/Eventra-white-320x68.png"
                   width="160"
                   height="34"
                   alt="City tours"
@@ -22,7 +22,7 @@ document.addEventListener("DOMContentLoaded", function () {
               /></a>
               <a href="/front-end/index"
                 ><img
-                  src="img/logo_sticky.png"
+                  src="img/Eventra-black-320x68.png"
                   width="160"
                   height="34"
                   alt="City tours"

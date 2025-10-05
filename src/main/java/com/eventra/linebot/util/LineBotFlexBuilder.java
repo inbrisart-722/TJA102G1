@@ -544,7 +544,10 @@ public class LineBotFlexBuilder {
 	    ObjectNode qrImage = mapper.createObjectNode();
 	    qrImage.put("type", "image");
 	    // ?? 測試中
-	    qrImage.put("url", "https://scdn.line-apps.com/n/channel_devcenter/img/fx/linecorp_code_withborder.png");
+	    qrImage.put("url", "https://eventra.ddns.net/load-qrcode/" + it.getTicketCode());
+	    System.out.println("===========");
+	    System.out.println("https://eventra.ddns.net/load-qrcode/" + it.getTicketCode());
+	    System.out.println("===========");
 	    qrImage.put("size", "xl");
 	    qrImage.put("aspectMode", "cover");
 	    qrContents.add(qrImage);

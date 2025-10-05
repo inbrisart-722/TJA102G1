@@ -1,6 +1,7 @@
 package com.eventra.order_item.model;
 
 import java.io.Serializable;
+import java.time.LocalDateTime;
 
 import com.eventra.exhibitiontickettype.model.ExhibitionTicketTypeVO;
 import com.eventra.order.model.OrderVO;
@@ -49,7 +50,18 @@ public class OrderItemVO implements Serializable{
 	
 	@Column(name = "ticket_code")
 	private String ticketCode;
-
+	
+	
+	@Column(name = "qr_code_used_at", insertable = false)
+	private LocalDateTime qrCodeUsedAt;
+	
+	
+	public LocalDateTime getQrCodeUsedAt() {
+		return qrCodeUsedAt;
+	}
+	public void setQrCodeUsedAt(LocalDateTime qrCodeUsedAt) {
+		this.qrCodeUsedAt = qrCodeUsedAt;
+	}
 	public Integer getOrderItemId() {
 		return orderItemId;
 	}

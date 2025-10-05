@@ -39,8 +39,8 @@ public class OrderItemService {
 					ExhibitionVO exhibition = vo.getExhibitionTicketType().getExhibition();
 							
 					return new OrderItemLineBotCarouselDTO()
-					.setPageUrl("http://localhost:8088/front-end/exhibitions?exhibitionId=" + exhibition.getExhibitionId())
-					.setPhotoPortrait("https://scdn.line-apps.com/n/channel_devcenter/img/fx/01_3_movie.png") // 測試
+					.setPageUrl("https://eventra.ddns.net/front-end/exhibitions?exhibitionId=" + exhibition.getExhibitionId())
+					.setPhotoPortrait("https://eventra.ddns.net/load-photo" + vo.getExhibitionTicketType().getExhibition().getPhotoPortrait()) // 測試
 //					.setPhotoPortrait(exhibition.getPhotoPortrait())
 					.setExhibitionName(exhibition.getExhibitionName())
 					.setOrderItemUlid(vo.getOrderItemUlid())

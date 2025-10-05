@@ -1,4 +1,4 @@
-package com.eventra.member.fileupload;
+package com.eventra.fileupload;
 
 public enum FileCategory {
 	profile_pic,

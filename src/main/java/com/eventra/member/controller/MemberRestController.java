@@ -17,8 +17,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.eventra.member.fileupload.FileCategory;
-import com.eventra.member.fileupload.FileUploadService;
+import com.eventra.fileupload.FileCategory;
+import com.eventra.fileupload.FileUploadService;
 import com.eventra.member.model.GetMemberInfoResDTO;
 import com.eventra.member.model.MemberService;
 import com.eventra.member.model.PasswordDTO;

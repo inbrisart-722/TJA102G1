@@ -25,7 +25,7 @@ import com.util.MillisToMinutesSecondsUtil;
 @Transactional // read-only 有可能呼叫 modifying 這隻就直接標一起
 public class CartItemService {
 
-	private static final long CART_EXPIRY_MILLIS = 30 * 60 * 1000L;
+	private static final long CART_EXPIRY_MILLIS = 5 * 60 * 1000L;
 
 	private final MemberRepository MEMBER_REPO;
 	private final CartItemRedisRepository CART_ITEM_REDIS_REPO;

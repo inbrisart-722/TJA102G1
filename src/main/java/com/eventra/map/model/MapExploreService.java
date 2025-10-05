@@ -33,7 +33,7 @@ public class MapExploreService {
 	    		    (String) r[2],                    // location
 	    		    ((Number) r[3]).doubleValue(),    // longitude
 	    		    ((Number) r[4]).doubleValue(),    // latitude
-	    		    (String) r[5],                    // photo
+	    		    (String) r[5],                    // photoPortrait
 	    		    ((Timestamp) r[6]).toLocalDateTime(), // startTime
 	    		    ((Timestamp) r[7]).toLocalDateTime(), // endTime
 	    		    ((Number) r[9]).intValue(),       // ratingCount
