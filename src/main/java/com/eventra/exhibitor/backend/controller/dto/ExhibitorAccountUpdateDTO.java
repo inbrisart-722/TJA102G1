@@ -23,6 +23,7 @@ public class ExhibitorAccountUpdateDTO {
 
     @NotBlank(message="聯絡電話為必填")
     @Size(max=50, message="聯絡電話最長 50 字")
+    @Pattern(regexp = "^09\\d{8}$", message = "請輸入 09 開頭的 10 碼手機")
     private String contactPhone;
 
     @NotBlank(message="公司/單位名稱為必填")

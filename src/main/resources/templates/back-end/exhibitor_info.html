@@ -178,9 +178,11 @@
 				        <label class="form-label">聯絡電話</label>
 				        <input type="text" class="form-control"
 				               th:classappend="${#fields.hasErrors('contactPhone')}? ' is-invalid' : ''"
-				               th:field="*{contactPhone}" maxlength="10" pattern="^09\d{8}$" required />
+				               th:field="*{contactPhone}" maxlength="10" pattern="^09\d{8}$" required 
+				               oninvalid="this.setCustomValidity('請輸入 09 開頭的 10 碼手機')"
+       						   oninput="this.setCustomValidity('')"/>
 				        <div class="invalid-feedback" th:if="${#fields.hasErrors('contactPhone')}"
-				             th:errors="*{contactPhone}">請輸入聯絡電話</div>
+				             th:errors="*{contactPhone}"></div>
 				      </div>
 				
 				      <div class="col-md-12">
@@ -417,6 +419,13 @@
       }
     })();
     </script>
+    <script>
+	document.addEventListener('DOMContentLoaded', () => {
+	  // 單一成功訊息：2.5 秒後自動關閉
+	  const ok = document.querySelector('.alert.alert-success');
+	  if (ok) setTimeout(() => bootstrap.Alert.getOrCreateInstance(ok).close(), 2500);
+	});
+	</script>
     
   </body>
 </html>

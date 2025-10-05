@@ -81,7 +81,23 @@
             <div class="row align-items-center">
               <div class="col-sm-8"><h3 class="mb-0">會員中心－帳戶資料</h3></div>
               <div class="col-sm-4 text-sm-end mt-2 mt-sm-0">
-                <button class="btn btn-outline-secondary btn-sm" id="btnEdit"><i class="bi bi-pencil me-1"></i>編輯</button>
+                <button type="button"
+				  class="btn btn-outline-secondary btn-sm"
+				  id="btnEdit"
+				  th:attr="
+				    data-tax-id=${exhibitor?.businessIdNumber},
+				    data-email=${exhibitor?.email},
+				    data-contact-name=${exhibitor?.contactName},
+				    data-phone=${exhibitor?.contactPhone},
+				    data-company=${exhibitor?.companyName},
+				    data-reg-name=${exhibitor?.exhibitorRegistrationName},
+				    data-bank-owner=${exhibitor?.bankAccountName},
+				    data-bank-code=${exhibitor?.bankCode},
+				    data-bank-no=${exhibitor?.bankAccountNumber}
+				  ">
+				  <i class="bi bi-pencil me-1"></i>編輯
+				</button>
+
               </div>
             </div>
           </div>
@@ -180,7 +196,9 @@
 			  <label class="form-label">聯絡電話</label>
 			  <input type="text" class="form-control"
 			         th:classappend="${#fields.hasErrors('contactPhone')}? ' is-invalid' : ''"
-			         th:field="*{contactPhone}" maxlength="50" required/>
+			         th:field="*{contactPhone}" maxlength="10" pattern="^09\d{8}$" required
+			         oninvalid="this.setCustomValidity('請輸入 09 開頭的 10 碼手機')"
+       				 oninput="this.setCustomValidity('')"/>
 			  <div class="invalid-feedback" th:if="${#fields.hasErrors('contactPhone')}"
 			       th:errors="*{contactPhone}"></div>
 			</div>
@@ -373,19 +391,56 @@
     </script>
     
     <script>
-	  // 開 Modal（點「編輯」）
-	  const editModal = new bootstrap.Modal(document.getElementById('editModal'));
-	  document.getElementById('btnEdit')?.addEventListener('click', () => editModal.show());
+	(function () {
+	  const modalNode = document.getElementById('editModal');
+	  const formNode  = document.getElementById('accountForm');
+	  const editBtn   = document.getElementById('btnEdit');
+	  if (!modalNode || !formNode || !editBtn) return;
 	
-	  // 前端驗證：阻擋 HTML5 驗證沒過的提交
-	  document.getElementById('accountForm')?.addEventListener('submit', function (e) {
+	  const modal = bootstrap.Modal.getOrCreateInstance(modalNode);
+	
+	  // 以資料庫原值回填（避免再次打開看到舊的錯誤輸入）
+	  function fillWithDbDefaults() {
+	    formNode.querySelector('[name="businessIdNumber"]').value       = editBtn.dataset.taxId || '';
+	    formNode.querySelector('[name="email"]').value                  = editBtn.dataset.email || '';
+	    formNode.querySelector('[name="contactName"]').value            = editBtn.dataset.contactName || '';
+	    formNode.querySelector('[name="contactPhone"]').value           = editBtn.dataset.phone || '';
+	    formNode.querySelector('[name="companyName"]').value            = editBtn.dataset.company || '';
+	    formNode.querySelector('[name="exhibitorRegistrationName"]').value = editBtn.dataset.regName || '';
+	    formNode.querySelector('[name="bankAccountName"]').value        = editBtn.dataset.bankOwner || '';
+	    formNode.querySelector('[name="bankCode"]').value               = editBtn.dataset.bankCode || '';
+	    formNode.querySelector('[name="bankAccountNumber"]').value      = editBtn.dataset.bankNo || '';
+	  }
+	
+	  // 清掉前端驗證樣式（避免綠勾/紅框殘留）
+	  function clearClientValidation() {
+	    formNode.classList.remove('was-validated');
+	    formNode.querySelectorAll('.is-invalid,.is-valid').forEach(el => {
+	      el.classList.remove('is-invalid','is-valid');
+	    });
+	  }
+	
+	  // 點「編輯」→ 以 DB 原值開窗
+	  editBtn.addEventListener('click', () => {
+	    fillWithDbDefaults();
+	    clearClientValidation();
+	    modal.show();
+	  });
+	
+	  // 關窗時清理驗證樣式（下次打開乾淨）
+	  modalNode.addEventListener('hidden.bs.modal', clearClientValidation);
+	
+	  // 前端 HTML5 驗證（與 Bootstrap 樣式）
+	  formNode.addEventListener('submit', function (e) {
 	    if (!this.checkValidity()) {
 	      e.preventDefault();
 	      e.stopPropagation();
 	    }
 	    this.classList.add('was-validated');
 	  });
-	
+	})();
+	</script>
+	<script>
 	  // 成功訊息自動收合（flash: msg）
 	  document.addEventListener('DOMContentLoaded', () => {
 	    const alertEl = document.querySelector('.alert.alert-success');
