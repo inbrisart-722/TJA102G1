@@ -7,18 +7,16 @@ import jakarta.validation.constraints.Size;
 
 public class ExhibitorInfoUpdateDTO {
 
-	@NotBlank
+	@NotBlank(message = "公司/單位名稱為必填")
 	@Size(max = 255, message = "名稱最多 255 字")
     private String companyName;
 	
-	@NotBlank(message = "名稱必填")
 	@Size(max = 100, message = "名稱最多 100 字")
 	private String exhibitorRegistrationName;
 
 	@NotBlank(message = "聯絡電話必填")
 	@Size(max = 50, message = "聯絡電話最多 50 字")
-	// 手機 09xxxxxxxx 或市話(含 -) 的簡單規則；要更嚴格可再調整
-	@Pattern(regexp = "^(09\\d{8}|0\\d{1,2}-?\\d{3,4}-?\\d{3,4})$", message = "請輸入正確的聯絡電話格式")
+	@Pattern(regexp = "^09\\d{8}$", message = "請輸入 09 開頭的 10 碼手機")
 	private String contactPhone;
 
 	@NotBlank(message = "Email 必填")

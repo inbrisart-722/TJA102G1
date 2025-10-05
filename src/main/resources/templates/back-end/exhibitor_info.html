@@ -83,7 +83,17 @@
             <div class="row align-items-center">
               <div class="col-sm-8"><h3 class="mb-0">會員中心－展商資訊</h3></div>
               <div class="col-sm-4 text-sm-end mt-2 mt-sm-0">
-                <button type="button" class="btn btn-outline-secondary btn-sm" id="btnEdit"><i class="bi bi-pencil me-1"></i>編輯</button>
+                <button type="button"
+				        class="btn btn-outline-secondary btn-sm"
+				        id="btnEdit"
+				        th:attr="data-company-name=${exhibitor?.companyName},
+				                 data-reg-name=${exhibitor?.exhibitorRegistrationName},
+				                 data-phone=${exhibitor?.contactPhone},
+				                 data-email=${exhibitor?.email},
+				                 data-about=${exhibitor?.about}">
+				  <i class="bi bi-pencil me-1"></i>編輯
+				</button>
+
               </div>
             </div>
           </div>
@@ -135,7 +145,7 @@
     </div>
 
     <!-- 編輯 Modal -->
-    <div class="modal fade" id="editModal" tabindex="-1" aria-hidden="true">
+    <div class="modal fade" id="editModal" tabindex="-1">
       <div class="modal-dialog modal-lg modal-dialog-centered">
         <div class="modal-content">
           <div class="modal-header"><h5 class="modal-title">編輯展商資訊</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
@@ -159,7 +169,7 @@
 				        <label class="form-label">名稱</label>
 				        <input type="text" class="form-control"
 				               th:classappend="${#fields.hasErrors('exhibitorRegistrationName')}? ' is-invalid' : ''"
-				               th:field="*{exhibitorRegistrationName}" maxlength="100" required />
+				               th:field="*{exhibitorRegistrationName}" maxlength="100" />
 				        <div class="invalid-feedback" th:if="${#fields.hasErrors('exhibitorRegistrationName')}"
 				             th:errors="*{exhibitorRegistrationName}">請填寫名稱</div>
 				      </div>
@@ -168,9 +178,11 @@
 				        <label class="form-label">聯絡電話</label>
 				        <input type="text" class="form-control"
 				               th:classappend="${#fields.hasErrors('contactPhone')}? ' is-invalid' : ''"
-				               th:field="*{contactPhone}" maxlength="50" required />
+				               th:field="*{contactPhone}" maxlength="10" pattern="^09\d{8}$" required 
+				               oninvalid="this.setCustomValidity('請輸入 09 開頭的 10 碼手機')"
+       						   oninput="this.setCustomValidity('')"/>
 				        <div class="invalid-feedback" th:if="${#fields.hasErrors('contactPhone')}"
-				             th:errors="*{contactPhone}">請輸入聯絡電話</div>
+				             th:errors="*{contactPhone}"></div>
 				      </div>
 				
 				      <div class="col-md-12">
@@ -213,48 +225,55 @@
     <script src="/front-end/js/g1_10_custom_common_csrf.js"></script>
 
    
-    <script>
-	    // 開 Modal
-	    const editModal = new bootstrap.Modal(document.getElementById('editModal'));
-	    document.getElementById('btnEdit').addEventListener('click', () => {
-	      editModal.show();
-	    });
-	
-	    // （可留可不留）前端驗證：阻擋 HTML5 驗證沒過的提交
-	    document.getElementById('vendorForm').addEventListener('submit', function (e) {
-	      if (!this.checkValidity()) {
-	        e.preventDefault();
-	        e.stopPropagation();
-	      }
-	      this.classList.add('was-validated');
-	    });
-	  </script>
+	  
 
-	<!-- 更新成功後訊息自動收合 -->
-	<script th:inline="javascript">
-	  document.addEventListener('DOMContentLoaded', () => {
-	    const modalEl = document.getElementById('editModal');
-	    const modal = bootstrap.Modal.getOrCreateInstance(modalEl);
+	<script>
+	(function () {
+	  const modalNode = document.getElementById('editModal');
+	  const formNode  = document.getElementById('vendorForm');
+	  const editBtn   = document.getElementById('btnEdit');
+	  if (!modalNode || !formNode || !editBtn) return;
 	
-	    // 後端驗證錯誤 -> 自動開窗
-	    const openModal = /*[[${openModal}]]*/ false;
-	    if (openModal) modal.show();
+	  const modal = bootstrap.Modal.getOrCreateInstance(modalNode);
 	
-	    // 前端驗證（只留一份）
-	    document.getElementById('vendorForm')?.addEventListener('submit', function (e) {
-	      if (!this.checkValidity()) {
-	        e.preventDefault();
-	        e.stopPropagation();
-	      }
-	      this.classList.add('was-validated');
+	  // 以資料庫原值回填
+	  function fillWithDbDefaults() {
+	    formNode.querySelector('[name="companyName"]').value               = editBtn.dataset.companyName || '';
+	    formNode.querySelector('[name="exhibitorRegistrationName"]').value = editBtn.dataset.regName || '';
+	    formNode.querySelector('[name="contactPhone"]').value              = editBtn.dataset.phone || '';
+	    formNode.querySelector('[name="email"]').value                     = editBtn.dataset.email || '';
+	    formNode.querySelector('[name="about"]').value                     = editBtn.dataset.about || '';
+	  }
+	
+	  // 清掉前端驗證樣式（避免綠勾/紅框殘留）
+	  function clearClientValidation() {
+	    formNode.classList.remove('was-validated');
+	    formNode.querySelectorAll('.is-invalid,.is-valid').forEach(el => {
+	      el.classList.remove('is-invalid','is-valid');
 	    });
-	 // 5) 成功訊息自動收合（2.5 秒）
-	    const alertEl = document.querySelector('.alert.alert-success');
-	    if (alertEl) {
-	      setTimeout(() => new bootstrap.Alert(alertEl).close(), 2500);
-	    }
+	  }
+	
+	  // 點「編輯」→ 以 DB 原值開窗
+	  editBtn.addEventListener('click', () => {
+	    fillWithDbDefaults();
+	    clearClientValidation();
+	    modal.show();
 	  });
+	
+	  // 關窗時清理驗證樣式（下次打開乾淨）
+	  modalNode.addEventListener('hidden.bs.modal', clearClientValidation);
+	
+	  // 前端 HTML5 驗證（與 Bootstrap 樣式）
+	  formNode.addEventListener('submit', function (e) {
+	    if (!this.checkValidity()) {
+	      e.preventDefault();
+	      e.stopPropagation();
+	    }
+	    this.classList.add('was-validated');
+	  });
+	})();
 	</script>
+	
 
     <!-- <script>
       // 開啟編輯
@@ -400,5 +419,13 @@
       }
     })();
     </script>
+    <script>
+	document.addEventListener('DOMContentLoaded', () => {
+	  // 單一成功訊息：2.5 秒後自動關閉
+	  const ok = document.querySelector('.alert.alert-success');
+	  if (ok) setTimeout(() => bootstrap.Alert.getOrCreateInstance(ok).close(), 2500);
+	});
+	</script>
+    
   </body>
 </html>

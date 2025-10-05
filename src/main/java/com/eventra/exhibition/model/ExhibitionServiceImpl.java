@@ -146,14 +146,28 @@ public class ExhibitionServiceImpl implements ExhibitionService {
 		// 2) 第一次 save : 先存到 DB 取得自增 id
 		ExhibitionVO saved = repository.save(exhibitionVO);
 
+		// 以前：沒上傳圖檔就呼叫save -> 容易500
+//		MultipartFile portrait = dto.getPhotoPortrait();
+//		String photo_portrait = localFileUploadService.save(portrait, FileCategory.exhibition_portrait);
+//		MultipartFile landscape = dto.getPhotoLandscape();
+//		String photo_landscape = localFileUploadService.save(landscape, FileCategory.exhibition_landscape);
+		
+		// 現在：有檔才save
+		String photoPortraitPath = null;
 		MultipartFile portrait = dto.getPhotoPortrait();
-		String photo_portrait = localFileUploadService.save(portrait, FileCategory.exhibition_portrait);
+		if (portrait != null && !portrait.isEmpty()) {
+		    photoPortraitPath = localFileUploadService.save(portrait, FileCategory.exhibition_portrait);
+		}
+
+		String photoLandscapePath = null;
 		MultipartFile landscape = dto.getPhotoLandscape();
-		String photo_landscape = localFileUploadService.save(landscape, FileCategory.exhibition_landscape);
-
-		saved.setPhotoPortrait(photo_portrait);
-		saved.setPhotoLandscape(photo_landscape);
-
+    
+		if (landscape != null && !landscape.isEmpty()) {
+		    photoLandscapePath = localFileUploadService.save(landscape, FileCategory.exhibition_landscape);
+		}
+		saved.setPhotoPortrait(photoPortraitPath);
+		saved.setPhotoLandscape(photoLandscapePath);
+		
 		// 6) 第二次 save : 更新圖片路徑
 		repository.save(saved);
 

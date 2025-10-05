@@ -365,7 +365,6 @@ public class BackendIndexController {
         if (br.hasErrors()) {
             ExhibitorVO e = exhibitorRepository.findById(exhibitorId).orElse(null);
             model.addAttribute("exhibitor", e);
-            model.addAttribute("openModal", true);
             return "back-end/exhibitor_info";
         }
 
@@ -419,11 +418,9 @@ public class BackendIndexController {
     	Integer exhibitorId = currentExhibitorId(businessIdNumber);
     	
     	if (br.hasErrors()) {
-            // 回填顯示資料 + 表單 + 讓 modal 自動打開
             ExhibitorVO e = exhibitorRepository.findById(exhibitorId).orElse(null);
             model.addAttribute("exhibitor", e);
             model.addAttribute("form", form);
-            model.addAttribute("openModal", true);
             return "back-end/exhibitor_account_data";
         }
 
