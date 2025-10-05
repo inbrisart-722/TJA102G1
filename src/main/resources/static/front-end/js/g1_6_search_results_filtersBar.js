@@ -238,25 +238,16 @@
   /* --- 事件：按下「搜尋」才更新已套用狀態 applied --- */
   form?.addEventListener("submit", (e) => {
     e.preventDefault();
-    // 讀取目前表單值 → 更新「已套用」狀態
-    applied.q = (keywordInput?.value || "").trim();
-    applied.region = (regionSelect?.value || "").trim();
-    applied.from = (dateFrom?.value || "").trim();
-    applied.to = (dateTo?.value || "").trim();
+    console.log("filtersBar submit → 轉交主搜尋");
 
-    // 顯示到「搜尋關鍵字」文字區
-    if (keywordEcho)
-      keywordEcho.querySelector("span").textContent =
-        applied.q || "（尚未輸入）";
-
-    // 同步網址參數（方便分享/返回）
-    setParam("q", applied.q);
-    setParam("region", applied.region);
-    setParam("from", applied.from);
-    setParam("to", applied.to);
-
-    applyAll();
+    // 交給主搜尋程式處理，不在這邊更新狀態
+    if (typeof window.fetchResults === "function") {
+      window.fetchResults(1);
+    } else {
+      console.warn("⚠️ g1_6_search_results.js 尚未載入或 fetchResults 未定義");
+    }
   });
+
 
   /* --- 排序 Seg：即時切換（不必按搜尋） --- */
   sortTabs.forEach((a) => {

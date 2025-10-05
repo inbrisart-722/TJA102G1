@@ -1,5 +1,12 @@
 document.addEventListener("DOMContentLoaded", function () {
 	
+	
+	/* ===== 10/5 追加, search 需要 ===== */
+	// 移除searchSyncDone
+	sessionStorage.removeItem("searchSyncDone");
+	/* ================================= */	
+
+
 	function showError(msg) {
 	  // 先刪掉舊的錯誤訊息（避免重複）
 	  const oldError = document.querySelector("#login-error");

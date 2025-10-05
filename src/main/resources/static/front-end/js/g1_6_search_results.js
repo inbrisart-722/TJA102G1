@@ -71,11 +71,13 @@ document.addEventListener("DOMContentLoaded", () => {
 		).map((cb) => cb.value);
 	}
 	function updateEcho() {
-		const hk = keywordInput.value.trim() !== "";
-		const hr = selectedRegions().length > 0;
-		const hd = !!(fbStart || fbEnd);
-		fbEcho.style.display = hk || hr || hd ? "block" : "none";
+	    if (!fbEcho) return;
+	    const hasKeyword = keywordInput.value.trim() !== "";
+	    const hasRegion = selectedRegions().length > 0;
+	    const hasDate = !!(fbStart || fbEnd);
+	    fbEcho.style.display = hasKeyword || hasRegion || hasDate ? "block" : "none";
 	}
+
 
 	// ========== 渲染結果 ========== //
 	function renderResults(data) {
@@ -157,18 +159,26 @@ document.addEventListener("DOMContentLoaded", () => {
 
 	// ========== 呼叫 API（統一跟 modal.js 一樣 criteria 格式） ========== //
 	window.fetchResults = function(page = 1) {
-	        const keyword = keywordInput.value.trim();
-	        const regions = selectedRegions();
-	        const date_from = fbStart ? fmt(fbStart) : null;
-	        const date_to = fbEnd ? fmt(fbEnd) : null;
+	    const keyword = keywordInput.value.trim();
+	    const regions = selectedRegions();
+	    const date_from = fbStart ? fmt(fbStart) : null;
+	    const date_to = fbEnd ? fmt(fbEnd) : null;
 
-	        const criteria = {};
-	        if (keyword) criteria.keyword = keyword;
-			if (regions.length) criteria.regions = regions;
-	        if (date_from) criteria.date_from = date_from;
-	        if (date_to) criteria.date_to = date_to;
+	    const criteria = {};
+	    if (keyword) criteria.keyword = keyword;
+	    if (regions.length) criteria.regions = regions.join(",");
+	    if (date_from) criteria.dateFrom = date_from;
+	    if (date_to) criteria.dateTo = date_to;
 
-	        resultsContainer.innerHTML = "<p>載入中...</p>";
+	    // ✅ 新增：同步更新 echo 顯示
+	    fbKeywordText.textContent = keyword || "（尚未輸入）";
+	    fbRegionText.textContent = regions.length ? regions.join("、") : "（未選擇）";
+	    fbDateText.textContent = (date_from && date_to)
+	        ? `${date_from} ~ ${date_to}`
+	        : (date_from ? `${date_from}（起）` : "（未選擇）");
+	    updateEcho();
+
+	    resultsContainer.innerHTML = "<p>載入中...</p>";
 
 	        csrfFetch(`/api/exhibitions/search?page=${page}`, {
 	            method: "POST",
@@ -177,6 +187,7 @@ document.addEventListener("DOMContentLoaded", () => {
 	        })
 	            .then((res) => res.json())
 	            .then((data) => {
+					console.log("🔍 搜尋結果資料:", data);
 	                renderResults(data.content);
 	                renderPagination(data.page, data.totalPages);
 	            })
@@ -187,16 +198,27 @@ document.addEventListener("DOMContentLoaded", () => {
 	    };
 
 	// ========== 表單送出（即時 fetch） ========== //
-	filtersForm.addEventListener("submit", (e) => {
-		e.preventDefault();
-		if (window.addSearchRecord) {
-			const keyword = keywordInput.value.trim();
-			const regions = selectedRegions().join(",");
-			const date_from = fbStart ? fmt(fbStart) : null;
-			const date_to = fbEnd ? fmt(fbEnd) : null;
-			window.addSearchRecord(keyword, regions, date_from, date_to);
-		}
-		fetchResults();
+	filtersForm?.addEventListener("submit", (e) => {
+	  e.preventDefault();
+
+	  const keyword = keywordInput.value.trim();
+	  const regions = selectedRegions();
+	  const date_from = fbStart ? fmt(fbStart) : null;
+	  const date_to = fbEnd ? fmt(fbEnd) : null;
+
+	  // 存搜尋紀錄
+	  if (window.addSearchRecord) {
+	    window.addSearchRecord(keyword, regions, date_from, date_to);
+	  }
+
+	  // 改成導頁
+	  const qs = new URLSearchParams();
+	  if (keyword) qs.append("q", keyword);
+	  if (regions.length) qs.append("region", regions.join(","));
+	  if (date_from) qs.append("start", date_from);
+	  if (date_to) qs.append("end", date_to);
+
+	  window.location.href = `/front-end/search_results?${qs.toString()}`;
 	});
 
 	// ========== 初始化（讀 URL → 填表單 → 打 API） ========== //
@@ -218,13 +240,9 @@ document.addEventListener("DOMContentLoaded", () => {
 		if (sP) fbStart = new Date(sP);
 		if (eP) fbEnd = new Date(eP);
 		if (fbStart && fbEnd) {
-			const t = `${fmt(fbStart)} ~ ${fmt(fbEnd)}`;
-			fbRangeInput.value = t;
-			fbDateText.textContent = t;
-		} else if (fbStart) {
-			const t = `${fmt(fbStart)}（已選起日）`;
-			fbRangeInput.value = t;
-			fbDateText.textContent = t;
+		    const t = `${fmt(fbStart)} ~ ${fmt(fbEnd)}`;
+		    fbRangeInput.value = t;
+		    fbDateText.textContent = t;
 		}
 
 		fbKeywordText.textContent = keywordInput.value.trim() || "（尚未輸入）";
@@ -233,4 +251,97 @@ document.addEventListener("DOMContentLoaded", () => {
 		// 頁面一進來就打 API
 		fetchResults();
 	})();
+	
+	// ========== 日期彈窗控制 ========== //
+	if (fbRangeInput && fbPopup) {
+	  function renderCalendar() {
+	    const y = fbCur.getFullYear();
+	    const m = fbCur.getMonth();
+	    fbMonth.textContent = `${y}/${String(m + 1).padStart(2, "0")}`;
+	    const firstDay = new Date(y, m, 1).getDay();
+	    const daysInMonth = new Date(y, m + 1, 0).getDate();
+
+	    fbBody.innerHTML = "";
+	    let row = document.createElement("tr");
+
+	    // 前面空白格
+	    for (let i = 0; i < firstDay; i++) row.appendChild(document.createElement("td"));
+
+	    for (let d = 1; d <= daysInMonth; d++) {
+	      const td = document.createElement("td");
+	      td.textContent = d;
+	      const thisDate = new Date(y, m, d);
+
+	      // 樣式標示
+	      td.classList.toggle("range-start", fbStart && thisDate.toDateString() === fbStart.toDateString());
+	      td.classList.toggle("range-end", fbEnd && thisDate.toDateString() === fbEnd.toDateString());
+	      if (fbStart && fbEnd && thisDate >= fbStart && thisDate <= fbEnd) td.classList.add("in-range");
+
+	      // 點選日期行為
+	      td.addEventListener("click", (e) => {
+	        e.stopPropagation();
+	        if (!fbStart || (fbStart && fbEnd)) {
+	          fbStart = thisDate;
+	          fbEnd = null;
+	        } else if (thisDate < fbStart) {
+	          fbEnd = fbStart;
+	          fbStart = thisDate;
+	        } else {
+	          fbEnd = thisDate;
+	        }
+	        renderCalendar();
+	      });
+
+	      row.appendChild(td);
+	      if ((firstDay + d) % 7 === 0 || d === daysInMonth) {
+	        fbBody.appendChild(row);
+	        row = document.createElement("tr");
+	      }
+	    }
+	  }
+
+	  // 開關彈窗
+	  fbRangeInput.addEventListener("click", (e) => {
+	    e.stopPropagation();
+	    fbPopup.style.display = fbPopup.style.display === "block" ? "none" : "block";
+	    renderCalendar();
+	  });
+	  fbPrev.addEventListener("click", () => {
+	    fbCur.setMonth(fbCur.getMonth() - 1);
+	    renderCalendar();
+	  });
+	  fbNext.addEventListener("click", () => {
+	    fbCur.setMonth(fbCur.getMonth() + 1);
+	    renderCalendar();
+	  });
+	  fbClear.addEventListener("click", () => {
+	    fbStart = fbEnd = null;
+	    fbRangeInput.value = "";
+	    fbDateText.textContent = "（未選擇）";
+	    updateEcho();
+	    renderCalendar();
+	  });
+	  fbOk.addEventListener("click", () => {
+	    fbPopup.style.display = "none";
+	    if (fbStart && fbEnd) {
+	      fbRangeInput.value = `${fmt(fbStart)} ~ ${fmt(fbEnd)}`;
+	      fbDateText.textContent = fbRangeInput.value;
+	    } else if (fbStart) {
+	      fbRangeInput.value = `${fmt(fbStart)}（起）`;
+	      fbDateText.textContent = fbRangeInput.value;
+	    } else {
+	      fbRangeInput.value = "";
+	      fbDateText.textContent = "（未選擇）";
+	    }
+	    updateEcho();
+	  });
+
+	  // 點外面關閉
+	  document.addEventListener("click", (e) => {
+	    if (fbPopup.style.display === "block" && !fbPopup.contains(e.target) && e.target !== fbRangeInput) {
+	      fbPopup.style.display = "none";
+	    }
+	  });
+	}
+
 });

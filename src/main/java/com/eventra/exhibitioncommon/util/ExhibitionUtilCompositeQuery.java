@@ -5,6 +5,7 @@ import java.time.LocalDateTime;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.TypedQuery;
 import jakarta.persistence.criteria.*;
+import jakarta.persistence.criteria.Predicate;
 
 import com.eventra.exhibition.model.ExhibitionVO;
 import com.eventra.exhibitioncommon.dto.ExhibitionListDTO;
@@ -74,8 +75,19 @@ public class ExhibitionUtilCompositeQuery {
         Root<ExhibitionVO> root = cq.from(ExhibitionVO.class);
         Join<ExhibitionVO, ExhibitionTicketTypeVO> ticket = root.join("exhibitionTicketTypes", JoinType.LEFT);
 
+        // 新增 JOIN 到展覽統計表（注意套件名稱）
+        Root<com.eventra.exhibitionpagepopularitystats.model.ExhibitionPagePopularityStatsVO> stats =
+            cq.from(com.eventra.exhibitionpagepopularitystats.model.ExhibitionPagePopularityStatsVO.class);
+
+        // 宣告 predicateList
         List<Predicate> predicateList = new ArrayList<>();
+
+        // 加入固定條件
         predicateList.add(root.get("exhibitionStatusId").in(Arrays.asList(3, 4)));
+
+        // 加入關聯條件（JOIN 關係）
+        predicateList.add(cb.equal(root.get("exhibitionId"), stats.get("exhibitionId")));
+
 
         if (map.containsKey("keyword")) {
             predicateList.add(get_aPredicate_ForKeyword(cb, root, map.get("keyword")[0]));
@@ -89,23 +101,27 @@ public class ExhibitionUtilCompositeQuery {
         }
 
         cq.multiselect(
-                root.get("exhibitionId"),
-                root.get("exhibitionName"),
-                root.get("photoLandscape"),
-                cb.min(ticket.get("price")),
-                cb.max(ticket.get("price")),
-                root.get("startTime"),
-                root.get("endTime"),
-                root.get("location"),
-                root.get("totalRatingScore"),
-                root.get("totalRatingCount")
-        )
-                .where(predicateList.toArray(new Predicate[0]))
-                .groupBy(root.get("exhibitionId"), root.get("exhibitionName"),
-                        root.get("photoLandscape"), root.get("startTime"),
-                        root.get("endTime"), root.get("location"),
-                        root.get("totalRatingScore"), root.get("totalRatingCount"))
-                .orderBy(cb.desc(root.get("exhibitionId")));
+        	    root.get("exhibitionId"),
+        	    root.get("exhibitionName"),
+        	    root.get("photoPortrait"), // 改成 DTO 對應欄位
+        	    cb.min(ticket.get("price")),
+        	    cb.max(ticket.get("price")),
+        	    root.get("startTime"),
+        	    root.get("endTime"),
+        	    root.get("location"),
+        	    root.get("totalRatingScore"),
+        	    root.get("totalRatingCount"),
+        	    cb.sum(stats.get("exhibitionPageViewCount")) // 新增 totalViews 欄位
+        	)
+        	.where(predicateList.toArray(new Predicate[0]))
+        	.groupBy(
+        	    root.get("exhibitionId"), root.get("exhibitionName"),
+        	    root.get("photoPortrait"), root.get("startTime"),
+        	    root.get("endTime"), root.get("location"),
+        	    root.get("totalRatingScore"), root.get("totalRatingCount")
+        	)
+        	.orderBy(cb.desc(cb.sum(stats.get("exhibitionPageViewCount")))); // 改排序依 totalViews DESC
+
 
         TypedQuery<Object[]> query = em.createQuery(cq);
         query.setFirstResult(offset);
@@ -159,7 +175,10 @@ public class ExhibitionUtilCompositeQuery {
             // 評分邏輯
             Integer totalScore = r[8] != null ? ((Number) r[8]).intValue() : 0;
             Integer ratingCount = r[9] != null ? ((Number) r[9]).intValue() : 0;
+            Integer totalViews = r[10] != null ? ((Number) r[10]).intValue() : 0; // 新增
+
             dto.setRatingCount(ratingCount);
+            dto.setTotalViews(totalViews); // 新增
             if (ratingCount > 0) {
                 dto.setAverageRatingScore(Math.round((totalScore * 10.0 / ratingCount)) / 10.0);
             } else {

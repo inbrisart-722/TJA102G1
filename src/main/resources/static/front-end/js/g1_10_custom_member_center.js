@@ -46,6 +46,22 @@ document.addEventListener("DOMContentLoaded", function() {
 
 		if (!wants_to_logout) return;
 
+		
+		/* ===== 10/5 追加, search 需要 ===== */
+		// 登出後保留 LocalStorage 搜尋紀錄, 但重設登入狀態
+
+			// 移除searchSyncDone
+			sessionStorage.removeItem("searchSyncDone");
+
+			// 移除searchSyncSig:memberId
+			for (let key in localStorage) {
+				if (key.startsWith("searchSyncSig:")) {
+					localStorage.removeItem(key);
+				}
+			}
+		/* ================================= */	
+			
+		
 		// 免 csrf 有放行
 		fetch("/api/auth/logout/member", {
 			method: "POST",

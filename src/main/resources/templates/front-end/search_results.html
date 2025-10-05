@@ -76,31 +76,125 @@
 										<!-- 區域 -->
 										<div class="col-12 col-md-8">
 											<label class="form-label mb-1">區域篩選</label>
-											<div id="regionGroup" class="d-flex flex-wrap gap-3">
-												<label class="form-check m-0"><input
-													class="form-check-input" type="checkbox" value="台北" /><span
-													class="form-check-label ms-1">台北</span></label> <label
-													class="form-check m-0"><input
-													class="form-check-input" type="checkbox" value="新北" /><span
-													class="form-check-label ms-1">新北</span></label> <label
-													class="form-check m-0"><input
-													class="form-check-input" type="checkbox" value="桃園" /><span
-													class="form-check-label ms-1">桃園</span></label> <label
-													class="form-check m-0"><input
-													class="form-check-input" type="checkbox" value="台中" /><span
-													class="form-check-label ms-1">台中</span></label> <label
-													class="form-check m-0"><input
-													class="form-check-input" type="checkbox" value="台南" /><span
-													class="form-check-label ms-1">台南</span></label> <label
-													class="form-check m-0"><input
-													class="form-check-input" type="checkbox" value="高雄" /><span
-													class="form-check-label ms-1">高雄</span></label>
+											<div id="regionGroup" class="region-selector">
+												<p></p>
+												<!-- 北部 -->
+												<div class="region-block mb-3">
+													<div class="d-flex align-items-center mb-2">
+														<p class="mb-1">北部地區： </p>
+														<div class="d-flex flex-wrap gap-2" data-group="north">
+															<label class="form-check m-0"><input
+																class="form-check-input" type="checkbox" value="台北"><span
+																class="form-check-label ms-1">台北</span></label> <label
+																class="form-check m-0"><input
+																class="form-check-input" type="checkbox" value="新北"><span
+																class="form-check-label ms-1">新北</span></label> <label
+																class="form-check m-0"><input
+																class="form-check-input" type="checkbox" value="基隆"><span
+																class="form-check-label ms-1">基隆</span></label> <label
+																class="form-check m-0"><input
+																class="form-check-input" type="checkbox" value="桃園"><span
+																class="form-check-label ms-1">桃園</span></label> <label
+																class="form-check m-0"><input
+																class="form-check-input" type="checkbox" value="新竹"><span
+																class="form-check-label ms-1">新竹</span></label>
+														</div>
+													</div>
+												</div>
+
+												<!-- 中部 -->
+												<div class="region-block mb-3">
+													<div
+														class="d-flex align-items-center mb-2">
+														<p class="mb-1">中部地區： </p>
+													<div class="d-flex flex-wrap gap-2" data-group="central">
+														<label class="form-check m-0"><input
+															class="form-check-input" type="checkbox" value="苗栗"><span
+															class="form-check-label ms-1">苗栗</span></label> <label
+															class="form-check m-0"><input
+															class="form-check-input" type="checkbox" value="台中"><span
+															class="form-check-label ms-1">台中</span></label> <label
+															class="form-check m-0"><input
+															class="form-check-input" type="checkbox" value="彰化"><span
+															class="form-check-label ms-1">彰化</span></label> <label
+															class="form-check m-0"><input
+															class="form-check-input" type="checkbox" value="南投"><span
+															class="form-check-label ms-1">南投</span></label> <label
+															class="form-check m-0"><input
+															class="form-check-input" type="checkbox" value="雲林"><span
+															class="form-check-label ms-1">雲林</span></label>
+													</div>
+													</div>
+												</div>
+
+												<!-- 南部 -->
+												<div class="region-block mb-3">
+													<div
+														class="d-flex align-items-center mb-2">
+														<p class="mb-1">南部地區： </p>
+													<div class="d-flex flex-wrap gap-2" data-group="south">
+														<label class="form-check m-0"><input
+															class="form-check-input" type="checkbox" value="嘉義"><span
+															class="form-check-label ms-1">嘉義</span></label> <label
+															class="form-check m-0"><input
+															class="form-check-input" type="checkbox" value="台南"><span
+															class="form-check-label ms-1">台南</span></label> <label
+															class="form-check m-0"><input
+															class="form-check-input" type="checkbox" value="高雄"><span
+															class="form-check-label ms-1">高雄</span></label> <label
+															class="form-check m-0"><input
+															class="form-check-input" type="checkbox" value="屏東"><span
+															class="form-check-label ms-1">屏東</span></label>
+													</div>
+													</div>
+												</div>
+
+												<!-- 東部 -->
+												<div class="region-block mb-3">
+													<div
+														class="d-flex align-items-center mb-2">
+														<p class="mb-1">東部地區： </p>
+													<div class="d-flex flex-wrap gap-2" data-group="east">
+														<label class="form-check m-0"><input
+															class="form-check-input" type="checkbox" value="宜蘭"><span
+															class="form-check-label ms-1">宜蘭</span></label> <label
+															class="form-check m-0"><input
+															class="form-check-input" type="checkbox" value="花蓮"><span
+															class="form-check-label ms-1">花蓮</span></label> <label
+															class="form-check m-0"><input
+															class="form-check-input" type="checkbox" value="台東"><span
+															class="form-check-label ms-1">台東</span></label>
+													</div>
+													</div>
+												</div>
+
+												<!-- 離島 -->
+												<div class="region-block mb-3">
+													<div
+														class="d-flex align-items-center mb-2">
+														<p class="mb-1">離島地區： </p>
+														<div class="d-flex flex-wrap gap-2" data-group="island">
+															<label class="form-check m-0"><input
+																class="form-check-input" type="checkbox" value="澎湖"><span
+																class="form-check-label ms-1">澎湖</span></label> <label
+																class="form-check m-0"><input
+																class="form-check-input" type="checkbox" value="金門"><span
+																class="form-check-label ms-1">金門</span></label> <label
+																class="form-check m-0"><input
+																class="form-check-input" type="checkbox" value="馬祖"><span
+																class="form-check-label ms-1">馬祖</span></label>
+														</div>
+													</div>
+												</div>
+
 											</div>
+
 										</div>
 
 										<!-- 日期（fb- 前綴） -->
 										<div class="col-12 col-md-4">
 											<label class="form-label mb-1">日期篩選</label>
+											<p></p>
 											<div id="fb-dateRangeBox"
 												class="position-relative text-md-end">
 												<input id="fb-dateRangeInput" class="form-control"
@@ -164,16 +258,16 @@
 									</div>
 								</div>
 
-								<!-- ④ 排序 -->
-								<div class="col-12">
-									<nav class="sort-tabs" aria-label="排序條件">
-										<a class="sort-tab is-active" href="#" data-sort="popularity"
-											aria-current="true">熱門度</a> <a class="sort-tab" href="#"
-											data-sort="rating">評價</a> <a class="sort-tab" href="#"
-											data-sort="newest">最新上架</a> <a class="sort-tab" href="#"
-											data-sort="nearest">離我最近</a>
-									</nav>
-								</div>
+								<!-- 								④ 排序 -->
+								<!-- 								<div class="col-12"> -->
+								<!-- 									<nav class="sort-tabs" aria-label="排序條件"> -->
+								<!-- 										<a class="sort-tab is-active" href="#" data-sort="popularity" -->
+								<!-- 											aria-current="true">熱門度</a> <a class="sort-tab" href="#" -->
+								<!-- 											data-sort="rating">評價</a> <a class="sort-tab" href="#" -->
+								<!-- 											data-sort="newest">最新上架</a> <a class="sort-tab" href="#" -->
+								<!-- 											data-sort="nearest">離我最近</a> -->
+								<!-- 									</nav> -->
+								<!-- 								</div> -->
 							</form>
 						</div>
 					</section>
@@ -191,64 +285,11 @@
 				</div>
 
 				<!-- 為你推薦區 隨機展示 -->
-				<aside class="col-lg-4" id="sidebar">
-				
+				<aside class="col-lg-4" id="sidebar">\
+
 					<div id="related_exhib">
 						<h3 class="inner">推薦展覽</h3>
-						<div>
-							<div class="sidebar_exhib_block">
-								<a href="">
-									<div class="sidebar_exhib_img">
-										<img src="img/0_exhibition/ChatGPT_exhibition_1.png"
-											alt="推薦圖片" />
-									</div> <span class="sidebar_exhib_title">當代藝術畫展 - TibaMe</span> <span
-									class="sidebar_exhib_loc"><i class="icon-location"></i>&nbsp;台北市立美術館</span>
-									<span class="sidebar_exhib_time"><i class="icon-clock"></i>&nbsp;08/12~08/25</span>
-									<div class="rating">
-										<i class="icon-star voted"></i><i class="icon-star voted"></i><i
-											class="icon-star voted"></i><i class="icon-star voted"></i><i
-											class="icon-star-half-alt voted"></i> <span><small>(75)</small></span>
-									</div>
-								</a>
-							</div>
-						</div>
-						<hr />
-						<div>
-							<div class="sidebar_exhib_block">
-								<a href="">
-									<div class="sidebar_exhib_img">
-										<img src="img/0_exhibition/ChatGPT_exhibition_1.png"
-											alt="推薦圖片" />
-									</div> <span class="sidebar_exhib_title">當代藝術畫展 - TibaMe</span> <span
-									class="sidebar_exhib_loc"><i class="icon-location"></i>&nbsp;台北市立美術館</span>
-									<span class="sidebar_exhib_time"><i class="icon-clock"></i>&nbsp;08/12~08/25</span>
-									<div class="rating">
-										<i class="icon-star voted"></i><i class="icon-star voted"></i><i
-											class="icon-star voted"></i><i class="icon-star voted"></i><i
-											class="icon-star-half-alt voted"></i> <span><small>(75)</small></span>
-									</div>
-								</a>
-							</div>
-						</div>
-						<hr />
-						<div>
-							<div class="sidebar_exhib_block">
-								<a href="">
-									<div class="sidebar_exhib_img">
-										<img src="img/0_exhibition/ChatGPT_exhibition_1.png"
-											alt="推薦圖片" />
-									</div> <span class="sidebar_exhib_title">當代藝術畫展 - TibaMe</span> <span
-									class="sidebar_exhib_loc"><i class="icon-location"></i>&nbsp;台北市立美術館</span>
-									<span class="sidebar_exhib_time"><i class="icon-clock"></i>&nbsp;08/12~08/25</span>
-									<div class="rating">
-										<i class="icon-star voted"></i><i class="icon-star voted"></i><i
-											class="icon-star voted"></i><i class="icon-star voted"></i><i
-											class="icon-star-half-alt voted"></i> <span><small>(75)</small></span>
-									</div>
-								</a>
-							</div>
-						</div>
-
+						
 						<div id="more_related_exhib">
 							<button class="btn_full btn_full_exhib">查看更多</button>
 						</div>
@@ -335,10 +376,11 @@
 	<script src="js/g1_10_custom_common_csrf.js"></script>
 	<script src="js/g1_10_custom_common.js"></script>
 	<script src="js/g1_10_custom_exhibition.js"></script>
-	<script src="js/g1_6_search_results.js"></script>
 	<script src="js/g1_6_search_history.js"></script> <!-- 存搜尋紀錄用 -->
+	<script src="js/g1_6_search_results_filtersBar.js"></script>
+	<script src="js/g1_6_search_results.js"></script>
 	<script src="js/g1_6_search_modal.js"></script> <!-- 導頁至搜尋結果頁用 -->
-		<script src="js/g1_10_custom_dify.js"></script>
+			<script src="js/g1_10_custom_dify.js"></script>
 	<script src="https://udify.app/embed.min.js" id="6dNmiwvbRPuqvJW7"
 		defer></script>
 	<link href="css/g1_10_custom_dify.css" rel="stylesheet" />	

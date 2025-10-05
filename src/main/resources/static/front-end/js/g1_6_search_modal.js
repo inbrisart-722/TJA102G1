@@ -35,8 +35,12 @@ document.addEventListener("DOMContentLoaded", function() {
 	let currentDate = new Date();
 
 	function fmt(d) {
-		return d.toISOString().split("T")[0];
+	    const year = d.getFullYear();
+	    const month = String(d.getMonth() + 1).padStart(2, "0");
+	    const day = String(d.getDate()).padStart(2, "0");
+	    return `${year}-${month}-${day}`;
 	}
+
 	function updateEcho() {
 		const hasK = searchInput.value.trim() !== "";
 		const hasR = selectedRegions.length > 0;
@@ -228,7 +232,7 @@ document.addEventListener("DOMContentLoaded", function() {
 				window.location.href = `/front-end/search_results?${qs.toString()}`;
 			})
 			.catch((err) => {
-				console.error("❌ 搜尋 API 失敗:", err);
+				console.error("搜尋 API 失敗:", err);
 				alert("搜尋失敗，請稍後再試");
 			});
 	});

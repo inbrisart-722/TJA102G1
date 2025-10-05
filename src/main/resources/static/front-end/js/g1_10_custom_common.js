@@ -125,14 +125,61 @@ document.addEventListener("DOMContentLoaded", function () {
 						<button id="regionSelectAll" class="btn-all" type="button">全選</button>
 					</div>
 					<div class="region-section">
-						<div class="region-options">
-							<button class="region-btn" data-region="台北" type="button">台北</button> <!-- 3字修改2字 -->
-							<button class="region-btn" data-region="新北" type="button">新北</button>
-							<button class="region-btn" data-region="桃園" type="button">桃園</button>
-							<button class="region-btn" data-region="台中" type="button">台中</button>
-							<button class="region-btn" data-region="台南" type="button">台南</button>
-							<button class="region-btn" data-region="高雄" type="button">高雄</button>
-						</div>
+
+					  <div class="region-block">
+					    <h6><b>北部地區</b></h6>
+					    <div class="region-options">
+					      <button class="region-btn" data-region="台北">台北</button>
+					      <button class="region-btn" data-region="新北">新北</button>
+					      <button class="region-btn" data-region="基隆">基隆</button>
+					      <button class="region-btn" data-region="桃園">桃園</button>
+					      <button class="region-btn" data-region="新竹">新竹</button>
+					    </div>
+					  </div>
+					  <p></p>
+
+					  <div class="region-block">
+					    <h6><b>中部地區</b></h6>
+					    <div class="region-options">
+					      <button class="region-btn" data-region="苗栗">苗栗</button>
+					      <button class="region-btn" data-region="台中">台中</button>
+					      <button class="region-btn" data-region="彰化">彰化</button>
+					      <button class="region-btn" data-region="南投">南投</button>
+					      <button class="region-btn" data-region="雲林">雲林</button>
+					    </div>
+					  </div>
+					  <p></p>
+
+					  <div class="region-block">
+					    <h6><b>南部地區</b></h6>
+					    <div class="region-options">
+					      <button class="region-btn" data-region="嘉義">嘉義</button>
+					      <button class="region-btn" data-region="台南">台南</button>
+					      <button class="region-btn" data-region="高雄">高雄</button>
+					      <button class="region-btn" data-region="屏東">屏東</button>
+					    </div>
+					  </div>
+					  <p></p>
+
+					  <div class="region-block">
+					    <h6><b>東部地區</b></h6>
+					    <div class="region-options">
+					      <button class="region-btn" data-region="宜蘭">宜蘭</button>
+					      <button class="region-btn" data-region="花蓮">花蓮</button>
+					      <button class="region-btn" data-region="台東">台東</button>
+					    </div>
+					  </div>
+					  <p></p>
+
+					  <div class="region-block">
+					    <h6><b>離島地區</b></h6>
+					    <div class="region-options">
+					      <button class="region-btn" data-region="澎湖">澎湖</button>
+					      <button class="region-btn" data-region="金門">金門</button>
+					      <button class="region-btn" data-region="馬祖">馬祖</button>
+					    </div>
+					  </div>
+
 					</div>
 					<div class="region-footer">
 						<button id="regionConfirm" class="btn-confirm" type="button">確認</button>

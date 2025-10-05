@@ -855,7 +855,7 @@ ul#cat_nav li a:after {
 .region-filter-popup {
 	display: none;
 	position: absolute;
-	min-width: 280px;
+	min-width: 400px;
 	background: #fff;
 	border-radius: 12px;
 	box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
@@ -897,7 +897,7 @@ ul#cat_nav li a:after {
 /* 區域選項容器 */
 .region-options {
 	display: grid;
-	grid-template-columns: repeat(3, 1fr);
+	grid-template-columns: repeat(5, 1fr);
 	/* 一排三個 */
 	gap: 10px 12px;
 	/* 上下10px、左右12px間距 */
@@ -983,7 +983,7 @@ ul#cat_nav li a:after {
 
 #regionGroup .form-check-label {
 	cursor: pointer;
-	margin-left: 0.8rem;
+	margin-left: 1.1rem;
 }
 
 /* 自訂重點色（調整為你的品牌色） */
@@ -1115,58 +1115,184 @@ ul#cat_nav li a:after {
 	color: #111;
 }
 
-/* <filtersBar 專用 CSS（不影響 Search Menu）  */
+/* <filtersBar 專用 CSS（不影響 Search Menu） */
 #fb-dateRangeBox {
 	min-height: 38px;
 }
 
+/* === 統一 Eventra 橘色主題 日期彈窗樣式 === */
 #fb-datePopup.date-popup {
 	position: absolute;
 	right: 0;
 	top: calc(100% + 0.5rem);
 	width: 320px;
 	background: #fff;
-	border: 1px solid #e5e5e5;
-	border-radius: 0.5rem;
-	padding: 0.75rem;
+	border: none;
+	border-radius: 12px;
+	padding: 16px;
 	z-index: 1050;
-	box-shadow: 0 10px 24px rgba(0, 0, 0, 0.12), 0 2px 8px
-		rgba(0, 0, 0, 0.06);
+	box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+	font-family: "Montserrat", "Microsoft JhengHei", sans-serif;
 }
 
+/* 頂部控制列（年月＋左右箭頭） */
+.date-header {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	font-weight: 600;
+	margin-bottom: 8px;
+	color: #333;
+}
+
+.date-header button {
+	border: none;
+	background: none;
+	font-size: 20px;
+	line-height: 1;
+	color: #555;
+	cursor: pointer;
+	transition: color 0.2s;
+}
+.date-header button:hover {
+	color: #e85b41;
+}
+
+/* 日曆表格 */
 .calendar-table {
 	table-layout: fixed;
-}
-
-.calendar-table th, .calendar-table td {
-	width: 14.285%;
+	width: 100%;
+	border-collapse: collapse;
 	text-align: center;
 }
 
+.calendar-table th {
+	color: #999;
+	font-weight: 500;
+	padding-bottom: 6px;
+}
+
 .calendar-table td {
+	width: 14.285%;
 	cursor: pointer;
 	user-select: none;
-	border-radius: 0.375rem;
-	padding: 0.5rem 0;
+	border-radius: 50%;
+	padding: 6px 0;
+	transition: all 0.2s ease-in-out;
 }
 
 .calendar-table td:hover {
-	background: #f7f7f7;
+	background: rgba(232, 91, 65, 0.1);
+	color: #e85b41;
 }
 
-.calendar-table td.range-start, .calendar-table td.range-end {
-	background: #e04f67;
+.calendar-table td.range-start,
+.calendar-table td.range-end {
+	background: #e85b41;
 	color: #fff;
 }
 
 .calendar-table td.in-range {
-	background: #fde4e9;
+	background: rgba(232, 91, 65, 0.12);
 }
 
-@media ( max-width : 576px) {
+/* 底部按鈕區 */
+#fb-datePopup .btn {
+	border-radius: 8px;
+	padding: 4px 12px;
+	font-size: 14px;
+	font-weight: 600;
+}
+
+#fb-dateClear {
+	border: none;
+	color: #e85b41;
+	background: none;
+}
+#fb-dateClear:hover {
+	background: rgba(232, 91, 65, 0.08);
+}
+
+#fb-dateConfirm {
+	background: #e85b41;
+	border: none;
+	color: #fff;
+}
+#fb-dateConfirm:hover {
+	background: #d24f37;
+}
+
+/* 手機版自適應 */
+@media (max-width: 576px) {
 	#fb-datePopup.date-popup {
 		right: auto;
 		left: 0;
 		width: 100%;
 	}
 }
+
+/* ====== 搜尋彈窗定位調整 ====== */
+
+/* 讓整個篩選彈窗定位於 filter 按鈕區下方 */
+#regionFilterPopup,
+#dateFilterPopup {
+  position: absolute;
+  top: 45px; /* 與按鈕距離，可微調 */
+  z-index: 1000;
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+}
+
+/* 對齊「區域篩選」按鈕 */
+#regionFilterPopup {
+  left: 0; /* 對齊第一顆 filter 按鈕左邊 */
+  width: 420px; /* 可依你的內容調整寬度 */
+}
+
+/* 對齊「日期篩選」按鈕 */
+#dateFilterPopup {
+  right: 0; /* 對齊第二顆 filter 按鈕右邊 */
+  width: 320px; /* 保持原本日期選單寬度 */
+}
+
+/* 如果外層父元素不是 relative，要補上 */
+#search_filter_block {
+  position: relative;
+}
+
+/* === 搜尋彈窗對齊修正版 === */
+#search_filter_block {
+  position: relative;       /* 成為定位基準點 */
+  display: inline-flex;     /* 讓兩顆按鈕並排 */
+  gap: 12px;                /* 按鈕間距 */
+  align-items: flex-start;  /* 對齊頂端 */
+}
+
+/* 區域彈窗（靠右） */
+#regionFilterPopup {
+  position: absolute;
+  top: 45px;
+  right: 0; /* ← 改這行 */
+  left: auto; /* ← 避免衝突 */
+  width: 420px;
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+  z-index: 1000;
+}
+
+/* 日期彈窗（靠左） */
+#dateFilterPopup {
+  position: absolute;
+  top: 45px;
+  left: 0; /* ← 改這行 */
+  right: auto; /* ← 避免衝突 */
+  width: 320px;
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+  z-index: 1000;
+}
+
+
