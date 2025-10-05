@@ -2,6 +2,7 @@
   height: 100%;
 } */
 section#hero.login {
+/* 	background-image: url("/profile_pic/???.jpg"); */
   background-image: url("../img/group1_img/富士山.jpg");
   height: 100vh;
 }

@@ -27,8 +27,8 @@ public class CartItemRedisRepository {
 	private final JsonCodec JSON_CODEC;
 	private final RedisPoolExecutor JEDIS;
 
-	private static final Integer WEAK_TTL_IN_SECONDS = 31 * 60; // 31mins（整台車用，小 buffer）
-	private static final Long TTL_IN_MILLISECONDS = 30 * 60 * 1000L; // 30mins（單筆明細用）
+	private static final Integer WEAK_TTL_IN_SECONDS = 6 * 60; // 6mins（整台車用，小 buffer）
+	private static final Long TTL_IN_MILLISECONDS = 5 * 60 * 1000L; // 5mins（單筆明細用）
 	private static final Long ABOUT_TO_EXPIRE_IN_MILLISECONDS = 5 * 60 * 1000L; // 5mins (5分鐘後過期通知用）
 	
 	private static final String GLOBAL_EXP_KEY = "cart:items:globalExp";
