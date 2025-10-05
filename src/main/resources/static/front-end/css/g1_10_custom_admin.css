@@ -65,7 +65,7 @@ div.order_row>div.order_head>span.order_qty {
 	/* 	text-align: center; */
 	/* 	width: 6%; */
 	position: absolute;
-	left: 385px;
+	left: 362px;
 }
 
 div.order_row>div.order_head>span.order_amount {
@@ -73,18 +73,18 @@ div.order_row>div.order_head>span.order_amount {
 	/* 	flex-grow: 1; */
 	/* 	margin-right: 30px; */
 	/* 	text-align: center; */
-	left: 465px;
+	left: 464px;
 }
 
 img.order_provider_img {
 	position: absolute;
 	height: 20px;
-	left: 585px;
+	left: 595px;
 }
 
 div.order_row>div.order_head>span.order_provider {
 	position: absolute;
-	left: 653px;
+	left: 658px;
 	/* 	flex-grow: 1; */
 	/* 	margin-right: 0px; */
 	/* 	text-align: right; */
@@ -119,7 +119,7 @@ div.order_row>div.order_head>button {
 div.order_row>div.order_body {
 	margin: 1% 0;
 	/* display: none; */
-	overflow: hidden;
+	overflow: auto;
 	max-height: 0;
 	opacity: 0;
 	transition: max-height 800ms ease, opacity 400ms ease;

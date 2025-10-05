@@ -230,14 +230,14 @@ document.addEventListener("DOMContentLoaded", function () {
             <ul>
               <li><a href="#">常見問題 FAQ</a></li>
               <li><a href="#">平台公告</a></li>
-              <li><a href="#">主辦方專區</a></li>
+              <li><a href="/front-end/exhibitor_register">展商註冊</a></li>
             </ul>
           </div>
           <div class="col-md-4">
             <h3>【聯繫我們】</h3>
-            <a href="tel://004542344599" id="phone">(02) 813-3782</a>
-            <a href="mailto:help@citytours.com" id="email_footer"
-              >helper@eventra.com</a
+            <a href="tel:+886227120589" id="phone">(02) 2712-0589</a>
+            <a href="mailto:brianchen8907222@gmail.com" id="email_footer"
+              >brianchen8907222@gmail.com</a
             >
           </div>
         </div>
@@ -247,19 +247,7 @@ document.addEventListener("DOMContentLoaded", function () {
             <div id="social_footer">
               <ul>
                 <li>
-                  <a href="#0"><i class="bi bi-instagram"></i></a>
-                </li>
-                <li>
-                  <a href="#0"><i class="bi bi-whatsapp"></i></a>
-                </li>
-                <li>
-                  <a href="#0"><i class="bi bi-facebook"></i></a>
-                </li>
-                <li>
-                  <a href="#0"><i class="bi bi-twitter-x"></i></a>
-                </li>
-                <li>
-                  <a href="#0"><i class="bi bi-youtube"></i></a>
+                  	<a href="https://line.me/R/ti/p/@801gqedd" style="width: 150px; border-radius: 5px;"><i class="bi bi-line"></i><span style="font-size: 12px; margin-left: 6px;">LINE 官方帳號</span></a>
                 </li>
               </ul>
               <p>© Eventra 2025</p>

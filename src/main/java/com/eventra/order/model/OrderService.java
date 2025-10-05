@@ -103,7 +103,7 @@ public class OrderService {
 
 	public List<GetAllOrderResDTO> getAllOrderByMemberId(Integer memberId) {
 		// 會員中心用 一次拿前端再去按照頁籤切（三層架構...）
-		List<OrderVO> orderVOs = ORDER_REPO.findAllByMemberId(memberId);
+		List<OrderVO> orderVOs = ORDER_REPO.findAllByMemberId(memberId, Sort.by(Sort.Direction.DESC, "createdAt"));
 		List<GetAllOrderResDTO> resDTOs = new ArrayList<>();
 
 		for (OrderVO oVO : orderVOs) {
