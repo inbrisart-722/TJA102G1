@@ -365,7 +365,6 @@ public class BackendIndexController {
         if (br.hasErrors()) {
             ExhibitorVO e = exhibitorRepository.findById(exhibitorId).orElse(null);
             model.addAttribute("exhibitor", e);
-            model.addAttribute("openModal", true);
             return "back-end/exhibitor_info";
         }
 
