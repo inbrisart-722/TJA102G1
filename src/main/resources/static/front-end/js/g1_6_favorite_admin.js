@@ -53,10 +53,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
                 card.innerHTML = `
                     <div class="hotel_container">
-                        <div class="img_container">
+                        <div class="img_container" style="height:267.83px">>
                             <a href="/front-end/exhibitions/${fav.exhibitionId}">
-                                <img src="/front-end/img/0_exhibition/ChatGPT_exhibition_6.png"
-                                     width="800" height="533" class="img-fluid" alt="Image"/>
+                                <img src="${fav.photoPortrait}" 
+                                     width="800" height="533" class="img-fluid" alt="${fav.exhibitionName}"/>
                                 <div class="short_info hotel"></div>
                             </a>
                         </div>

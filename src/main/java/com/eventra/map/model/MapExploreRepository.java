@@ -15,7 +15,7 @@ public interface MapExploreRepository extends JpaRepository<ExhibitionVO, Intege
 	
 	@Query(value = "SELECT e.exhibition_id, e.exhibition_name, " +
 		            "e.location, e.longitude, e.latitude, " +
-		            "COALESCE(e.photo_landscape, '/img/0_exhibition/default.png'), " +
+		            "COALESCE(e.photo_portrait, '/img/0_exhibition/default.png'), " +
 		            "e.start_time, e.end_time, " +
 		            "CASE WHEN e.total_rating_count > 0 " +
 		            "THEN ROUND(e.total_rating_score / e.total_rating_count, 1) ELSE 0 END AS averageRatingScore, " +
@@ -31,7 +31,7 @@ public interface MapExploreRepository extends JpaRepository<ExhibitionVO, Intege
 		// 日期區間篩選(暫保留)
 		@Query(value = "SELECT e.exhibition_id, e.exhibition_name, " +
 		               "e.location, e.longitude, e.latitude, " +
-		               "COALESCE(e.photo_landscape, '/img/0_exhibition/default.png'), " +
+		               "COALESCE(e.photo_portrait, '/img/0_exhibition/default.png'), " +
 		               "e.start_time, e.end_time, " +
 		               "e.total_rating_count " +
 		               "FROM exhibition e " +

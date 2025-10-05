@@ -10,7 +10,7 @@ public class MapExploreDTO {
 	private String location; // 展覽地點
 	private Double longitude; // 經度
 	private Double latitude; // 緯度
-	private String photo; // 展覽圖片
+	private String photoPortrait; // 展覽圖片
 	private LocalDateTime startTime; // 開始時間
 	private LocalDateTime endTime; // 結束時間
 	private Integer ratingCount; // 評價總數
@@ -23,7 +23,7 @@ public class MapExploreDTO {
 
 	// 有參數建構子
 	public MapExploreDTO(Integer exhibitionId, String exhibitionName, String location, Double longitude,
-			Double latitude, String photo, LocalDateTime startTime, LocalDateTime endTime, Integer ratingCount,
+			Double latitude, String photoPortrait, LocalDateTime startTime, LocalDateTime endTime, Integer ratingCount,
 			Double averageRatingScore) {
 		super();
 		this.exhibitionId = exhibitionId;
@@ -31,7 +31,7 @@ public class MapExploreDTO {
 		this.location = location;
 		this.longitude = longitude;
 		this.latitude = latitude;
-		this.photo = photo;
+		this.photoPortrait = photoPortrait;
 		this.startTime = startTime;
 		this.endTime = endTime;
 		this.ratingCount = ratingCount;
@@ -79,12 +79,12 @@ public class MapExploreDTO {
 		this.latitude = latitude;
 	}
 
-	public String getPhoto() {
-		return photo;
+	public String getPhotoPortrait() {
+		return photoPortrait;
 	}
 
-	public void setPhoto(String photo) {
-		this.photo = photo;
+	public void setPhotoPortrait(String photo) {
+		this.photoPortrait = photoPortrait;
 	}
 
 	public LocalDateTime getStartTime() {
