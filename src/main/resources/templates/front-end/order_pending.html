@@ -418,7 +418,9 @@
       <!--form -->
     </div>
     <!-- /Sign In Popup -->
-
+    <!-- websocket 聊天室使用（內含多份檔案） -->
+	<div th:replace="fragments/chat-widget :: chat-widget"></div>
+	
     <!-- Jquery -->
     <script src="js/jquery-3.7.1.min.js"></script>
     <script src="js/common_scripts_min.js"></script>
@@ -436,5 +438,9 @@
         additionalMarginTop: 80,
       });
     </script>
+    	<script src="js/g1_10_custom_dify.js"></script>
+	<script src="https://udify.app/embed.min.js" id="6dNmiwvbRPuqvJW7"
+		defer></script>
+	<link href="css/g1_10_custom_dify.css" rel="stylesheet" />	
   </body>
 </html>

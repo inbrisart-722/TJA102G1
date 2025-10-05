@@ -1,0 +1,14 @@
+#dify-chatbot-bubble-button {
+	background-color: rgba(37, 29, 28, 0.65) !important;
+	position: fixed;
+	left: 24px;
+	bottom: 24px;
+}
+
+#dify-chatbot-bubble-window {
+	width: 24rem !important;
+	height: 32rem !important;
+	position: fixed !important;
+	left: 92px !important;
+	bottom: 28px !important;
+}

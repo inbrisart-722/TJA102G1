@@ -402,44 +402,7 @@
 	<div id="toTop"></div>
 	<!-- Back to top button -->
 
-	<div id="chat-widget">
-		<!-- Sticky Button -->
-		<button id="chat-toggle">
-			<i class=" icon-chat-5"></i>
-		</button>
-
-		<!-- Chat Window -->
-		<div id="chat-window">
-			<div class="chat-header">
-				<span>Eventra - 聊天大廳</span>
-				<span><sub>(目前在線人數: <span id="chat-online-count">1</span>人)</sub></span>
-				<button id="chat-close">✕</button>
-			</div>
-			<div class="chat-body" id="chat-body">
-<!-- 				<div class="message others"> -->
-<!-- 					<img src="img/group1_img/aa志嘉.png" class="avatar"> -->
-<!-- 					<div class="bubble">Hi 👋 有什麼可以幫忙的嗎？</div> -->
-<!-- 					<time class="others">上午8:12</time> -->
-<!-- 				</div> -->
-<!-- 				<div class="message self"> -->
-<!-- 					<img src="img/group1_img/aa志嘉.png" class="avatar" /> -->
-<!-- 					<div class="bubble">Hi 👋 我是志嘉</div> -->
-<!-- 					<time class="self">下午12:37</time> -->
-<!-- 				</div> -->
-				<div id="chat-overlay">
-					<button onclick="location.href='/front-end/login'">登入</button>
-					<span>登入後才能留言哦！</span>
-				</div>
-
-			</div>
-
-			<div class="chat-footer">
-				<input type="text" id="chat-input" placeholder="輸入訊息..." />
-				<button id="chat-send">➤</button>
-			</div>
-		</div>
-	</div>
-
+	<div th:replace="fragments/chat-widget :: chat-widget"></div>
 
 	<!-- Search Menu -->
 	<div class="search-overlay-menu">
@@ -577,8 +540,6 @@
 	<script src="js/jquery-3.7.1.min.js"></script>
 	<script src="js/common_scripts_min.js"></script>
 	<script src="js/functions.js"></script>
-	<script src="js/sockjs.min.js"></script>
-	<script src="js/stomp.min.js"></script>
 
 	<!-- Date and time pickers -->
 	<script>
@@ -623,49 +584,12 @@
 	<script src="js/g1_6_exhibitions_viewcount.js"></script>
 	<script src="js/g1_6_search_history.js"></script> <!-- 存搜尋紀錄用 -->
 	<script src="js/g1_6_search_modal.js"></script>	<!-- 導頁至搜尋結果頁用 -->
-  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script> <!-- 引入 SweetAlert2 -->
+  	<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script> <!-- 引入 SweetAlert2 -->
 
-	<!-- dify.ai ai chatbot -->
-	<script>
-		window.difyChatbotConfig = {
-			token : '6dNmiwvbRPuqvJW7',
-			inputs : {
-				welcome_message : "您好，歡迎來到 Eventra，請詢問任何問題！"
-			// You can define the inputs from the Start node here
-			// key is the variable name
-			// e.g.
-			// name: "NAME"
-			},
-			systemVariables : {
-			// user_id: 'YOU CAN DEFINE USER ID HERE',
-			// conversation_id: 'YOU CAN DEFINE CONVERSATION ID HERE, IT MUST BE A VALID UUID',
-			},
-			userVariables : {
-			// avatar_url: 'YOU CAN DEFINE USER AVATAR URL HERE',
-			// name: 'YOU CAN DEFINE USER NAME HERE',
-			},
-		}
-	</script>
+	<script src="js/g1_10_custom_dify.js"></script>
 	<script src="https://udify.app/embed.min.js" id="6dNmiwvbRPuqvJW7"
-		defer>
-		
-	</script>
-	<style>
-#dify-chatbot-bubble-button {
-	background-color: rgba(37, 29, 28, 0.65) !important;
-	position: fixed;
-	left: 24px;
-	bottom: 24px;
-}
-
-#dify-chatbot-bubble-window {
-	width: 24rem !important;
-	height: 32rem !important;
-	position: fixed !important;
-	left: 92px !important;
-	bottom: 28px !important;
-}
-</style>
+		defer></script>
+	<link href="css/g1_10_custom_dify.css" rel="stylesheet" />	
 
 </body>
 </html>
