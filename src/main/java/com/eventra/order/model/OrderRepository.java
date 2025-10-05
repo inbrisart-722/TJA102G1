@@ -7,11 +7,11 @@ import java.util.Set;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
-import com.eventra.exhibitor.model.ExhibitorVO;
 import com.eventra.member.model.MemberVO;
 
 public interface OrderRepository extends JpaRepository<OrderVO, Integer> {
@@ -22,7 +22,7 @@ public interface OrderRepository extends JpaRepository<OrderVO, Integer> {
 	List<OrderVO> findExpiredOrders(@Param("threshold") Timestamp threshold,
 			@Param("statuses") Set<OrderStatus> statuses);
 
-	List<OrderVO> findAllByMemberId(Integer memberId);
+	List<OrderVO> findAllByMemberId(Integer memberId, Sort sort);
 
 	OrderVO findByOrderUlid(String orderUlid);
 

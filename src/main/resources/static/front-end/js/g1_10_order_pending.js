@@ -31,7 +31,7 @@ const fetch_order_result = function() {
 			}
 			// ReturnURL 都沒回應的措施
 			else {
-				console.log("30秒都沒更新，看來該做點什麼了");
+				console.log("10秒都沒更新，看來該做點什麼了");
 				alert("目前訂單狀態正在查詢中，請您稍後至「會員中心 - 訂單頁」查看狀態");
 				location.href = "/front-end/admin?go=ticket";
 			}
@@ -43,7 +43,7 @@ const fetch_order_result = function() {
 };
 
 document.addEventListener("DOMContentLoaded", function() {
-	setTimeout(fetch_order_result, 5000);
+	setTimeout(fetch_order_result, 2500);
 });
 
 ///////////////////////////////////////////////////////////////

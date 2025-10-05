@@ -75,7 +75,7 @@
 
 								<!-- 統一編號 -->
 								<div class="form-group">
-									<label>統一編號（登入帳號）<font color="red">*</font></label> <input
+									<label>統一編號（後台登入帳號）<font color="red">*</font></label> <input
 										type="text" class="form-control"
 										th:field="*{businessIdNumber}" placeholder="請輸入 8 碼統一編號" />
 									<div th:if="${#fields.hasErrors('businessIdNumber')}"
@@ -133,7 +133,7 @@
 
 								<!-- 聯絡信箱 -->
 								<div class="form-group">
-									<label>聯絡信箱<font color="red">*</font></label> <input
+									<label>聯絡信箱<font color="red">*</font></label><sub style="padding: 0 0 12px 4px;">（溫馨提醒：後續結果通知將透過此信箱）</sub><input
 										type="text" class="form-control" th:field="*{email}" />
 									<div th:if="${#fields.hasErrors('email')}" th:errors="*{email}"
 										class="text-danger"></div>
