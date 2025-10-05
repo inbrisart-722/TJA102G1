@@ -35,8 +35,8 @@ import com.eventra.exhibitiontickettype.model.ExhibitionTicketTypeVO;
 import com.eventra.exhibitor.backend.controller.dto.ExhibitionCreateDTO;
 import com.eventra.exhibitor.model.ExhibitorDTO;
 import com.eventra.exhibitor.model.ExhibitorVO;
-import com.eventra.member.fileupload.FileCategory;
-import com.eventra.member.fileupload.LocalFileUploadService;
+import com.eventra.fileupload.FileCategory;
+import com.eventra.fileupload.LocalFileUploadService;
 import com.eventra.notificationpush.model.NotificationPushService;
 import com.eventra.order.model.OrderRepository;
 import com.eventra.order.model.OrderStatus;
@@ -487,9 +487,8 @@ public class ExhibitionServiceImpl implements ExhibitionService {
 			ExhibitionLineBotCarouselDTO dto = new ExhibitionLineBotCarouselDTO();
 			dto
 				.setExhibitionName(vo.getExhibitionName())
-//				.setPhotoPortrait(vo.getPhotoPortrait())
-				// 測試
-				.setPhotoPortrait("https://scdn.line-apps.com/n/channel_devcenter/img/fx/01_1_cafe.png")
+				.setPhotoPortrait("https://eventra.ddns.net/load-photo" + vo.getPhotoPortrait())
+//				.setPhotoPortrait("https://scdn.line-apps.com/n/channel_devcenter/img/fx/01_1_cafe.png")
 				.setAverageRatingScore(vo.getAverageRatingScore())
 				.setLocation(vo.getLocation())
 				.setStartTime(vo.getStartTime())
@@ -516,9 +515,9 @@ public class ExhibitionServiceImpl implements ExhibitionService {
 			ExhibitionLineBotCarouselDTO dto = new ExhibitionLineBotCarouselDTO();
 			dto
 				.setExhibitionName(vo.getExhibitionName())
-//				.setPhotoPortrait(vo.getPhotoPortrait())
 				// 測試
-				.setPhotoPortrait("https://scdn.line-apps.com/n/channel_devcenter/img/fx/01_1_cafe.png")
+				.setPhotoPortrait("https://eventra.ddns.net/load-photo" + vo.getPhotoPortrait())
+//				.setPhotoPortrait("https://scdn.line-apps.com/n/channel_devcenter/img/fx/01_1_cafe.png")
 				.setAverageRatingScore(vo.getAverageRatingScore())
 				.setLocation(vo.getLocation())
 				.setStartTime(vo.getStartTime())

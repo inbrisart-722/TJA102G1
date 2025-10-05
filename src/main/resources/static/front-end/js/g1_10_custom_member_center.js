@@ -4,15 +4,16 @@ document.addEventListener("DOMContentLoaded", function() {
 	const params = new URLSearchParams(window.location.search);
 	const go = params.get("go");
 	
-	if(go === "ticket") {
+//	if(go === "ticket") {
 		document.querySelector("a.icon-ticket-2").click();
-		params.delete("go");
-		let newUrl;
-		if(params.size !== 0) newUrl = window.location.pathname + '?' + params.toString();
-		else newUrl = window.location.pathname;
-		window.history.replaceState({}, document.title, newUrl);
-	}
-	else document.querySelector("a.icon-profile").click();
+		setTimeout(() => document.querySelector(".tab5").click(), 500);
+//		params.delete("go");
+//		let newUrl;
+//		if(params.size !== 0) newUrl = window.location.pathname + '?' + params.toString();
+//		else newUrl = window.location.pathname;
+//		window.history.replaceState({}, document.title, newUrl);
+//	}
+//	else document.querySelector("a.icon-profile").click();
 
 //	if(lineUserIdBoundAlready){
 //		// true -> 失敗
@@ -190,8 +191,7 @@ document.addEventListener("DOMContentLoaded", function() {
 					  <span>訂單明細編號：<span>${item.orderItemUlid}</span></span>
 					  <span>票價：${item.unitPrice}</span>
 					  <span class="${order.orderStatus === '已付款' ? "paid" : ""}">${item.ticketTypeName}</span>
-					  ${order.orderStatus === '已付款' ? `<span class="qrcode_id">${item.ticketCode}
-					  </span><button class="qrcode">取得入場 QR Code</button>` : ''}
+					  ${order.orderStatus === '已付款' ? `<span class="qrcode_id">${item.ticketCode}</span><button class="qrcode">取得入場 QR Code</button>` : ''}
 					</div>
 					`;
 					order_body_el.appendChild(order_item_body_el);
@@ -241,6 +241,8 @@ document.addEventListener("DOMContentLoaded", function() {
 
 		if (qrcode_modal.classList.contains("open")) return;
 
+		const ticketCode = btn.closest("div.order_item_ticket").querySelector("span.qrcode_id").innerText;
+		
 		const qr_img = new Image();
 		qr_img.src =
 			"https://user-images.githubusercontent.com/3139113/38300650-ed2c25c4-382f-11e8-9792-d46987eb17d1.png";
@@ -249,12 +251,15 @@ document.addEventListener("DOMContentLoaded", function() {
 			const canvas = qrcanvas.qrcanvas({
 				cellSize: 8,
 				correctLevel: "H",
-				data: "https://www.opentix.life/event/1925501807699976193",
+				data: "https://eventra.ddns.net/back-end/exhibitor/qrcode-validation?ticketCode=" + ticketCode,
 				logo: { qr_img },
 			});
 			qrcode_content.appendChild(canvas);
+			qrcode_content.insertAdjacentHTML("beforeend",'<p style="text-align: center; font-size:12px">提示：請於展覽入場時出示此 QR Code</p>');
 			canvas.setAttribute("role", "img");
 			canvas.setAttribute("aria-label", "QR Code 圖片，請掃描以開啟活動連結");
+			
+			
 		});
 
 		qrcode_modal.classList.add("open");
