@@ -1,4 +1,4 @@
-package com.eventra.exhibition_review_log.model;
+package com.eventra.exhibitionreviewlog.model;
 
 import java.sql.Timestamp;
 

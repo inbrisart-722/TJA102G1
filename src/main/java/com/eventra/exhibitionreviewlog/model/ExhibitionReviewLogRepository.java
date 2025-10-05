@@ -1,4 +1,4 @@
-package com.eventra.exhibition_review_log.model;
+package com.eventra.exhibitionreviewlog.model;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;

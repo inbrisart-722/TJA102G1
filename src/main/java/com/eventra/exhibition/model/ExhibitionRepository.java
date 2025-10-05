@@ -1,12 +1,14 @@
 package com.eventra.exhibition.model;
 
 
-import org.springframework.data.domain.Page;
 import java.time.LocalDateTime;
-
 import java.util.List;
+import java.util.Optional;
+
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -118,4 +120,18 @@ public interface ExhibitionRepository extends JpaRepository<ExhibitionVO, Intege
 	    @Query("SELECT e FROM ExhibitionVO e WHERE (e.averageRatingScore < :score) OR "
 	    		+ " (e.averageRatingScore = :score AND e.exhibitionId > :eid) ORDER BY e.averageRatingScore DESC")
 	    Slice<ExhibitionVO> findExhibitionsByAverageRatingScoreDesc(@Param("score") Double score, @Param("eid") Integer exhibitionId, Pageable pageable);
+
+
+
+
+
+
+	
+
+
+
+
+
+
+
 }

@@ -532,4 +532,21 @@ public class ExhibitionServiceImpl implements ExhibitionService {
 		
 		return new SliceImpl<>(dtos, pageable, exhibitionsSlice.hasNext());
 	}
+
+	public List<ExhibitionReviewPageDTO> getExhibitionsForReviewPage(){
+		  List<ExhibitionVO> exhibitions = repository.findAll();
+		  
+		  List<ExhibitionReviewPageDTO> dtos = new ArrayList<>();
+		  for(ExhibitionVO vo : exhibitions) {
+		   ExhibitionReviewPageDTO dto = new ExhibitionReviewPageDTO();
+		   dto.setExhibitionStatus(vo.getExhibitionStatus().getExhibitionStatus());
+		   dto.setExhibitionName(vo.getExhibitionName());
+		   dto.setExhibitorName(vo.getExhibitorVO().getExhibitorRegistrationName());
+		   dto.setExhibitionId(vo.getExhibitionId());
+		   
+		   dtos.add(dto);
+		  }
+		  
+		  return dtos;
+		 }
 }
