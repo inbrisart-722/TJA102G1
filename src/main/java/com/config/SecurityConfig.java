@@ -418,7 +418,7 @@ public class SecurityConfig {
 				.requestMatchers(
 					    "/back-end/css/**",
 					    "/back-end/js/**",
-					    "/back-end/img/**",
+					    "/back-end/img/**",  
 					    "/back-end/header.html", // 你用 data-include 載入的 partial
 					    "/webjars/**",
 					    "/favicon.ico"
