@@ -455,6 +455,7 @@ public class SecurityConfig {
 				UsernamePasswordAuthenticationFilter.class // 位置：比帳密登入 Filter 更前面（先嘗試從 Cookie 建立身份）
 		);
 
+		// 
 		// Spring Security - Filter (過濾器層)
 		// 最大單位，所有請求都會經過 Security Filter Chain。
 		// 每個 Filter 負責一種策略：
