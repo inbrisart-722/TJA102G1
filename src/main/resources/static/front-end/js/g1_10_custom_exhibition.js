@@ -1279,7 +1279,7 @@ document.addEventListener("DOMContentLoaded", function() {
 					1
 				)}&nbsp;&nbsp;(${result.totalRatingCount})`;
 
-				const stars = span_rating.querySelectorAll("i");
+				const stars = span_rating.querySelectorAll("i.icon-star, i.icon-star-half-alt, i.icon-star-empty");
 
 				renderAverageStars(result.averageRatingScore, stars);
 				// ...
