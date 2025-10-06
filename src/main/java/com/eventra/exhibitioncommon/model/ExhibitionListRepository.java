@@ -118,4 +118,17 @@ public interface ExhibitionListRepository extends JpaRepository<ExhibitionVO, In
 		            "AND e.exhibition_status_id IN (3,4)", nativeQuery = true)
 	int countExhibitionsByExhibitor(@Param("exhibitorId") Integer exhibitorId);
 
+	
+	
+	/* ===== 首頁輪播圖 (每日隨機 3 個展覽，僅顯示尚未結束的) ===== */
+	@Query(value = "SELECT e.exhibition_id, e.exhibition_name, " +
+	               "COALESCE(e.photo_portrait, '/img/0_exhibition/test.jpg') " +
+	               "FROM exhibition e " +
+	               "WHERE e.exhibition_status_id IN (3,4) " +
+	               "AND e.end_time >= NOW() " +                   // 只顯示尚未結束的展覽
+	               "ORDER BY RAND(DAY(CURDATE() + e.exhibition_id)) " +  // 每天亂數固定、且每筆不同
+	               "LIMIT 3", nativeQuery = true)
+	List<Object[]> findDailyRandomThree();
+
+
 }

@@ -1311,3 +1311,9 @@ ul#cat_nav li a:after {
   border-radius: 5px;
   overflow: hidden;
 }
+
+footer {
+    background: none !important;
+    color: #fff;
+    /* padding: 30px 0 10px 0; */
+}

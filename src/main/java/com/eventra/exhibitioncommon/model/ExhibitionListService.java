@@ -150,5 +150,16 @@ public class ExhibitionListService {
                 list, totalElements, page, size, ExhibitionListUtil::toListDTO
         );
     }
+    
+    /* ===== 首頁輪播圖 (每日隨機三個展覽) ===== */
+    public List<ExhibitionListDTO> getDailyRandomThree() {
+        List<Object[]> list = repository.findDailyRandomThree();
+        List<ExhibitionListDTO> result = new ArrayList<>();
+        for (Object[] r : list) {
+            result.add(ExhibitionListUtil.toHomepageDTO(r, false));
+        }
+        return result;
+    }
+
 
 }

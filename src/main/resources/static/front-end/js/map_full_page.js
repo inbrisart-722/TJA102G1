@@ -1,43 +1,17 @@
 // map_full_page.js
 // 建立地圖、使用者定位、地圖樣式控制
 
+// 預設中心點常數 (緯育)
+const DEFAULT_CENTER = { lat: 25.05213085756364, lng: 121.54325832447591 };
+
 // 全域變數宣告
 var mapObject; // 存放 Google Map 物件
-
-
-//var mapObject, // 存放 Google Map 物件
-//	markers = [], // 存 marker (保留後續可能會優化 UI)
-//	markersData = { // 假資料 (後續改成 API 抓資料)
-//		pin: [
-//			{
-//				name: "test1",
-//				location_latitude: 25.052283489684932,
-//				location_longitude: 121.543242167044,
-//				map_image_url: "/front-end/img/thumb_map_1.jpg",
-//				name_point: "都市敘事：以鏡頭書寫在城市縫隙間的故事與記憶",
-//				get_directions_start_address: "",
-//				phone: "04-2339-1141",
-//				url_point: "/front-end/exhibitions.html",
-//			},
-//			{
-//				name: "test2",
-//				location_latitude: 25.052322367622292,
-//				location_longitude: 121.54133243435263,
-//				map_image_url: "img/thumb_map_1.jpg",
-//				name_point: "都市敘事：以鏡頭書寫在城市縫隙間的故事與記憶",
-//				get_directions_start_address: "",
-//				phone: "04-2339-1141",
-//				url_point: "/front-end/exhibitions.html",
-//			},
-//		],
-//	};
-
 
 // Google Maps 初始化
 function initMap() {
 	var mapOptions = {
 		zoom: 17, // 地圖縮放等級(數字越大越近)
-		center: new google.maps.LatLng(25.034199581347696, 121.56456035767059), // 初始地圖中心點(台北101)
+		center: new google.maps.LatLng(DEFAULT_CENTER.lat, DEFAULT_CENTER.lng),
 		mapTypeId: google.maps.MapTypeId.ROADMAP, // 地圖類型, 預設一般街道圖
 
 		// 地圖控制選項
@@ -95,45 +69,105 @@ function initMap() {
 	// 建立地圖
 	mapObject = new google.maps.Map(document.getElementById("map"), mapOptions);
 
-	// 取得使用者座標
-	if (navigator.geolocation) {
-		navigator.geolocation.getCurrentPosition(
-			(position) => {
-				const pos = {
-					lat: position.coords.latitude,
-					lng: position.coords.longitude,
-				};
-				console.log("定位結果: ", pos.lat, pos.lng);
-				console.log("定位精準度(公尺): ", position.coords.accuracy);
+	// 建立 返回地圖 X 按鈕
+	  const exitBtn = document.createElement("button");
+	  exitBtn.id = "exit-streetview";
+	  exitBtn.innerHTML = "✕";
+	  Object.assign(exitBtn.style, {
+	    display: "none",
+	    position: "absolute",
+		top: "90px",
+		right: "30px",
+		left: "auto",
+	    zIndex: "9999",
+	    width: "36px",
+	    height: "36px",
+	    lineHeight: "32px",
+	    textAlign: "center",
+	    fontSize: "20px",
+	    fontWeight: "700",
+	    color: "#333",
+	    background: "#fff",
+	    border: "1px solid #ccc",
+	    borderRadius: "50%",
+	    boxShadow: "0 2px 6px rgba(0,0,0,0.25)",
+	    cursor: "pointer",
+	  });
+	  document.body.appendChild(exitBtn);
+	
+	// 監聽 Street View 狀態
+	  const streetView = mapObject.getStreetView();
+	  streetView.addListener("visible_changed", () => {
+	    if (streetView.getVisible()) {
+//	      console.log("進入街景模式");
+			exitBtn.style.display = "block";
+	    } else {
+//	      console.log("離開街景模式，恢復地圖顯示");
+			exitBtn.style.display = "none";
+	      // 回到預設中心點
+	      mapObject.setCenter(new google.maps.LatLng(DEFAULT_CENTER.lat, DEFAULT_CENTER.lng));
+	      mapObject.setZoom(17);
+	    }
+	  });
+	  
+	  // 點擊 X → 退出街景並重設地圖
+	  exitBtn.addEventListener("click", () => {
+	    streetView.setVisible(false);
+	    mapObject.setCenter(new google.maps.LatLng(DEFAULT_CENTER.lat, DEFAULT_CENTER.lng));
+	    mapObject.setZoom(17);
+	  });
+	
+	// 放置地圖中心點標記
+	new google.maps.Marker({
+		position: DEFAULT_CENTER,
+		map: mapObject,
+		title: "中心點",
+	});
 
-				mapObject.setCenter(pos);
+	// 直接載入展覽資料（1 公里範圍）
+	loadNearbyExhibitions(DEFAULT_CENTER.lat, DEFAULT_CENTER.lng, 1);
 
-				// 使用者位置 marker
-				new google.maps.Marker({
-					position: pos,
-					map: mapObject,
-					title: "你在這裡",
-					icon: "http://maps.google.com/mapfiles/ms/icons/blue-dot.png"
-				});
+	//	// 取得使用者座標
+	//	if (navigator.geolocation) {
+	//		navigator.geolocation.getCurrentPosition(
+	//			(position) => {
+	//				const pos = {
+	//					lat: position.coords.latitude,
+	//					lng: position.coords.longitude,
+	//				};
+	//				console.log("定位結果: ", pos.lat, pos.lng);
+	//				console.log("定位精準度(公尺): ", position.coords.accuracy);
+	//
+	//				mapObject.setCenter(pos);
+	//
+	//				// 使用者位置 marker
+	//				new google.maps.Marker({
+	//					position: pos,
+	//					map: mapObject,
+	//					title: "你在這裡",
+	//					icon: "http://maps.google.com/mapfiles/ms/icons/blue-dot.png"
+	//				});
+	//
+	//				// 呼叫 API (g1_6_map_explore.js)
+	//				loadNearbyExhibitions(pos.lat, pos.lng, 1);
+	//			},
+	//			(error) => {
+	//				console.warn("定位失敗: ", error.message);
+	//				// 如果定位失敗, 至少呼叫 API 以台北101為中心
+	//				loadNearbyExhibitions(25.034199581347696, 121.56456035767059, 1);
+	//			},
+	//			{
+	//				enableHighAccuracy: true, // 優先使用 GPS 或 Wi-Fi, 非 IP
+	//				timeout: 10000,           // 最長等待 10 秒
+	//				maximumAge: 0             // 不要用快取
+	//			}
+	//		);
+	//	} else {
+	//		console.warn("瀏覽器不支援 Geolocation API");
+	//		loadNearbyExhibitions(25.034199581347696, 121.56456035767059, 1);
+	//	}
 
-				// 呼叫 API (g1_6_map_explore.js)
-				loadNearbyExhibitions(pos.lat, pos.lng, 1);
-			},
-			(error) => {
-				console.warn("定位失敗: ", error.message);
-				// 如果定位失敗, 至少呼叫 API 以台北101為中心
-				loadNearbyExhibitions(25.034199581347696, 121.56456035767059, 1);
-			},
-			{
-				enableHighAccuracy: true, // 優先使用 GPS 或 Wi-Fi, 非 IP
-				timeout: 10000,           // 最長等待 10 秒
-				maximumAge: 0             // 不要用快取
-			}
-		);
-	} else {
-		console.warn("瀏覽器不支援 Geolocation API");
-		loadNearbyExhibitions(25.034199581347696, 121.56456035767059, 1);
-	}
+
 }
 
 //

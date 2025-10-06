@@ -24,6 +24,9 @@ import com.eventra.exhibition.model.ExhibitionServiceImpl;
 import com.eventra.exhibitor.model.ExhibitorService;
 import com.eventra.exhibitor.model.ExhibitorVO;
 import com.eventra.member.verif.model.VerifService;
+import com.eventra.exhibitioncommon.model.ExhibitionListService;
+import com.eventra.exhibitioncommon.dto.ExhibitionListDTO;
+
 
 import jakarta.servlet.http.HttpServletRequest;
 
@@ -39,6 +42,9 @@ public class FrontendIndexController {
 	private ExhibitionServiceImpl exhibitionSvc;
 	@Autowired
     private ExhibitorService exhibitorService;
+	@Autowired
+	private ExhibitionListService exhibitionListService;
+
 	
 //	private static final Integer TEST_MEMBER = 3;
 
@@ -94,10 +100,14 @@ public class FrontendIndexController {
 	}
 
 	@GetMapping("/index")
-	public String index(@AuthenticationPrincipal UserDetails user) {
+	public String index(@AuthenticationPrincipal UserDetails user, Model model) {
 //		System.out.println(user.getUsername());
 //		System.out.println(user.getPassword());
 //		System.out.println(user.getAuthorities());
+		
+		// 取得每日隨機三個展覽(輪播用)
+	    List<ExhibitionListDTO> dailyBanners = exhibitionListService.getDailyRandomThree();
+	    model.addAttribute("dailyBanners", dailyBanners);
         return "front-end/index";
 	}
 	
