@@ -20,8 +20,6 @@ public class MemberVO {
 	@GeneratedValue(strategy=GenerationType.IDENTITY)
 	@Column(name = "member_id")
     private Integer memberId;
-	@NotBlank(message = "Email 不可為空")
-	@Email(message = "Email 格式不正確")
 	@Column(name = "email")
 	private String email;
 	@Column(name = "password_hash")
