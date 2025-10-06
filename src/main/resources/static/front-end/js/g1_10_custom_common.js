@@ -230,34 +230,9 @@ document.addEventListener("DOMContentLoaded", function () {
 					日期篩選：<span id="dateText">（未選擇）</span>
 				</small>
 			</div>
-
-			<!-- ==================== /修改+新增 ==================== -->
-
-			<h3>熱門搜尋</h3>
-			<div id="search_hot_block" class="search_block">
-				<a href="/html/all_tours_list.html" class="history-btn">熱門搜尋</a>
-				<a href="/html/all_tours_list.html" class="history-btn">熱門搜尋</a>
-				<a href="/html/all_tours_list.html" class="history-btn">熱門搜尋</a>
-				<a href="/html/all_tours_list.html" class="history-btn">熱門搜尋</a>
-				<a href="/html/all_tours_list.html" class="history-btn">熱門搜尋</a>
-				<a href="/html/all_tours_list.html" class="history-btn">熱門搜尋</a>
-			</div>
 			<hr />
-
 			<h3>您最近搜尋過</h3>
 			<div id="search_history_block" class="search_block">
-				<a href="/html/all_tours_list.html" class="history-btn">歷史搜尋</a>
-				<a href="/html/all_tours_list.html" class="history-btn">歷史搜尋</a>
-				<a href="/html/all_tours_list.html" class="history-btn">歷史搜尋</a>
-				<a href="/html/all_tours_list.html" class="history-btn">歷史搜尋</a>
-				<a href="/html/all_tours_list.html" class="history-btn">歷史搜尋</a>
-				<a href="/html/all_tours_list.html" class="history-btn">歷史搜尋</a>
-				<a href="/html/all_tours_list.html" class="history-btn">歷史搜尋</a>
-				<a href="/html/all_tours_list.html" class="history-btn">歷史搜尋</a>
-				<a href="/html/all_tours_list.html" class="history-btn">歷史搜尋</a>
-				<a href="/html/all_tours_list.html" class="history-btn">歷史搜尋</a>
-				<a href="/html/all_tours_list.html" class="history-btn">歷史搜尋</a>
-				<a href="/html/all_tours_list.html" class="history-btn">歷史搜尋</a>
 			</div>
 		</div>
 	<!-- End Search Menu -->`;
