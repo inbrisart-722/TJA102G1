@@ -190,9 +190,8 @@
 			  <label class="form-label">帳號(統編)</label>
 			  <input type="text" readonly class="form-control readonly-look"
 			         th:classappend="${#fields.hasErrors('businessIdNumber')}? ' is-invalid' : ''"
-			         th:field="*{businessIdNumber}" maxlength="8" pattern="^\d{8}$" required/>
-			  <div class="invalid-feedback" th:if="${#fields.hasErrors('businessIdNumber')}"
-			       th:errors="*{businessIdNumber}">統編錯誤</div>
+			         th:field="*{businessIdNumber}">
+			  
 			</div>
 			
 			<div class="col-md-6">
@@ -201,7 +200,7 @@
 			         th:classappend="${#fields.hasErrors('email')}? ' is-invalid' : ''"
 			         th:field="*{email}" maxlength="100" required/>
 			  <div class="invalid-feedback" th:if="${#fields.hasErrors('email')}"
-			       th:errors="*{email}">Email 錯誤</div>
+			       th:errors="*{email}"></div>
 			</div>
 	          <div class="col-md-6">
 			  <label class="form-label">聯絡人姓名</label>
@@ -227,7 +226,9 @@
 			  <label class="form-label">公司/單位名稱</label>
 			  <input type="text" class="form-control"
 			         th:classappend="${#fields.hasErrors('companyName')}? ' is-invalid' : ''"
-			         th:field="*{companyName}" maxlength="255" required/>
+			         th:field="*{companyName}" maxlength="255" required
+			         oninvalid="this.setCustomValidity('請輸入公司/單位名稱')"
+       				 oninput="this.setCustomValidity('')"/>
 			  <div class="invalid-feedback" th:if="${#fields.hasErrors('companyName')}"
 			       th:errors="*{companyName}"></div>
 			</div>
@@ -244,7 +245,9 @@
 			  <label class="form-label">戶名</label>
 			  <input type="text" class="form-control"
 			         th:classappend="${#fields.hasErrors('bankAccountName')}? ' is-invalid' : ''"
-			         th:field="*{bankAccountName}" maxlength="100" required/>
+			         th:field="*{bankAccountName}" maxlength="100" required
+			         oninvalid="this.setCustomValidity('請輸入戶名')"
+       				 oninput="this.setCustomValidity('')"/>
 			  <div class="invalid-feedback" th:if="${#fields.hasErrors('bankAccountName')}"
 			       th:errors="*{bankAccountName}"></div>
 			</div>
@@ -253,7 +256,9 @@
 			  <label class="form-label">銀行代碼</label>
 			  <input type="text" class="form-control"
 			         th:classappend="${#fields.hasErrors('bankCode')}? ' is-invalid' : ''"
-			         th:field="*{bankCode}" maxlength="3" pattern="^\d{3}$" required/>
+			         th:field="*{bankCode}" maxlength="3" pattern="^\d{3}$" required
+			         oninvalid="this.setCustomValidity('請輸入銀行代碼')"
+       				 oninput="this.setCustomValidity('')"/>
 			  <div class="invalid-feedback" th:if="${#fields.hasErrors('bankCode')}"
 			       th:errors="*{bankCode}"></div>
 			</div>
@@ -262,7 +267,9 @@
 			  <label class="form-label">帳號</label>
 			  <input type="text" class="form-control"
 			         th:classappend="${#fields.hasErrors('bankAccountNumber')}? ' is-invalid' : ''"
-			         th:field="*{bankAccountNumber}" maxlength="30" pattern="^\d{7,30}$" required/>
+			         th:field="*{bankAccountNumber}" maxlength="30" pattern="^\d{7,30}$" 
+			         oninvalid="this.setCustomValidity('請輸入銀行帳號')"
+       				 oninput="this.setCustomValidity('')"required/>
 			  <div class="invalid-feedback" th:if="${#fields.hasErrors('bankAccountNumber')}"
 			       th:errors="*{bankAccountNumber}"></div>
 			</div>
