@@ -29,7 +29,7 @@ public class CartItemRedisRepository {
 
 	private static final Integer WEAK_TTL_IN_SECONDS = 6 * 60; // 6mins（整台車用，小 buffer）
 	private static final Long TTL_IN_MILLISECONDS = 5 * 60 * 1000L; // 5mins（單筆明細用）
-	private static final Long ABOUT_TO_EXPIRE_IN_MILLISECONDS = 5 * 60 * 1000L; // 5mins (5分鐘後過期通知用）
+	private static final Long ABOUT_TO_EXPIRE_IN_MILLISECONDS = 295 * 1000L; // 4:55mins (5分鐘後過期通知用）
 	
 	private static final String GLOBAL_EXP_KEY = "cart:items:globalExp";
 	private static final String NOTIFY_LOCK_KEY_PREFIX = "cart:notify:lock:";

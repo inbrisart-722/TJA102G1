@@ -979,3 +979,7 @@ span.ticket_not_selling {
 	margin: 30px 0 36px 0;
 	font-size: 12px;
 }
+
+#main-div img{
+	max-width: 825px;
+}
