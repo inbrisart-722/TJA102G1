@@ -25,6 +25,7 @@ public class PlatformAnnouncementVO implements Serializable {
 	private String title;
 	
 	// 內容不在VO做錯誤驗證, 手動判斷 summernote 的 <p><br></p>
+	@NotBlank(message = "公告內容不可為空")
 	@Column(name ="content", columnDefinition = "longtext") // 定義資料庫的型別為longtext
 	private String content;
 	
