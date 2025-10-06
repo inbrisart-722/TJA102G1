@@ -30,7 +30,13 @@
 <link href="css/g1_6_custom.css" rel="stylesheet" />
 <style>
 	a.cart_bt strong {
- 	 display: none;
+ 		display: none;
+	}
+	
+	footer {
+    	background: none !important;
+    	color: #fff;
+    	/* padding: 30px 0 10px 0; */
 	}
 </style>
 </head>
@@ -175,7 +181,7 @@
     <!-- websocket 聊天室使用（內含多份檔案） -->
 	<div th:replace="fragments/chat-widget :: chat-widget"></div>
 	
-	<footer class="revealed" style="width: auto;"></footer>
+	<footer class="revealed"></footer>
 
 	<!-- Common scripts -->
 	<script src="js/jquery-3.7.1.min.js"></script>

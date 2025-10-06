@@ -70,35 +70,26 @@ public class PlatformIndexController {
 
 	// 首頁
 	@GetMapping("/platform/index")
-	public String index(Model model, @RequestParam(defaultValue = "0") int page,
-			@RequestParam(required = false) String keyword) {
+	public String index(Model model,
+	                    @RequestParam(defaultValue = "0") int page,
+	                    @RequestParam(required = false) String keyword) {
 
-		// === 分頁 + 關鍵字搜尋 ===
-		PageRequest pageable = PageRequest.of(page, 5, Sort.by("createdAt").descending());
-		Page<PlatformAnnouncementVO> annPage = annSvc.search(keyword, pageable);
+	    // === 分頁 + 關鍵字搜尋 ===
+	    PageRequest pageable = PageRequest.of(page, 5, Sort.by("createdAt").descending());
+	    Page<PlatformAnnouncementVO> annPage = annSvc.search(keyword, pageable);
 
-		// === 公告內容轉純文字，避免html標籤影響表格 ===
-		for (PlatformAnnouncementVO ann : annPage.getContent()) {
-			if (ann.getContent() != null) {
-				String plain = ann.getContent().replaceAll("<[^>]*>", "").trim();
-				if (plain.length() > 50) {
-					plain = plain.substring(0, 50) + "...";
-				}
-				ann.setContent(plain);
-			}
-		}
+	    // ✅ 不再清除 HTML、不再截斷內容，直接使用原始資料
+	    model.addAttribute("annListData", annPage.getContent());
+	    model.addAttribute("annPage", annPage);
+	    model.addAttribute("keyword", keyword); // 保留搜尋欄的輸入值
 
-		model.addAttribute("annListData", annPage.getContent());
-		model.addAttribute("annPage", annPage);
-		model.addAttribute("keyword", keyword); // 保留搜尋欄的輸入值
+	    // === 帶入平台統計數據 ===
+	    model.addAttribute("pendingExhibitorCount", exhibitorSvc.countByStatusId(1)); // 只統計狀態是1待核准的
+	    model.addAttribute("memberCount", memberSvc.countAll());
+	    model.addAttribute("exhibitorCount", exhibitorSvc.countAll());
+	    model.addAttribute("exhibitionCount", exhibitionSvc.countAll());
 
-		// === 帶入平台統計數據 ===
-		model.addAttribute("pendingExhibitorCount", exhibitorSvc.countByStatusId(1)); // 只統計狀態是1待核准的
-		model.addAttribute("memberCount", memberSvc.countAll());
-		model.addAttribute("exhibitorCount", exhibitorSvc.countAll());
-		model.addAttribute("exhibitionCount", exhibitionSvc.countAll());
-
-		return "platform/index";
+	    return "platform/index";
 	}
 
 	@GetMapping("/platform/platform_edit")
