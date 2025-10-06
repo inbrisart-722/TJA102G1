@@ -21,7 +21,7 @@ public class LoadPhotoController {
     /**
      * 取得圖片檔案。
      * 範例請求：
-     * GET /front-end/load-photo/exhibition/photo_portrait/abc123.jpg
+     * GET /load-photo/photo_portrait/abc123.jpg
      */
     @GetMapping("/{category}/{filename}")
     public ResponseEntity<Resource> getPhoto(
