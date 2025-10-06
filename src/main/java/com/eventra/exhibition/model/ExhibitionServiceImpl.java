@@ -1,7 +1,5 @@
-
 package com.eventra.exhibition.model;
 
-import java.util.function.Consumer;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -32,14 +30,10 @@ import org.springframework.web.multipart.MultipartFile;
 import com.eventra.comment.controller.CommentStatus;
 import com.eventra.comment.model.CommentRepository;
 import com.eventra.eventnotification.model.EventNotificationService.NotificationType;
-import com.eventra.exhibition.backend.controller.dto.ExhibitionReviewReqDTO;
-import com.eventra.exhibition_review_log.model.ExhibitionReviewLogRepository;
-import com.eventra.exhibition_review_log.model.ExhibitionReviewLogVO;
 import com.eventra.exhibitiontickettype.model.ExhibitionTicketTypeRepository;
 import com.eventra.exhibitiontickettype.model.ExhibitionTicketTypeVO;
 import com.eventra.exhibitor.backend.controller.dto.ExhibitionCreateDTO;
 import com.eventra.exhibitor.model.ExhibitorDTO;
-import com.eventra.exhibitor.model.ExhibitorRepository;
 import com.eventra.exhibitor.model.ExhibitorVO;
 import com.eventra.fileupload.FileCategory;
 import com.eventra.fileupload.LocalFileUploadService;
@@ -61,9 +55,6 @@ import jakarta.persistence.PersistenceContext;
 public class ExhibitionServiceImpl implements ExhibitionService {
 
 	private final ExhibitionRepository repository;
-
-	private final ExhibitorRepository exhibitorRepo;
-
 	private final ExhibitionTicketTypeRepository exhibitionTicketTypeRepository;
 	private final TicketTypeRepository ticketTypeRepository;
 	private final OrderRepository orderRepository;
@@ -637,180 +628,4 @@ public class ExhibitionServiceImpl implements ExhibitionService {
 	public long countAll() {
 		return repository.count(); // 直接用 JPA 內建 count()
 	}
-
-	
-	
-//	
-//	
-//	
-//	
-//	
-//	
-//	
-//	
-//	
-//	
-//	
-//	
-	public List<ExhibitionReviewPageDTO> getExhibitionsForReviewPage() {
-		List<ExhibitionVO> exhibitions = repository.findAll();
-
-		List<ExhibitionReviewPageDTO> dtos = new ArrayList<>();
-		for (ExhibitionVO vo : exhibitions) {
-			ExhibitionReviewPageDTO dto = new ExhibitionReviewPageDTO();
-			dto.setExhibitionStatus(vo.getExhibitionStatus().getExhibitionStatus());
-			dto.setExhibitionName(vo.getExhibitionName());
-			dto.setExhibitorName(vo.getExhibitorVO().getExhibitorRegistrationName());
-			dto.setExhibitionId(vo.getExhibitionId());
-
-			dtos.add(dto);
-		}
-
-		return dtos;
-	}
-//
-//	
-//	//		public List<ExhibitionReviewReqDTO> getExhibitionReviewReqDTO = new ArrayList<>() {
-//	//		List<ExhibitorVO> exhibitorVO = repository.exhibitorRepo.findAll();
-//	//	}
-//
-//	
-//	
-//	
-//	
-//	
-//	
-//	
-//	
-//	
-//	
-//	
-//	
-//	
-//	
-//	private void setIfHasText(String string, Consumer<String> setter) {
-//	    if (string != null && !string.isBlank()) setter.accept(string.trim());
-//	}
-//
-//	@Override
-//	@Transactional
-//	public void reviewAndSave(ExhibitionReviewReqDTO dto) {
-//
-//	    // 1) 基本驗證
-//	    if (dto.getExhibitionId() == null) {
-//	        throw new IllegalArgumentException("exhibitionId 不可為空");
-//	    }
-//	    if (dto.getStatusId() == null) {
-//	        throw new IllegalArgumentException("statusId 不可為空");
-//	    }
-//	    int status = dto.getStatusId();
-//	    if (status != 3 && status != 4 && status != 5) {
-//	        throw new IllegalArgumentException("statusId 僅接受 3(失敗) / 4(成功) / 5(已結束)");
-//	    }
-//	    if (status == 3) { // 失敗必填理由
-//	        String reason = dto.getRejectReason() == null ? "" : dto.getRejectReason().trim();
-//	        if (reason.isEmpty()) {
-//	            throw new IllegalArgumentException("審核失敗需提供 rejectReason");
-//	        }
-//	    }
-//
-//	    // 2) 取展覽
-//	    ExhibitionVO exhibitionVO = repository.findById(dto.getExhibitionId())
-//	        .orElseThrow(() -> new IllegalArgumentException("展覽不存在: " + dto.getExhibitionId()));
-//
-//	    // 3) 若是結束展覽，直接結束並寫 log 後返回
-//	    if (status == 5) {
-//	        endExhibition(dto.getExhibitionId());
-//
-//	        ExhibitionReviewLogVO endLog = new ExhibitionReviewLogVO();
-//	        endLog.setExhibitionId(dto.getExhibitionId());
-//	        // 若你的 VO 有 reviewedAt 欄位可加： endLog.setReviewedAt(LocalDateTime.now());
-//	        endLog.setRejectReason(null);
-//	        reviewLogRepo.save(endLog);
-//	        return;
-//	    }
-//
-//	    // 4) 寫回展覽狀態
-//	    exhibitionVO.setExhibitionStatusId(status);
-//	    if (status == 3) {
-//	        exhibitionVO.setLastRejectReason(dto.getRejectReason());
-//	    }
-//
-//	    // 5) 更新展覽欄位（可為 null 表示不更新）
-//	    setIfHasText(dto.getExhibitionName(), exhibitionVO::setExhibitionName);
-//	    setIfHasText(dto.getDescription(),    exhibitionVO::setDescription);
-//
-//	    // 6) 更新展商欄位（可為 null 表示不更新）
-//	    ExhibitorVO exhibitorVO = exhibitionVO.getExhibitorVO();
-//	    if (exhibitorVO != null) {
-//	        setIfHasText(dto.getCompanyName(),      exhibitorVO::setCompanyName);
-//	        setIfHasText(dto.getBusinessIdNumber(), exhibitorVO::setBusinessIdNumber);
-//	        setIfHasText(dto.getContactPhone(),     exhibitorVO::setContactPhone);
-//	        setIfHasText(dto.getContactName(),      exhibitorVO::setContactName);
-//	        setIfHasText(dto.getCompanyAddress(),   exhibitorVO::setCompanyAddress);
-//	        setIfHasText(dto.getEmail(),            exhibitorVO::setEmail);
-//	        // 若未設定 cascade，手動存 Exhibitor
-//	        exhibitorRepo.save(exhibitorVO);
-//	    }
-//
-//	    // 7) 存展覽
-//	    repository.save(exhibitionVO);
-//
-//	    // 8) 寫入審核 Log
-//	    ExhibitionReviewLogVO exhibitionReviewLogVO = new ExhibitionReviewLogVO();
-//	    exhibitionReviewLogVO.setExhibitionId(exhibitionVO.getExhibitionId());
-//	    // 若有 reviewedAt / status 欄位可加：
-//	    // log.setReviewedAt(LocalDateTime.now());
-//	    // log.setStatusId(status);
-//	    exhibitionReviewLogVO.setRejectReason(status == 3 ? dto.getRejectReason() : null);
-//	    reviewLogRepo.save(exhibitionReviewLogVO);
-//	}
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//	/** 共用邏輯：真的做狀態更新的地方（用 primitive int 避免 NPE） */
-//	private void doUpdateStatus(Integer exhibitionId, Integer statusId) {
-//	    if (statusId == 5) {
-//	        endExhibition(exhibitionId);
-//	        return;
-//	    }
-//	    ExhibitionVO exhibitionee = repository.findById(exhibitionId)
-//	            .orElseThrow(() -> new IllegalArgumentException("展覽不存在: " + exhibitionId));
-//	    exhibitionee.setExhibitionStatusId(statusId);
-//	    repository.save(exhibitionee);
-//	}
-//
-//	@Override
-//	@Transactional
-//	public void endExhibition(Integer exhibitionId) {
-//	    ExhibitionVO exhibitionaa = repository.findById(exhibitionId)
-//	            .orElseThrow(() -> new IllegalArgumentException("展覽不存在: " + exhibitionId));
-//	    exhibitionaa.setExhibitionStatusId(5);
-//	    exhibitionaa.setEndTime(LocalDateTime.now());
-//	    repository.save(exhibitionaa);
-//	}
-//
-//	@Override
-//	@Transactional
-//	public void updateStatus(Integer exhibitionId, Integer statusId) {
-//	    // operatorId 目前沒用到，若之後要記錄操作人可在這裡加
-//		
-//		if (statusId == null) {
-//	        throw new IllegalArgumentException("statusId 不能為空");
-//	    }
-//	    doUpdateStatus(exhibitionId, statusId);
-//	    
-//	    
-//	    
-//	}
-
 }
