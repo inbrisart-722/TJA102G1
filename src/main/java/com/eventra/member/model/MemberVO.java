@@ -9,6 +9,8 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
 
 @Entity
 @Table(name = "member")
@@ -18,8 +20,10 @@ public class MemberVO {
 	@GeneratedValue(strategy=GenerationType.IDENTITY)
 	@Column(name = "member_id")
     private Integer memberId;
+	@NotBlank(message = "Email 不可為空")
+	@Email(message = "Email 格式不正確")
 	@Column(name = "email")
-    private String email;
+	private String email;
 	@Column(name = "password_hash")
     private String passwordHash;
 	@Column(name = "full_name")

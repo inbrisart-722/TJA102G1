@@ -45,91 +45,52 @@
         </div>
       </div>
 
-      <div class="container-fluid">
-        <div class="card card-primary card-outline">
-          <div class="card-body p-0">
-            <div class="table-responsive">
-              <table class="table table-hover mb-0 align-middle">
-                <thead class="table-light">
-                  <tr>
-                    <th style="width:110px;">會員編號</th>
-                    <th style="width:130px;">姓名</th>
-                    <th style="width:80px;">性別</th>
-                    <th style="width:130px;">生日</th>
-                    <th style="width:160px;">連絡電話</th>
-                    <th style="width:200px;">Email</th>
-                    <th>地址</th>
-                    <th style="width:140px; text-align:center;">操作</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <!-- 範例列 -->
-                  <tr>
-                    <td>00001</td>
-                    <td>王小明</td>
-                    <td>男</td>
-                    <td>2000/01/01</td>
-                    <td>0912345678</td>
-                    <td>abc@email.com</td>
-                    <td>台北市中山區南京東路三段219號4F</td>
-                    <td class="text-center">
-                      <button class="btn btn-outline-secondary btn-sm me-1" onclick="window.location.href='/platform/member_edit'">修改</button>
-                      <button class="btn btn-outline-danger btn-sm">刪除</button>
-                    </td>
-                  </tr>
-                  <tr>
-                    <td>00002</td>
-                    <td>李小華</td>
-                    <td>女</td>
-                    <td>2001/02/15</td>
-                    <td>0922333444</td>
-                    <td>xyz@email.com</td>
-                    <td>新北市汐止區新台五路1段100號22樓</td>
-                    <td class="text-center">
-                      <button class="btn btn-outline-secondary btn-sm me-1">修改</button>
-                      <button class="btn btn-outline-danger btn-sm">刪除</button>
-                    </td>
-                  </tr>
-                  <tr>
-                    <td>00003</td>
-                    <td>陳大同</td>
-                    <td>男</td>
-                    <td>1999/12/25</td>
-                    <td>0933555666</td>
-                    <td>test@email.com</td>
-                    <td>桃園市中壢區中正路99號</td>
-                    <td class="text-center">
-                      <button class="btn btn-outline-secondary btn-sm me-1">修改</button>
-                      <button class="btn btn-outline-danger btn-sm">刪除</button>
-                    </td>
-                  </tr>
+			<div class="container-fluid">
+				<div class="card card-primary card-outline">
+					<div class="card-body p-0">
+						<div class="table-responsive">
+							<table class="table table-hover mb-0 align-middle">
+								<thead class="table-light">
+									<tr>
+										<th style="width: 100px;">會員編號</th>
+										<th style="width: 70px;">姓名</th>
+										<th style="width: 50px;">性別</th>
+										<th style="width: 110px;">生日</th>
+										<th style="width: 120px;">手機號碼</th>
+										<th style="width: 150px;">Email</th>
+										<th style="width: 150px;">地址</th>
+										<th style="width: 150px;">頭貼</th>
+										<th style="width: 40px;">修改</th>
 
-                  <!-- 灰色留白列 -->
-                  <tr><td colspan="8" class="bg-body-secondary" style="height:50px;"></td></tr>
-                  <tr><td colspan="8" class="bg-body-secondary" style="height:50px;"></td></tr>
-                  <tr><td colspan="8" class="bg-body-secondary" style="height:50px;"></td></tr>
-                  <tr><td colspan="8" class="bg-body-secondary" style="height:50px;"></td></tr>
-                </tbody>
-              </table>
-            </div>
-          </div>
+									</tr>
+								</thead>
 
-          <!-- 分頁 -->
-          <div class="card-footer bg-white">
-            <nav aria-label="Member pagination">
-              <ul class="pagination pagination-sm justify-content-center mb-0">
-                <li class="page-item disabled"><a class="page-link" href="#" tabindex="-1" aria-disabled="true">«</a></li>
-                <li class="page-item active"><a class="page-link" href="#">1</a></li>
-                <li class="page-item"><a class="page-link" href="#">2</a></li>
-                <li class="page-item"><a class="page-link" href="#">3</a></li>
-                <li class="page-item"><a class="page-link" href="#">4</a></li>
-                <li class="page-item"><a class="page-link" href="#">5</a></li>
-                <li class="page-item"><a class="page-link" href="#">»</a></li>
-              </ul>
-            </nav>
-          </div>
-        </div>
-      </div>
+								<tbody>
+									<!-- 範例列 -->
+									<th:block th:each="memberVO : ${memberList}">
+										<tr>
+											<td th:text="${memberVO.memberId}"></td>
+											<td th:text="${memberVO.fullName}"></td>
+											<td th:with="g=${#strings.toLowerCase(memberVO.gender)}"
+												th:text="${ g=='male' ? '男性': (g=='female' or g=='famale') ? '女性': '未設定' }"></td>
+
+											<td th:text="${memberVO.birthDate}"></td>
+											<td th:text="${memberVO.phoneNumber}"></td>
+											<td th:text="${memberVO.email}"></td>
+											<td th:text="${memberVO.address}"></td>
+											<td></td>
+
+
+											<td class="text-center">
+												<!-- 											<button class="btn btn-outline-secondary btn-sm me-1" -->
+												<!-- 												onclick="document.querySelector('#sendkkk').submit()">修改</button> -->
+												<form method="post" id="sendkkk"
+									 				th:action="@{/platform/member_edit}">
+													<input type="submit" value="修改" style="display: block">
+													<input type="hidden" name="memberId"
+														th:value="${memberVO.memberId}">
+												</form>
+
     </main>
 
     <!-- Footer -->

@@ -2,33 +2,36 @@ package com.eventra.exhibition.model;
 
 public class ExhibitionReviewPageDTO {
 	private String exhibitionStatus;
-	private String exhibitorId;
 	private String exhibitionName;
 	private String exhibitorName;
+	private Integer exhibitionId;
 	
 	public String getExhibitionStatus() {
 		return exhibitionStatus;
 	}
-	public void setExhibitionStatus(String exhibitionStatus) {
+	public ExhibitionReviewPageDTO setExhibitionStatus(String exhibitionStatus) {
 		this.exhibitionStatus = exhibitionStatus;
-	}
-	public String getExhibitorId() {
-		return exhibitorId;
-	}
-	public void setExhibitorId(String exhibitorId) {
-		this.exhibitorId = exhibitorId;
+		return this;
 	}
 	public String getExhibitionName() {
 		return exhibitionName;
 	}
-	public void setExhibitionName(String exhibitionName) {
+	public ExhibitionReviewPageDTO setExhibitionName(String exhibitionName) {
 		this.exhibitionName = exhibitionName;
+		return this;
 	}
 	public String getExhibitorName() {
 		return exhibitorName;
 	}
-	public void setExhibitorName(String exhibitorName) {
+	public ExhibitionReviewPageDTO setExhibitorName(String exhibitorName) {
 		this.exhibitorName = exhibitorName;
+		return this;
 	}
-	
+	public Integer getExhibitionId() {
+		return exhibitionId;
+	}
+	public ExhibitionReviewPageDTO setExhibitionId(Integer exhibitionId) {
+		this.exhibitionId = exhibitionId;
+		return this;
+	}
 }

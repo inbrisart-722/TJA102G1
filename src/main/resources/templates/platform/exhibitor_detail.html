@@ -1,117 +1,216 @@
 <!doctype html>
 <html lang="zh-Hant" xmlns:th="http://www.thymeleaf.org">
 <head>
-  <meta charset="utf-8" />
-  <title>Eventra 管理者平台 — 廠商申請審核</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
-  <meta name="color-scheme" content="light dark" />
-  <meta name="theme-color" content="#007bff" media="(prefers-color-scheme: light)" />
-  <meta name="theme-color" content="#1a1a1a" media="(prefers-color-scheme: dark)" />
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/source-sans-3@5.0.12/index.css" crossorigin="anonymous" media="print" onload="this.media='all'"/>
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/overlayscrollbars@2.11.0/styles/overlayscrollbars.min.css" crossorigin="anonymous"/>
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css" crossorigin="anonymous"/>
-  <link rel="stylesheet" href="./css/adminlte.css" />
-  <style>
-    body{font-family:"Source Sans 3","Noto Sans TC","Microsoft JhengHei",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
-    .logo-circle{width:96px;height:96px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.06)}
-    .panel{background:#fff;border:1px solid #e5e7eb;border-radius:1rem;padding:1.25rem}
-    .form-wrap{max-width:1000px}
-    .label-col{width:140px}
-  </style>
-</head>
-<body class="layout-fixed sidebar-expand-lg sidebar-open bg-body-tertiary">
-<div class="app-wrapper">
+<meta charset="utf-8" />
+<title>Eventra 管理者平台 — 廠商申請審核</title>
+<meta name="viewport"
+	content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+<meta name="color-scheme" content="light dark" />
+<meta name="theme-color" content="#007bff"
+	media="(prefers-color-scheme: light)" />
+<meta name="theme-color" content="#1a1a1a"
+	media="(prefers-color-scheme: dark)" />
+<link rel="stylesheet"
+	href="https://cdn.jsdelivr.net/npm/@fontsource/source-sans-3@5.0.12/index.css"
+	crossorigin="anonymous" media="print" onload="this.media='all'" />
+<link rel="stylesheet"
+	href="https://cdn.jsdelivr.net/npm/overlayscrollbars@2.11.0/styles/overlayscrollbars.min.css"
+	crossorigin="anonymous" />
+<link rel="stylesheet"
+	href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css"
+	crossorigin="anonymous" />
+<link rel="stylesheet" href="./css/adminlte.css" />
+<style>
+body {
+	font-family: "Source Sans 3", "Noto Sans TC", "Microsoft JhengHei",
+		system-ui, -apple-system, "Segoe UI", Roboto, sans-serif
+}
 
-<!-- 共用 header & sidebar -->
+.logo-circle {
+	width: 96px;
+	height: 96px;
+	border-radius: 50%;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	background: rgba(0, 0, 0, .06)
+}
+
+.panel {
+	background: #fff;
+	border: 1px solid #e5e7eb;
+	border-radius: 1rem;
+	padding: 1.25rem
+}
+
+.form-wrap {
+	max-width: 1000px
+}
+
+.label-col {
+	width: 140px
+}
+</style>
+</head>
+<body
+	class="layout-fixed sidebar-expand-lg sidebar-open bg-body-tertiary">
+	<div class="app-wrapper">
+
+		<!-- 共用 header & sidebar -->
 		<div th:replace="~{platform/common/layout :: header}"></div>
 		<div th:replace="~{platform/common/layout :: sidebar}"></div>
 
-  <!-- Main -->
-  <main class="app-main">
-    <div class="app-content-header">
-      <div class="container-fluid">
-        <h1 class="mb-3" style="font-weight:700;font-size:32px;">申請管理</h1>
-      </div>
-    </div>
+		<!-- Main -->
+		<main class="app-main">
+			<div class="app-content-header">
+				<div class="container-fluid">
+					<h1 class="mb-3" style="font-weight: 700; font-size: 32px;">申請管理</h1>
+				</div>
+			</div>
 
-    <div class="app-content">
-      <div class="container-fluid">
-        <div class="panel form-wrap">
-          <form id="review-form" novalidate th:action="@{/platform/exhibitor-review}" method="POST" >
-            <!-- 廠商編號（唯讀顯示） -->
-            <div class="row g-3 align-items-center mb-2">
-              <div class="col-12 col-sm-2 label-col"><label class="col-form-label">廠商 ID</label></div>
-              <div class="col-12 col-sm-10"><div class="form-control-plaintext" th:text=${exhibitor.exhibitorId}>A003</div></div>
-            </div>
-            <!-- 公司名稱 -->
-            <div class="row g-3 align-items-center mb-2">
-              <div class="col-12 col-sm-2 label-col"><label for="company" class="col-form-label">公司名稱</label></div>
-              <div class="col-12 col-sm-10"><div class="form-control-plaintext" th:text=${exhibitor.companyName}>A003</div></div>
-            </div>
-            <!-- 統編 + 代表人 -->
-            <div class="row g-3 align-items-center mb-2">
-              <div class="col-12 col-sm-2 label-col"><label for="vat" class="col-form-label">統一編號</label></div>
-              <div class="col-12 col-sm-10"><div class="form-control-plaintext" th:text=${exhibitor.businessIdNumber}>A003</div></div>
-            </div>
-            <!-- 電話 + 聯絡人 -->
-            <div class="row g-3 align-items-center mb-2">
-              <div class="col-12 col-sm-2 label-col"><label for="tel" class="col-form-label">聯絡電話</label></div>
-              <div class="col-12 col-sm-10"><div class="form-control-plaintext" th:text=${exhibitor.contactPhone}>A003</div></div>
-            </div>
-            <!-- 地址 -->
-            <div class="row g-3 align-items-center mb-2">
-              <div class="col-12 col-sm-2 label-col"><label for="addr" class="col-form-label">公司地址</label></div>
-              <div class="col-12 col-sm-10"><div class="form-control-plaintext" th:text=${exhibitor.companyAddress}>A003</div></div>
-            </div>
-            <!-- Email -->
-            <div class="row g-3 align-items-center mb-2">
-              <div class="col-12 col-sm-2 label-col"><label for="email" class="col-form-label">聯絡信箱</label></div>
-              <div class="col-12 col-sm-10"><div class="form-control-plaintext" th:text=${exhibitor.email}>A003</div></div>
-            </div>
-            <div class="row g-3 align-items-center mb-2">
-              <div class="col-12 col-sm-2 label-col"><label for="email" class="col-form-label">銀行代碼</label></div>
-              <div class="col-12 col-sm-10"><div class="form-control-plaintext" th:text=${exhibitor.bankCode}>A003</div></div>
-            </div>
-            <div class="row g-3 align-items-center mb-2">
-              <div class="col-12 col-sm-2 label-col"><label for="email" class="col-form-label">銀行戶名</label></div>
-              <div class="col-12 col-sm-10"><div class="form-control-plaintext" th:text=${exhibitor.bankAccountName}>A003</div></div>
-            </div>
-            <div class="row g-3 align-items-center mb-2">
-              <div class="col-12 col-sm-2 label-col"><label for="email" class="col-form-label">銀行帳號</label></div>
-              <div class="col-12 col-sm-10"><div class="form-control-plaintext" th:text=${exhibitor.bankAccountNumber}>A003</div></div>
-            </div>
-            <!-- 未通過原因 -->
-            <br>
-            <div class="row g-3 align-items-start mb-3">
-              <div class="col-12 col-sm-2 label-col"><label for="rejectReason" class="col-form-label">未通過原因<br>(選填)</label></div>
-              <div class="col-12 col-sm-10">
-                <textarea id="rejectReason" name="rejectReason" class="form-control" rows="6" placeholder="請輸入展覽內容…"></textarea>
-                <div class="invalid-feedback" id="err-feedback-msg" style="display: none">請填寫未通過原因。</div>
-              </div>
-            </div>
-            
-			<input type="hidden" name="exhibitorId" th:value="${exhibitor.exhibitorId}">
-			
-            <div class="d-flex gap-2 justify-content-end" style="margin-right: 24px;">
-            	<button type="button" style="background: 0; color: black; border: 0;" ><a style="color: black" onclick="if(confirm('確定取消並放棄此次審核嗎？')) window.location.href = '/platform/exhibitor'; ">取消</a></button>
-              <button type="button" class="btn btn-primary" id="btn-pass">審核成功</button>
-              <button type="button" class="btn btn-outline-secondary" id="btn-fail" style="background-color: red; color: white; filter: saturate(0.8)">審核失敗</button>
-            </div>
-          </form>
-        </div>
-      </div>
-    </div>
-  </main>
+			<div class="app-content">
+				<div class="container-fluid">
+					<div class="panel form-wrap">
+						<form id="review-form" novalidate
+							th:action="@{/platform/exhibitor-review}" method="POST">
+							<!-- 廠商編號（唯讀顯示） -->
+							<div class="row g-3 align-items-center mb-2">
+								<div class="col-12 col-sm-2 label-col">
+									<label class="col-form-label">廠商 ID</label>
+								</div>
+								<div class="col-12 col-sm-10">
+									<div class="form-control-plaintext"
+										th:text=${exhibitor.exhibitorId}>A003</div>
+								</div>
+							</div>
+							<!-- 公司名稱 -->
+							<div class="row g-3 align-items-center mb-2">
+								<div class="col-12 col-sm-2 label-col">
+									<label for="company" class="col-form-label">公司名稱</label>
+								</div>
+								<div class="col-12 col-sm-10">
+									<div class="form-control-plaintext"
+										th:text=${exhibitor.companyName}>A003</div>
+								</div>
+							</div>
+							<!-- 統編 + 代表人 -->
+							<div class="row g-3 align-items-center mb-2">
+								<div class="col-12 col-sm-2 label-col">
+									<label for="vat" class="col-form-label">統一編號</label>
+								</div>
+								<div class="col-12 col-sm-10">
+									<div class="form-control-plaintext"
+										th:text=${exhibitor.businessIdNumber}>A003</div>
+								</div>
+							</div>
+							<!-- 電話 + 聯絡人 -->
+							<div class="row g-3 align-items-center mb-2">
+								<div class="col-12 col-sm-2 label-col">
+									<label for="tel" class="col-form-label">聯絡電話</label>
+								</div>
+								<div class="col-12 col-sm-10">
+									<div class="form-control-plaintext"
+										th:text=${exhibitor.contactPhone}>A003</div>
+								</div>
+							</div>
+							<!-- 地址 -->
+							<div class="row g-3 align-items-center mb-2">
+								<div class="col-12 col-sm-2 label-col">
+									<label for="addr" class="col-form-label">公司地址</label>
+								</div>
+								<div class="col-12 col-sm-10">
+									<div class="form-control-plaintext"
+										th:text=${exhibitor.companyAddress}>A003</div>
+								</div>
+							</div>
+							<!-- Email -->
+							<div class="row g-3 align-items-center mb-2">
+								<div class="col-12 col-sm-2 label-col">
+									<label for="email" class="col-form-label">聯絡信箱</label>
+								</div>
+								<div class="col-12 col-sm-10">
+									<div class="form-control-plaintext" th:text=${exhibitor.email}>A003</div>
+								</div>
+							</div>
+							<div class="row g-3 align-items-center mb-2">
+								<div class="col-12 col-sm-2 label-col">
+									<label for="email" class="col-form-label">銀行代碼</label>
+								</div>
+								<div class="col-12 col-sm-10">
+									<div class="form-control-plaintext"
+										th:text=${exhibitor.bankCode}>A003</div>
+								</div>
+							</div>
+							<div class="row g-3 align-items-center mb-2">
+								<div class="col-12 col-sm-2 label-col">
+									<label for="email" class="col-form-label">銀行戶名</label>
+								</div>
+								<div class="col-12 col-sm-10">
+									<div class="form-control-plaintext"
+										th:text=${exhibitor.bankAccountName}>A003</div>
+								</div>
+							</div>
+							<div class="row g-3 align-items-center mb-2">
+								<div class="col-12 col-sm-2 label-col">
+									<label for="email" class="col-form-label">銀行帳號</label>
+								</div>
+								<div class="col-12 col-sm-10">
+									<div class="form-control-plaintext"
+										th:text=${exhibitor.bankAccountNumber}>A003</div>
+								</div>
+							</div>
+							<!-- 未通過原因 -->
+							<br>
+							<div class="row g-3 align-items-start mb-3">
+								<div class="col-12 col-sm-2 label-col">
+									<label for="rejectReason" class="col-form-label">未通過原因<br>(選填)
+									</label>
+								</div>
+								<div class="col-12 col-sm-10">
+									<textarea id="rejectReason" name="rejectReason"
+										class="form-control" rows="6" placeholder="請輸入展覽內容…"></textarea>
+									<div class="invalid-feedback" id="err-feedback-msg"
+										style="display: none">請填寫未通過原因。</div>
+								</div>
+							</div>
 
-  <!-- footer -->
+							<input type="hidden" name="exhibitorId"
+								th:value="${exhibitor.exhibitorId}">
+
+							<div class="d-flex gap-2 justify-content-end"
+								style="margin-right: 24px;">
+								<button type="button"
+									style="background: 0; color: black; border: 0;">
+									<a style="color: black"
+										onclick="if(confirm('確定取消並放棄此次審核嗎？')) window.location.href = '/platform/exhibitor'; ">取消</a>
+								</button>
+								<button type="button" class="btn btn-primary" id="btn-pass">審核成功</button>
+								<button type="button" class="btn btn-outline-secondary"
+									id="btn-fail"
+									style="background-color: red; color: white; filter: saturate(0.8)">審核失敗</button>
+							</div>
+						</form>
+					</div>
+				</div>
+			</div>
+		</main>
+
+		<!-- footer -->
 		<div th:replace="~{platform/common/layout :: footer}"></div>
-</div>
+	</div>
 
-<script src="https://cdn.jsdelivr.net/npm/overlayscrollbars@2.11.0/browser/overlayscrollbars.browser.es6.min.js" crossorigin="anonymous"></script>
-<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js" crossorigin="anonymous"></script>
-script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.min.js" crossorigin="anonymous"></script>
-<script src="./js/adminlte.js"></script>
-<script>
+	<script
+		src="https://cdn.jsdelivr.net/npm/overlayscrollbars@2.11.0/browser/overlayscrollbars.browser.es6.min.js"
+		crossorigin="anonymous"></script>
+	<script
+		src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"
+		crossorigin="anonymous"></script>
+	script
+	src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.min.js"
+	crossorigin="anonymous">
+	</script>
+	<script src="./js/adminlte.js"></script>
+	<script>
   // 側欄捲軸
   document.addEventListener('DOMContentLoaded', () => {
     const sw = document.querySelector('.sidebar-wrapper');

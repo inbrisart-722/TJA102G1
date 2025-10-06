@@ -1,9 +1,5 @@
 package com.eventra.exhibition.model;
 
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -12,7 +8,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
-import java.util.UUID;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -151,23 +146,23 @@ public class ExhibitionServiceImpl implements ExhibitionService {
 //		String photo_portrait = localFileUploadService.save(portrait, FileCategory.exhibition_portrait);
 //		MultipartFile landscape = dto.getPhotoLandscape();
 //		String photo_landscape = localFileUploadService.save(landscape, FileCategory.exhibition_landscape);
-		
+
 		// 現在：有檔才save
 		String photoPortraitPath = null;
-		MultipartFile portrait = dto.getPhotoPortrait(); 
+		MultipartFile portrait = dto.getPhotoPortrait();
 		if (portrait != null && !portrait.isEmpty()) {
-		    photoPortraitPath = localFileUploadService.save(portrait, FileCategory.exhibition_portrait);
+			photoPortraitPath = localFileUploadService.save(portrait, FileCategory.exhibition_portrait);
 		}
 
 		String photoLandscapePath = null;
 		MultipartFile landscape = dto.getPhotoLandscape();
-    
+
 		if (landscape != null && !landscape.isEmpty()) {
-		    photoLandscapePath = localFileUploadService.save(landscape, FileCategory.exhibition_landscape);
+			photoLandscapePath = localFileUploadService.save(landscape, FileCategory.exhibition_landscape);
 		}
 		saved.setPhotoPortrait(photoPortraitPath);
 		saved.setPhotoLandscape(photoLandscapePath);
-		
+
 		// 6) 第二次 save : 更新圖片路徑
 		repository.save(saved);
 
@@ -304,17 +299,17 @@ public class ExhibitionServiceImpl implements ExhibitionService {
 		String photoPortraitPath = vo.getPhotoPortrait();
 		MultipartFile portrait = dto.getPhotoPortrait();
 		if (portrait != null && !portrait.isEmpty()) {
-		    photoPortraitPath = localFileUploadService.save(portrait, FileCategory.exhibition_portrait);
+			photoPortraitPath = localFileUploadService.save(portrait, FileCategory.exhibition_portrait);
 		}
 
 		vo.setPhotoPortrait(photoPortraitPath);
-		
+
 		String photoLandscapePath = vo.getPhotoLandscape();
 		MultipartFile landscape = dto.getPhotoLandscape();
 		if (landscape != null && !landscape.isEmpty()) {
-		    photoLandscapePath = localFileUploadService.save(landscape, FileCategory.exhibition_landscape);
+			photoLandscapePath = localFileUploadService.save(landscape, FileCategory.exhibition_landscape);
 		}
-		
+
 		vo.setPhotoLandscape(photoLandscapePath);
 
 		// 按儲存為草稿按鈕後變更展覽狀態為草稿
@@ -627,5 +622,23 @@ public class ExhibitionServiceImpl implements ExhibitionService {
 	// 平台公告用, 展覽總數
 	public long countAll() {
 		return repository.count(); // 直接用 JPA 內建 count()
+		
 	}
+		public List<ExhibitionReviewPageDTO> getExhibitionsForReviewPage() {
+			List<ExhibitionVO> exhibitions = repository.findAll();
+
+			List<ExhibitionReviewPageDTO> dtos = new ArrayList<>();
+			for (ExhibitionVO vo : exhibitions) {
+				ExhibitionReviewPageDTO dto = new ExhibitionReviewPageDTO();
+				dto.setExhibitionStatus(vo.getExhibitionStatus().getExhibitionStatus());
+				dto.setExhibitionName(vo.getExhibitionName());
+				dto.setExhibitorName(vo.getExhibitorVO().getExhibitorRegistrationName());
+				dto.setExhibitionId(vo.getExhibitionId());
+
+				dtos.add(dto);
+			}
+
+			return dtos;
+		}
 }
+

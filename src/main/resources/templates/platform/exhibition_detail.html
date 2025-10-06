@@ -1,148 +1,330 @@
 <!doctype html>
-<html lang="zh-Hant">
+<html lang="zh-Hant" xmlns:th="http://www.thymeleaf.org">
 <head>
-  <meta charset="utf-8" />
-  <title>Eventra 管理者平台 — 活動申請審核</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
-  <meta name="color-scheme" content="light dark" />
-  <meta name="theme-color" content="#007bff" media="(prefers-color-scheme: light)" />
-  <meta name="theme-color" content="#1a1a1a" media="(prefers-color-scheme: dark)" />
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/source-sans-3@5.0.12/index.css" crossorigin="anonymous" media="print" onload="this.media='all'"/>
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/overlayscrollbars@2.11.0/styles/overlayscrollbars.min.css" crossorigin="anonymous"/>
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css" crossorigin="anonymous"/>
-  <link rel="stylesheet" href="./css/adminlte.css" />
-  <style>
-    body{font-family:"Source Sans 3","Noto Sans TC","Microsoft JhengHei",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
-    .logo-circle{width:96px;height:96px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.06)}
-    .form-wrap{max-width:1000px}
-    .panel{background:#fff;border:1px solid #e5e7eb;border-radius:1rem;padding:1.25rem}
-    .label-col{width:140px}
-  </style>
+
+
+
+
+<meta name="_csrf" th:content="${_csrf != null ? _csrf.token : ''}" />
+<meta name="_csrf_header"
+	th:content="${_csrf != null ? _csrf.headerName : 'X-CSRF-TOKEN'}" />
+
+
+
+
+
+
+
+<meta charset="utf-8" />
+<title>Eventra 管理者平台 — 活動申請審核</title>
+<meta name="viewport"
+	content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+<meta name="color-scheme" content="light dark" />
+<meta name="theme-color" content="#007bff"
+	media="(prefers-color-scheme: light)" />
+<meta name="theme-color" content="#1a1a1a"
+	media="(prefers-color-scheme: dark)" />
+<link rel="stylesheet"
+	href="https://cdn.jsdelivr.net/npm/@fontsource/source-sans-3@5.0.12/index.css"
+	crossorigin="anonymous" media="print" onload="this.media='all'" />
+<link rel="stylesheet"
+	href="https://cdn.jsdelivr.net/npm/overlayscrollbars@2.11.0/styles/overlayscrollbars.min.css"
+	crossorigin="anonymous" />
+<link rel="stylesheet"
+	href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css"
+	crossorigin="anonymous" />
+<link rel="stylesheet" href="./css/adminlte.css" />
+<style>
+body {
+	font-family: "Source Sans 3", "Noto Sans TC", "Microsoft JhengHei",
+		system-ui, -apple-system, "Segoe UI", Roboto, sans-serif
+}
+
+.logo-circle {
+	width: 96px;
+	height: 96px;
+	border-radius: 50%;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	background: rgba(0, 0, 0, .06)
+}
+
+.form-wrap {
+	max-width: 1000px
+}
+
+.panel {
+	background: #fff;
+	border: 1px solid #e5e7eb;
+	border-radius: 1rem;
+	padding: 1.25rem
+}
+
+.label-col {
+	width: 140px
+}
+
+.panel {
+	position: relative;
+} /* 讓子元素可以絕對定位在面板內 */
+.btn-end-exhibition {
+	position: absolute;
+	left: 12px;
+	bottom: 12px;
+}
+</style>
 </head>
-<body class="layout-fixed sidebar-expand-lg sidebar-open bg-body-tertiary">
-<div class="app-wrapper">
+<body
+	class="layout-fixed sidebar-expand-lg sidebar-open bg-body-tertiary">
+	<div class="app-wrapper">
 
-  <!-- Header -->
-  <nav class="app-header navbar navbar-expand bg-body-tertiary" data-bs-theme="dark">
-    <div class="container-fluid">
-      <ul class="navbar-nav">
-        <li class="nav-item"><a class="nav-link" data-lte-toggle="sidebar" href="#" role="button" aria-label="切換側欄"><i class="bi bi-list"></i></a></li>
-      </ul>
-      <ul class="navbar-nav ms-auto">
-        <li class="user-footer"><a href="/dist/examples/login.html" class="btn btn-default btn-flat float-end">Sign out</a></li>
-      </ul>
-    </div>
-  </nav>
+		<!-- Header -->
+		<nav class="app-header navbar navbar-expand bg-body-tertiary"
+			data-bs-theme="dark">
+			<div class="container-fluid">
+				<ul class="navbar-nav">
+					<li class="nav-item"><a class="nav-link"
+						data-lte-toggle="sidebar" href="#" role="button" aria-label="切換側欄"><i
+							class="bi bi-list"></i></a></li>
+				</ul>
+				<ul class="navbar-nav ms-auto">
+					<li class="user-footer"><a href="/dist/examples/login.html"
+						class="btn btn-default btn-flat float-end">Sign out</a></li>
+				</ul>
+			</div>
+		</nav>
 
-  <!-- Sidebar -->
-  <aside class="app-sidebar bg-body-tertiary" data-bs-theme="dark">
-    <div class="sidebar-brand text-center py-4">
-      <a href="#" class="brand-link d-flex flex-column align-items-center">
-        <div class="logo-circle mb-2">Logo</div>
-        <span class="brand-text fw-light">平台管理系統</span>
-      </a>
-    </div>
-    <div class="sidebar-wrapper">
-      <nav class="mt-2">
-        <ul class="nav sidebar-menu flex-column" data-lte-toggle="treeview" role="navigation" aria-label="Main navigation" data-accordion="false">
-          <li class="nav-item"><a href="#" class="nav-link"><i class="nav-icon bi bi-people-fill"></i><p>用戶管理<i class="nav-arrow bi bi-chevron-right"></i></p></a></li>
-          <li class="nav-item"><a href="#" class="nav-link"><i class="nav-icon bi bi-chat-left-text-fill"></i><p>留言管理<i class="nav-arrow bi bi-chevron-right"></i></p></a></li>
-          <li class="nav-item menu-open">
-            <a href="#" class="nav-link active"><i class="nav-icon bi bi-pencil-square"></i><p>申請管理<i class="nav-arrow bi bi-chevron-right"></i></p></a>
-            <ul class="nav nav-treeview">
-              <li class="nav-item"><a href="#" class="nav-link" style="padding-left:56px;"><p>廠商申請</p></a></li>
-              <li class="nav-item"><a href="#" class="nav-link active" style="padding-left:56px;"><p>活動申請</p></a></li>
-            </ul>
-          </li>
-          <li class="nav-item"><a href="#" class="nav-link"><i class="nav-icon bi bi-circle"></i><p>訂單管理</p></a></li>
-          <li class="nav-item"><a href="#" class="nav-link"><i class="nav-icon bi bi-circle"></i><p>報表管理</p></a></li>
-          <li class="nav-item mt-4"><a href="#" class="nav-link"><i class="nav-icon bi bi-box-arrow-right"></i><p>登出</p></a></li>
-        </ul>
-      </nav>
-    </div>
-  </aside>
+		<!-- Sidebar -->
+		<aside class="app-sidebar bg-body-tertiary" data-bs-theme="dark">
+			<div class="sidebar-brand text-center py-4">
+				<a href="#" class="brand-link d-flex flex-column align-items-center">
+					<div class="logo-circle mb-2">Logo</div> <span
+					class="brand-text fw-light">平台管理系統</span>
+				</a>
+			</div>
+			<div class="sidebar-wrapper">
+				<nav class="mt-2">
+					<ul class="nav sidebar-menu flex-column" data-lte-toggle="treeview"
+						role="navigation" aria-label="Main navigation"
+						data-accordion="false">
+						<li class="nav-item"><a href="#" class="nav-link"><i
+								class="nav-icon bi bi-people-fill"></i>
+								<p>
+									用戶管理<i class="nav-arrow bi bi-chevron-right"></i>
+								</p></a></li>
+						<li class="nav-item"><a href="#" class="nav-link"><i
+								class="nav-icon bi bi-chat-left-text-fill"></i>
+								<p>
+									留言管理<i class="nav-arrow bi bi-chevron-right"></i>
+								</p></a></li>
+						<li class="nav-item menu-open"><a href="#"
+							class="nav-link active"><i
+								class="nav-icon bi bi-pencil-square"></i>
+								<p>
+									申請管理<i class="nav-arrow bi bi-chevron-right"></i>
+								</p></a>
+							<ul class="nav nav-treeview">
+								<li class="nav-item"><a href="#" class="nav-link"
+									style="padding-left: 56px;"><p>廠商申請</p></a></li>
+								<li class="nav-item"><a href="#" class="nav-link active"
+									style="padding-left: 56px;"><p>活動申請</p></a></li>
+							</ul></li>
+						<li class="nav-item"><a href="#" class="nav-link"><i
+								class="nav-icon bi bi-circle"></i>
+								<p>訂單管理</p></a></li>
+						<li class="nav-item"><a href="#" class="nav-link"><i
+								class="nav-icon bi bi-circle"></i>
+								<p>報表管理</p></a></li>
+						<li class="nav-item mt-4"><a href="#" class="nav-link"><i
+								class="nav-icon bi bi-box-arrow-right"></i>
+								<p>登出</p></a></li>
+					</ul>
+				</nav>
+			</div>
+		</aside>
 
-  <!-- Main -->
-  <main class="app-main">
-    <div class="app-content-header">
-      <div class="container-fluid">
-        <h1 class="mb-3" style="font-weight:700;font-size:32px;">申請管理</h1>
-      </div>
-    </div>
+		<!-- Main -->
+		<main class="app-main">
+			<div class="app-content-header">
+				<div class="container-fluid">
+					<h1 class="mb-3" style="font-weight: 700; font-size: 32px;">申請管理</h1>
+				</div>
+			</div>
 
-    <div class="app-content">
-      <div class="container-fluid">
-        <div class="panel form-wrap">
-          <form id="review-form" novalidate>
-            <!-- 活動名稱 -->
-            <div class="row g-3 align-items-center mb-2">
-              <div class="col-12 col-sm-2 label-col"><label for="activityName" class="col-form-label">活動名稱</label></div>
-              <div class="col-12 col-sm-10"><input id="activityName" type="text" class="form-control" value="abc"/></div>
-            </div>
-            <!-- 展覽簡介 -->
-            <div class="row g-3 align-items-start mb-2">
-              <div class="col-12 col-sm-2 label-col"><label for="desc" class="col-form-label">展覽簡介</label></div>
-              <div class="col-12 col-sm-10"><textarea id="desc" class="form-control" rows="4">XXXXXXXXXXXXX</textarea></div>
-            </div>
-            <!-- 公司名稱 -->
-            <div class="row g-3 align-items-center mb-2">
-              <div class="col-12 col-sm-2 label-col"><label for="company" class="col-form-label">公司名稱</label></div>
-              <div class="col-12 col-sm-10"><input id="company" type="text" class="form-control" value="abc"/></div>
-            </div>
-            <!-- 統編 + 代表人 -->
-            <div class="row g-3 align-items-center mb-2">
-              <div class="col-12 col-sm-2 label-col"><label for="vat" class="col-form-label">統一編號</label></div>
-              <div class="col-12 col-sm-4"><input id="vat" type="text" class="form-control" value="24708053"/></div>
-              <div class="col-12 col-sm-2 label-col"><label for="ceo" class="col-form-label">代表人姓名</label></div>
-              <div class="col-12 col-sm-4"><input id="ceo" type="text" class="form-control" value="黃柏凱"/></div>
-            </div>
-            <!-- 連絡電話 + 聯絡人 -->
-            <div class="row g-3 align-items-center mb-2">
-              <div class="col-12 col-sm-2 label-col"><label for="tel" class="col-form-label">連絡電話</label></div>
-              <div class="col-12 col-sm-4"><input id="tel" type="text" class="form-control" value="02-66152085 #102"/></div>
-              <div class="col-12 col-sm-2 label-col"><label for="contact" class="col-form-label">聯絡人姓名</label></div>
-              <div class="col-12 col-sm-4"><input id="contact" type="text" class="form-control" value="王小姐"/></div>
-            </div>
-            <!-- 地址 -->
-            <div class="row g-3 align-items-center mb-2">
-              <div class="col-12 col-sm-2 label-col"><label for="addr" class="col-form-label">公司地址</label></div>
-              <div class="col-12 col-sm-10"><input id="addr" type="text" class="form-control" value="新北市汐止區新台五路1段100號25樓"/></div>
-            </div>
-            <!-- Email -->
-            <div class="row g-3 align-items-center mb-2">
-              <div class="col-12 col-sm-2 label-col"><label for="email" class="col-form-label">Email</label></div>
-              <div class="col-12 col-sm-10"><input id="email" type="email" class="form-control" value="def@tibame.com"/></div>
-            </div>
-            <!-- 未通過原因 -->
-            <div class="row g-3 align-items-start mb-3">
-              <div class="col-12 col-sm-2 label-col"><label for="rejectReason" class="col-form-label">未通過原因</label></div>
-              <div class="col-12 col-sm-10">
-                <textarea id="rejectReason" class="form-control" rows="4" placeholder="請輸入展覽內容…"></textarea>
-                <div class="invalid-feedback">請填寫未通過原因。</div>
-              </div>
-            </div>
+			<div class="app-content">
+				<div class="container-fluid">
+					<div class="panel form-wrap">
 
-            <div class="d-flex gap-2 justify-content-end">
-              <button type="button" class="btn btn-primary" id="btn-pass">審核成功</button>
-              <button type="button" class="btn btn-outline-secondary" id="btn-fail">審核失敗</button>
-            </div>
-          </form>
-        </div>
-      </div>
-    </div>
-  </main>
 
-  <footer class="app-footer">
-    <strong>Copyright &copy; 2025&nbsp;&nbsp;<span class="text-decoration-none">Eventra Inc.</span></strong>
-    ｜ Tibame TJA102 G1 專題製作
-  </footer>
-</div>
 
-<script src="https://cdn.jsdelivr.net/npm/overlayscrollbars@2.11.0/browser/overlaysscrollbars.browser.es6.min.js" crossorigin="anonymous"></script>
-<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js" crossorigin="anonymous"></script>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.min.js" crossorigin="anonymous"></script>
-<script src="./js/adminlte.js"></script>
-<script>
+
+						<!-- 審核表單（fetch 用，不直接提交） -->
+						<form id="review-form" novalidate>
+							<!-- PK -->
+							<input type="hidden" id="exhibitionId" name="exhibitionId"
+								th:value="${exhibitionVO.exhibitionId}" />
+
+							<!-- 活動名稱 -->
+							<div class="row g-3 align-items-center mb-2">
+								<div class="col-12 col-sm-2 label-col">
+									<label for="activityName" class="col-form-label">活動名稱</label>
+								</div>
+								<div class="col-12 col-sm-10">
+									<input id="activityName" name="exhibitionName" type="text"
+										class="form-control" th:value="${exhibitionVO.exhibitionName}">
+								</div>
+							</div>
+
+							<!-- 展覽簡介 -->
+							<div class="row g-3 align-items-start mb-2">
+								<div class="col-12 col-sm-2 label-col">
+									<label for="desc" class="col-form-label">展覽簡介</label>
+								</div>
+								<div class="col-12 col-sm-10">
+									<textarea id="desc" name="description" class="form-control"
+										rows="4" th:text="${exhibitionVO.description}"></textarea>
+								</div>
+							</div>
+
+							<!-- 公司名稱 -->
+							<div class="row g-3 align-items-center mb-2">
+								<div class="col-12 col-sm-2 label-col">
+									<label for="company" class="col-form-label">公司名稱</label>
+								</div>
+								<div class="col-12 col-sm-10">
+									<input id="company" name="companyName" type="text"
+										class="form-control"
+										th:value="${exhibitionVO.exhibitorVO.companyName}">
+								</div>
+							</div>
+
+							<!-- 統編 + 代表人 -->
+							<div class="row g-3 align-items-center mb-2">
+								<div class="col-12 col-sm-2 label-col">
+									<label for="vat" class="col-form-label">統一編號</label>
+								</div>
+								<div class="col-12 col-sm-4">
+									<input id="vat" name="businessIdNumber" type="text"
+										class="form-control"
+										th:value="${exhibitionVO.exhibitorVO.businessIdNumber}">
+								</div>
+
+								<div class="col-12 col-sm-2 label-col">
+									<label for="ceo" class="col-form-label">代表人姓名</label>
+								</div>
+								<div class="col-12 col-sm-4">
+									<input id="ceo" name="ceoName" type="text" class="form-control"
+										th:value="${exhibitionVO.exhibitorVO.contactName}">
+								</div>
+							</div>
+
+							<!-- 連絡電話 + 聯絡人 -->
+							<div class="row g-3 align-items-center mb-2">
+								<div class="col-12 col-sm-2 label-col">
+									<label for="tel" class="col-form-label">連絡電話</label>
+								</div>
+								<div class="col-12 col-sm-4">
+									<input id="tel" name="contactPhone" type="text"
+										class="form-control"
+										th:value="${exhibitionVO.exhibitorVO.contactPhone}">
+								</div>
+
+								<div class="col-12 col-sm-2 label-col">
+									<label for="contact" class="col-form-label">聯絡人姓名</label>
+								</div>
+								<div class="col-12 col-sm-4">
+									<input id="contact" name="contactName" type="text"
+										class="form-control"
+										th:value="${exhibitionVO.exhibitorVO.contactName}">
+								</div>
+							</div>
+
+							<!-- 地址 -->
+							<div class="row g-3 align-items-center mb-2">
+								<div class="col-12 col-sm-2 label-col">
+									<label for="addr" class="col-form-label">公司地址</label>
+								</div>
+								<div class="col-12 col-sm-10">
+									<input id="addr" name="companyAddress" type="text"
+										class="form-control"
+										th:value="${exhibitionVO.exhibitorVO.companyAddress}">
+								</div>
+							</div>
+
+							<!-- Email -->
+							<div class="row g-3 align-items-center mb-2">
+								<div class="col-12 col-sm-2 label-col">
+									<label for="email" class="col-form-label">Email</label>
+								</div>
+								<div class="col-12 col-sm-10">
+									<input id="email" name="email" type="email"
+										class="form-control"
+										th:value="${exhibitionVO.exhibitorVO.email}">
+								</div>
+							</div>
+
+							<!-- 未通過原因 -->
+							<div class="row g-3 align-items-start mb-3">
+								<div class="col-12 col-sm-2 label-col">
+									<label for="rejectReason" class="col-form-label">未通過原因</label>
+								</div>
+								<div class="col-12 col-sm-10">
+									<textarea id="rejectReason" name="rejectReason"
+										class="form-control" rows="4" placeholder="請輸入未過內容…"
+										th:text="${exhibitionVO.lastRejectReason}"></textarea>
+									<div class="invalid-feedback">請填寫未通過原因。</div>
+								</div>
+							</div>
+
+							<!-- 送出按鈕 -->
+							<div class="d-flex gap-2 justify-content-end">
+								<button type="button" class="btn btn-primary" id="btn-pass">審核成功</button>
+								<button type="button" class="btn btn-outline-secondary"
+									id="btn-fail">審核失敗</button>
+							</div>
+						</form>
+
+						<!-- 結束展覽（直接送表單到後端） -->
+						<form id="end-form" method="post"
+							th:action="@{/platform/exhibition/end}">
+							<input type="hidden" name="exhibitionId"
+								th:value="${exhibitionVO.exhibitionId}" /> <input type="hidden"
+								th:if="${_csrf != null}" th:name="${_csrf.parameterName}"
+								th:value="${_csrf.token}" />
+							<button type="button" id="btn-end"
+								class="btn btn-danger btn-end-exhibition">結束展覽</button>
+						</form>
+		</main>
+
+		<footer class="app-footer">
+			<strong>Copyright &copy; 2025&nbsp;&nbsp;<span
+				class="text-decoration-none">Eventra Inc.</span></strong> ｜ Tibame TJA102 G1
+			專題製作
+		</footer>
+	</div>
+
+	<script
+		src="https://cdn.jsdelivr.net/npm/overlayscrollbars@2.11.0/browser/overlaysscrollbars.browser.es6.min.js"
+		crossorigin="anonymous"></script>
+	<script
+		src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"
+		crossorigin="anonymous"></script>
+	<script
+		src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.min.js"
+		crossorigin="anonymous"></script>
+	<script src="./js/adminlte.js"></script>
+
+
+
+
+
+
+
+
+
+
+	<script>
   // 側欄捲軸
   document.addEventListener('DOMContentLoaded', () => {
     const sw = document.querySelector('.sidebar-wrapper');
@@ -150,26 +332,97 @@
       OverlayScrollbarsGlobal.OverlayScrollbars(sw, { scrollbars:{ autoHide:'leave' }});
     }
   });
+</script>
 
-  // 審核互動（Demo）
+
+
+
+
+
+	<script th:inline="javascript">
+  const REDIRECT_URL = /*[[@{/platform/exhibition}]]*/ '/platform/exhibition';
+  const token  = document.querySelector('meta[name="_csrf"]')?.content || '';
+  const header = document.querySelector('meta[name="_csrf_header"]')?.content || 'X-CSRF-TOKEN';
+
+  const $exhId  = document.getElementById('exhibitionId');
   const $reason = document.getElementById('rejectReason');
-  const $form = document.getElementById('review-form');
-  document.getElementById('btn-pass').addEventListener('click', () => {
-    $reason.required = false;
-    $reason.classList.remove('is-invalid');
-    alert('已送出：審核成功');
-    // TODO: fetch('/api/exhibition-applications/{id}', {method:'PATCH', body:JSON.stringify({status:"approved"})})
+  const val = id => (document.getElementById(id)?.value ?? '').trim();
+
+  async function sendReview(statusId) {
+
+    		  const payload = {
+    		  exhibitionId: Number($exhId.value),
+    		  statusId,
+    		  rejectReason: statusId === 3 ? val('rejectReason') : null,
+
+    		  // ExhibitionVO
+    		  exhibitionName:   val('activityName') || null,
+    		  description:      val('desc') || null,
+
+    		  // ExhibitorVO
+    		  companyName:      val('company') || null,
+    		  businessIdNumber: val('vat') || null,
+    		  contactPhone:     val('tel') || null,
+    		  contactName:      val('contact') || null,
+    		  companyAddress:   val('addr') || null,
+    		  email:            val('email') || null
+    		};
+
+
+    const res = await fetch(/*[[@{/platform/exhibition/review/status}]]*/ '/platform/exhibition/review/status', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', [header]: token },
+      body: JSON.stringify(payload)
+    });
+    if (!res.ok) throw new Error(`儲存失敗（HTTP ${res.status}）`);
+  }
+
+  document.getElementById('btn-pass').addEventListener('click', async () => {
+    alert('將送出「審核成功」。按下「確定」後會更新資料並返回列表。');
+    try {
+      await sendReview(4);
+      await new Promise(r => setTimeout(r, 50));
+      window.location.assign(REDIRECT_URL);
+    } catch (e) {
+      alert(String(e));
+    }
   });
-  document.getElementById('btn-fail').addEventListener('click', () => {
-    if (!$reason.value.trim()) {
-      $reason.required = true;
-      $reason.classList.add('is-invalid');
-      $reason.focus();
+
+  document.getElementById('btn-fail').addEventListener('click', async () => {
+    if (!val('rejectReason')) {
+      $reason.required = true; 
+      $reason.classList.add('is-invalid'); 
+      $reason.focus(); 
       return;
     }
-    alert('已送出：審核失敗\n原因：' + $reason.value.trim());
-    // TODO: fetch('/api/exhibition-applications/{id}', {method:'PATCH', body:JSON.stringify({status:"rejected", reason:$reason.value.trim()})})
+    alert('將送出「審核失敗」。按下「確定」後會更新資料並返回列表。');
+    try {
+      await sendReview(3);
+      await new Promise(r => setTimeout(r, 50));
+      window.location.assign(REDIRECT_URL);
+    } catch (e) {
+      alert(String(e));
+    }
   });
+
+  // 結束展覽
+  document.getElementById('btn-end').addEventListener('click', () => {
+    if (confirm('確定要結束展覽嗎？此動作將把狀態改為已結束。')) {
+      document.getElementById('end-form').submit();
+    }
+  });
+
+  // 去除紅框（使用者輸入時）
+  $reason?.addEventListener('input', () => $reason.classList.remove('is-invalid'));
 </script>
+
+
+
+
+
+
+
+
+
 </body>
 </html>
