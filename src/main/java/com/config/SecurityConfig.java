@@ -416,6 +416,12 @@ public class SecurityConfig {
 //                .requestMatchers("/platform/login", "/platform/register")
 //                .permitAll()
 				.requestMatchers(
+				        "/back-end/exhibitor/exhibitor_login",
+				        "/back-end/exhibitor/forgot-password",
+				        "/back-end/exhibitor/reset_password"
+				    ).permitAll()
+				
+				.requestMatchers(
 					    "/back-end/css/**",
 					    "/back-end/js/**",
 					    "/back-end/img/**",  
