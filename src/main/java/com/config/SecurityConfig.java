@@ -417,8 +417,9 @@ public class SecurityConfig {
 //                .permitAll()
 				.requestMatchers(
 				        "/back-end/exhibitor/exhibitor_login",
-				        "/back-end/exhibitor/forgot-password",
-				        "/back-end/exhibitor/reset_password"
+				        "/back-end/exhibitor/forgot_password",
+				        "/back-end/exhibitor/reset_password",
+				        "/back-end/exhibitor/reset_password_result"
 				    ).permitAll()
 				
 				.requestMatchers(
