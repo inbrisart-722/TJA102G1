@@ -30,7 +30,7 @@
       <!-- Sidebar (使用你提供的) -->
      <aside class="app-sidebar bg-body-secondary" data-bs-theme="dark">
         <div class="sidebar-brand">
-          <a href="#" class="brand-link">
+          <a href="/back-end/exhibitor/back_end_homepage" class="brand-link">
             <img src="/back-end/img/AdminLTELogo.png" alt="AdminLTE Logo" class="brand-image opacity-75 shadow" />
             <span class="brand-text fw-light">eventra</span>
           </a>
@@ -89,7 +89,7 @@
 					<!-- 未付款 -->
 					<a class="btn btn-outline-secondary"
 					   th:classappend="${status} == '付款中' ? ' active'"
-					   th:href="@{/back-end/exhibitor/order_list(status='付款中', page=0, size=${size}, q=${q})}">未付款</a>
+					   th:href="@{/back-end/exhibitor/order_list(status='付款中', page=0, size=${size}, q=${q})}">付款中</a>
 					
 					<!-- 已付款 -->
 					<a class="btn btn-outline-secondary"
@@ -99,12 +99,12 @@
 					<!-- 未成立 -->
 					<a class="btn btn-outline-secondary"
 					   th:classappend="${status} == '付款失敗' ? ' active'"
-					   th:href="@{/back-end/exhibitor/order_list(status='付款失敗', page=0, size=${size}, q=${q})}">未成立</a>
+					   th:href="@{/back-end/exhibitor/order_list(status='付款失敗', page=0, size=${size}, q=${q})}">付款失敗</a>
 					
 					<!-- 逾時 -->
 					<a class="btn btn-outline-secondary"
 					   th:classappend="${status} == '付款逾時' ? ' active'"
-					   th:href="@{/back-end/exhibitor/order_list(status='付款逾時', page=0, size=${size}, q=${q})}">逾時</a>
+					   th:href="@{/back-end/exhibitor/order_list(status='付款逾時', page=0, size=${size}, q=${q})}">付款逾時</a>
 					
 					<!-- 已退款 -->
 					<a class="btn btn-outline-secondary"

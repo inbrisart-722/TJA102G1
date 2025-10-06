@@ -15,6 +15,26 @@
       .section-title{font-weight:700}
       
     </style>
+    <style>
+      /* 灰底、灰字、禁用游標，避免有輸入感 */
+		.readonly-look,
+		.form-control[readonly] {
+		  background-color: #e9ecef;   /* Bootstrap 的 disabled 背景 */
+		  color: #6c757d;
+		  cursor: not-allowed;
+		  pointer-events: none;         /* 滑鼠不進入 */
+		}
+		
+		/* 聚焦時不要出現藍色外框或陰影 */
+		.readonly-look:focus,
+		.form-control[readonly]:focus {
+		  box-shadow: none;
+		  border-color: #ced4da;
+		}
+		
+		/* 也可以隱藏輸入游標（就算被 Tab 到） */
+		.readonly-look { caret-color: transparent; }
+    </style>
   </head>
   <body class="layout-fixed sidebar-expand-lg bg-body-tertiary">
     <div class="app-wrapper">
@@ -25,7 +45,7 @@
       <!-- Sidebar (你的版本) -->
      <aside class="app-sidebar bg-body-secondary" data-bs-theme="dark">
         <div class="sidebar-brand">
-          <a href="#" class="brand-link">
+          <a href="/back-end/exhibitor/back_end_homepage" class="brand-link">
             <img src="/back-end/img/AdminLTELogo.png" alt="AdminLTE Logo" class="brand-image opacity-75 shadow" />
             <span class="brand-text fw-light">eventra</span>
           </a>
@@ -168,7 +188,7 @@
 	        <div class="modal-body">
 	          <div class="col-md-6">
 			  <label class="form-label">帳號(統編)</label>
-			  <input type="text" class="form-control"
+			  <input type="text" readonly class="form-control readonly-look"
 			         th:classappend="${#fields.hasErrors('businessIdNumber')}? ' is-invalid' : ''"
 			         th:field="*{businessIdNumber}" maxlength="8" pattern="^\d{8}$" required/>
 			  <div class="invalid-feedback" th:if="${#fields.hasErrors('businessIdNumber')}"
