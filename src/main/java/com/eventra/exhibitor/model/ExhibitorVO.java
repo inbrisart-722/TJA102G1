@@ -27,7 +27,7 @@ public class ExhibitorVO {
 
 //    @NotBlank(message = "統編欄位必填")
 //    @Pattern(regexp="\\d{8}", message = "統編必須為8位數字")
-	@Column(name = "business_id_number", nullable = false, length = 8)
+	@Column(name = "business_id_number", nullable = false, length = 8, unique = true, updatable = true)
 	private String businessIdNumber;
 
 //    @NotBlank(message = "密碼欄位必填")

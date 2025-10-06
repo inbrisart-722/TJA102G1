@@ -301,19 +301,20 @@ public class ExhibitionServiceImpl implements ExhibitionService {
 		}
 
 		// 現在：有檔才save
-		String photoPortraitPath = null;
+		String photoPortraitPath = vo.getPhotoPortrait();
 		MultipartFile portrait = dto.getPhotoPortrait();
 		if (portrait != null && !portrait.isEmpty()) {
 		    photoPortraitPath = localFileUploadService.save(portrait, FileCategory.exhibition_portrait);
 		}
 
-		String photoLandscapePath = null;
+		vo.setPhotoPortrait(photoPortraitPath);
+		
+		String photoLandscapePath = vo.getPhotoLandscape();
 		MultipartFile landscape = dto.getPhotoLandscape();
-    
 		if (landscape != null && !landscape.isEmpty()) {
 		    photoLandscapePath = localFileUploadService.save(landscape, FileCategory.exhibition_landscape);
 		}
-		vo.setPhotoPortrait(photoPortraitPath);
+		
 		vo.setPhotoLandscape(photoLandscapePath);
 
 		// 按儲存為草稿按鈕後變更展覽狀態為草稿
