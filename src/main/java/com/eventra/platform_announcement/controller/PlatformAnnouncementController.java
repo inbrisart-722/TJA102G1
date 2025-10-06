@@ -39,38 +39,23 @@ public class PlatformAnnouncementController {
 
 	// 儲存 (新增或修改)
 	@PostMapping("/save")
-	public String save(@Valid @ModelAttribute("annVO") PlatformAnnouncementVO annVO, BindingResult result,
-			Model model) {
+	public String save(@Valid @ModelAttribute("annVO") PlatformAnnouncementVO annVO, BindingResult result) {
 
-		// 手動清理 HTML 標籤與空白內容
-		String content = annVO.getContent();
-		if (content != null) {
-			content = content.replaceAll("<[^>]*>", ""); // 移除所有 HTML 標籤
-			content = content.replaceAll("&nbsp;", ""); // 移除 &nbsp; (HTML 不斷行空白)
-			content = content.trim(); // 去掉前後空白
-		}
-
-		// 內容錯誤驗證, 檢查內容是否為空
-		if (content == null || content.isEmpty()) {
-			result.rejectValue("content", "content.empty", "公告內容不可為空");
-		}
-
-		// 若有任何欄位錯誤, 回到編輯頁
+		System.out.println("收到內容：" + annVO.getContent());
+		
+		// 僅驗證標題，內容完全保留
 		if (result.hasErrors()) {
 			return "platform/platform_edit";
 		}
 
-		// 判斷是新增或修改
-	    boolean isNew = (annVO.getPlatformAnnouncementId() == null);
+		boolean isNew = (annVO.getPlatformAnnouncementId() == null);
 
-	    annSvc.saveAnn(annVO);
+		// 強制保留 HTML，不清理、不驗證
+		annSvc.saveAnn(annVO);
 
-	    // 成功後回傳對應訊息參數
-	    if (isNew) {
-	        return "redirect:/platform/platform_edit?success=add";
-	    } else {
-	        return "redirect:/platform/platform_edit?success=edit";
-	    }
+		return isNew
+				? "redirect:/platform/platform_edit?success=add"
+				: "redirect:/platform/platform_edit?success=edit";
 	}
 
 	// 刪除
