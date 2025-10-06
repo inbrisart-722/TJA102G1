@@ -206,7 +206,7 @@
               </div>
               <div class="card-footer d-flex justify-content-between align-items-center flex-wrap gap-2">
                 <div class="text-secondary small">共 <span th:text="${totalElements}">0</span> 筆</div>
-                <nav>
+                <nav th:if="${totalElements > 0}">
                   <ul class="pagination pagination-sm mb-0">
 					<!-- 上一頁 -->
 					<li class="page-item" th:classappend="${currentPage == 0} ? ' disabled'">

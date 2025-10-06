@@ -254,7 +254,7 @@
 							</small>
 
 							<!-- 右邊顯示分頁按鈕 -->
-							<nav>
+							<nav th:if="${totalElements > 0}">
 								<ul class="pagination pagination-sm mb-0 justify-content-center">
 									<!-- 上一頁 -->
 									<li class="page-item"

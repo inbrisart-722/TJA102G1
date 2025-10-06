@@ -16,6 +16,12 @@
       .kv .k{width:72px; color:var(--bs-secondary-color)}
       .intro-box{min-height:240px; border:1px dashed var(--bs-border-color); border-radius:.5rem; padding:1rem; background:var(--bs-body-bg)}
       .btn-icon-sm{--bs-btn-padding-y:.25rem; --bs-btn-padding-x:.5rem}
+      .kv .k{
+		  /* 原本 width:72px 會造成換行 */
+		  flex: 0 0 120px;      /* 或 110~140px，給得比文字長一點 */
+		  white-space: nowrap;  /* 不允許換行 */
+		  word-break: keep-all; /* 中文盡量不斷詞 */
+		}
     </style>
   </head>
   <body class="layout-fixed sidebar-expand-lg bg-body-tertiary">
@@ -104,7 +110,7 @@
             <div class="card mb-4">
               <div class="card-header"><span class="section-title">展商資訊</span></div>
               <div class="card-body">
-              <div class="kv mb-2"><div class="k">公司名稱</div><div id="vCompanyName"
+              <div class="kv mb-2"><div class="k">公司/單位名稱</div><div id="vCompanyName"
 				     th:text="${exhibitor != null 
 				                 ? (!#strings.isEmpty(exhibitor.companyName) 
 				                      ? exhibitor.companyName 
@@ -158,20 +164,20 @@
 				  <div class="modal-body">
 				    <div class="row g-3">
 				    <div class="col-md-6">
-				        <label class="form-label">公司名稱</label>
+				        <label class="form-label">公司/單位名稱</label>
 				        <input type="text" class="form-control"
 				               th:classappend="${#fields.hasErrors('companyName')}? ' is-invalid' : ''"
-				               th:field="*{companyName}" maxlength="255" required />
+				               th:field="*{companyName}" maxlength="255" required 
+				               oninvalid="this.setCustomValidity('請輸入公司/單位名稱')"
+       				 		   oninput="this.setCustomValidity('')"/>
 				        <div class="invalid-feedback" th:if="${#fields.hasErrors('companyName')}"
-				             th:errors="*{companyName}">請填寫公司名稱</div>
+				             th:errors="*{companyName}"></div>
 				      </div>
 				      <div class="col-md-6">
 				        <label class="form-label">名稱</label>
 				        <input type="text" class="form-control"
 				               th:classappend="${#fields.hasErrors('exhibitorRegistrationName')}? ' is-invalid' : ''"
 				               th:field="*{exhibitorRegistrationName}" maxlength="100" />
-				        <div class="invalid-feedback" th:if="${#fields.hasErrors('exhibitorRegistrationName')}"
-				             th:errors="*{exhibitorRegistrationName}">請填寫名稱</div>
 				      </div>
 				
 				      <div class="col-md-6">
@@ -191,7 +197,7 @@
 				               th:classappend="${#fields.hasErrors('email')}? ' is-invalid' : ''"
 				               th:field="*{email}" maxlength="100" required />
 				        <div class="invalid-feedback" th:if="${#fields.hasErrors('email')}"
-				             th:errors="*{email}">請輸入有效 Email</div>
+				             th:errors="*{email}"></div>
 				      </div>
 				
 				      <div class="col-12">
