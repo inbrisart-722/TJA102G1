@@ -271,7 +271,8 @@ document.addEventListener("DOMContentLoaded", function() {
 				logo: { qr_img },
 			});
 			qrcode_content.appendChild(canvas);
-			qrcode_content.insertAdjacentHTML("beforeend",'<p style="text-align: center; font-size:12px">提示：請於展覽入場時出示此 QR Code</p>');
+			if(!qrcode_content.querySelector("#already_p"))
+				qrcode_content.insertAdjacentHTML("beforeend",'<p id="already_p" style="text-align: center; font-size:12px">提示：請於展覽入場時出示此 QR Code</p>');
 			canvas.setAttribute("role", "img");
 			canvas.setAttribute("aria-label", "QR Code 圖片，請掃描以開啟活動連結");
 			
