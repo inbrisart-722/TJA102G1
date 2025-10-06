@@ -50,38 +50,20 @@
 		<!-- banner區 展示3個展覽 -->
 		<div id="carousel-home">
 			<div class="owl-carousel owl-theme">
-			<div th:each="exh : ${dailyBanners}" class="item">
+				<div th:each="exh : ${dailyBanners}" class="item">
 					<a th:href="@{'/front-end/exhibitions/' + ${exh.exhibitionId}}">
-							<div class="owl-slide cover"
-								th:style="'background-image: url(' + ${exh.photoPortrait} + ');'">
-								<div class="opacity-mask d-flex align-items-center"
-									data-opacity-mask="rgba(0, 0, 0, 0.5)">
-									<div class="container">
-									<h2 style="color:white" th:text="${exh.exhibitionName}"></h2>
-									</div>
+						<div class="owl-slide cover" th:style="|background-image: url('@{${exh.photoPortrait}}')|">
+							<div class="opacity-mask d-flex align-items-center"
+								data-opacity-mask="rgba(0, 0, 0, 0.5)">
+								<div class="container">
+									<h2
+										style="color: white; position: absolute; right: 100px; bottom: 50px; font-size: 50px"
+										th:text="${exh.exhibitionName}"></h2>
 								</div>
 							</div>
-						</a>
-			</div>		
-<!-- 					<a href="#"> -->
-<!-- 						<div class="owl-slide cover" -->
-<!-- 							style="background-image: url(img/0_exhibition/ChatGPT_banner_2.png);"> -->
-<!-- 							<div class="opacity-mask d-flex align-items-center" -->
-<!-- 								data-opacity-mask="rgba(0, 0, 0, 0.5)"> -->
-<!-- 								<div class="container"></div> -->
-<!-- 							</div> -->
-<!-- 						</div> -->
-<!-- 					</a> -->
-	
-<!-- 					<a href="#"> -->
-<!-- 						<div class="owl-slide cover" -->
-<!-- 							style="background-image: url(img/0_exhibition/ChatGPT_banner_3.png);"> -->
-<!-- 							<div class="opacity-mask d-flex align-items-center" -->
-<!-- 								data-opacity-mask="rgba(0, 0, 0, 0.5)"> -->
-<!-- 								<div class="container"></div> -->
-<!-- 							</div> -->
-<!-- 						</div> -->
-<!-- 					</a> -->
+						</div>
+					</a>
+				</div>
 			</div>
 			<div id="icon_drag_mobile"></div>
 		</div>
@@ -118,7 +100,7 @@
 				</h2>
 			</div>
 
-			
+
 			<!-- ajax載入資料 -->
 			<div id="latestExhibitionsCarousel"
 				class="owl-carousel owl-theme list_carousel add_bottom_30"></div>
@@ -222,7 +204,7 @@
 		<!--form -->
 	</div>
 	<!-- /Sign In Popup -->
-    <!-- websocket 聊天室使用（內含多份檔案） -->
+	<!-- websocket 聊天室使用（內含多份檔案） -->
 	<div th:replace="fragments/chat-widget :: chat-widget"></div>
 
 	<!-- Common scripts -->
@@ -233,7 +215,7 @@
 	<script src="js/functions.js"></script>
 
 	<!-- NOTIFY BUBBLES  -->
-<!-- 	<script src="js/notify_func.js"></script> -->
+	<!-- 	<script src="js/notify_func.js"></script> -->
 	<script src="js/g1_10_custom_common.js"></script>
 	<script src="js/g1_6_exhibitions_popular_index.js"></script>
 	<script src="js/g1_6_exhibitions_latest_index.js"></script>
@@ -245,9 +227,9 @@
 	<script src="js/g1_10_custom_dify.js"></script>
 	<script src="https://udify.app/embed.min.js" id="6dNmiwvbRPuqvJW7"
 		defer></script>
-	<link href="css/g1_10_custom_dify.css" rel="stylesheet" />	
-	
-<script>
+	<link href="css/g1_10_custom_dify.css" rel="stylesheet" />
+
+	<script>
 // 先處理 exhibitorRegister 參數
 const params = new URLSearchParams(window.location.search);
 const exhibitorRegister = params.get("exhibitorRegister");
