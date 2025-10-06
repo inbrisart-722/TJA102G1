@@ -48,9 +48,12 @@ public class QrCodeService {
 		orderItem.setQrCodeUsedAt(now);
 		
 		// 2. 裝 qrcode_success 頁面所需之 dto
+		String exhibitorName = exhibition.getExhibitorVO().getExhibitorRegistrationName();
+		if(exhibitorName == null) exhibitorName = exhibition.getExhibitorVO().getCompanyName();
+		
 		QrCodeDTO dto = new QrCodeDTO();
 		dto.setExhibitionName(exhibition.getExhibitionName());
-		dto.setExhibitorName(exhibition.getExhibitorVO().getExhibitorRegistrationName());
+		dto.setExhibitorName(exhibitorName);
 		dto.setMemberNickname(orderItem.getOrder().getMember().getNickname());
 		dto.setTicketCode(ticketCode);
 		dto.setQrCodeUsedAt(now);
