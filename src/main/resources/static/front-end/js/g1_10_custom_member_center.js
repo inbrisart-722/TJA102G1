@@ -4,16 +4,16 @@ document.addEventListener("DOMContentLoaded", function() {
 	const params = new URLSearchParams(window.location.search);
 	const go = params.get("go");
 	
-//	if(go === "ticket") {
+	if(go === "ticket") {
 		document.querySelector("a.icon-ticket-2").click();
-		setTimeout(() => document.querySelector(".tab5").click(), 500);
-//		params.delete("go");
-//		let newUrl;
-//		if(params.size !== 0) newUrl = window.location.pathname + '?' + params.toString();
-//		else newUrl = window.location.pathname;
-//		window.history.replaceState({}, document.title, newUrl);
-//	}
-//	else document.querySelector("a.icon-profile").click();
+		setTimeout(() => document.querySelector(".tab5").click(), 300);
+		params.delete("go");
+		let newUrl;
+		if(params.size !== 0) newUrl = window.location.pathname + '?' + params.toString();
+		else newUrl = window.location.pathname;
+		window.history.replaceState({}, document.title, newUrl);
+	}
+	else document.querySelector("a.icon-profile").click();
 
 //	if(lineUserIdBoundAlready){
 //		// true -> 失敗
