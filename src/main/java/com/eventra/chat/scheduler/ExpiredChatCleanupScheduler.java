@@ -16,6 +16,7 @@ public class ExpiredChatCleanupScheduler {
 	
 	@Scheduled(fixedRate=600_000)
 	public void cleanupExpiredChatMessages() {
+		System.out.println("-----每10分鐘掃: cleanupExpiredChatMessages-----");
 		CHAT_REDIS_REPO.cleanupExpiredChatMessages();
 	}
 	
