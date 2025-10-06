@@ -275,7 +275,7 @@ public class LineBotFlexBuilder {
 		ObjectNode heroAction = mapper.createObjectNode();
 		heroAction.put("type", "uri");
 		heroAction.put("label", "Action");
-		heroAction.put("uri", "https://eventra.ddns.net/front-end/index");
+		heroAction.put("uri", "https://linecorp.com/");
 		hero.set("action", heroAction);
 		bubble.set("hero", hero);
 
