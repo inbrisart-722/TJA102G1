@@ -268,7 +268,7 @@ public class LineBotFlexBuilder {
 		// hero：先放示意圖或品牌圖
 		ObjectNode hero = mapper.createObjectNode();
 		hero.put("type", "image");
-		hero.put("url", "https://eventra.ddns.net/load-photo/profile_pic/fuji.jpg");
+		hero.put("url", "https://scdn.line-apps.com/n/channel_devcenter/img/fx/01_3_movie.png");
 		hero.put("size", "full");
 		hero.put("aspectRatio", "16:9");
 		hero.put("aspectMode", "cover");
