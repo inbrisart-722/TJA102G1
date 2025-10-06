@@ -415,6 +415,15 @@ public class SecurityConfig {
 				.requestMatchers("/back-end/exhibitor/exhibitor_login", "/front-end/exhibitor_register").permitAll()
 //                .requestMatchers("/platform/login", "/platform/register")
 //                .permitAll()
+				.requestMatchers(
+					    "/back-end/css/**",
+					    "/back-end/js/**",
+					    "/back-end/img/**",  
+					    "/back-end/header.html", // 你用 data-include 載入的 partial
+					    "/webjars/**",
+					    "/favicon.ico"
+					).permitAll()
+
 				.requestMatchers("/back-end/**", "/api/back-end/**").hasRole("EXHIBITOR")
 //                .requestMatchers("/platform/**", "/api/platform/**")
 //                .authenticated()

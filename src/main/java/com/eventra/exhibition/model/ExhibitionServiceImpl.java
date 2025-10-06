@@ -154,7 +154,7 @@ public class ExhibitionServiceImpl implements ExhibitionService {
 		
 		// 現在：有檔才save
 		String photoPortraitPath = null;
-		MultipartFile portrait = dto.getPhotoPortrait();
+		MultipartFile portrait = dto.getPhotoPortrait(); 
 		if (portrait != null && !portrait.isEmpty()) {
 		    photoPortraitPath = localFileUploadService.save(portrait, FileCategory.exhibition_portrait);
 		}
