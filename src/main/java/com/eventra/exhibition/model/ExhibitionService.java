@@ -1,11 +1,6 @@
 package com.eventra.exhibition.model;
 
-import java.util.List;
-
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.query.Param;
 
 import com.eventra.exhibitor.backend.controller.dto.ExhibitionCreateDTO;
 
@@ -59,4 +54,13 @@ public interface ExhibitionService {
 
 	// 平台公告用, 展覽總數
     public long countAll();
+
+
+	
+	// 展覽審核用
+//	void endExhibition(Integer exhibitionId);
+
+//	void updateStatus(Integer exhibitionId, Integer statusId);
+//
+//	void reviewAndSave(ExhibitionReviewReqDTO dto);
 }

@@ -1,151 +1,138 @@
 <!doctype html>
 <html lang="zh-Hant">
 <head>
-  <meta charset="UTF-8" />
-  <title>Eventra管理者平台</title>
+<meta charset="UTF-8" />
+<title>Eventra管理者平台</title>
 
-  <!-- Fonts / Icons -->
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/source-sans-3@5.0.12/index.css" crossorigin="anonymous" media="print" onload="this.media='all'"/>
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css" crossorigin="anonymous"/>
+<!-- Fonts / Icons -->
+<link rel="stylesheet"
+	href="https://cdn.jsdelivr.net/npm/@fontsource/source-sans-3@5.0.12/index.css"
+	crossorigin="anonymous" media="print" onload="this.media='all'" />
+<link rel="stylesheet"
+	href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css"
+	crossorigin="anonymous" />
 
-  <!-- AdminLTE & custom -->
-  <link rel="stylesheet" href="./css/adminlte.css" />
-  <link rel="stylesheet" href="./css/custom.css" />
+<!-- AdminLTE & custom -->
+<link rel="stylesheet" href="./css/adminlte.css" />
+<link rel="stylesheet" href="./css/custom.css" />
 
-  <!-- Bootstrap 5 -->
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+<!-- Bootstrap 5 -->
+<link
+	href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+	rel="stylesheet">
 
-  <!-- jQuery -->
-  <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<!-- jQuery -->
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+<script
+	src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
-  <!-- Bootstrap Datepicker (保留，不影響此頁) -->
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-datepicker@1.10.0/dist/css/bootstrap-datepicker.min.css">
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap-datepicker@1.10.0/dist/js/bootstrap-datepicker.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap-datepicker@1.10.0/dist/locales/bootstrap-datepicker.zh-TW.min.js"></script>
+<!-- Bootstrap Datepicker (保留，不影響此頁) -->
+<link rel="stylesheet"
+	href="https://cdn.jsdelivr.net/npm/bootstrap-datepicker@1.10.0/dist/css/bootstrap-datepicker.min.css">
+<script
+	src="https://cdn.jsdelivr.net/npm/bootstrap-datepicker@1.10.0/dist/js/bootstrap-datepicker.min.js"></script>
+<script
+	src="https://cdn.jsdelivr.net/npm/bootstrap-datepicker@1.10.0/dist/locales/bootstrap-datepicker.zh-TW.min.js"></script>
 </head>
 
-<body class="layout-fixed sidebar-expand-lg sidebar-open bg-body-tertiary">
-  <div class="app-wrapper">
+<body
+	class="layout-fixed sidebar-expand-lg sidebar-open bg-body-tertiary">
+	<div class="app-wrapper">
 
-<!-- 共用 header & sidebar -->
+		<!-- 共用 header & sidebar -->
 		<div th:replace="~{platform/common/layout :: header}"></div>
 		<div th:replace="~{platform/common/layout :: sidebar}"></div>
 
-    <!-- Main（已改為：廠商列表頁） -->
-    <main class="app-main">
-      <div class="app-content-header">
-        <div class="container-fluid">
-          <div class="d-flex align-items-center justify-content-between" style="margin:10px 0 40px;">
-            <h3 class="mb-0 fw-bold" style="font-size:36px;">廠商列表</h3>
+		<!-- Main（已改為：廠商列表頁） -->
+		<main class="app-main">
+			<div class="app-content-header">
+				<div class="container-fluid">
+					<div class="d-flex align-items-center justify-content-between"
+						style="margin: 10px 0 40px;">
+						<h3 class="mb-0 fw-bold" style="font-size: 36px;">廠商列表</h3>
 
-            <!-- 右上搜尋框 -->
-            <form class="d-flex" role="search" style="max-width: 420px; width: 100%;">
-              <input class="form-control form-control-lg me-2" type="search" placeholder="搜尋關鍵字…" aria-label="Search">
-              <button class="btn btn-outline-secondary btn-lg" type="submit">
-                <i class="bi bi-search"></i>
-              </button>
-            </form>
-          </div>
-        </div>
-      </div>
+						<!-- 右上搜尋框 -->
+						<form class="d-flex" role="search"
+							style="max-width: 420px; width: 100%;">
+							<input class="form-control form-control-lg me-2" type="search"
+								placeholder="搜尋關鍵字…" aria-label="Search">
+							<button class="btn btn-outline-secondary btn-lg" type="submit">
+								<i class="bi bi-search"></i>
+							</button>
+						</form>
+					</div>
+				</div>
+			</div>
 
-      <div class="container-fluid">
-        <div class="card card-primary card-outline">
-          <div class="card-body p-0">
-            <div class="table-responsive">
-              <table class="table table-hover mb-0 align-middle">
-                <thead class="table-light">
-                  <tr>
-                    <th style="width:110px;">審核狀態</th>
-                    <th style="width:110px;">會員編號</th>
-                    <th>廠商名稱</th>
-                    <th style="width:130px;">統一編號</th>
-                    <th style="width:140px;">連絡電話</th>
-                    <th>地址</th>
-                    <th style="width:140px; text-align:center;">操作</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <!-- 範例列 1 -->
-                  <tr>
-                    <td><span class="badge text-bg-success">審核通過</span></td>
-                    <td>A003</td>
-                    <td>緯育股份有限公司附設中壢…</td>
-                    <td>91906546</td>
-                    <td>03-4251108</td>
-                    <td>桃園市中壢區…</td>
-                    <td class="text-center">
-                      <button class="btn btn-outline-secondary btn-sm me-1">修改</button>
-                      <button class="btn btn-outline-danger btn-sm">刪除</button>
-                    </td>
-                  </tr>
-                  <!-- 範例列 2 -->
-                  <tr class="table-striped">
-                    <td><span class="badge text-bg-success">審核通過</span></td>
-                    <td>A003</td>
-                    <td>緯育股份有限公司附設中壢…</td>
-                    <td>91906546</td>
-                    <td>03-4251108</td>
-                    <td>桃園市中壢區…</td>
-                    <td class="text-center">
-                      <button class="btn btn-outline-secondary btn-sm me-1">修改</button>
-                      <button class="btn btn-outline-danger btn-sm">刪除</button>
-                    </td>
-                  </tr>
-                  <!-- 範例列 3 -->
-                  <tr>
-                    <td><span class="badge text-bg-success">審核通過</span></td>
-                    <td>A003</td>
-                    <td>緯育股份有限公司</td>
-                    <td>24708053</td>
-                    <td>02-66152085</td>
-                    <td>新北市汐止區…</td>
-                    <td class="text-center">
-                      <button class="btn btn-outline-secondary btn-sm me-1">修改</button>
-                      <button class="btn btn-outline-danger btn-sm">刪除</button>
-                    </td>
-                  </tr>
+			<div class="container-fluid">
+				<div class="card card-primary card-outline">
+					<div class="card-body p-0">
+						<div class="table-responsive">
+							<table class="table table-hover mb-0 align-middle">
+								<thead class="table-light">
+									<tr>
+										<th style="width: 25%;">審核狀態</th>
+										<th style="width: 25%;">活動名稱</th>
+										<th style="width: 25%;">所屬單位</th>
+										<th style="width: 25%;">操作</th>
 
-                  <!-- 下面留白列（模擬設計稿的灰條，可按需要刪除） -->
-                  <tr><td colspan="7" class="bg-body-secondary" style="height:50px;"></td></tr>
-                  <tr><td colspan="7" class="bg-body-secondary" style="height:50px;"></td></tr>
-                  <tr><td colspan="7" class="bg-body-secondary" style="height:50px;"></td></tr>
-                  <tr><td colspan="7" class="bg-body-secondary" style="height:50px;"></td></tr>
-                  <tr><td colspan="7" class="bg-body-secondary" style="height:50px;"></td></tr>
-                  <tr><td colspan="7" class="bg-body-secondary" style="height:50px;"></td></tr>
-                  <tr><td colspan="7" class="bg-body-secondary" style="height:50px;"></td></tr>
-                </tbody>
-              </table>
-            </div>
-          </div>
+									</tr>
+									<tbody id="tbody">
+									<tr th:each="exhibition : ${exhibitionList}"
+										th:object="${exhibition}">
+										<td th:text="*{exhibitionStatus}">狀態</td>
+										<td th:text="*{exhibitionName}">活動名稱</td>
+										<td th:text="*{exhibitorName}">廠商名稱</td>
+										<td class="text-center">
+											<form method="post"
+												th:action="@{/platform/exhibition_detail}">
+												<!-- 主鍵 -->
+												<input type="hidden" name="exhibitionId"
+													th:value="*{exhibitionId}" />
 
-          <!-- 分頁 -->
-          <div class="card-footer bg-white">
-            <nav aria-label="Vendor pagination">
-              <ul class="pagination pagination-sm justify-content-center mb-0">
-                <li class="page-item disabled"><a class="page-link" href="#" tabindex="-1" aria-disabled="true">«</a></li>
-                <li class="page-item active"><a class="page-link" href="#">1</a></li>
-                <li class="page-item"><a class="page-link" href="#">2</a></li>
-                <li class="page-item"><a class="page-link" href="#">3</a></li>
-                <li class="page-item"><a class="page-link" href="#">4</a></li>
-                <li class="page-item"><a class="page-link" href="#">5</a></li>
-                <li class="page-item"><a class="page-link" href="#">»</a></li>
-              </ul>
-            </nav>
-          </div>
-        </div>
-      </div>
-    </main>
+												<!-- CSRF（有開 Spring Security 才會存在） -->
+												<input type="hidden" th:if="${_csrf != null}"
+													th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+
+												<button type="submit" class="btn btn-sm btn-primary">修改</button>
+											</form>
+										</td>
+									</tr>
+								</tbody>
+							</table>
+						</div>
+					</div>
+
+					<div class="card-footer bg-white">
+						<nav aria-label="Member pagination">
+							<ul class="pagination pagination-sm justify-content-center mb-0">
+								<li class="page-item disabled"><a class="page-link"
+									href="#" tabindex="-1" aria-disabled="true">«</a></li>
+								<li class="page-item active"><a class="page-link" href="#">1</a></li>
+
+								<li class="page-item"><a class="page-link" href="#">»</a></li>
+							</ul>
+						</nav>
+					</div>
+				</div>
+			</div>
+		</main>
 
     <!-- footer -->
-		<div th:replace="~{platform/common/layout :: footer}"></div>
-  </div>
+									<div th:replace="~{platform/common/layout :: footer}"></div>
+  
+								</div>
 
   <!-- Plugins -->
-  <script src="https://cdn.jsdelivr.net/npm/overlayscrollbars@2.11.0/browser/overlayscrollbars.browser.es6.min.js" crossorigin="anonymous"></script>
-  <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js" crossorigin="anonymous"></script>
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.min.js" crossorigin="anonymous"></script>
+  <script
+		src="https://cdn.jsdelivr.net/npm/overlayscrollbars@2.11.0/browser/overlayscrollbars.browser.es6.min.js"
+		crossorigin="anonymous"></script>
+  <script
+		src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"
+		crossorigin="anonymous"></script>
+  <script
+		src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.min.js"
+		crossorigin="anonymous"></script>
   <script src="./js/adminlte.js"></script>
 
   <script>
