@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="zh-Hant">
+<html xmlns:th="http://www.thymeleaf.org" lang="zh-Hant">
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -117,6 +117,8 @@ body {
 			<div class="card-body">
 				<h1 class="login-title">登入</h1>
 				<p class="login-sub">請輸入您的帳號與密碼以登入展商後台</p>
+				
+				<div th:if="${msg}" class="alert alert-success" th:text="${msg}"></div>
 
 				<div id="loginAlert" class="alert alert-danger d-none" role="alert"></div>
 
@@ -164,6 +166,8 @@ body {
 				</form>
 			</div>
 		</div>
+		
+		
 	</main>
 
 	<script

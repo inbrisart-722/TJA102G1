@@ -198,7 +198,9 @@
 			  <label class="form-label">信箱</label>
 			  <input type="email" class="form-control"
 			         th:classappend="${#fields.hasErrors('email')}? ' is-invalid' : ''"
-			         th:field="*{email}" maxlength="100" required/>
+			         th:field="*{email}" maxlength="100" required
+			         oninvalid="this.setCustomValidity('請輸入正確信箱格式，必須包含@')"
+       				 oninput="this.setCustomValidity('')"/>
 			  <div class="invalid-feedback" th:if="${#fields.hasErrors('email')}"
 			       th:errors="*{email}"></div>
 			</div>
