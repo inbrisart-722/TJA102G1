@@ -381,7 +381,8 @@
 			data-opacity-mask="rgba(0, 0, 0, 0.4)">
 			<div class="animated fadeInDown">
 				<h1>歡迎來到會員中心！</h1>
-				<p style="margin: 12px 12px 0 0">- welcome to the member center -</p>
+				<p style="margin: 12px 12px 0 0">- welcome to the member center
+					-</p>
 			</div>
 		</div>
 	</section>
@@ -407,8 +408,12 @@
 						</li>
 						<li><a href="#section-2" class="icon-wishlist"><span>收藏</span></a>
 						</li>
-						<li><a href="#section-3" class="icon-settings"><span>通知／公告</span></a>
-						</li>
+						<li><a href="#section-3" class="icon-settings"
+							id="nav-notif-tab" style="position: relative;"> <span>通知</span>
+								<span id="badge-top-notif" class="notif-badge d-none">0</span>
+						</a></li>
+
+
 						<li><a href="#section-4" class="icon-profile"><span>基本資料</span></a>
 						</li>
 						<li><a href="#" id="logout" class="icon-logout"
@@ -437,62 +442,25 @@
 						</div>
 					</section>
 
-					<!-- 通知/公告 -->
+					<!-- 通知 -->
 					<section id="section-3">
-						<div class="row">
-							<!-- 左側 -->
-							<aside class="col-lg-3">
-								<div class="box_style_cat">
-									<ul id="cat_nav">
-										<li><a href="#" data-target="#favorite-notifications">
-												<i class="icon_set_1_icon-95"></i>收藏展覽通知 <span
-												id="badge-fav" class="notif-badge d-none">0</span>
-										</a></li>
-<!-- 										<li><a href="#" data-target="#platform-notifications"> -->
-<!-- 												<i class="icon_set_1_icon-95"></i>平台公告 <span -->
-<!-- 												id="badge-platform" class="notif-badge d-none">0</span> -->
-<!-- 										</a></li> -->
-									</ul>
-								</div>
-							</aside>
-
-							<!-- 右側內容 -->
+						<div class="row" style="padding-right:50px;padding-left:50px">
 							<div class="col-lg" id="faq">
 								<!-- 工具列（標題+全部已讀） -->
 								<div
 									class="d-flex justify-content-between align-items-center mb-3">
-									<h3 class="nomargin_top mb-0" id="notifTitle">通知/公告一覽</h3>
+									<h3 class="nomargin_top mb-0" id="notifTitle">通知一覽</h3>
 									<button id="markAllRead"
 										class="btn btn-sm btn-outline-secondary">全部標示為已讀</button>
-								</div>								
+								</div>
 
-								<!-- 面板2：收藏展覽通知 -->
+								<!-- 收藏展覽通知 -->
 								<div id="favorite-notifications" class="notification-section">
 									<!-- 由 g1_6_event_notification.js 帶入 -->
 								</div>
 								<div class="text-center my-3">
-								  <button id="loadMoreFav" class="btn btn-outline-primary btn-sm d-none btn_full">載入更多</button>
-								</div>
-
-								<!-- 面板3：平台公告（預設隱藏） -->
-								<div id="platform-notifications"
-									class="notification-section d-none">
-									<!-- 1 -->
-									<div class="card mb-3 shadow-sm border-0 notification-unread">
-										<div class="card-body border-0">
-											<h5 class="card-title mb-1 fw-bold">系統維護公告</h5>
-											<p class="card-text mb-2 text-muted" style="font-size: 16px">
-												本週日 02:00–04:00 進行例行維護，期間暫停購票與退票服務，造成不便敬請見諒。</p>
-										</div>
-									</div>
-									<!-- 2 -->
-									<div class="card mb-3 shadow-sm border-0 notification-read">
-										<div class="card-body border-0">
-											<h5 class="card-title mb-1 fw-bold">隱私權政策更新</h5>
-											<p class="card-text mb-2 text-muted" style="font-size: 16px">
-												我們已更新個資告知事項與第三方服務說明，請參閱最新條款。</p>
-										</div>
-									</div>
+									<button id="loadMoreFav"
+										class="btn btn-outline-primary btn-sm d-none btn_full">載入更多</button>
 								</div>
 							</div>
 							<!-- /#faq -->
@@ -517,14 +485,17 @@
 									<li>地址 <span id="saved_address"></span>
 									</li>
 
-									<h4 id="related_account"><a id="line-oauth2" href="/oauth2/authorization/line">綁定 LINE 帳號</a></h4>
+									<h4 id="related_account">
+										<a id="line-oauth2" href="/oauth2/authorization/line">綁定
+											LINE 帳號</a>
+									</h4>
 									<br>
 								</ul>
 							</div>
 							<div class="col-md-3" id="img_block">
 								<p>
-									<img src="" alt="Image"
-										class="img-fluid styled profile_pic" id="user_img" />
+									<img src="" alt="Image" class="img-fluid styled profile_pic"
+										id="user_img" />
 								</p>
 								<button type="submit" class="btn_1 gray" id="js-upload-submit">
 									更換照片</button>
@@ -535,10 +506,10 @@
 						</div>
 						<!-- End row -->
 
-<!-- 						<br /> -->
-<!-- 						<div class="divider"></div> -->
-<!-- 						<br /> -->
-						
+						<!-- 						<br /> -->
+						<!-- 						<div class="divider"></div> -->
+						<!-- 						<br /> -->
+
 						<br />
 						<div class="divider"></div>
 						<br />
@@ -556,14 +527,14 @@
 						<div class="row">
 							<div class="col-md-6">
 								<div class="form-group">
-									<label>姓名</label> <input class="form-control update" name="full_name"
-										id="full_name" type="text" value="陳珮瑋" />
+									<label>姓名</label> <input class="form-control update"
+										name="full_name" id="full_name" type="text" value="陳珮瑋" />
 								</div>
 							</div>
 							<div class="col-md-6">
 								<div class="form-group">
-									<label>平台暱稱</label> <input class="form-control update" name="nickname"
-										id="nickname" type="text" value="Tomcat11" />
+									<label>平台暱稱</label> <input class="form-control update"
+										name="nickname" id="nickname" type="text" value="Tomcat11" />
 								</div>
 							</div>
 						</div>
@@ -604,8 +575,8 @@
 							</div>
 							<div class="col-md-6">
 								<div class="form-group">
-									<label>地址</label> <input class="form-control update" name="address"
-										id="address" type="text"
+									<label>地址</label> <input class="form-control update"
+										name="address" id="address" type="text"
 										value="臺北市中山區南京東路三段219號5樓(緯育TibaMe台北職訓中心)
                       " />
 								</div>
@@ -731,7 +702,7 @@
 
 	<!-- 聊天室片段插入 -->
 	<div th:replace="fragments/chat-widget :: chat-widget"></div>
-	
+
 	<!-- Sign In Popup -->
 	<div id="sign-in-dialog" class="zoom-anim-dialog mfp-hide">
 		<div class="small-dialog-header">
@@ -815,7 +786,7 @@
 	<script src="js/g1_10_custom_dify.js"></script>
 	<script src="https://udify.app/embed.min.js" id="6dNmiwvbRPuqvJW7"
 		defer></script>
-	<link href="css/g1_10_custom_dify.css" rel="stylesheet" />	
-	
+	<link href="css/g1_10_custom_dify.css" rel="stylesheet" />
+
 </body>
 </html>
