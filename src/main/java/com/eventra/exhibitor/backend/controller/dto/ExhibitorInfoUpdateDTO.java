@@ -15,7 +15,6 @@ public class ExhibitorInfoUpdateDTO {
 	private String exhibitorRegistrationName;
 
 	@NotBlank(message = "聯絡電話必填")
-	@Size(max = 50, message = "聯絡電話最多 50 字")
 	@Pattern(regexp = "^09\\d{8}$", message = "請輸入 09 開頭的 10 碼手機")
 	private String contactPhone;
 
