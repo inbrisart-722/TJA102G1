@@ -12,10 +12,10 @@
 
 document.addEventListener("DOMContentLoaded", function() {
 	const favPanel = document.querySelector("#favorite-notifications"); // 收藏通知面板
-	const favBadge = document.getElementById("badge-fav");              // 收藏通知徽章
+	const favBadge = document.getElementById("badge-top-notif");		// 上方通知分頁的徽章
 	const markBtn = document.getElementById("markAllRead");             // 全部已讀按鈕
 	const loadMoreBtn = document.getElementById("loadMoreFav");         // 載入更多按鈕
-
+		
 	// 分頁狀態
 	let currentPage = 0;
 	const pageSize = 5;
@@ -48,7 +48,7 @@ document.addEventListener("DOMContentLoaded", function() {
 
 	/* ========== 1. 載入歷史收藏通知 ========== */
 	function loadFavHistory(page = 0) {
-	  csrfFetch(`/api/front-end/protected/notifications/my?page=${page}&size=${pageSize}`)
+	  csrfFetch(`/api/front-end/protected/notifications/my`)
 	    .then(res => {
 	      if (!res.ok) throw new Error("無法載入收藏通知");
 	      return res.json();

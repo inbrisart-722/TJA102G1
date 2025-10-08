@@ -639,6 +639,32 @@ div.search_block>a {
 
 /* ========================================================= */
 /* 通知頁籤 */
+
+/* 通知分頁(上方nav)紅點樣式 */
+/* 讓紅點出現在「通知」兩字旁邊 */
+#nav-notif-tab {
+	position: relative;
+	display: inline-flex;
+	align-items: center;
+	gap: 4px;
+}
+
+
+#nav-notif-tab .notif-badge {
+	position: static;
+	display: inline-block;
+	transform: translateY(0);
+	background: #dc3545;
+	color: #fff;
+	border-radius: 50%;
+	font-size: 11px;
+	padding: 2px 5px;
+	min-width: 18px;
+	text-align: center;
+	line-height: 1.2;
+	box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.9);
+}
+
 #cat_nav a {
 	position: relative;
 	padding-right: 56px;

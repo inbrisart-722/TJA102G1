@@ -5,6 +5,9 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -24,6 +27,8 @@ import com.eventra.exhibition.model.ExhibitionServiceImpl;
 import com.eventra.exhibitor.model.ExhibitorService;
 import com.eventra.exhibitor.model.ExhibitorVO;
 import com.eventra.member.verif.model.VerifService;
+import com.eventra.platform_announcement.model.PlatformAnnouncementService;
+import com.eventra.platform_announcement.model.PlatformAnnouncementVO;
 import com.eventra.exhibitioncommon.model.ExhibitionListService;
 import com.eventra.exhibitioncommon.dto.ExhibitionListDTO;
 
@@ -44,6 +49,8 @@ public class FrontendIndexController {
     private ExhibitorService exhibitorService;
 	@Autowired
 	private ExhibitionListService exhibitionListService;
+	@Autowired
+	private PlatformAnnouncementService annSvc;
 
 	
 //	private static final Integer TEST_MEMBER = 3;
@@ -212,6 +219,22 @@ public class FrontendIndexController {
 	    }
 	    model.addAttribute("exhibitor", exhibitor);
 	    return "front-end/exhibitor_home";
+	}
+	
+	@GetMapping("/announcement")
+	public String announcementPage(
+	        Model model,
+	        @RequestParam(defaultValue = "0") int page) {
+
+	    // 每頁5筆，依建立時間新→舊排序
+	    PageRequest pageable = PageRequest.of(page, 5, Sort.by("createdAt").descending());
+	    Page<PlatformAnnouncementVO> annPage = annSvc.getAll(pageable);
+
+	    model.addAttribute("annList", annPage.getContent());
+	    model.addAttribute("currentPage", page);
+	    model.addAttribute("totalPages", annPage.getTotalPages());
+
+	    return "front-end/announcement";
 	}
 
 }
