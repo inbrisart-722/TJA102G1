@@ -166,10 +166,10 @@
 				    <div class="col-md-6">
 				        <label class="form-label">公司/單位名稱</label>
 				        <input type="text" class="form-control"
-				               th:classappend="${#fields.hasErrors('companyName')}? ' is-invalid' : ''"
-				               th:field="*{companyName}" maxlength="255" required 
-				               oninvalid="this.setCustomValidity('請輸入公司/單位名稱')"
-       				 		   oninput="this.setCustomValidity('')"/>
+				               th:field="*{companyName}" maxlength="255" 
+				               th:errorclass="is-invalid"
+				               required 
+				               />
 				        <div class="invalid-feedback" th:if="${#fields.hasErrors('companyName')}"
 				             th:errors="*{companyName}"></div>
 				      </div>
@@ -183,21 +183,21 @@
 				      <div class="col-md-6">
 				        <label class="form-label">聯絡電話</label>
 				        <input type="text" class="form-control"
-				               th:classappend="${#fields.hasErrors('contactPhone')}? ' is-invalid' : ''"
-				               th:field="*{contactPhone}" maxlength="10" pattern="^09\d{8}$" required 
-				               oninvalid="this.setCustomValidity('請輸入 09 開頭的 10 碼手機')"
-       						   oninput="this.setCustomValidity('')"/>
+				               th:field="*{contactPhone}" maxlength="10" pattern="^09\d{8}$" 
+				               th:errorclass="is-invalid"
+				               required 
+				               />
 				        <div class="invalid-feedback" th:if="${#fields.hasErrors('contactPhone')}"
-				             th:errors="*{contactPhone}"></div>
+				             th:errors="*{contactPhone}">123</div>
 				      </div>
 				
 				      <div class="col-md-12">
 				        <label class="form-label">信箱</label>
 				        <input type="email" class="form-control"
-				               th:classappend="${#fields.hasErrors('email')}? ' is-invalid' : ''"
-				               th:field="*{email}" maxlength="100" required 
-				               oninvalid="this.setCustomValidity('請輸入正確信箱格式，必須包含@')"
-       						   oninput="this.setCustomValidity('')"/>
+				               th:field="*{email}" maxlength="100" 
+				               th:errorclass="is-invalid"
+				               required 
+				               />
 				        <div class="invalid-feedback" th:if="${#fields.hasErrors('email')}"
 				             th:errors="*{email}"></div>
 				      </div>
@@ -271,14 +271,14 @@
 	  // 關窗時清理驗證樣式（下次打開乾淨）
 	  modalNode.addEventListener('hidden.bs.modal', clearClientValidation);
 	
-	  // 前端 HTML5 驗證（與 Bootstrap 樣式）
+	  /* // 前端 HTML5 驗證（與 Bootstrap 樣式）
 	  formNode.addEventListener('submit', function (e) {
 	    if (!this.checkValidity()) {
 	      e.preventDefault();
 	      e.stopPropagation();
 	    }
 	    this.classList.add('was-validated');
-	  });
+	  }); */
 	})();
 	</script>
 	
@@ -434,6 +434,50 @@
 	  if (ok) setTimeout(() => bootstrap.Alert.getOrCreateInstance(ok).close(), 2500);
 	});
 	</script>
+	<script th:inline="javascript">
+	(function () {
+	  // 從後端塞到 model 的安全布林；若沒塞就回退 false
+	  const HAS_ERRORS = /*[[${hasErrors}]]*/ false;
+	
+	  function showEditModalIfNeeded() {
+	    try {
+	      const modalEl = document.getElementById('editModal');
+	      const editBtn = document.getElementById('btnEdit');
+	      if (!modalEl) return;
+	
+	      // 點「編輯」→ 開窗
+	      if (editBtn) {
+	        editBtn.addEventListener('click', () => {
+	          if (!window.bootstrap?.Modal) return;
+	          const m = bootstrap.Modal.getOrCreateInstance(modalEl);
+	          m.show();
+	        });
+	      }
+	
+	      // 後端驗證失敗 → 自動開窗顯示 th:errors
+	      if (HAS_ERRORS && window.bootstrap?.Modal) {
+	        const m = bootstrap.Modal.getOrCreateInstance(modalEl);
+	        m.show();
+	      }
+	    } catch (err) {
+	      console.warn('edit modal init failed:', err);
+	    }
+	  }
+	
+	  // 若你有用 async 載入 header 的 window.__partialsReady，就等它；否則直接做
+	  const ready = (window.__partialsReady && typeof window.__partialsReady.then === 'function')
+	    ? window.__partialsReady : Promise.resolve();
+	
+	  ready.then(() => {
+	    if (document.readyState === 'loading') {
+	      document.addEventListener('DOMContentLoaded', showEditModalIfNeeded);
+	    } else {
+	      showEditModalIfNeeded();
+	    }
+	  });
+	})();
+	</script>
+	
     
   </body>
 </html>

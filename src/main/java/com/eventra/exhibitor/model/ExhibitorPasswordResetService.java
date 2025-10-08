@@ -4,6 +4,8 @@ import com.eventra.exhibitor.model.ExhibitorRepository;
 import com.eventra.exhibitor.model.ExhibitorVO;
 import com.eventra.exhibitor.ExhibitorResetTokenUtil;
 import io.jsonwebtoken.JwtException;
+
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -17,6 +19,9 @@ public class ExhibitorPasswordResetService {
   private final PasswordEncoder passwordEncoder;
   private final JavaMailSender mailSender;
   private final ExhibitorResetTokenUtil tokenUtil;
+  
+  @Value("${spring.mail.username}")           // ← 從設定檔取寄件者帳號
+  private String fromAddress;
 
   public ExhibitorPasswordResetService(
       ExhibitorRepository exhibitorRepository,
@@ -68,6 +73,7 @@ public class ExhibitorPasswordResetService {
 
   private void sendMail(String to, String url) {
     var msg = new SimpleMailMessage();
+    msg.setFrom(fromAddress);
     msg.setTo(to);
     msg.setSubject("【eventra 展商】重設密碼連結（30 分鐘內有效）");
     msg.setText("""
