@@ -121,7 +121,10 @@ function initMap() {
 	new google.maps.Marker({
 		position: DEFAULT_CENTER,
 		map: mapObject,
-		title: "中心點",
+		title: "你在這裡",
+		icon: {
+			url: "http://maps.google.com/mapfiles/ms/icons/blue-dot.png",
+		}
 	});
 
 	// 直接載入展覽資料（1 公里範圍）
