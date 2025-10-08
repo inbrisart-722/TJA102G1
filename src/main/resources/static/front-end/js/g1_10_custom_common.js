@@ -251,7 +251,7 @@ document.addEventListener("DOMContentLoaded", function () {
             <br />
             <ul>
               <li><a href="#">常見問題 FAQ</a></li>
-              <li><a href="#">平台公告</a></li>
+              <li><a href="/front-end/announcement">平台公告</a></li>
               <li><a href="/front-end/exhibitor_register">展商註冊</a></li>
             </ul>
           </div>

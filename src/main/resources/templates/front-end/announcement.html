@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Eventra</title>
+
+<!-- Favicons-->
+<link rel="shortcut icon" href="img/favicon.ico" type="image/x-icon">
+<link rel="apple-touch-icon" type="image/x-icon"
+	href="img/apple-touch-icon-57x57-precomposed.png">
+<link rel="apple-touch-icon" type="image/x-icon" sizes="72x72"
+	href="img/apple-touch-icon-72x72-precomposed.png">
+<link rel="apple-touch-icon" type="image/x-icon" sizes="114x114"
+	href="img/apple-touch-icon-114x114-precomposed.png">
+<link rel="apple-touch-icon" type="image/x-icon" sizes="144x144"
+	href="img/apple-touch-icon-144x144-precomposed.png">
+
+<!-- GOOGLE WEB FONT -->
+<link
+	href="https://fonts.googleapis.com/css2?family=Gochi+Hand&family=Montserrat:wght@300;400;500;600;700&display=swap"
+	rel="stylesheet">
+
+<!-- COMMON CSS -->
+<link href="css/bootstrap.min.css" rel="stylesheet">
+<link href="css/style.css" rel="stylesheet">
+<link href="css/vendors.css" rel="stylesheet">
+
+<!-- CUSTOM CSS -->
+<link href="css/g1_6_custom.css" rel="stylesheet">
+<link href="css/g1_10_custom.css" rel="stylesheet" />
+<link href="css/g1_10_custom_common.css" rel="stylesheet">
+<link href="css/g1_10_custom_dify.css" rel="stylesheet" />
+</head>
+
+<body>
+	<div id="preloader">
+		<div class="sk-spinner sk-spinner-wave">
+			<div class="sk-rect1"></div>
+			<div class="sk-rect2"></div>
+			<div class="sk-rect3"></div>
+			<div class="sk-rect4"></div>
+			<div class="sk-rect5"></div>
+		</div>
+	</div>
+
+	<div class="layer"></div>
+
+	<!-- Header -->
+	<header>
+		<!-- 從js/g1_10_custom_common.js 帶入 -->
+	</header>
+
+	<!-- 1400*470px 背景圖區 -->
+	<section class="parallax-window" data-parallax="scroll"
+		data-image-src="img/0_exhibition/announcement.jpg"
+		data-natural-width="1400" data-natural-height="470">
+		<div class="parallax-content-1 opacity-mask"
+			data-opacity-mask="rgba(0, 0, 0, 0.6)">
+			<div class="animated fadeInDown" style="height: 60px;"></div>
+		</div>
+	</section>
+
+	<!-- 主畫面 -->
+	<main>
+		<div class="container margin_60">
+			<div class="row" style="justify-content: center;">
+				<div class="col-lg-9" id="faq">
+					<h3 class="nomargin_top">平台公告</h3>
+
+					<div id="announcement" class="accordion_styled">
+
+						<!-- 公告 -->
+						<div class="card" th:each="ann, iterStat : ${annList}">
+
+							<div class="card-header"
+								style="padding: 20px; display: flex; justify-content: space-between; align-items: center;">
+								<div style="font-size: 20px; font-weight: 700;"
+									th:text="${ann.title}"></div>
+								<i
+									style="margin-right: 10px; color: #888 !important; font-size: 14px;">
+									公告時間：<span
+									th:text="${#dates.format(ann.createdAt, 'yyyy-MM-dd')}"></span>
+								</i>
+							</div>
+
+
+							<div th:id="'c' + ${iterStat.index}" class="collapse show"
+								th:classappend="${iterStat.index == 0} ? ' show' : ''"
+								data-bs-parent="#announcement">
+								<div class="card-body" th:text="${ann.content}">公告內容</div>
+							</div>
+
+						</div>
+						<!-- 公告end -->
+
+					</div>
+
+					<!-- 分頁區 -->
+					<nav aria-label="Page navigation" th:if="${totalPages > 1}">
+						<ul class="pagination justify-content-center">
+
+							<!-- 上一頁 -->
+							<li class="page-item"
+								th:classappend="${currentPage == 0} ? ' disabled'"><a
+								class="page-link"
+								th:href="@{/front-end/announcement(page=${currentPage - 1})}"
+								aria-label="Previous"> <span aria-hidden="true">&laquo;</span>
+									<span class="sr-only">上一頁</span>
+							</a></li>
+
+							<!-- 頁碼 -->
+							<li class="page-item"
+								th:each="i : ${#numbers.sequence(0, totalPages - 1)}"
+								th:classappend="${i == currentPage} ? ' active'"><a
+								class="page-link"
+								th:href="@{/front-end/announcement(page=${i})}"
+								th:text="${i + 1}">1</a></li>
+
+							<!-- 下一頁 -->
+							<li class="page-item"
+								th:classappend="${currentPage + 1 == totalPages} ? ' disabled'">
+								<a class="page-link"
+								th:href="@{/front-end/announcement(page=${currentPage + 1})}"
+								aria-label="Next"> <span class="sr-only">下一頁</span> <span
+									aria-hidden="true">&raquo;</span>
+							</a>
+							</li>
+
+						</ul>
+					</nav>
+
+				</div>
+
+
+			</div>
+		</div>
+	</main>
+
+	<!-- 頁尾 -->
+	<footer class="revealed">
+		<!-- 從js/g1_10_custom_common.js 帶入 -->
+	</footer>
+
+	<div id="toTop"></div>
+
+	<!-- Search Menu -->
+	<div class="search-overlay-menu">
+		<!-- 從js/g1_10_custom_common.js 帶入 -->
+	</div>
+
+	<!-- Sign In Popup -->
+	<div id="sign-in-dialog" class="zoom-anim-dialog mfp-hide">
+		<div class="small-dialog-header">
+			<h3>Sign In</h3>
+		</div>
+		<form>
+			<div class="sign-in-wrapper">
+				<a href="#0" class="social_bt facebook">Login with Facebook</a> <a
+					href="#0" class="social_bt google">Login with Google</a>
+				<div class="divider">
+					<span>Or</span>
+				</div>
+				<div class="form-group">
+					<label>Email</label> <input type="email" class="form-control"
+						name="email" id="email"> <i class="icon_mail_alt"></i>
+				</div>
+				<div class="form-group">
+					<label>Password</label> <input type="password" class="form-control"
+						name="password" id="password" value=""> <i
+						class="icon_lock_alt"></i>
+				</div>
+				<div class="clearfix add_bottom_15">
+					<div class="checkboxes float-start">
+						<label class="container_check">Remember me <input
+							type="checkbox"> <span class="checkmark"></span>
+						</label>
+					</div>
+					<div class="float-end">
+						<a id="forgot" href="javascript:void(0);">Forgot Password?</a>
+					</div>
+				</div>
+				<div class="text-center">
+					<input type="submit" value="Log In" class="btn_login">
+				</div>
+				<div class="text-center">
+					Don’t have an account? <a href="javascript:void(0);">Sign up</a>
+				</div>
+				<div id="forgot_pw">
+					<div class="form-group">
+						<label>Please confirm login email below</label> <input
+							type="email" class="form-control" name="email_forgot"
+							id="email_forgot"> <i class="icon_mail_alt"></i>
+					</div>
+					<p>You will receive an email containing a link allowing you to
+						reset your password to a new preferred one.</p>
+					<div class="text-center">
+						<input type="submit" value="Reset Password" class="btn_1">
+					</div>
+				</div>
+			</div>
+		</form>
+		<!--form -->
+	</div>
+	<!-- /Sign In Popup -->
+	<!-- websocket 聊天室使用（內含多份檔案） -->
+	<div th:replace="fragments/chat-widget :: chat-widget"></div>
+
+	<!-- Common scripts -->
+	<script src="js/jquery-3.7.1.min.js"></script>
+	<script src="js/common_scripts_min.js"></script>
+	<script src="js/functions.js"></script>
+
+	<script src="js/g1_10_custom_common_csrf.js"></script>
+	<script src="js/g1_10_custom_common.js"></script>
+	<script src="js/g1_10_custom_exhibition.js"></script>
+	<script src="js/g1_6_exhibitions_latest.js"></script>
+	<script src="js/g1_6_search_history.js"></script>
+	<!-- 存搜尋紀錄用 -->
+	<script src="js/g1_6_search_modal.js"></script>
+	<!-- 導頁至搜尋結果頁用 -->
+	<!-- 以下 3 個引入 (2js + 1css) 為 dify.ai 使用 -->
+	<script src="js/g1_10_custom_dify.js"></script>
+	<script src="https://udify.app/embed.min.js" id="6dNmiwvbRPuqvJW7"
+		defer></script>
+
+</body>
+
+</html>
